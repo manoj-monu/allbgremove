@@ -31,14 +31,16 @@ app.add_middleware(
 def read_root():
     return {"message": "Background Removal API is running!"}
 
+from PIL import Image, ImageEnhance, ImageFilter
+
 @app.post("/api/remove-bg")
-async def remove_background(file: UploadFile = File(...)):
+async def remove_background(file: UploadFile = File(...), enhance: bool = False):
     try:
         # Validate file type
         if not file.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail="File must be an image")
         
-        print(f"Received file: {file.filename}, content-type: {file.content_type}")
+        print(f"Received file: {file.filename}, content-type: {file.content_type}, enhance: {enhance}")
         # Read image
         contents = await file.read()
         print(f"Read {len(contents)} bytes from upload")
@@ -66,6 +68,31 @@ async def remove_background(file: UploadFile = File(...)):
         alpha = output_image.split()[3]
         min_alpha, max_alpha = alpha.getextrema()
         print(f"Finished rembg in {time.time()-start:.2f}s. Alpha extrema: {min_alpha} to {max_alpha}")
+
+        # Lightweight Remini-style enhancement
+        if enhance:
+            print("Applying Remini-style photo enhancement...")
+            # Split to preserve the transparent alpha channel accurately
+            r, g, b, a = output_image.split()
+            rgb_image = Image.merge('RGB', (r, g, b))
+            
+            # 1. Boost Color Saturation
+            color_enhancer = ImageEnhance.Color(rgb_image)
+            rgb_image = color_enhancer.enhance(1.2)
+            
+            # 2. Boost Contrast
+            contrast_enhancer = ImageEnhance.Contrast(rgb_image)
+            rgb_image = contrast_enhancer.enhance(1.1)
+            
+            # 3. Sharpening for clearer edges/faces
+            rgb_image = rgb_image.filter(ImageFilter.SHARPEN)
+            
+            # 4. Optional subtle unsharp mask for deeper clarity
+            rgb_image = rgb_image.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
+            
+            # Re-attach transparent background
+            r, g, b = rgb_image.split()
+            output_image = Image.merge('RGBA', (r, g, b, a))
 
         # Save to PNG
         img_byte_arr = io.BytesIO()
