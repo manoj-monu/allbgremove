@@ -14,10 +14,25 @@ ai_session = None
 import os
 import urllib.request
 
+import os
+import onnxruntime as ort
+import rembg.sessions.base
+
+# Hugely memory-optimized ONNX runtime initialization to stop Render 512MB RAM from crashing
+original_init = rembg.sessions.base.BaseSession.__init__
+def custom_init(self, model_name, sess_opts, *args, **kwargs):
+    sess_opts.inter_op_num_threads = 1
+    sess_opts.intra_op_num_threads = 1
+    sess_opts.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+    sess_opts.enable_cpu_mem_arena = False # This prevents memory spiking during processing
+    return original_init(self, model_name, sess_opts, *args, **kwargs)
+
+rembg.sessions.base.BaseSession.__init__ = custom_init
+
 def get_session():
     global ai_session
     if ai_session is None:
-        print("Loading Birefnet General Lite model (Newer, highly accurate, lightweight, doesn't cut foreground)...")
+        print("Loading Birefnet General Lite model with memory optimization...")
         ai_session = new_session("birefnet-general-lite")
     return ai_session
 
