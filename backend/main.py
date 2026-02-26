@@ -14,9 +14,33 @@ ai_session = None
 import os
 import urllib.request
 
+def ensure_isnet_downloaded():
+    u2net_home = os.path.expanduser("~/.u2net")
+    os.makedirs(u2net_home, exist_ok=True)
+    model_path = os.path.join(u2net_home, "isnet-general-use.onnx")
+    url = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx"
+    
+    if not (os.path.exists(model_path) and os.path.getsize(model_path) > 50000000):
+        print("Pre-downloading ISNet model with robust timeout protection...")
+        import urllib.request
+        import socket
+        socket.setdefaulttimeout(120)  # Stop strict connection timeouts
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req) as response, open(model_path, "wb") as f:
+            while True:
+                chunk = response.read(65536)
+                if not chunk:
+                    break
+                f.write(chunk)
+        print("Robust download complete!")
+
 def get_session():
     global ai_session
     if ai_session is None:
+        try:
+            ensure_isnet_downloaded()
+        except Exception as e:
+            print(f"Robust download failed: {e}")
         print("Loading ISNet General Use model...")
         ai_session = new_session("isnet-general-use")
     return ai_session
