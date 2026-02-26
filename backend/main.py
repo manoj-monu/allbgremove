@@ -14,49 +14,10 @@ ai_session = None
 import os
 import urllib.request
 
-import os
-import onnxruntime as ort
-import rembg.sessions.base
-
-# Hugely memory-optimized ONNX runtime initialization to stop Render 512MB RAM from crashing
-original_init = rembg.sessions.base.BaseSession.__init__
-def custom_init(self, model_name, sess_opts, *args, **kwargs):
-    sess_opts.inter_op_num_threads = 1
-    sess_opts.intra_op_num_threads = 1
-    sess_opts.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
-    sess_opts.enable_cpu_mem_arena = False # This prevents memory spiking during processing
-    return original_init(self, model_name, sess_opts, *args, **kwargs)
-
-rembg.sessions.base.BaseSession.__init__ = custom_init
-
-def ensure_birefnet_model_downloaded():
-    u2net_home = os.path.expanduser("~/.u2net")
-    os.makedirs(u2net_home, exist_ok=True)
-    model_path = os.path.join(u2net_home, "birefnet-general-lite.onnx")
-    url = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/BiRefNet-general-bb_swin_v1_tiny-epoch_232.onnx"
-    
-    if not (os.path.exists(model_path) and os.path.getsize(model_path) > 50000000):
-        print("Pre-downloading Birefnet Lite model with robust timeout protection...")
-        import urllib.request
-        import socket
-        socket.setdefaulttimeout(120)  # Stop strict connection timeouts
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req) as response, open(model_path, "wb") as f:
-            while True:
-                chunk = response.read(8192)
-                if not chunk:
-                    break
-                f.write(chunk)
-        print("Robust download complete!")
-
 def get_session():
     global ai_session
     if ai_session is None:
-        try:
-            ensure_birefnet_model_downloaded()
-        except Exception as e:
-            print(f"Robust download failed: {e}")
-        print("Loading Birefnet General Lite model with memory optimization...")
+        print("Loading Birefnet General Lite model...")
         ai_session = new_session("birefnet-general-lite")
     return ai_session
 
@@ -89,9 +50,8 @@ async def remove_background(file: UploadFile = File(...), enhance: bool = False)
         
         input_image = Image.open(io.BytesIO(contents)).convert("RGB")
         
-        # DOWN-SCALE TO PREVENT HUGE 4K IMAGES FROM EATING ALL RESOURCES
-        # The Standard Plan has 1 CPU, allowing processing of 2048px images safely
-        max_size = 2048
+        # DOWN-SCALE TO SPEED UP AND PREVENT 60-SEC LOAD BALANCER TIMEOUTS
+        max_size = 1400
         if input_image.size[0] > max_size or input_image.size[1] > max_size:
             print(f"Downscaling huge image {input_image.size} to {max_size}px max...")
             input_image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
@@ -102,13 +62,10 @@ async def remove_background(file: UploadFile = File(...), enhance: bool = False)
         start = time.time()
         print("Starting rembg processing with enhanced quality settings...")
         
-        # We must run this synchronous blocking CPU task in a threadpool!
-        # Otherwise, the FastAPI event loop is blocked, causing Render to hit 502 Bad Gateway timeouts.
         def blocking_bg_removal():
             return remove(
                 input_image, 
-                session=get_session(), 
-                post_process_mask=True
+                session=get_session()
             ).convert("RGBA")
             
         output_image = await run_in_threadpool(blocking_bg_removal)
