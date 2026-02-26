@@ -57,11 +57,7 @@ async def remove_background(file: UploadFile = File(...), enhance: bool = False)
         output_image = remove(
             input_image, 
             session=get_session(), 
-            post_process_mask=True,
-            alpha_matting=True,
-            alpha_matting_foreground_threshold=240,
-            alpha_matting_background_threshold=10,
-            alpha_matting_erode_size=10
+            post_process_mask=True
         ).convert("RGBA")
         
         # Verify alpha channel in logs
