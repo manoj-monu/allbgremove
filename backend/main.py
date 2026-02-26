@@ -63,8 +63,8 @@ from PIL import Image, ImageEnhance, ImageFilter
 @app.post("/api/remove-bg")
 async def remove_background(file: UploadFile = File(...), enhance: bool = False):
     try:
-        # Validate file type
-        if not file.content_type.startswith("image/"):
+        # Validate file type safely
+        if file.content_type and not file.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail="File must be an image")
         
         print(f"Received file: {file.filename}, content-type: {file.content_type}, enhance: {enhance}")
