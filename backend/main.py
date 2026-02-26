@@ -14,8 +14,8 @@ ai_session = None
 def get_session():
     global ai_session
     if ai_session is None:
-        print("Loading isnet-general-use AI model into memory...")
-        ai_session = new_session("isnet-general-use")
+        print("Loading u2net_human_seg AI model into memory specifically for portraits...")
+        ai_session = new_session("u2net_human_seg")
     return ai_session
 
 # Configure CORS for frontend communication
