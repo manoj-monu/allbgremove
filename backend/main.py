@@ -89,11 +89,11 @@ async def remove_background(file: UploadFile = File(...), enhance: bool = False)
         
         input_image = Image.open(io.BytesIO(contents)).convert("RGB")
         
-        # DOWN-SCALE TO PREVENT RENDER 60-SEC LOAD BALANCER TIMEOUTS
-        # The free 0.1 CPU is too slow for 4000x4000 images, causing 502 Bad Gateway
-        max_size = 1024
+        # DOWN-SCALE TO PREVENT HUGE 4K IMAGES FROM EATING ALL RESOURCES
+        # The Standard Plan has 1 CPU, allowing processing of 2048px images safely
+        max_size = 2048
         if input_image.size[0] > max_size or input_image.size[1] > max_size:
-            print(f"Downscaling huge image {input_image.size} to {max_size}px max to prevent Render CPU crashes & 60s Timeouts...")
+            print(f"Downscaling huge image {input_image.size} to {max_size}px max...")
             input_image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
         
         # Remove background explicitly requesting RGBA
