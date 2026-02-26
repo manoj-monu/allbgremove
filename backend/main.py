@@ -11,9 +11,31 @@ app = FastAPI(title="AI Background Remover API")
 # Making it lazily loaded to prevent Render startup healthcheck timeouts
 ai_session = None
 
+import os
+import urllib.request
+
+def ensure_bria_model_downloaded():
+    u2net_home = os.path.expanduser("~/.u2net")
+    os.makedirs(u2net_home, exist_ok=True)
+    model_path = os.path.join(u2net_home, "bria-rmbg.onnx")
+    
+    # Check if we already have the large model file downloaded
+    if not (os.path.exists(model_path) and os.path.getsize(model_path) > 100000000):
+        print("Pre-downloading Bria model from high-speed HuggingFace mirror...")
+        url = "https://huggingface.co/briaai/RMBG-1.4/resolve/main/onnx/model.onnx?download=true"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req) as response, open(model_path, "wb") as f:
+            f.write(response.read())
+        print("Pre-download complete!")
+
 def get_session():
     global ai_session
     if ai_session is None:
+        try:
+            ensure_bria_model_downloaded()
+        except Exception as e:
+            print(f"HuggingFace mirror download failed ({e}), relying on default downloader.")
+            
         print("Loading Bria RMBG-1.4 AI model (commercial grade) into memory...")
         ai_session = new_session("bria-rmbg")
     return ai_session
