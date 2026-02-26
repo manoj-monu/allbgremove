@@ -206,9 +206,64 @@ async def get_result(task_id: str):
         headers={"Content-Disposition": f"attachment; filename=removed_bg_{task_id}.png"}
     )
 
-# Maintain backwards compatibility just in case older cached browsers try to access the old endpoint
 @app.post("/api/remove-bg")
 async def remove_background_legacy(file: UploadFile = File(...), enhance: bool = False):
-    raise HTTPException(status_code=410, detail="This endpoint is deprecated. Upgrade your mobile app/client to use /api/remove-bg-async")
+    try:
+        # Validate file type safely
+        if file.content_type and not file.content_type.startswith("image/"):
+            raise HTTPException(status_code=400, detail="File must be an image")
+        
+        contents = await file.read()
+        input_image = Image.open(io.BytesIO(contents)).convert("RGB")
+        
+        # DOWN-SCALE TO SPEED UP AND PREVENT TIMEOUTS
+        max_size = 1024
+        if input_image.size[0] > max_size or input_image.size[1] > max_size:
+            input_image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+        
+        import time
+        from fastapi.concurrency import run_in_threadpool
+        start = time.time()
+        
+        def blocking_bg_removal():
+            return remove(
+                input_image, 
+                session=get_session()
+            ).convert("RGBA")
+            
+        async with processing_lock:
+            output_image = await run_in_threadpool(blocking_bg_removal)
+        
+        if enhance:
+            r, g, b, a = output_image.split()
+            rgb_image = Image.merge('RGB', (r, g, b))
+            
+            color_enhancer = ImageEnhance.Color(rgb_image)
+            rgb_image = color_enhancer.enhance(1.2)
+            
+            contrast_enhancer = ImageEnhance.Contrast(rgb_image)
+            rgb_image = contrast_enhancer.enhance(1.1)
+            
+            rgb_image = rgb_image.filter(ImageFilter.SHARPEN)
+            rgb_image = rgb_image.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
+            
+            r, g, b = rgb_image.split()
+            output_image = Image.merge('RGBA', (r, g, b, a))
+
+        # Save to PNG
+        img_byte_arr = io.BytesIO()
+        output_image.save(img_byte_arr, format='PNG')
+        img_byte_arr.seek(0)
+        
+        return StreamingResponse(
+            img_byte_arr, 
+            media_type="image/png",
+            headers={"Content-Disposition": f"attachment; filename=removed_bg_{file.filename}"}
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# To run: uvicorn main:app --reload
 
 # To run: uvicorn main:app --reload
