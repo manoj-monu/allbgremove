@@ -17,8 +17,8 @@ import urllib.request
 def get_session():
     global ai_session
     if ai_session is None:
-        print("Loading Birefnet General Lite model...")
-        ai_session = new_session("birefnet-general-lite")
+        print("Loading ISNet General Use model...")
+        ai_session = new_session("isnet-general-use")
     return ai_session
 
 # Configure CORS for frontend communication
@@ -51,7 +51,7 @@ async def remove_background(file: UploadFile = File(...), enhance: bool = False)
         input_image = Image.open(io.BytesIO(contents)).convert("RGB")
         
         # DOWN-SCALE TO SPEED UP AND PREVENT 60-SEC LOAD BALANCER TIMEOUTS
-        max_size = 1400
+        max_size = 1024
         if input_image.size[0] > max_size or input_image.size[1] > max_size:
             print(f"Downscaling huge image {input_image.size} to {max_size}px max...")
             input_image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
