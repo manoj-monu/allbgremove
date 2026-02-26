@@ -7,8 +7,8 @@ import io
 
 app = FastAPI(title="AI Background Remover API")
 
-# Initialize robust AI model session globally (u2net is the most reliable baseline without creating internal holes)
-ai_session = new_session("u2net")
+# Initialize robust AI model session globally (isnet-general-use is more accurate for general images)
+ai_session = new_session("isnet-general-use")
 
 # Configure CORS for frontend communication
 app.add_middleware(
@@ -40,8 +40,19 @@ async def remove_background(file: UploadFile = File(...)):
         # Remove background explicitly requesting RGBA
         import time
         start = time.time()
-        print("Starting rembg processing via PIL with base u2net model...")
-        output_image = remove(input_image, session=ai_session, post_process_mask=False).convert("RGBA")
+        print("Starting rembg processing with enhanced quality settings...")
+        
+        # Using alpha_matting for better edge detection (e.g., hair, fur)
+        # Using post_process_mask to clean up leftover noise
+        output_image = remove(
+            input_image, 
+            session=ai_session, 
+            post_process_mask=True,
+            alpha_matting=True,
+            alpha_matting_foreground_threshold=240,
+            alpha_matting_background_threshold=10,
+            alpha_matting_erode_size=10
+        ).convert("RGBA")
         
         # Verify alpha channel in logs
         alpha = output_image.split()[3]
