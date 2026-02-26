@@ -98,15 +98,20 @@ async def remove_background(file: UploadFile = File(...), enhance: bool = False)
         
         # Remove background explicitly requesting RGBA
         import time
+        from fastapi.concurrency import run_in_threadpool
         start = time.time()
         print("Starting rembg processing with enhanced quality settings...")
         
-        # Using post_process_mask to clean up leftover noise
-        output_image = remove(
-            input_image, 
-            session=get_session(), 
-            post_process_mask=True
-        ).convert("RGBA")
+        # We must run this synchronous blocking CPU task in a threadpool!
+        # Otherwise, the FastAPI event loop is blocked, causing Render to hit 502 Bad Gateway timeouts.
+        def blocking_bg_removal():
+            return remove(
+                input_image, 
+                session=get_session(), 
+                post_process_mask=True
+            ).convert("RGBA")
+            
+        output_image = await run_in_threadpool(blocking_bg_removal)
         
         # Verify alpha channel in logs
         alpha = output_image.split()[3]
