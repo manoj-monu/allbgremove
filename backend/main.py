@@ -7,8 +7,16 @@ import io
 
 app = FastAPI(title="AI Background Remover API")
 
-# Initialize robust AI model session globally (isnet-general-use is more accurate for general images)
-ai_session = new_session("isnet-general-use")
+# Initialize robust AI model session (isnet-general-use is more accurate for general images)
+# Making it lazily loaded to prevent Render startup healthcheck timeouts
+ai_session = None
+
+def get_session():
+    global ai_session
+    if ai_session is None:
+        print("Loading AI model into memory...")
+        ai_session = new_session("isnet-general-use")
+    return ai_session
 
 # Configure CORS for frontend communication
 app.add_middleware(
@@ -46,7 +54,7 @@ async def remove_background(file: UploadFile = File(...)):
         # Using post_process_mask to clean up leftover noise
         output_image = remove(
             input_image, 
-            session=ai_session, 
+            session=get_session(), 
             post_process_mask=True,
             alpha_matting=True,
             alpha_matting_foreground_threshold=240,
