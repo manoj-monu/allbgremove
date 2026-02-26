@@ -72,17 +72,43 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                 const formData = new FormData();
                 formData.append("file", file);
 
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-                const response = await fetch(`${apiUrl}/api/remove-bg?enhance=${enhance}`, {
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://bg-remover-api-vbi7.onrender.com";
+
+                // STEP 1: Queue the image for processing
+                const response = await fetch(`${apiUrl}/api/remove-bg-async?enhance=${enhance}`, {
                     method: "POST",
                     body: formData,
                 });
 
                 if (!response.ok) {
-                    throw new Error("Failed to process image");
+                    throw new Error("Server is too busy or rejected the file");
                 }
 
-                const blob = await response.blob();
+                const data = await response.json();
+                const taskId = data.task_id;
+
+                // STEP 2: Silently poll status every 2 seconds
+                let isCompleted = false;
+                while (!isCompleted) {
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    const statusRes = await fetch(`${apiUrl}/api/status/${taskId}`);
+                    if (!statusRes.ok) throw new Error("Lost connection to processing server");
+
+                    const statusData = await statusRes.json();
+
+                    if (statusData.status === "completed") {
+                        isCompleted = true;
+                    } else if (statusData.status === "failed") {
+                        throw new Error(statusData.error || "AI processing failed on server");
+                    }
+                }
+
+                // STEP 3: Download the final result
+                const resultRes = await fetch(`${apiUrl}/api/result/${taskId}`);
+                if (!resultRes.ok) throw new Error("Failed to download processed image");
+
+                const blob = await resultRes.blob();
                 const processedUrl = URL.createObjectURL(blob);
                 setProcessedImageUrl(processedUrl);
             } catch (err) {
