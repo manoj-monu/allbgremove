@@ -29,9 +29,33 @@ def custom_init(self, model_name, sess_opts, *args, **kwargs):
 
 rembg.sessions.base.BaseSession.__init__ = custom_init
 
+def ensure_birefnet_model_downloaded():
+    u2net_home = os.path.expanduser("~/.u2net")
+    os.makedirs(u2net_home, exist_ok=True)
+    model_path = os.path.join(u2net_home, "birefnet-general-lite.onnx")
+    url = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/BiRefNet-general-bb_swin_v1_tiny-epoch_232.onnx"
+    
+    if not (os.path.exists(model_path) and os.path.getsize(model_path) > 50000000):
+        print("Pre-downloading Birefnet Lite model with robust timeout protection...")
+        import urllib.request
+        import socket
+        socket.setdefaulttimeout(120)  # Stop strict connection timeouts
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req) as response, open(model_path, "wb") as f:
+            while True:
+                chunk = response.read(8192)
+                if not chunk:
+                    break
+                f.write(chunk)
+        print("Robust download complete!")
+
 def get_session():
     global ai_session
     if ai_session is None:
+        try:
+            ensure_birefnet_model_downloaded()
+        except Exception as e:
+            print(f"Robust download failed: {e}")
         print("Loading Birefnet General Lite model with memory optimization...")
         ai_session = new_session("birefnet-general-lite")
     return ai_session
