@@ -76,83 +76,139 @@ def read_root():
 
 from PIL import Image, ImageEnhance, ImageFilter
 
-@app.post("/api/remove-bg")
-async def remove_background(file: UploadFile = File(...), enhance: bool = False):
+import uuid
+from fastapi.responses import FileResponse
+from fastapi import BackgroundTasks
+
+tasks = {}
+task_queue = asyncio.Queue()
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(worker_loop())
+
+async def worker_loop():
+    while True:
+        task_id, input_image, enhance = await task_queue.get()
+        tasks[task_id]["status"] = "processing"
+        
+        try:
+            # DOWN-SCALE TO SPEED UP AND PREVENT 60-SEC LOAD BALANCER TIMEOUTS
+            max_size = 1024
+            if input_image.size[0] > max_size or input_image.size[1] > max_size:
+                print(f"Downscaling huge image {input_image.size} to {max_size}px max...")
+                input_image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+            
+            import time
+            from fastapi.concurrency import run_in_threadpool
+            start = time.time()
+            print(f"Task {task_id}: Starting rembg processing...")
+            
+            def blocking_bg_removal():
+                return remove(
+                    input_image, 
+                    session=get_session()
+                ).convert("RGBA")
+                
+            async with processing_lock:
+                output_image = await run_in_threadpool(blocking_bg_removal)
+            
+            # Verify alpha channel in logs
+            alpha = output_image.split()[3]
+            min_alpha, max_alpha = alpha.getextrema()
+            print(f"Task {task_id}: Finished rembg in {time.time()-start:.2f}s. Alpha extrema: {min_alpha} to {max_alpha}")
+
+            # Lightweight Remini-style enhancement
+            if enhance:
+                print(f"Task {task_id}: Applying photo enhancement...")
+                r, g, b, a = output_image.split()
+                rgb_image = Image.merge('RGB', (r, g, b))
+                
+                # 1. Boost Color Saturation
+                color_enhancer = ImageEnhance.Color(rgb_image)
+                rgb_image = color_enhancer.enhance(1.2)
+                
+                # 2. Boost Contrast
+                contrast_enhancer = ImageEnhance.Contrast(rgb_image)
+                rgb_image = contrast_enhancer.enhance(1.1)
+                
+                # 3. Sharpening for clearer edges/faces
+                rgb_image = rgb_image.filter(ImageFilter.SHARPEN)
+                
+                # 4. Optional subtle unsharp mask for deeper clarity
+                rgb_image = rgb_image.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
+                
+                # Re-attach transparent background
+                r, g, b = rgb_image.split()
+                output_image = Image.merge('RGBA', (r, g, b, a))
+
+            # Save to PNG
+            os.makedirs("results", exist_ok=True)
+            result_path = f"results/{task_id}.png"
+            output_image.save(result_path, format='PNG')
+            
+            tasks[task_id]["status"] = "completed"
+            tasks[task_id]["result_path"] = result_path
+            
+        except Exception as e:
+            print(f"Task {task_id} failed: {e}")
+            tasks[task_id]["status"] = "failed"
+            tasks[task_id]["error"] = str(e)
+            
+        finally:
+            task_queue.task_done()
+
+@app.post("/api/remove-bg-async")
+async def queue_remove_background(file: UploadFile = File(...), enhance: bool = False):
     try:
         # Validate file type safely
         if file.content_type and not file.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail="File must be an image")
         
-        print(f"Received file: {file.filename}, content-type: {file.content_type}, enhance: {enhance}")
-        # Read image
         contents = await file.read()
-        print(f"Read {len(contents)} bytes from upload")
-        
         input_image = Image.open(io.BytesIO(contents)).convert("RGB")
         
-        # DOWN-SCALE TO SPEED UP AND PREVENT 60-SEC LOAD BALANCER TIMEOUTS
-        max_size = 1024
-        if input_image.size[0] > max_size or input_image.size[1] > max_size:
-            print(f"Downscaling huge image {input_image.size} to {max_size}px max...")
-            input_image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+        task_id = str(uuid.uuid4())
+        tasks[task_id] = {"status": "pending"}
         
-        # Remove background explicitly requesting RGBA
-        import time
-        from fastapi.concurrency import run_in_threadpool
-        start = time.time()
-        print("Starting rembg processing with enhanced quality settings...")
+        await task_queue.put((task_id, input_image, enhance))
         
-        def blocking_bg_removal():
-            return remove(
-                input_image, 
-                session=get_session()
-            ).convert("RGBA")
-            
-        async with processing_lock:
-            output_image = await run_in_threadpool(blocking_bg_removal)
-        
-        # Verify alpha channel in logs
-        alpha = output_image.split()[3]
-        min_alpha, max_alpha = alpha.getextrema()
-        print(f"Finished rembg in {time.time()-start:.2f}s. Alpha extrema: {min_alpha} to {max_alpha}")
-
-        # Lightweight Remini-style enhancement
-        if enhance:
-            print("Applying Remini-style photo enhancement...")
-            # Split to preserve the transparent alpha channel accurately
-            r, g, b, a = output_image.split()
-            rgb_image = Image.merge('RGB', (r, g, b))
-            
-            # 1. Boost Color Saturation
-            color_enhancer = ImageEnhance.Color(rgb_image)
-            rgb_image = color_enhancer.enhance(1.2)
-            
-            # 2. Boost Contrast
-            contrast_enhancer = ImageEnhance.Contrast(rgb_image)
-            rgb_image = contrast_enhancer.enhance(1.1)
-            
-            # 3. Sharpening for clearer edges/faces
-            rgb_image = rgb_image.filter(ImageFilter.SHARPEN)
-            
-            # 4. Optional subtle unsharp mask for deeper clarity
-            rgb_image = rgb_image.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
-            
-            # Re-attach transparent background
-            r, g, b = rgb_image.split()
-            output_image = Image.merge('RGBA', (r, g, b, a))
-
-        # Save to PNG
-        img_byte_arr = io.BytesIO()
-        output_image.save(img_byte_arr, format='PNG')
-        img_byte_arr.seek(0)
-        
-        return StreamingResponse(
-            img_byte_arr, 
-            media_type="image/png",
-            headers={"Content-Disposition": f"attachment; filename=removed_bg_{file.filename}"}
-        )
+        return {"task_id": task_id, "position": task_queue.qsize()}
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/status/{task_id}")
+async def get_status(task_id: str):
+    if task_id not in tasks:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    # Calculate approximate queue position
+    status = tasks[task_id]["status"]
+    return {
+        "status": status, 
+        "queue_length": task_queue.qsize() if status == "pending" else 0,
+        "error": tasks[task_id].get("error")
+    }
+
+@app.get("/api/result/{task_id}")
+async def get_result(task_id: str):
+    if task_id not in tasks:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    task = tasks[task_id]
+    if task["status"] != "completed":
+        raise HTTPException(status_code=400, detail="Result not ready yet")
+        
+    return FileResponse(
+        task["result_path"], 
+        media_type="image/png", 
+        headers={"Content-Disposition": f"attachment; filename=removed_bg_{task_id}.png"}
+    )
+
+# Maintain backwards compatibility just in case older cached browsers try to access the old endpoint
+@app.post("/api/remove-bg")
+async def remove_background_legacy(file: UploadFile = File(...), enhance: bool = False):
+    raise HTTPException(status_code=410, detail="This endpoint is deprecated. Upgrade your mobile app/client to use /api/remove-bg-async")
 
 # To run: uvicorn main:app --reload
