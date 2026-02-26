@@ -319,7 +319,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                 </div>
                                 <div className="w-1/2 flex flex-col items-center justify-center bg-neutral-900/40 backdrop-blur-md p-4 text-center">
                                     <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-                                    <p className="font-semibold text-blue-400">Removing Background.<br />Hold on tight!</p>
+                                    <p className="font-semibold text-blue-400">Applying AI Magic...<br />Hold on tight!</p>
                                 </div>
                             </motion.div>
                         ) : error ? (
@@ -366,167 +366,150 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                 </div>
             </motion.div>
 
-            {/* Sidebar Tooling */}
-            <AnimatePresence>
-                {!isProcessing && !error && (
-                    <motion.div
-                        initial={{ opacity: 0, x: 50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3, duration: 0.5 }}
-                        className="w-full md:w-1/3 flex flex-col gap-6"
+            {/* Sidebar Tooling - Permanent Right Side like Remini */}
+            <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1, duration: 0.5 }}
+                className="w-full md:w-1/3 flex flex-col gap-6"
+            >
+                {/* Remini-style AI Enhance Toggle always visible at the top */}
+                <div className={`bg-neutral-900/80 border border-neutral-800 rounded-2xl p-5 flex items-center justify-between transition-all backdrop-blur-lg ${isProcessing ? 'opacity-50 pointer-events-none' : 'hover:bg-neutral-800'}`}>
+                    <div className="flex flex-col gap-1 pr-4">
+                        <h4 className="font-bold text-neutral-100 flex items-center gap-2">
+                            <Sparkles className="w-5 h-5 text-blue-400" />
+                            Auto AI Enhance
+                        </h4>
+                        <p className="text-xs text-neutral-400 leading-relaxed">
+                            Improve colors, contrast & face quality
+                        </p>
+                    </div>
+
+                    <button
+                        onClick={() => setEnhance(!enhance)}
+                        className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors flex-shrink-0 ${enhance ? 'bg-blue-500' : 'bg-neutral-600'}`}
+                        disabled={isProcessing}
                     >
-                        <div className="bg-neutral-900/80 border border-neutral-800 rounded-2xl overflow-hidden backdrop-blur-lg flex flex-col min-h-[400px]">
-                            {/* Tabs Header */}
-                            <div className="flex border-b border-neutral-800">
+                        <span
+                            className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${enhance ? 'translate-x-7' : 'translate-x-1'}`}
+                        />
+                    </button>
+                </div>
+
+                <div className={`bg-neutral-900/80 border border-neutral-800 rounded-2xl overflow-hidden backdrop-blur-lg flex flex-col min-h-[350px] transition-opacity ${isProcessing ? 'opacity-50 pointer-events-none' : ''}`}>
+                    {/* Tabs Header */}
+                    <div className="flex border-b border-neutral-800">
+                        <button
+                            onClick={() => setActiveTab("color")}
+                            className={`flex-1 py-4 text-sm font-semibold transition-colors ${activeTab === "color" || activeTab === "magic" ? "text-blue-400 border-b-2 border-blue-400 bg-blue-500/5" : "text-neutral-400 hover:text-neutral-200"}`}
+                        >
+                            Background Color
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("photo")}
+                            className={`flex-1 py-4 text-sm font-semibold transition-colors ${activeTab === "photo" ? "text-blue-400 border-b-2 border-blue-400 bg-blue-500/5" : "text-neutral-400 hover:text-neutral-200"}`}
+                        >
+                            Background Image
+                        </button>
+                    </div>
+
+                    {/* Tab Content Area */}
+                    <div className="flex-1 overflow-y-auto p-5 custom-scrollbar max-h-[450px]">
+                        {(activeTab === "color" || activeTab === "magic") && (
+                            <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+                                {/* Transparent */}
                                 <button
-                                    onClick={() => setActiveTab("magic")}
-                                    className={`flex-1 py-4 text-sm font-semibold transition-colors ${activeTab === "magic" ? "text-blue-400 border-b-2 border-blue-400 bg-blue-500/5" : "text-neutral-400 hover:text-neutral-200"}`}
+                                    onClick={() => { setBgColor("transparent"); setCustomBgImage(null); setSliderPosition(0); }}
+                                    className={`aspect-square rounded-xl flex items-center justify-center border-2 transition-transform hover:scale-105 ${bgColor === "transparent" && !customBgImage ? "border-blue-500 bg-neutral-800" : "border-neutral-700 bg-neutral-900"}`}
+                                    title="Transparent"
                                 >
-                                    Magic
+                                    <Ban className="w-6 h-6 text-neutral-400" />
                                 </button>
-                                <button
-                                    onClick={() => setActiveTab("photo")}
-                                    className={`flex-1 py-4 text-sm font-semibold transition-colors ${activeTab === "photo" ? "text-blue-400 border-b-2 border-blue-400 bg-blue-500/5" : "text-neutral-400 hover:text-neutral-200"}`}
-                                >
-                                    Photo
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab("color")}
-                                    className={`flex-1 py-4 text-sm font-semibold transition-colors ${activeTab === "color" ? "text-blue-400 border-b-2 border-blue-400 bg-blue-500/5" : "text-neutral-400 hover:text-neutral-200"}`}
-                                >
-                                    Color
-                                </button>
+
+                                {/* Color Picker */}
+                                <div className="relative aspect-square rounded-xl border-2 border-neutral-700 overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+                                    title="Custom Color"
+                                    style={{ background: 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)' }}>
+                                    <input
+                                        type="color"
+                                        className="absolute inset-[0] w-[200%] h-[200%] cursor-pointer opacity-0"
+                                        onChange={(e) => { setBgColor(e.target.value); setCustomBgImage(null); setSliderPosition(0); }}
+                                    />
+                                </div>
+
+                                {/* Predefined Colors */}
+                                {PREDEFINED_COLORS.map(color => (
+                                    <button
+                                        key={color}
+                                        onClick={() => { setBgColor(color); setCustomBgImage(null); setSliderPosition(0); }}
+                                        className={`aspect-square rounded-xl border-2 transition-transform hover:scale-105 ${bgColor === color && !customBgImage ? 'border-white scale-110 shadow-lg' : 'border-transparent'}`}
+                                        style={{ background: color }}
+                                        title={color}
+                                    />
+                                ))}
                             </div>
+                        )}
 
-                            {/* Tab Content Area */}
-                            <div className="flex-1 overflow-y-auto p-5 custom-scrollbar max-h-[450px]">
-                                {activeTab === "color" && (
-                                    <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
-                                        {/* Transparent */}
-                                        <button
-                                            onClick={() => { setBgColor("transparent"); setCustomBgImage(null); setSliderPosition(0); }}
-                                            className={`aspect-square rounded-xl flex items-center justify-center border-2 transition-transform hover:scale-105 ${bgColor === "transparent" && !customBgImage ? "border-blue-500 bg-neutral-800" : "border-neutral-700 bg-neutral-900"}`}
-                                            title="Transparent"
-                                        >
-                                            <Ban className="w-6 h-6 text-neutral-400" />
-                                        </button>
+                        {activeTab === "photo" && (
+                            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                                {/* Upload Custom BG */}
+                                <label className="aspect-square rounded-xl border-2 border-dashed border-neutral-600 bg-neutral-800 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-neutral-700 transition-all">
+                                    <Upload className="w-5 h-5 text-neutral-400 mb-1" />
+                                    <span className="text-[10px] text-neutral-400 font-medium">Upload</span>
+                                    <input type="file" className="hidden" accept="image/*" onChange={handleCustomBgUpload} />
+                                </label>
 
-                                        {/* Color Picker */}
-                                        <div className="relative aspect-square rounded-xl border-2 border-neutral-700 overflow-hidden cursor-pointer hover:scale-105 transition-transform"
-                                            title="Custom Color"
-                                            style={{ background: 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)' }}>
-                                            <input
-                                                type="color"
-                                                className="absolute inset-[0] w-[200%] h-[200%] cursor-pointer opacity-0"
-                                                onChange={(e) => { setBgColor(e.target.value); setCustomBgImage(null); setSliderPosition(0); }}
-                                            />
-                                        </div>
-
-                                        {/* Predefined Colors */}
-                                        {PREDEFINED_COLORS.map(color => (
-                                            <button
-                                                key={color}
-                                                onClick={() => { setBgColor(color); setCustomBgImage(null); setSliderPosition(0); }}
-                                                className={`aspect-square rounded-xl border-2 transition-transform hover:scale-105 ${bgColor === color && !customBgImage ? 'border-white scale-110 shadow-lg' : 'border-transparent'}`}
-                                                style={{ background: color }}
-                                                title={color}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
-
-                                {activeTab === "photo" && (
-                                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                                        {/* Upload Custom BG */}
-                                        <label className="aspect-square rounded-xl border-2 border-dashed border-neutral-600 bg-neutral-800 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-neutral-700 transition-all">
-                                            <Upload className="w-5 h-5 text-neutral-400 mb-1" />
-                                            <span className="text-[10px] text-neutral-400 font-medium">Upload</span>
-                                            <input type="file" className="hidden" accept="image/*" onChange={handleCustomBgUpload} />
-                                        </label>
-
-                                        {/* Predefined Photos */}
-                                        {PREDEFINED_PHOTOS.map((photo, i) => (
-                                            <button
-                                                key={i}
-                                                onClick={() => { setCustomBgImage(photo); setBgColor(""); setSliderPosition(0); }}
-                                                className={`aspect-square rounded-xl border-2 overflow-hidden transition-transform hover:scale-105 ${customBgImage === photo ? 'border-blue-500 scale-105' : 'border-transparent'}`}
-                                            >
-                                                <img src={photo} alt="bg" className="w-full h-full object-cover" />
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {activeTab === "magic" && (
-                                    <div className="flex flex-col items-center justify-center p-6 gap-6 min-h-[300px]">
-
-                                        {/* AI Photo Enhance Toggle */}
-                                        <div className="w-full bg-neutral-800/50 border border-neutral-700/50 rounded-2xl p-5 flex items-center justify-between transition-all hover:bg-neutral-800">
-                                            <div className="flex flex-col gap-1 pr-4">
-                                                <h4 className="font-bold text-neutral-100 flex items-center gap-2">
-                                                    <Sparkles className="w-4 h-4 text-blue-400" />
-                                                    AI Enhance Photo
-                                                </h4>
-                                                <p className="text-xs text-neutral-400 leading-relaxed">
-                                                    Automatically improve colors, contrast, and clarify faces using AI (like Remini).
-                                                </p>
-                                            </div>
-
-                                            <button
-                                                onClick={() => setEnhance(!enhance)}
-                                                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors flex-shrink-0 ${enhance ? 'bg-blue-500' : 'bg-neutral-600'}`}
-                                            >
-                                                <span
-                                                    className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${enhance ? 'translate-x-6' : 'translate-x-1'}`}
-                                                />
-                                            </button>
-                                        </div>
-
-                                        <div className="w-full h-[1px] bg-neutral-800"></div>
-
-                                        <div className="text-center text-neutral-500 flex flex-col items-center gap-2 mt-4">
-                                            <ImageIcon className="w-8 h-8 opacity-50" />
-                                            <p className="text-sm font-medium">Magic Backgrounds<br />(Coming Soon)</p>
-                                        </div>
-                                    </div>
-                                )}
+                                {/* Predefined Photos */}
+                                {PREDEFINED_PHOTOS.map((photo, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => { setCustomBgImage(photo); setBgColor(""); setSliderPosition(0); }}
+                                        className={`aspect-square rounded-xl border-2 overflow-hidden transition-transform hover:scale-105 ${customBgImage === photo ? 'border-blue-500 scale-105' : 'border-transparent'}`}
+                                    >
+                                        <img src={photo} alt="bg" className="w-full h-full object-cover" />
+                                    </button>
+                                ))}
                             </div>
-                        </div>
+                        )}
+                    </div>
+                </div>
 
-                        {/* Actions */}
-                        <div className="flex flex-col gap-3">
-                            <button
-                                onClick={handleCreatePassport}
-                                className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-500/20 mb-2"
-                            >
-                                <LayoutGrid className="w-5 h-5" />
-                                Create Passport Photos
-                            </button>
-                            <button
-                                onClick={handleCreateAlbum}
-                                className="w-full py-4 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-purple-500/20 mb-2"
-                            >
-                                <Palette className="w-5 h-5" />
-                                Create Album Picture
-                            </button>
-                            <button
-                                onClick={handleDownload}
-                                className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-blue-500/20"
-                            >
-                                <Download className="w-5 h-5" />
-                                Download HD
-                            </button>
-                            <button
-                                onClick={onReset}
-                                className="w-full py-4 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
-                            >
-                                <IterationCcw className="w-4 h-4" />
-                                Upload Another Image
-                            </button>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                {/* Actions */}
+                <div className="flex flex-col gap-3">
+                    <button
+                        onClick={handleCreatePassport}
+                        disabled={isProcessing || !processedImageUrl || !!error}
+                        className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 disabled:bg-neutral-800 disabled:text-neutral-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-500/20 mb-2"
+                    >
+                        <LayoutGrid className="w-5 h-5" />
+                        Create Passport Photos
+                    </button>
+                    <button
+                        onClick={handleCreateAlbum}
+                        disabled={isProcessing || !processedImageUrl || !!error}
+                        className="w-full py-4 bg-purple-600 hover:bg-purple-500 disabled:bg-neutral-800 disabled:text-neutral-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-purple-500/20 mb-2"
+                    >
+                        <Palette className="w-5 h-5" />
+                        Create Album Picture
+                    </button>
+                    <button
+                        onClick={handleDownload}
+                        disabled={isProcessing || !processedImageUrl || !!error}
+                        className="w-full py-4 bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 disabled:text-neutral-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-blue-500/20"
+                    >
+                        <Download className="w-5 h-5" />
+                        Download HD
+                    </button>
+                    <button
+                        onClick={onReset}
+                        disabled={isProcessing && !processedImageUrl}
+                        className="w-full py-4 bg-neutral-800 hover:bg-neutral-700 disabled:opacity-50 text-neutral-300 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
+                    >
+                        <IterationCcw className="w-4 h-4" />
+                        Upload Another Image
+                    </button>
+                </div>
+            </motion.div>
         </div>
     );
 }
