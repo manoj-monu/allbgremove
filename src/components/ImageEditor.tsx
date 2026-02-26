@@ -52,6 +52,8 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
+    const [enhance, setEnhance] = useState<boolean>(true);
+
     useEffect(() => {
         // Show preview of original
         const objectUrl = URL.createObjectURL(file);
@@ -71,7 +73,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                 formData.append("file", file);
 
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-                const response = await fetch(`${apiUrl}/api/remove-bg?enhance=true`, {
+                const response = await fetch(`${apiUrl}/api/remove-bg?enhance=${enhance}`, {
                     method: "POST",
                     body: formData,
                 });
@@ -96,7 +98,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
             URL.revokeObjectURL(objectUrl);
             if (processedImageUrl) URL.revokeObjectURL(processedImageUrl);
         };
-    }, [file]);
+    }, [file, enhance]);
 
     const handleCustomBgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -430,10 +432,36 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                 )}
 
                                 {activeTab === "magic" && (
-                                    <div className="flex flex-col items-center justify-center h-full text-center text-neutral-400 p-8 min-h-[300px]">
-                                        <Sparkles className="w-12 h-12 text-blue-500/50 mb-4" />
-                                        <h4 className="font-semibold text-neutral-200 mb-2">Magic AI Backgrounds</h4>
-                                        <p className="text-sm">Describe the background you want, and let AI generate it. Coming soon to this platform!</p>
+                                    <div className="flex flex-col items-center justify-center p-6 gap-6 min-h-[300px]">
+
+                                        {/* AI Photo Enhance Toggle */}
+                                        <div className="w-full bg-neutral-800/50 border border-neutral-700/50 rounded-2xl p-5 flex items-center justify-between transition-all hover:bg-neutral-800">
+                                            <div className="flex flex-col gap-1 pr-4">
+                                                <h4 className="font-bold text-neutral-100 flex items-center gap-2">
+                                                    <Sparkles className="w-4 h-4 text-blue-400" />
+                                                    AI Enhance Photo
+                                                </h4>
+                                                <p className="text-xs text-neutral-400 leading-relaxed">
+                                                    Automatically improve colors, contrast, and clarify faces using AI (like Remini).
+                                                </p>
+                                            </div>
+
+                                            <button
+                                                onClick={() => setEnhance(!enhance)}
+                                                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors flex-shrink-0 ${enhance ? 'bg-blue-500' : 'bg-neutral-600'}`}
+                                            >
+                                                <span
+                                                    className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${enhance ? 'translate-x-6' : 'translate-x-1'}`}
+                                                />
+                                            </button>
+                                        </div>
+
+                                        <div className="w-full h-[1px] bg-neutral-800"></div>
+
+                                        <div className="text-center text-neutral-500 flex flex-col items-center gap-2 mt-4">
+                                            <ImageIcon className="w-8 h-8 opacity-50" />
+                                            <p className="text-sm font-medium">Magic Backgrounds<br />(Coming Soon)</p>
+                                        </div>
                                     </div>
                                 )}
                             </div>
