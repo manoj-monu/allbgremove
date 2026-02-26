@@ -71,7 +71,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                 formData.append("file", file);
 
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-                const response = await fetch(`${apiUrl}/api/remove-bg`, {
+                const response = await fetch(`${apiUrl}/api/remove-bg?enhance=true`, {
                     method: "POST",
                     body: formData,
                 });
