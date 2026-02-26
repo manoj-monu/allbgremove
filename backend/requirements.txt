@@ -3,3 +3,4 @@ uvicorn
 python-multipart
 rembg[cpu]
 pillow
+huggingface_hub

@@ -15,7 +15,7 @@ def get_session():
     global ai_session
     if ai_session is None:
         print("Loading Bria RMBG-1.4 AI model (commercial grade) into memory...")
-        ai_session = new_session("bria")
+        ai_session = new_session("bria-rmbg")
     return ai_session
 
 # Configure CORS for frontend communication
