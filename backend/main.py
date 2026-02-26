@@ -13,6 +13,22 @@ ai_session = None
 
 import os
 import urllib.request
+import asyncio
+import onnxruntime as ort
+import rembg.sessions.base
+
+# Hugely memory-optimized ONNX runtime initialization to stop Render 2GB RAM from crashing
+original_init = rembg.sessions.base.BaseSession.__init__
+def custom_init(self, model_name, sess_opts, *args, **kwargs):
+    sess_opts.inter_op_num_threads = 1
+    sess_opts.intra_op_num_threads = 1
+    sess_opts.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+    sess_opts.enable_cpu_mem_arena = False # This prevents memory spiking during processing
+    return original_init(self, model_name, sess_opts, *args, **kwargs)
+
+rembg.sessions.base.BaseSession.__init__ = custom_init
+
+processing_lock = asyncio.Lock()
 
 def ensure_isnet_downloaded():
     u2net_home = os.path.expanduser("~/.u2net")
@@ -92,7 +108,8 @@ async def remove_background(file: UploadFile = File(...), enhance: bool = False)
                 session=get_session()
             ).convert("RGBA")
             
-        output_image = await run_in_threadpool(blocking_bg_removal)
+        async with processing_lock:
+            output_image = await run_in_threadpool(blocking_bg_removal)
         
         # Verify alpha channel in logs
         alpha = output_image.split()[3]
