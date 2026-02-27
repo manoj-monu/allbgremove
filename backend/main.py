@@ -4,6 +4,7 @@ from fastapi.responses import StreamingResponse
 from rembg import remove, new_session
 from PIL import Image
 import io
+import time
 
 app = FastAPI(title="AI Background Remover API")
 
@@ -142,10 +143,14 @@ async def worker_loop():
                 r, g, b = rgb_image.split()
                 output_image = Image.merge('RGBA', (r, g, b, a))
 
-            # Save to PNG
+            # Wipe out potentially corrupting ICC profiles and EXIF metadata that crashes Windows Photo Viewers
+            output_image.info.pop('icc_profile', None)
+            output_image.info.pop('exif', None)
+            
+            # Save to PNG purely and simply
             os.makedirs("results", exist_ok=True)
             result_path = f"results/{task_id}.png"
-            output_image.save(result_path, format='PNG')
+            output_image.save(result_path, format='PNG', optimize=True)
             
             tasks[task_id]["status"] = "completed"
             tasks[task_id]["result_path"] = result_path
@@ -192,7 +197,7 @@ async def get_status(task_id: str):
     }
 
 @app.get("/api/result/{task_id}")
-async def get_result(task_id: str):
+async def get_result(task_id: str, download_name: str = None):
     if task_id not in tasks:
         raise HTTPException(status_code=404, detail="Task not found")
     
@@ -200,10 +205,41 @@ async def get_result(task_id: str):
     if task["status"] != "completed":
         raise HTTPException(status_code=400, detail="Result not ready yet")
         
+    fn = download_name if download_name else f"removed_bg_{task_id}.png"
     return FileResponse(
         task["result_path"], 
         media_type="image/png", 
-        headers={"Content-Disposition": f"attachment; filename=removed_bg_{task_id}.png"}
+        headers={"Content-Disposition": f'attachment; filename="{fn}"'}
+    )
+
+stashed_blobs = {}
+
+@app.post("/api/stash")
+async def stash_blob(file: UploadFile = File(...)):
+    # Temporarily hold an explicitly encoded PNG from the frontend Canvas
+    # This circumvents Chrome's Javascript Memory Blob corruption bugs via native HTTP downloads
+    stash_id = str(uuid.uuid4())
+    contents = await file.read()
+    
+    # Optional Validation (ensure the canvas actually provided a PNG)
+    stashed_blobs[stash_id] = {
+        "content": contents,
+        "filename": file.filename or "canvas_export.png",
+        "created_at": time.time()
+    }
+    return {"stash_id": stash_id}
+
+@app.get("/api/download-stashed/{stash_id}")
+async def download_stashed(stash_id: str):
+    if stash_id not in stashed_blobs:
+        raise HTTPException(status_code=404, detail="Stash expired or not found")
+        
+    data = stashed_blobs[stash_id]
+    
+    return Response(
+        content=data["content"], 
+        media_type="image/png", 
+        headers={"Content-Disposition": f'attachment; filename="{data["filename"]}"'}
     )
 
 @app.post("/api/remove-bg")
@@ -250,9 +286,13 @@ async def remove_background_legacy(file: UploadFile = File(...), enhance: bool =
             r, g, b = rgb_image.split()
             output_image = Image.merge('RGBA', (r, g, b, a))
 
-        # Save to PNG
+        # Wipe out potentially corrupting ICC profiles and EXIF metadata that crashes Windows Photo Viewers
+        output_image.info.pop('icc_profile', None)
+        output_image.info.pop('exif', None)
+        
+        # Save to PNG purely and simply
         img_byte_arr = io.BytesIO()
-        output_image.save(img_byte_arr, format='PNG')
+        output_image.save(img_byte_arr, format='PNG', optimize=True)
         img_byte_arr.seek(0)
         
         return StreamingResponse(
