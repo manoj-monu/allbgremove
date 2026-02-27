@@ -26,17 +26,17 @@ export default function PassportMaker({ imageUrl, onBack }: PassportMakerProps) 
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<{ x: number, y: number, width: number, height: number } | null>(null);
     const [croppedImage, setCroppedImage] = useState<string | null>(null);
 
-    // Photo Dimensions (Default: typical Indian passport 3.5 x 4.5 cm)
-    const [photoWidth, setPhotoWidth] = useState(3.5);
-    const [photoHeight, setPhotoHeight] = useState(4.5);
+    // Photo Dimensions (Default: 3 x 3.5 cm to fit 12 photos perfectly on 4x6)
+    const [photoWidth, setPhotoWidth] = useState(3);
+    const [photoHeight, setPhotoHeight] = useState(3.5);
     const [unit, setUnit] = useState<"cm" | "in">("cm");
     const [dpi, setDpi] = useState<number>(300);
     const [copies, setCopies] = useState<number>(0); // 0 = Auto-fill
 
     // Layout State
-    const [paperSize, setPaperSize] = useState(PAPER_SIZES[0]);
-    const [margin, setMargin] = useState(1.0); // 1cm margin
-    const [gap, setGap] = useState(0.4); // 4mm gap
+    const [paperSize, setPaperSize] = useState(PAPER_SIZES[1]); // Default to 4x6
+    const [margin, setMargin] = useState(PAPER_SIZES[1].defaultMargin); // 0.32cm margin
+    const [gap, setGap] = useState(PAPER_SIZES[1].defaultGap); // 0.2cm gap
     const [borderWidth, setBorderWidth] = useState(2); // px
     const [borderColor, setBorderColor] = useState("#000000");
 
