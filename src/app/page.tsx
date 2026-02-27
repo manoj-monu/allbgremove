@@ -110,9 +110,49 @@ export default function Home() {
           </div>
         )}
 
+        {/* Feature Showcase Section */}
+        {!uploadedFile && (
+          <div className="w-full bg-white flex justify-center py-24 px-6 mt-16 shadow-sm shadow-gray-100 border-t border-gray-100">
+            <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center justify-between gap-16">
+              {/* Text Side */}
+              <div className="lg:w-1/2 flex flex-col items-start text-left">
+                <h2 className="text-4xl md:text-5xl font-extrabold text-[#3a3a3a] leading-tight mb-6">
+                  All-in-one AI background remover & generator
+                </h2>
+                <p className="text-[#6b6b6b] text-lg mb-6 leading-relaxed">
+                  ALLBgremove is your go-to, high-quality background remover, making it easy to <span className="font-bold text-gray-800">cut out a picture</span> and isolate the background with incredible accuracy.
+                </p>
+                <p className="text-[#6b6b6b] text-lg leading-relaxed">
+                  But it doesn&apos;t stop there. With the AI background editor, you can instantly <span className="font-bold text-gray-800">create custom backdrops</span>, add beautiful colors, or make standard passport photo layouts seamlessly.
+                </p>
+              </div>
+
+              {/* Image Side */}
+              <div className="lg:w-1/2 w-full flex justify-center items-center mt-10 lg:mt-0">
+                <div className="relative w-full max-w-lg">
+                  {/* Decorative background element behind images */}
+                  <div className="absolute inset-0 bg-[#f4f6f8] rounded-[2.5rem] transform -rotate-2 -scale-x-100 z-0 shadow-inner"></div>
+
+                  <div className="relative z-10 flex gap-4 p-6 w-full">
+                    {/* Before Image */}
+                    <div className="w-1/2 aspect-[3/4] rounded-2xl overflow-hidden shadow-xl bg-gray-200">
+                      <img src="/demo-before.jpg" alt="Original Background" className="w-full h-full object-cover" />
+                    </div>
+                    {/* After Image */}
+                    <div className="w-1/2 aspect-[3/4] rounded-2xl overflow-hidden shadow-xl relative bg-blue-50">
+                      <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(45deg, #cbd5e1 25%, transparent 25%), linear-gradient(-45deg, #cbd5e1 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #cbd5e1 75%), linear-gradient(-45deg, transparent 75%, #cbd5e1 75%)', backgroundSize: '16px 16px', backgroundPosition: '0 0, 0 8px, 8px -8px, -8px 0px', opacity: 0.5 }}></div>
+                      <img src="/demo-after.png" alt="Removed Background Result" className="w-full h-full object-cover relative z-10" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* SEO Text Content block (Only visible on initial load when no file is uploaded) */}
         {!uploadedFile && (
-          <div className="w-full max-w-6xl px-6 py-20 border-t border-gray-200 mt-12 text-gray-700">
+          <div className="w-full max-w-6xl px-6 py-20 mt-8 text-gray-700">
             <h2 className="text-3xl font-bold mb-6 text-gray-900">100% Free AI Background Remover & Editor</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
