@@ -89,9 +89,9 @@ export default function Home() {
                 {/* Decorative blob */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-100 rounded-full blur-3xl -z-10 opacity-70"></div>
 
-                <div className="w-full aspect-[4/3] rounded-[2rem] overflow-hidden shadow-2xl shadow-blue-900/10 border-4 border-white relative group">
+                <div className="w-full aspect-[3/4] md:aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl shadow-blue-900/10 border-4 border-white relative group">
                   <ReactCompareSlider
-                    className="w-full h-full object-cover"
+                    className="w-full h-full"
                     position={50}
                     itemOne={<ReactCompareSliderImage src="/demo-before.jpg" alt="Original Image" className="w-full h-full object-cover" />}
                     itemTwo={
