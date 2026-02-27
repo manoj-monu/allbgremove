@@ -109,6 +109,34 @@ export default function Home() {
             <ImageEditor file={uploadedFile} onReset={() => setUploadedFile(null)} />
           </div>
         )}
+
+        {/* SEO Text Content block (Only visible on initial load when no file is uploaded) */}
+        {!uploadedFile && (
+          <div className="w-full max-w-6xl px-6 py-20 border-t border-gray-200 mt-12 text-gray-700">
+            <h2 className="text-3xl font-bold mb-6 text-gray-900">100% Free AI Background Remover & Editor</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              <div>
+                <h3 className="text-xl font-bold mb-3 text-blue-700">Instant Background Removal</h3>
+                <p className="leading-relaxed text-sm">Remove backgrounds automatically in seconds. Our advanced AI instantly cuts out the background from your images and portraits, creating flawless transparent backgrounds perfect for design projects, profile pictures, or e-commerce products without any manual effort.</p>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-bold mb-3 text-blue-700">Change & Custom Backgrounds</h3>
+                <p className="leading-relaxed text-sm">Don&apos;t just remove your background — replace it! With our fast editing tools, you can easily change your background to a solid color, an aesthetic gradient, or upload a custom image. Perfect for creating professional headshots or engaging Instagram posts.</p>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-bold mb-3 text-blue-700">Passport Photo Maker</h3>
+                <p className="leading-relaxed text-sm">Need a passport or visa photo quickly? Use our built-in Passport Photo Layout setting to auto-adjust margins, apply borders, and automatically tile your images exactly to standard print formats like 4x6 inches or A4. Get high-quality printable layouts legally instantly.</p>
+              </div>
+            </div>
+
+            <div className="mt-12 text-sm text-gray-500 text-center">
+              By using our service, you agree to our terms. ALLBgremove is the fastest online tool to remove image backgrounds with high definition accuracy. Stop paying for expensive software and use our instantly accessible application for perfect background erasing!
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
