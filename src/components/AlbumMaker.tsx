@@ -464,17 +464,10 @@ export default function AlbumMaker({ imageUrl, onBack }: AlbumMakerProps) {
                 <div className="flex gap-3">
                     <button
                         onClick={handleDownloadSheet}
-                        className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold flex flex-col items-center justify-center gap-1 transition-colors shadow-lg shadow-emerald-500/20 text-sm"
+                        className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-500/20 text-sm"
                     >
-                        <Download className="w-4 h-4" />
-                        PDF / Sheet
-                    </button>
-                    <button
-                        onClick={handlePrint}
-                        className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold flex flex-col items-center justify-center gap-1 transition-colors shadow-lg shadow-blue-500/20 text-sm"
-                    >
-                        <Printer className="w-4 h-4" />
-                        Print Directly
+                        <Download className="w-5 h-5" />
+                        Download PDF / Sheet
                     </button>
                 </div>
 
