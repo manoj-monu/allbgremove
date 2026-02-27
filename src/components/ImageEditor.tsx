@@ -55,7 +55,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const [enhance, setEnhance] = useState<boolean>(true);
-    const [enhanceLevel, setEnhanceLevel] = useState<number>(100);
+    const [enhanceLevel, setEnhanceLevel] = useState<number>(20);
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://bg-remover-api-vbi7.onrender.com";
 
@@ -433,16 +433,16 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                     {processedImageUrl && originalImageUrl ? (
                                         <div className="w-full h-full relative">
                                             {/* Top Toggle Switch */}
-                                            <div className="absolute top-4 right-4 z-20 flex bg-white/80 backdrop-blur-md rounded-lg p-1 shadow-sm border border-gray-200">
+                                            <div className="absolute top-4 right-4 z-20 flex bg-white/90 backdrop-blur-md rounded-full p-1 shadow-md border border-gray-100">
                                                 <button
                                                     onClick={() => setViewMode("original")}
-                                                    className={`px-3 py-1 text-sm font-medium rounded-md transition-all ${viewMode === "original" ? "bg-white shadow-sm text-gray-800" : "text-gray-500 hover:text-gray-700"}`}
+                                                    className={`px-4 py-1.5 text-sm font-bold rounded-full transition-all ${viewMode === "original" ? "bg-gray-800 shadow-md text-white" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
                                                 >
                                                     Original
                                                 </button>
                                                 <button
                                                     onClick={() => setViewMode("removed")}
-                                                    className={`px-3 py-1 text-sm font-medium rounded-md transition-all ${viewMode === "removed" ? "bg-white shadow-sm text-gray-800" : "text-gray-500 hover:text-gray-700"}`}
+                                                    className={`px-4 py-1.5 text-sm font-bold rounded-full transition-all ${viewMode === "removed" ? "bg-gray-800 shadow-md text-white" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
                                                 >
                                                     Removed BG
                                                 </button>
@@ -503,28 +503,28 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
 
                         {/* Tools Toolbar under image */}
                         {!isProcessing && !error && (
-                            <div className="mt-4 flex flex-wrap gap-2 justify-center w-full">
+                            <div className="mt-4 flex flex-wrap gap-3 justify-center w-full">
                                 <button
                                     onClick={() => setShowBackgroundOptions(!showBackgroundOptions)}
-                                    className={`px-4 py-2 border rounded-full text-sm font-medium flex items-center gap-2 transition-colors ${showBackgroundOptions ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                                    className={`px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 shadow-sm hover:shadow-md ${showBackgroundOptions ? 'bg-blue-600 text-white shadow-blue-500/30 ring-2 ring-blue-600 ring-offset-2' : 'bg-blue-50 text-blue-700 hover:bg-blue-100'}`}
                                 >
                                     <Palette className="w-4 h-4" /> Add Background
                                 </button>
                                 <button
                                     onClick={() => setEnhance(!enhance)}
-                                    className={`px-4 py-2 border rounded-full text-sm font-medium flex items-center gap-2 transition-colors ${enhance ? 'border-purple-500 text-purple-600 bg-purple-50' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                                    className={`px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 shadow-sm hover:shadow-md ${enhance ? 'bg-purple-600 text-white shadow-purple-500/30 ring-2 ring-purple-600 ring-offset-2' : 'bg-purple-50 text-purple-700 hover:bg-purple-100'}`}
                                 >
                                     <Sparkles className="w-4 h-4" /> AI Enhance {enhance ? 'On' : 'Off'}
                                 </button>
                                 <button
                                     onClick={handleCreatePassport}
-                                    className="px-4 py-2 border border-gray-300 rounded-full text-sm font-medium flex items-center gap-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                                    className="px-5 py-2.5 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 shadow-sm hover:shadow-md"
                                 >
                                     <LayoutGrid className="w-4 h-4" /> Passport Photo
                                 </button>
                                 <button
                                     onClick={handleCreateAlbum}
-                                    className="px-4 py-2 border border-gray-300 rounded-full text-sm font-medium flex items-center gap-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                                    className="px-5 py-2.5 bg-teal-50 text-teal-700 hover:bg-teal-100 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 shadow-sm hover:shadow-md"
                                 >
                                     <ImageIcon className="w-4 h-4" /> Album Picture
                                 </button>
