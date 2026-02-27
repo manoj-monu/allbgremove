@@ -1,11 +1,11 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ReactCompareSlider, ReactCompareSliderImage } from "react-compare-slider";
 import { Download, IterationCcw, Loader2, Image as ImageIcon, PaintBucket, Ban, Upload, Sparkles, LayoutGrid, Palette, X } from "lucide-react";
 import PassportMaker from "./PassportMaker";
 import AlbumMaker from "./AlbumMaker";
 import { saveAs } from "file-saver";
+import imageCompression from 'browser-image-compression';
 
 interface ImageEditorProps {
     file: File;
@@ -44,6 +44,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
     const [customBgImage, setCustomBgImage] = useState<string | null>(null);
     const [showBackgroundOptions, setShowBackgroundOptions] = useState<boolean>(false);
     const [bgTab, setBgTab] = useState<"color" | "image">("color");
+    const [viewMode, setViewMode] = useState<"original" | "removed">("removed");
 
     const [passportMode, setPassportMode] = useState<boolean>(false);
     const [passportImageUrl, setPassportImageUrl] = useState<string>("");
@@ -70,8 +71,25 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
         const processImage = async () => {
             try {
                 setIsProcessing(true);
+
+                // FRONTEND COMPRESSION: Maximum speed optimizations
+                const options = {
+                    maxSizeMB: 0.8, // Reduced to 800KB for lightning fast upload
+                    maxWidthOrHeight: 1024, // 1024px limit guarantees backend won't lag
+                    useWebWorker: true,
+                    initialQuality: 0.8 // Good quality, faster processing
+                };
+
+                let fileToUpload = file;
+                try {
+                    fileToUpload = await imageCompression(file, options);
+                    console.log(`Front-end compression: ${(file.size / 1024 / 1024).toFixed(2)} MB -> ${(fileToUpload.size / 1024 / 1024).toFixed(2)} MB`);
+                } catch (compressError) {
+                    console.warn("Front-end compression failed, using original file:", compressError);
+                }
+
                 const formData = new FormData();
-                formData.append("file", file);
+                formData.append("file", fileToUpload);
 
                 // STEP 1: Queue the image for processing. We do pure BG removal, no server enhancement!
                 const response = await fetch(`${apiUrl}/api/remove-bg-async?enhance=false`, {
@@ -413,75 +431,70 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                     className="w-full h-full relative"
                                 >
                                     {processedImageUrl && originalImageUrl ? (
-                                        <div className="w-full h-full">
-                                            <ReactCompareSlider
-                                                className="w-full h-full select-none"
-                                                itemOne={
-                                                    <div className="w-full h-full relative">
-                                                        <div className="absolute inset-4">
-                                                            <img src={originalImageUrl} alt="Original" className="w-full h-full object-contain absolute inset-0" />
-                                                        </div>
-                                                        <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold tracking-wide z-10 shadow-lg border border-white/20">
-                                                            Before
-                                                        </div>
-                                                    </div>
-                                                }
-                                                itemTwo={
-                                                    <div className="w-full h-full relative" style={{
-                                                        backgroundColor: bgColor !== "transparent" ? bgColor : undefined,
-                                                        backgroundImage: customBgImage ? `url(${customBgImage})` : undefined,
-                                                        backgroundSize: 'cover',
-                                                        backgroundPosition: 'center',
-                                                    }}>
+                                        <div className="w-full h-full relative">
+                                            {/* Top Toggle Switch */}
+                                            <div className="absolute top-4 right-4 z-20 flex bg-white/80 backdrop-blur-md rounded-lg p-1 shadow-sm border border-gray-200">
+                                                <button
+                                                    onClick={() => setViewMode("original")}
+                                                    className={`px-3 py-1 text-sm font-medium rounded-md transition-all ${viewMode === "original" ? "bg-white shadow-sm text-gray-800" : "text-gray-500 hover:text-gray-700"}`}
+                                                >
+                                                    Original
+                                                </button>
+                                                <button
+                                                    onClick={() => setViewMode("removed")}
+                                                    className={`px-3 py-1 text-sm font-medium rounded-md transition-all ${viewMode === "removed" ? "bg-white shadow-sm text-gray-800" : "text-gray-500 hover:text-gray-700"}`}
+                                                >
+                                                    Removed BG
+                                                </button>
+                                            </div>
 
-                                                        {/* LIVE CSS FILTER RENDERER (replicates the backend perfectly at 60fps) */}
-                                                        <div className="absolute inset-4">
+                                            {viewMode === "original" ? (
+                                                <div className="w-full h-full relative bg-white">
+                                                    <div className="absolute inset-4">
+                                                        <img src={originalImageUrl} alt="Original" className="w-full h-full object-contain absolute inset-0" />
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="w-full h-full relative" style={{
+                                                    backgroundColor: bgColor !== "transparent" ? bgColor : undefined,
+                                                    backgroundImage: customBgImage ? `url(${customBgImage})` : undefined,
+                                                    backgroundSize: 'cover',
+                                                    backgroundPosition: 'center',
+                                                }}>
+
+                                                    {/* LIVE CSS FILTER RENDERER (replicates the backend perfectly at 60fps) */}
+                                                    <div className="absolute inset-4">
+                                                        <img
+                                                            src={processedImageUrl}
+                                                            alt="Removed Background"
+                                                            className="w-full h-full object-contain absolute inset-0"
+                                                            style={{
+                                                                filter: enhance ? `contrast(${1 + (enhanceLevel * 0.002)}) saturate(${1 + (enhanceLevel * 0.004)}) brightness(${1 + (enhanceLevel * 0.001)})` : 'none'
+                                                            }}
+                                                        />
+                                                        {enhance && enhanceLevel > 0 && (
                                                             <img
                                                                 src={processedImageUrl}
-                                                                alt="Removed Background"
-                                                                className="w-full h-full object-contain absolute inset-0"
+                                                                alt="Smoothing Layer"
+                                                                className="w-full h-full object-contain absolute inset-0 pointer-events-none"
                                                                 style={{
-                                                                    filter: enhance ? `contrast(${1 + (enhanceLevel * 0.002)}) saturate(${1 + (enhanceLevel * 0.004)}) brightness(${1 + (enhanceLevel * 0.001)})` : 'none'
+                                                                    opacity: enhanceLevel * 0.006, // Max density 0.6
+                                                                    filter: 'blur(4px) brightness(1.15) contrast(1.1)',
+                                                                    mixBlendMode: 'screen',
+                                                                    WebkitMaskImage: `url(${processedImageUrl})`,
+                                                                    WebkitMaskSize: 'contain',
+                                                                    WebkitMaskPosition: 'center',
+                                                                    WebkitMaskRepeat: 'no-repeat',
+                                                                    maskImage: `url(${processedImageUrl})`,
+                                                                    maskSize: 'contain',
+                                                                    maskPosition: 'center',
+                                                                    maskRepeat: 'no-repeat'
                                                                 }}
                                                             />
-                                                            {enhance && enhanceLevel > 0 && (
-                                                                <img
-                                                                    src={processedImageUrl}
-                                                                    alt="Smoothing Layer"
-                                                                    className="w-full h-full object-contain absolute inset-0 pointer-events-none"
-                                                                    style={{
-                                                                        opacity: enhanceLevel * 0.006, // Max density 0.6
-                                                                        filter: 'blur(4px) brightness(1.15) contrast(1.1)',
-                                                                        mixBlendMode: 'screen',
-                                                                        WebkitMaskImage: `url(${processedImageUrl})`,
-                                                                        WebkitMaskSize: 'contain',
-                                                                        WebkitMaskPosition: 'center',
-                                                                        WebkitMaskRepeat: 'no-repeat',
-                                                                        maskImage: `url(${processedImageUrl})`,
-                                                                        maskSize: 'contain',
-                                                                        maskPosition: 'center',
-                                                                        maskRepeat: 'no-repeat'
-                                                                    }}
-                                                                />
-                                                            )}
-                                                        </div>
-
-                                                        <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold tracking-wide z-10 shadow-lg border border-white/20">
-                                                            After
-                                                        </div>
+                                                        )}
                                                     </div>
-                                                }
-                                                handle={
-                                                    <div className="w-1 h-full bg-white shadow-[0_0_10px_rgba(0,0,0,0.5)] flex items-center justify-center relative cursor-ew-resize">
-                                                        <div className="w-8 h-8 bg-white text-gray-800 rounded-full shadow-lg flex items-center justify-center border border-gray-200">
-                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                                <path d="M15 18l-6-6 6-6" />
-                                                                <path d="M9 18l6-6-6-6" />
-                                                            </svg>
-                                                        </div>
-                                                    </div>
-                                                }
-                                            />
+                                                </div>
+                                            )}
                                         </div>
                                     ) : null}
                                 </motion.div>
