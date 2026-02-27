@@ -54,6 +54,9 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const [enhance, setEnhance] = useState<boolean>(true);
+    const [enhanceLevel, setEnhanceLevel] = useState<number>(100);
+    const [appliedEnhanceLevel, setAppliedEnhanceLevel] = useState<number>(100);
+
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://bg-remover-api-vbi7.onrender.com";
 
     useEffect(() => {
@@ -72,7 +75,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                 formData.append("file", file);
 
                 // STEP 1: Queue the image for processing
-                const response = await fetch(`${apiUrl}/api/remove-bg-async?enhance=${enhance}`, {
+                const response = await fetch(`${apiUrl}/api/remove-bg-async?enhance=${enhance}&intensity=${appliedEnhanceLevel / 100}`, {
                     method: "POST",
                     body: formData,
                 });
@@ -122,7 +125,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
             URL.revokeObjectURL(objectUrl);
             if (processedImageUrl) URL.revokeObjectURL(processedImageUrl);
         };
-    }, [file, enhance]);
+    }, [file, enhance, appliedEnhanceLevel]);
 
     const handleCustomBgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -447,6 +450,32 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                     <ImageIcon className="w-4 h-4" /> Album Picture
                                 </button>
                             </div>
+                        )}
+
+                        {/* Enhance Slider UI */}
+                        {!isProcessing && !error && enhance && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="w-full flex flex-col items-center mt-4 bg-purple-50 rounded-xl p-4 border border-purple-100"
+                            >
+                                <div className="flex justify-between w-full max-w-sm mb-2">
+                                    <span className="text-sm font-semibold text-purple-800">Beauty & Smooth Intensity</span>
+                                    <span className="text-sm font-bold text-purple-600">{enhanceLevel}%</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="100"
+                                    value={enhanceLevel}
+                                    onChange={(e) => setEnhanceLevel(Number(e.target.value))}
+                                    onMouseUp={() => setAppliedEnhanceLevel(enhanceLevel)}
+                                    onTouchEnd={() => setAppliedEnhanceLevel(enhanceLevel)}
+                                    className="w-full max-w-sm h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                                />
+                                <p className="text-xs text-purple-600/70 mt-2 text-center">(Adjust and release to apply changes. May take a few seconds.)</p>
+                            </motion.div>
                         )}
 
                         {/* Background Options Panel */}
