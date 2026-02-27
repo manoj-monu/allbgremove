@@ -108,7 +108,12 @@ async def worker_loop():
             def blocking_bg_removal():
                 return remove(
                     input_image, 
-                    session=get_session()
+                    session=get_session(),
+                    post_process_mask=True,
+                    alpha_matting=True,
+                    alpha_matting_foreground_threshold=240,
+                    alpha_matting_background_threshold=10,
+                    alpha_matting_erode_size=10
                 ).convert("RGBA")
                 
             async with processing_lock:
@@ -264,7 +269,12 @@ async def remove_background_legacy(file: UploadFile = File(...), enhance: bool =
         def blocking_bg_removal():
             return remove(
                 input_image, 
-                session=get_session()
+                session=get_session(),
+                post_process_mask=True,
+                alpha_matting=True,
+                alpha_matting_foreground_threshold=240,
+                alpha_matting_background_threshold=10,
+                alpha_matting_erode_size=10
             ).convert("RGBA")
             
         async with processing_lock:
