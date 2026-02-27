@@ -93,11 +93,10 @@ export default function Home() {
                   <ReactCompareSlider
                     className="w-full h-full object-cover"
                     position={50}
-                    itemOne={<ReactCompareSliderImage src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?q=80&w=2070&auto=format&fit=crop" alt="Original Image" className="w-full h-full object-cover" />}
+                    itemOne={<ReactCompareSliderImage src="/demo-before.jpg" alt="Original Image" className="w-full h-full object-cover" />}
                     itemTwo={
                       <div className="w-full h-full relative" style={{ backgroundImage: 'linear-gradient(45deg, #e2e8f0 25%, transparent 25%), linear-gradient(-45deg, #e2e8f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e2e8f0 75%), linear-gradient(-45deg, transparent 75%, #e2e8f0 75%)', backgroundSize: '20px 20px', backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px' }}>
-                        <ReactCompareSliderImage src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?q=80&w=2070&auto=format&fit=crop" alt="Removed Background" className="w-full h-full object-cover absolute inset-0 mix-blend-multiply" />
-                        <div className="absolute inset-0 bg-white/70"></div>
+                        <ReactCompareSliderImage src="/demo-after.png" alt="Removed Background" className="w-full h-full object-cover absolute inset-0" />
                       </div>
                     }
                   />
