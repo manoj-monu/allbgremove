@@ -90,7 +90,31 @@ export default function RootLayout({
           })
         }} />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <div className="flex flex-col min-h-screen">
+          <main className="flex-grow">
+            {children}
+          </main>
+
+          {/* Universal Footer for AdSense and Navigation */}
+          <footer className="w-full bg-white border-t border-gray-200 py-10 mt-auto">
+            <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+              <div className="mb-4 md:mb-0 flex items-center">
+                <span className="font-bold text-gray-800 text-lg mr-2">ALLBgremove</span>
+                &copy; {new Date().getFullYear()} All Rights Reserved.
+              </div>
+
+              <div className="flex flex-wrap justify-center gap-6 font-medium text-gray-600">
+                <a href="/about" className="hover:text-blue-600 transition">About Us</a>
+                <a href="/contact" className="hover:text-blue-600 transition">Contact</a>
+                <a href="/privacy-policy" className="hover:text-blue-600 transition">Privacy Policy</a>
+                <a href="/terms" className="hover:text-blue-600 transition">Terms & Conditions</a>
+                <a href="/disclaimer" className="hover:text-blue-600 transition">Disclaimer</a>
+              </div>
+            </div>
+          </footer>
+        </div>
+      </body>
     </html>
   )
 }
