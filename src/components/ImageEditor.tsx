@@ -55,7 +55,6 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
 
     const [enhance, setEnhance] = useState<boolean>(true);
     const [enhanceLevel, setEnhanceLevel] = useState<number>(100);
-    const [appliedEnhanceLevel, setAppliedEnhanceLevel] = useState<number>(100);
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://bg-remover-api-vbi7.onrender.com";
 
@@ -74,8 +73,8 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                 const formData = new FormData();
                 formData.append("file", file);
 
-                // STEP 1: Queue the image for processing
-                const response = await fetch(`${apiUrl}/api/remove-bg-async?enhance=${enhance}&intensity=${appliedEnhanceLevel / 100}`, {
+                // STEP 1: Queue the image for processing. We do pure BG removal, no server enhancement!
+                const response = await fetch(`${apiUrl}/api/remove-bg-async?enhance=false`, {
                     method: "POST",
                     body: formData,
                 });
@@ -125,7 +124,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
             URL.revokeObjectURL(objectUrl);
             if (processedImageUrl) URL.revokeObjectURL(processedImageUrl);
         };
-    }, [file, enhance, appliedEnhanceLevel]);
+    }, [file]); // ONLY trigger on new file upload! Fast live UI!
 
     const handleCustomBgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -148,12 +147,14 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
         // SCENARIO 1: Simple Download with Transparent Background
         // By downloading straight from the Python server, we guarantee a pure, native file stream
         // that completely circumvents any Chromium Memory Blob corruption bugs or Canvas ICC stripping issues.
-        if (bgColor === "transparent" && !customBgImage && currentTaskId) {
+        const requiresCanvas = (bgColor !== "transparent") || customBgImage || (enhance && enhanceLevel > 0);
+
+        if (!requiresCanvas && currentTaskId) {
             window.location.href = `${apiUrl}/api/result/${currentTaskId}?download_name=${encodeURIComponent(filename)}`;
             return;
         }
 
-        // SCENARIO 2: Background Color or Image Applied (CANVAS REQUIRED FOR RE-ENCODING)
+        // SCENARIO 2: Background Color, Image, OR Enhance Filter Applied (CANVAS REQUIRED)
         // For custom backgrounds, we must combine elements using the local Canvas.
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
@@ -179,6 +180,37 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                 }
 
+                // Helper to bake the Live CSS Filters perfectly into the PNG Canvas Download
+                const drawForeground = () => {
+                    if (enhance) {
+                        ctx.filter = `contrast(${1 + (enhanceLevel * 0.002)}) saturate(${1 + (enhanceLevel * 0.004)}) brightness(${1 + (enhanceLevel * 0.001)})`;
+                    }
+                    ctx.drawImage(imgElement, 0, 0);
+
+                    if (enhance && enhanceLevel > 0) {
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = canvas.width;
+                        tempCanvas.height = canvas.height;
+                        const tCtx = tempCanvas.getContext('2d');
+                        if (tCtx) {
+                            tCtx.filter = `blur(4px) brightness(1.15) contrast(1.1)`;
+                            tCtx.drawImage(imgElement, 0, 0);
+
+                            tCtx.filter = 'none';
+                            tCtx.globalCompositeOperation = 'destination-in';
+                            tCtx.drawImage(imgElement, 0, 0);
+
+                            ctx.globalCompositeOperation = 'screen';
+                            ctx.globalAlpha = enhanceLevel * 0.006;
+                            ctx.drawImage(tempCanvas, 0, 0);
+                        }
+                    }
+
+                    ctx.globalAlpha = 1.0;
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.filter = 'none';
+                };
+
                 // Draw background image
                 if (customBgImage) {
                     const bgImgElement = new window.Image();
@@ -187,21 +219,21 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
 
                     bgImgElement.onload = () => {
                         ctx.drawImage(bgImgElement, 0, 0, canvas.width, canvas.height);
-                        ctx.drawImage(imgElement, 0, 0);
+                        drawForeground();
                         triggerDownload(canvas, filename);
                         URL.revokeObjectURL(safeLocalImageUrl); // Cleanup
                     };
 
                     bgImgElement.onerror = () => {
-                        ctx.drawImage(imgElement, 0, 0);
+                        drawForeground();
                         triggerDownload(canvas, filename);
                         URL.revokeObjectURL(safeLocalImageUrl);
                     }
                     return;
                 }
 
-                // Draw transparent image
-                ctx.drawImage(imgElement, 0, 0);
+                // Draw transparent image purely
+                drawForeground();
                 triggerDownload(canvas, filename);
                 URL.revokeObjectURL(safeLocalImageUrl);
             };
@@ -386,7 +418,9 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                                 className="w-full h-full select-none"
                                                 itemOne={
                                                     <div className="w-full h-full relative">
-                                                        <ReactCompareSliderImage src={originalImageUrl} alt="Original" />
+                                                        <div className="absolute inset-4">
+                                                            <img src={originalImageUrl} alt="Original" className="w-full h-full object-contain absolute inset-0" />
+                                                        </div>
                                                         <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold tracking-wide z-10 shadow-lg border border-white/20">
                                                             Before
                                                         </div>
@@ -399,7 +433,39 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                                         backgroundSize: 'cover',
                                                         backgroundPosition: 'center',
                                                     }}>
-                                                        <ReactCompareSliderImage src={processedImageUrl} alt="Removed Background" />
+
+                                                        {/* LIVE CSS FILTER RENDERER (replicates the backend perfectly at 60fps) */}
+                                                        <div className="absolute inset-4">
+                                                            <img
+                                                                src={processedImageUrl}
+                                                                alt="Removed Background"
+                                                                className="w-full h-full object-contain absolute inset-0"
+                                                                style={{
+                                                                    filter: enhance ? `contrast(${1 + (enhanceLevel * 0.002)}) saturate(${1 + (enhanceLevel * 0.004)}) brightness(${1 + (enhanceLevel * 0.001)})` : 'none'
+                                                                }}
+                                                            />
+                                                            {enhance && enhanceLevel > 0 && (
+                                                                <img
+                                                                    src={processedImageUrl}
+                                                                    alt="Smoothing Layer"
+                                                                    className="w-full h-full object-contain absolute inset-0 pointer-events-none"
+                                                                    style={{
+                                                                        opacity: enhanceLevel * 0.006, // Max density 0.6
+                                                                        filter: 'blur(4px) brightness(1.15) contrast(1.1)',
+                                                                        mixBlendMode: 'screen',
+                                                                        WebkitMaskImage: `url(${processedImageUrl})`,
+                                                                        WebkitMaskSize: 'contain',
+                                                                        WebkitMaskPosition: 'center',
+                                                                        WebkitMaskRepeat: 'no-repeat',
+                                                                        maskImage: `url(${processedImageUrl})`,
+                                                                        maskSize: 'contain',
+                                                                        maskPosition: 'center',
+                                                                        maskRepeat: 'no-repeat'
+                                                                    }}
+                                                                />
+                                                            )}
+                                                        </div>
+
                                                         <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold tracking-wide z-10 shadow-lg border border-white/20">
                                                             After
                                                         </div>
@@ -470,11 +536,9 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                     max="100"
                                     value={enhanceLevel}
                                     onChange={(e) => setEnhanceLevel(Number(e.target.value))}
-                                    onMouseUp={() => setAppliedEnhanceLevel(enhanceLevel)}
-                                    onTouchEnd={() => setAppliedEnhanceLevel(enhanceLevel)}
                                     className="w-full max-w-sm h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
                                 />
-                                <p className="text-xs text-purple-600/70 mt-2 text-center">(Adjust and release to apply changes. May take a few seconds.)</p>
+                                <p className="text-xs text-purple-600/70 mt-2 text-center font-medium opacity-80">(Live Preview is completely instantaneous!)</p>
                             </motion.div>
                         )}
 
