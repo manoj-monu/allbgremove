@@ -34,11 +34,11 @@ processing_lock = asyncio.Lock()
 def ensure_u2net_downloaded():
     u2net_home = os.path.expanduser("~/.u2net")
     os.makedirs(u2net_home, exist_ok=True)
-    model_path = os.path.join(u2net_home, "u2net.onnx")
-    url = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net.onnx"
+    model_path = os.path.join(u2net_home, "u2netp.onnx")
+    url = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2netp.onnx"
     
-    if not (os.path.exists(model_path) and os.path.getsize(model_path) > 50000000):
-        print("Pre-downloading U2-Net model with robust timeout protection...")
+    if not (os.path.exists(model_path) and os.path.getsize(model_path) > 4000000):
+        print("Pre-downloading U2-NetP model with robust timeout protection...")
         import urllib.request
         import socket
         socket.setdefaulttimeout(120)  # Stop strict connection timeouts
@@ -58,8 +58,8 @@ def get_session():
             ensure_u2net_downloaded()
         except Exception as e:
             print(f"Robust download failed: {e}")
-        print("Loading U2-Net model...")
-        ai_session = new_session("u2net")
+        print("Loading U2-NetP model...")
+        ai_session = new_session("u2netp")
     return ai_session
 
 # Configure CORS for frontend communication
@@ -90,7 +90,14 @@ async def startup_event():
 
 async def worker_loop():
     while True:
-        task_id, input_image, enhance = await task_queue.get()
+        task = await task_queue.get()
+        # Handle backward compatibility if old tasks are in queue
+        if len(task) == 4:
+            task_id, input_image, enhance, intensity = task
+        else:
+            task_id, input_image, enhance = task
+            intensity = 1.0
+            
         tasks[task_id]["status"] = "processing"
         
         try:
@@ -110,10 +117,7 @@ async def worker_loop():
                     input_image, 
                     session=get_session(),
                     post_process_mask=True,
-                    alpha_matting=True,
-                    alpha_matting_foreground_threshold=240,
-                    alpha_matting_background_threshold=10,
-                    alpha_matting_erode_size=10
+                    alpha_matting=False
                 ).convert("RGBA")
                 
             async with processing_lock:
@@ -138,31 +142,36 @@ async def worker_loop():
                     img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
                     
                     # 1. Skin Smoothing / Retouching via Bilateral Filter
-                    smoothed = cv2.bilateralFilter(img_bgr, d=11, sigmaColor=75, sigmaSpace=75)
+                    d_val = max(3, int(11 * intensity))
+                    sigma_val = 75 * intensity
+                    smoothed = cv2.bilateralFilter(img_bgr, d=d_val, sigmaColor=sigma_val, sigmaSpace=sigma_val)
                     
                     # 2. Local Contrast / Detail Enhancement (HDR Pop)
                     detail = cv2.detailEnhance(smoothed, sigma_s=10, sigma_r=0.15)
                     # Blend to keep it realistic
-                    blended = cv2.addWeighted(smoothed, 0.4, detail, 0.6, 0)
+                    blend_weight = 0.6 * intensity
+                    blended = cv2.addWeighted(smoothed, 1.0 - blend_weight, detail, blend_weight, 0)
                     
                     # 3. Vivid Color Enhancement
                     hsv = cv2.cvtColor(blended, cv2.COLOR_BGR2HSV)
                     hsv = np.array(hsv, dtype=np.float32)
-                    hsv[:,:,1] = hsv[:,:,1] * 1.35 # Boost saturation by 35%
+                    hsv[:,:,1] = hsv[:,:,1] * (1.0 + 0.35 * intensity) # Boost saturation linearly
                     hsv[:,:,1] = np.clip(hsv[:,:,1], 0, 255)
                     hsv = np.array(hsv, dtype=np.uint8)
                     vibrant = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
                     
                     # 4. Brightness & Contrast
-                    adjusted = cv2.convertScaleAbs(vibrant, alpha=1.1, beta=15)
+                    alpha_val = 1.0 + (0.1 * intensity)
+                    beta_val = 15 * intensity
+                    adjusted = cv2.convertScaleAbs(vibrant, alpha=alpha_val, beta=beta_val)
                     
                     result_rgb = cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
                     rgb_image = Image.fromarray(result_rgb)
                 except Exception as e:
                     print(f"OpenCV enhance failed: {e}")
                     # Fallback to extreme PIL if OpenCV fails
-                    rgb_image = ImageEnhance.Brightness(rgb_image).enhance(1.2)
-                    rgb_image = ImageEnhance.Color(rgb_image).enhance(1.4)
+                    rgb_image = ImageEnhance.Brightness(rgb_image).enhance(1.0 + 0.2*intensity)
+                    rgb_image = ImageEnhance.Color(rgb_image).enhance(1.0 + 0.4*intensity)
                     rgb_image = rgb_image.filter(ImageFilter.DETAIL)
                 
                 # Re-attach transparent background
@@ -190,7 +199,7 @@ async def worker_loop():
             task_queue.task_done()
 
 @app.post("/api/remove-bg-async")
-async def queue_remove_background(file: UploadFile = File(...), enhance: bool = False):
+async def queue_remove_background(file: UploadFile = File(...), enhance: bool = False, intensity: float = 1.0):
     try:
         # Validate file type safely
         if file.content_type and not file.content_type.startswith("image/"):
@@ -202,7 +211,7 @@ async def queue_remove_background(file: UploadFile = File(...), enhance: bool = 
         task_id = str(uuid.uuid4())
         tasks[task_id] = {"status": "pending"}
         
-        await task_queue.put((task_id, input_image, enhance))
+        await task_queue.put((task_id, input_image, enhance, intensity))
         
         return {"task_id": task_id, "position": task_queue.qsize()}
         
@@ -269,7 +278,7 @@ async def download_stashed(stash_id: str):
     )
 
 @app.post("/api/remove-bg")
-async def remove_background_legacy(file: UploadFile = File(...), enhance: bool = False):
+async def remove_background_legacy(file: UploadFile = File(...), enhance: bool = False, intensity: float = 1.0):
     try:
         # Validate file type safely
         if file.content_type and not file.content_type.startswith("image/"):
@@ -292,10 +301,7 @@ async def remove_background_legacy(file: UploadFile = File(...), enhance: bool =
                 input_image, 
                 session=get_session(),
                 post_process_mask=True,
-                alpha_matting=True,
-                alpha_matting_foreground_threshold=240,
-                alpha_matting_background_threshold=10,
-                alpha_matting_erode_size=10
+                alpha_matting=False
             ).convert("RGBA")
             
         async with processing_lock:
@@ -312,26 +318,31 @@ async def remove_background_legacy(file: UploadFile = File(...), enhance: bool =
                 img_np = np.array(rgb_image)
                 img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
                 
-                smoothed = cv2.bilateralFilter(img_bgr, d=11, sigmaColor=75, sigmaSpace=75)
+                d_val = max(3, int(11 * intensity))
+                sigma_val = 75 * intensity
+                smoothed = cv2.bilateralFilter(img_bgr, d=d_val, sigmaColor=sigma_val, sigmaSpace=sigma_val)
                 
                 detail = cv2.detailEnhance(smoothed, sigma_s=10, sigma_r=0.15)
-                blended = cv2.addWeighted(smoothed, 0.4, detail, 0.6, 0)
+                blend_weight = 0.6 * intensity
+                blended = cv2.addWeighted(smoothed, 1.0 - blend_weight, detail, blend_weight, 0)
                 
                 hsv = cv2.cvtColor(blended, cv2.COLOR_BGR2HSV)
                 hsv = np.array(hsv, dtype=np.float32)
-                hsv[:,:,1] = hsv[:,:,1] * 1.35
+                hsv[:,:,1] = hsv[:,:,1] * (1.0 + 0.35 * intensity)
                 hsv[:,:,1] = np.clip(hsv[:,:,1], 0, 255)
                 hsv = np.array(hsv, dtype=np.uint8)
                 vibrant = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
                 
-                adjusted = cv2.convertScaleAbs(vibrant, alpha=1.1, beta=15)
+                alpha_val = 1.0 + (0.1 * intensity)
+                beta_val = 15 * intensity
+                adjusted = cv2.convertScaleAbs(vibrant, alpha=alpha_val, beta=beta_val)
                 
                 result_rgb = cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
                 rgb_image = Image.fromarray(result_rgb)
             except Exception as e:
                 print(f"OpenCV enhance failed: {e}")
-                rgb_image = ImageEnhance.Brightness(rgb_image).enhance(1.2)
-                rgb_image = ImageEnhance.Color(rgb_image).enhance(1.4)
+                rgb_image = ImageEnhance.Brightness(rgb_image).enhance(1.0 + 0.2*intensity)
+                rgb_image = ImageEnhance.Color(rgb_image).enhance(1.0 + 0.4*intensity)
                 rgb_image = rgb_image.filter(ImageFilter.DETAIL)
             
             r_ret, g_ret, b_ret = rgb_image.split()
