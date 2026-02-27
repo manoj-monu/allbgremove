@@ -531,110 +531,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                             </div>
                         )}
 
-                        {/* Enhance Slider UI */}
-                        {!isProcessing && !error && enhance && (
-                            <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                className="w-full flex flex-col items-center mt-4 bg-purple-50 rounded-xl p-4 border border-purple-100"
-                            >
-                                <div className="flex justify-between w-full max-w-sm mb-2">
-                                    <span className="text-sm font-semibold text-purple-800">Beauty & Smooth Intensity</span>
-                                    <span className="text-sm font-bold text-purple-600">{enhanceLevel}%</span>
-                                </div>
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="100"
-                                    value={enhanceLevel}
-                                    onChange={(e) => setEnhanceLevel(Number(e.target.value))}
-                                    className="w-full max-w-sm h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
-                                />
-                                <p className="text-xs text-purple-600/70 mt-2 text-center font-medium opacity-80">(Live Preview is completely instantaneous!)</p>
-                            </motion.div>
-                        )}
 
-                        {/* Background Options Panel */}
-                        <AnimatePresence>
-                            {showBackgroundOptions && (
-                                <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    className="w-full mt-4 overflow-hidden"
-                                >
-                                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-                                        <div className="flex gap-4 mb-4 border-b border-gray-200 pb-2">
-                                            <button
-                                                onClick={() => setBgTab("color")}
-                                                className={`text-sm font-semibold transition-colors ${bgTab === "color" ? "text-blue-600" : "text-gray-500 hover:text-gray-800"}`}
-                                            >
-                                                Color
-                                            </button>
-                                            <button
-                                                onClick={() => setBgTab("image")}
-                                                className={`text-sm font-semibold transition-colors ${bgTab === "image" ? "text-blue-600" : "text-gray-500 hover:text-gray-800"}`}
-                                            >
-                                                Image
-                                            </button>
-                                        </div>
-
-                                        {bgTab === "color" && (
-                                            <div className="flex flex-wrap gap-2">
-                                                <button
-                                                    onClick={() => { setBgColor("transparent"); setCustomBgImage(null); }}
-                                                    className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-transform hover:scale-110 bg-[url('https://www.remove.bg/images/transparency_demo_1.png')] bg-repeat ${bgColor === "transparent" && !customBgImage ? "border-blue-500" : "border-gray-200"}`}
-                                                    style={{ backgroundSize: '10px 10px' }}
-                                                    title="Transparent"
-                                                >
-                                                    <Ban className="w-4 h-4 text-gray-600" />
-                                                </button>
-
-                                                <div className="relative w-10 h-10 rounded-full border-2 border-gray-200 overflow-hidden cursor-pointer hover:scale-110 transition-transform"
-                                                    title="Custom Color"
-                                                    style={{ background: 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)' }}>
-                                                    <input
-                                                        type="color"
-                                                        className="absolute inset-[0] w-[200%] h-[200%] cursor-pointer opacity-0"
-                                                        onChange={(e) => { setBgColor(e.target.value); setCustomBgImage(null); }}
-                                                    />
-                                                </div>
-
-                                                {PREDEFINED_COLORS.map(color => (
-                                                    <button
-                                                        key={color}
-                                                        onClick={() => { setBgColor(color); setCustomBgImage(null); }}
-                                                        className={`w-10 h-10 rounded-full border-2 transition-transform hover:scale-110 shadow-sm ${bgColor === color && !customBgImage ? 'border-black' : 'border-transparent'}`}
-                                                        style={{ background: color, border: bgColor === color ? '2px solid black' : color === '#ffffff' ? '1px solid #e5e5e5' : 'none' }}
-                                                        title={color}
-                                                    />
-                                                ))}
-                                            </div>
-                                        )}
-
-                                        {bgTab === "image" && (
-                                            <div className="flex flex-wrap gap-2">
-                                                <label className="w-16 h-16 rounded-lg border-2 border-dashed border-gray-300 bg-white flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-all">
-                                                    <Upload className="w-5 h-5 text-gray-400" />
-                                                    <input type="file" className="hidden" accept="image/*" onChange={handleCustomBgUpload} />
-                                                </label>
-
-                                                {PREDEFINED_PHOTOS.map((photo, i) => (
-                                                    <button
-                                                        key={i}
-                                                        onClick={() => { setCustomBgImage(photo); setBgColor(""); }}
-                                                        className={`w-16 h-16 rounded-lg border-2 overflow-hidden transition-transform hover:scale-105 ${customBgImage === photo ? 'border-blue-500 scale-105' : 'border-transparent'}`}
-                                                    >
-                                                        <img src={photo} alt="bg" className="w-full h-full object-cover" />
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
                     </div>
 
                     {/* Right side: Download Panel */}
@@ -660,20 +557,111 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
 
                             <div className="h-px bg-gray-200 w-full mb-6"></div>
 
-                            {/* HD Download Option - Often disabled or paid in remove.bg, styling differently */}
-                            <div className="flex flex-col mb-auto">
-                                <div className="flex justify-between items-center mb-2">
-                                    <span className="font-semibold text-gray-800 text-lg">HD Image</span>
-                                    <span className="text-sm text-gray-500 font-medium whitespace-nowrap">Up to 4K</span>
-                                </div>
-                                <button
-                                    onClick={handleDownload}
-                                    disabled={isProcessing || !processedImageUrl || !!error}
-                                    className="w-full py-3.5 bg-white border-2 border-gray-200 hover:border-gray-300 disabled:opacity-50 text-gray-800 rounded-full font-bold text-lg transition-colors flex justify-center items-center"
-                                >
-                                    Download HD
-                                </button>
-                                <p className="text-xs text-gray-500 text-center mt-2 font-medium">Best quality • 1 credit</p>
+                            {/* Interactive Tool Panels moved to Right Side */}
+                            <div className="flex flex-col mb-auto space-y-4">
+                                {/* Enhance Slider UI */}
+                                {!isProcessing && !error && enhance && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        className="w-full flex flex-col items-center bg-purple-50 rounded-xl p-4 border border-purple-100"
+                                    >
+                                        <div className="flex justify-between w-full mb-2">
+                                            <span className="text-sm font-semibold text-purple-800">Beauty & Smooth</span>
+                                            <span className="text-sm font-bold text-purple-600">{enhanceLevel}%</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="100"
+                                            value={enhanceLevel}
+                                            onChange={(e) => setEnhanceLevel(Number(e.target.value))}
+                                            className="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                                        />
+                                    </motion.div>
+                                )}
+
+                                {/* Background Options Panel */}
+                                <AnimatePresence>
+                                    {showBackgroundOptions && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            className="w-full overflow-hidden"
+                                        >
+                                            <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+                                                <div className="flex gap-4 mb-4 border-b border-gray-200 pb-2">
+                                                    <button
+                                                        onClick={() => setBgTab("color")}
+                                                        className={`text-sm font-semibold transition-colors ${bgTab === "color" ? "text-blue-600" : "text-gray-500 hover:text-gray-800"}`}
+                                                    >
+                                                        Color
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setBgTab("image")}
+                                                        className={`text-sm font-semibold transition-colors ${bgTab === "image" ? "text-blue-600" : "text-gray-500 hover:text-gray-800"}`}
+                                                    >
+                                                        Image
+                                                    </button>
+                                                </div>
+
+                                                {bgTab === "color" && (
+                                                    <div className="flex flex-wrap gap-2">
+                                                        <button
+                                                            onClick={() => { setBgColor("transparent"); setCustomBgImage(null); }}
+                                                            className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-transform hover:scale-110 bg-[url('https://www.remove.bg/images/transparency_demo_1.png')] bg-repeat ${bgColor === "transparent" && !customBgImage ? "border-blue-500" : "border-gray-200"}`}
+                                                            style={{ backgroundSize: '10px 10px' }}
+                                                            title="Transparent"
+                                                        >
+                                                            <Ban className="w-3 h-3 text-gray-600" />
+                                                        </button>
+
+                                                        <div className="relative w-8 h-8 rounded-full border-2 border-gray-200 overflow-hidden cursor-pointer hover:scale-110 transition-transform"
+                                                            title="Custom Color"
+                                                            style={{ background: 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)' }}>
+                                                            <input
+                                                                type="color"
+                                                                className="absolute inset-[0] w-[200%] h-[200%] cursor-pointer opacity-0"
+                                                                onChange={(e) => { setBgColor(e.target.value); setCustomBgImage(null); }}
+                                                            />
+                                                        </div>
+
+                                                        {PREDEFINED_COLORS.map(color => (
+                                                            <button
+                                                                key={color}
+                                                                onClick={() => { setBgColor(color); setCustomBgImage(null); }}
+                                                                className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 shadow-sm ${bgColor === color && !customBgImage ? 'border-black' : 'border-transparent'}`}
+                                                                style={{ background: color, border: bgColor === color ? '2px solid black' : color === '#ffffff' ? '1px solid #e5e5e5' : 'none' }}
+                                                                title={color}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                {bgTab === "image" && (
+                                                    <div className="flex flex-wrap gap-2">
+                                                        <label className="w-12 h-12 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-all">
+                                                            <Upload className="w-4 h-4 text-gray-400" />
+                                                            <input type="file" className="hidden" accept="image/*" onChange={handleCustomBgUpload} />
+                                                        </label>
+
+                                                        {PREDEFINED_PHOTOS.map((photo, i) => (
+                                                            <button
+                                                                key={i}
+                                                                onClick={() => { setCustomBgImage(photo); setBgColor(""); }}
+                                                                className={`w-12 h-12 rounded-lg border-2 overflow-hidden transition-transform hover:scale-105 ${customBgImage === photo ? 'border-blue-500 scale-105' : 'border-transparent'}`}
+                                                            >
+                                                                <img src={photo} alt="bg" className="w-full h-full object-cover" />
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
 
                         </div>
