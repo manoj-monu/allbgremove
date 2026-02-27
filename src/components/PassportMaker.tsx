@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useCallback } from "react";
 import Cropper from "react-easy-crop";
 import { ArrowLeft, Printer, Download, Settings2, Image as ImageIcon, Layout as LayoutIcon, Camera } from "lucide-react";
+import { saveAs } from "file-saver";
 
 interface PassportMakerProps {
     imageUrl: string;
@@ -196,11 +197,30 @@ export default function PassportMaker({ imageUrl, onBack }: PassportMakerProps) 
             }
         }
 
-        const dataUrl = downloadCanvas.toDataURL("image/png", 1.0);
-        const link = document.createElement("a");
-        link.href = dataUrl;
-        link.download = "passport_sheet.png";
-        link.click();
+        downloadCanvas.toBlob((blob) => {
+            if (blob) {
+                const fileObj = new File([blob], "passport_sheet.png", { type: "image/png" });
+                const blobUrl = window.URL.createObjectURL(fileObj);
+
+                const link = document.createElement("a");
+                link.style.display = "none";
+                link.href = blobUrl;
+                link.download = "passport_sheet.png";
+                document.body.appendChild(link);
+
+                const clickEvent = new MouseEvent("click", {
+                    view: window,
+                    bubbles: true,
+                    cancelable: false,
+                });
+                link.dispatchEvent(clickEvent);
+
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(blobUrl);
+                }, 1000);
+            }
+        }, "image/png", 1.0);
     };
 
 

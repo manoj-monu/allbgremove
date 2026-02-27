@@ -15,7 +15,7 @@ export default function PrivacyPolicy() {
                 <p className="mb-4">We do NOT store the images you upload. They are processed in-memory and discarded upon completion. No personal data is saved to our servers.</p>
 
                 <h2 className="text-xl font-semibold mb-4 mt-8">Third-Party Services</h2>
-                <p className="mb-4">We may use Google AdSense to serve ads. Third party vendors, including Google, use cookies to serve ads based on a user's prior visits.</p>
+                <p className="mb-4">We may use Google AdSense to serve ads. Third party vendors, including Google, use cookies to serve ads based on a user&apos;s prior visits.</p>
             </div>
         </main>
     );

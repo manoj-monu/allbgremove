@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import ImageEditor from "@/components/ImageEditor";
-import { UploadCloud, CheckCircle } from "lucide-react";
 import { ReactCompareSlider, ReactCompareSliderImage } from "react-compare-slider";
+import Link from "next/link";
 
 export default function Home() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -21,107 +21,96 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#fafbfc] text-slate-800 flex flex-col items-center py-6 px-4 font-sans selection:bg-pink-100">
+    <main className="min-h-screen bg-[#f4f6f8] text-slate-800 flex flex-col items-center font-sans tracking-tight">
       {/* Header */}
-      <header className="w-full max-w-7xl flex justify-between items-center mb-10 md:mb-16 px-4">
-        <a
-          href="/"
-          className="text-2xl font-black tracking-tighter text-slate-800 flex items-center gap-2 cursor-pointer"
-          title="Go to Home"
-        >
-          {/* A simple geometric logo placeholder like removal.ai */}
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF4B82] to-[#7135D8] flex items-center justify-center text-white text-lg font-bold">R</div>
-          BgRemover<span className="text-[#FF4B82] font-medium text-xl">.ai</span>
-        </a>
-        <nav className="space-x-8 text-sm font-bold text-slate-600 hidden md:block tracking-wide">
-          <a href="/" className="hover:text-[#FF4B82] transition-colors">HOW TO USE</a>
-          <a href="/about" className="hover:text-[#FF4B82] transition-colors">TOOLS & API</a>
-          <a href="/blog" className="hover:text-[#FF4B82] transition-colors">PRICING</a>
-          <a href="/contact" className="hover:text-[#FF4B82] transition-colors">CONTACT</a>
-        </nav>
+      <header className="w-full flex justify-between items-center py-4 px-6 md:px-10 bg-transparent">
+        <div className="flex items-center gap-8">
+          <Link href="/" className="text-[22px] font-bold text-gray-800 flex items-center gap-2">
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-gray-700">
+              <path d="M12 2l-10 5 10 5 10-5-10-5z" opacity="0.6" />
+              <path d="M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.8" />
+              <path d="M2 17l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" />
+            </svg>
+            removebg
+          </Link>
+          <nav className="hidden lg:flex space-x-6 text-[15px] font-medium text-gray-600">
+            <a href="#" className="hover:text-gray-900 border-b-2 border-transparent">Uploads</a>
+            <a href="#" className="hover:text-gray-900 border-b-2 border-transparent">Bulk Editing</a>
+            <a href="#" className="hover:text-gray-900 border-b-2 border-transparent">API</a>
+            <a href="#" className="hover:text-gray-900 border-b-2 border-transparent">Plugins</a>
+            <a href="#" className="hover:text-gray-900 border-b-2 border-transparent">Pricing</a>
+          </nav>
+        </div>
+        <div className="flex items-center gap-4 text-[15px] font-medium text-gray-600">
+          <a href="#" className="hover:text-gray-900 hidden sm:block">Log in</a>
+          <a href="#" className="bg-gray-200/50 hover:bg-gray-200 px-5 py-2.5 rounded-full text-gray-800 transition font-semibold text-sm">Sign up</a>
+        </div>
       </header>
 
       {/* Main Content */}
-      <div className="w-full max-w-7xl flex flex-col items-center flex-grow">
+      <div className="w-full flex flex-col items-center flex-grow mt-8">
         {!uploadedFile ? (
-          <div className="flex flex-col md:flex-row items-center justify-between gap-12 w-full mt-4 md:mt-6 px-4">
-
-            {/* Left Side: Upload Column */}
-            <div className="text-left w-full md:w-[45%] flex flex-col items-start pr-0 md:pr-8">
-              <span className="text-[13px] font-bold tracking-widest text-[#7135D8] mb-4 uppercase">FAST, EASY AND AUTOMATED</span>
-              <h1 className="text-5xl md:text-[64px] font-black leading-[1.1] text-slate-900 mb-6 font-sans tracking-tight">
-                IMAGE BACKGROUND <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF4B82] to-[#7135D8]">REMOVER</span>
+          <div className="w-full max-w-6xl flex flex-col md:flex-row items-center justify-between gap-12 px-6">
+            <div className="text-left w-full md:w-1/2 flex flex-col items-start pt-8 pb-12">
+              <h1 className="text-5xl md:text-[60px] font-extrabold leading-[1.1] text-gray-900 mb-6 font-sans">
+                Remove Image <br />Background
               </h1>
-
-              <ul className="space-y-4 mb-10 text-slate-600 font-medium text-[15px]">
-                <li className="flex items-center gap-3"><CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" /> <span className="opacity-90">Remove background from image automatically</span></li>
-                <li className="flex items-center gap-3"><CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" /> <span className="opacity-90">Instantly get transparent background image</span></li>
-                <li className="flex items-center gap-3"><CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" /> <span className="opacity-90">Fully automatic AI processing in 3 seconds</span></li>
-              </ul>
+              <p className="text-xl text-gray-600 mb-8 font-medium">100% Automatically and <span className="text-yellow-500 rounded px-1 bg-yellow-50">Free</span></p>
 
               {/* Upload Area */}
-              <div
-                className="relative group w-full rounded-[2rem] border-[1.5px] border-slate-200 bg-white shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_25px_50px_-12px_rgba(255,75,130,0.15)] transition-all duration-300 p-8 flex flex-col items-center justify-center cursor-pointer hover:border-[#FF4B82]/30"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={handleDrop}
-                onClick={() => document.getElementById('file-upload')?.click()}
-              >
-                <input
-                  id="file-upload"
-                  type="file"
-                  className="hidden"
-                  accept="image/png, image/jpeg, image/webp"
-                  onChange={handleFileUpload}
-                />
-
-                <button className="bg-gradient-to-r from-[#FF4B82] to-[#7135D8] hover:from-[#ff3a75] hover:to-[#612abc] text-white font-bold py-4 px-10 rounded-full text-lg shadow-[0_10px_20px_-10px_rgba(255,75,130,0.6)] transform transition-transform group-hover:-translate-y-1 mb-4 flex items-center gap-3 uppercase tracking-wide">
-                  <UploadCloud className="w-6 h-6" />
-                  UPLOAD IMAGE
-                </button>
-                <p className="text-sm text-slate-500 font-medium tracking-wide">Or drag and drop an image</p>
-                <div className="text-[11px] text-slate-400 mt-6 max-w-[280px] text-center opacity-80 leading-relaxed">
-                  By uploading an image or URL you agree to our Terms of Service and Privacy Policy.
+              <div className="w-full max-w-[400px]">
+                <div
+                  className="w-full bg-[#0066FF] hover:bg-blue-600 text-white rounded-full shadow-lg shadow-blue-500/30 transition-all duration-300 p-4 flex items-center justify-center cursor-pointer mb-4"
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                >
+                  <input
+                    id="file-upload"
+                    type="file"
+                    className="hidden"
+                    accept="image/png, image/jpeg, image/webp"
+                    onChange={handleFileUpload}
+                    title="Upload an image"
+                  />
+                  <span className="text-lg font-bold tracking-wide">Upload Image</span>
+                </div>
+                <div
+                  className="w-full text-center text-gray-500 font-medium py-3 border-2 border-dashed border-gray-300 rounded-2xl bg-white/50 cursor-pointer"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={handleDrop}
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                >
+                  or drop a file, paste image or URL
                 </div>
               </div>
             </div>
 
-            {/* Right Side: Demo Slider */}
-            <div className="w-full md:w-[55%] flex justify-center lg:justify-end mt-12 md:mt-0 relative">
-              {/* Decorative background blobs to mimic removal.ai sleek aesthetic */}
-              <div className="absolute top-10 right-20 w-72 h-72 bg-[#FF4B82]/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
-              <div className="absolute bottom-10 left-20 w-80 h-80 bg-[#7135D8]/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+            <div className="w-full md:w-1/2 flex justify-center pb-20">
+              <div className="relative w-full max-w-[450px]">
+                {/* Decorative blob */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-100 rounded-full blur-3xl -z-10 opacity-70"></div>
 
-              <div className="w-full max-w-[620px] h-[550px] rounded-[1.5rem] overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] border border-slate-100 relative bg-[#f8fafc] hidden md:block group">
-
-                <ReactCompareSlider
-                  className="w-full h-full object-cover"
-                  position={50}
-                  itemOne={<ReactCompareSliderImage src="/demo-before.jpg" alt="Original Image" className="w-full h-full object-cover" />}
-                  itemTwo={
-                    <div className="w-full h-full relative" style={{ backgroundImage: 'linear-gradient(45deg, #e2e8f0 25%, transparent 25%), linear-gradient(-45deg, #e2e8f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e2e8f0 75%), linear-gradient(-45deg, transparent 75%, #e2e8f0 75%)', backgroundSize: '20px 20px', backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px' }}>
-                      <ReactCompareSliderImage src="/demo-after.png" alt="Removed Background" className="w-full h-full object-cover absolute inset-0 drop-shadow-2xl" />
-                    </div>
-                  }
-                />
+                <div className="w-full aspect-[4/3] rounded-[2rem] overflow-hidden shadow-2xl shadow-blue-900/10 border-4 border-white relative group">
+                  <ReactCompareSlider
+                    className="w-full h-full object-cover"
+                    position={50}
+                    itemOne={<ReactCompareSliderImage src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?q=80&w=2070&auto=format&fit=crop" alt="Original Image" className="w-full h-full object-cover" />}
+                    itemTwo={
+                      <div className="w-full h-full relative" style={{ backgroundImage: 'linear-gradient(45deg, #e2e8f0 25%, transparent 25%), linear-gradient(-45deg, #e2e8f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e2e8f0 75%), linear-gradient(-45deg, transparent 75%, #e2e8f0 75%)', backgroundSize: '20px 20px', backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px' }}>
+                        <ReactCompareSliderImage src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?q=80&w=2070&auto=format&fit=crop" alt="Removed Background" className="w-full h-full object-cover absolute inset-0 mix-blend-multiply" />
+                        <div className="absolute inset-0 bg-white/70"></div>
+                      </div>
+                    }
+                  />
+                </div>
               </div>
             </div>
-
           </div>
         ) : (
-          <div className="w-full flex justify-center max-w-5xl">
+          <div className="w-full flex justify-center max-w-6xl px-4 pb-20">
             <ImageEditor file={uploadedFile} onReset={() => setUploadedFile(null)} />
           </div>
         )}
       </div>
-
-      {/* Footer for SEO & Legal */}
-      <footer className="w-full max-w-7xl mt-auto pt-20 pb-4 flex flex-col md:flex-row justify-between items-center text-sm text-slate-400 font-medium px-4">
-        <p>&copy; 2026 BgRemover AI. All rights reserved.</p>
-        <div className="space-x-6 mt-4 md:mt-0">
-          <a href="/privacy-policy" className="hover:text-[#FF4B82] transition-colors">Privacy Policy</a>
-          <a href="/terms" className="hover:text-[#FF4B82] transition-colors">Terms & Conditions</a>
-        </div>
-      </footer>
     </main>
   );
 }
