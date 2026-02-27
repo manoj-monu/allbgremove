@@ -31,7 +31,7 @@ export default function Home() {
               <path d="M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.8" />
               <path d="M2 17l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" />
             </svg>
-            removebg
+            ALLBgremove.com
           </Link>
           <nav className="hidden lg:flex space-x-6 text-[15px] font-medium text-gray-600">
             <a href="#" className="hover:text-gray-900 border-b-2 border-transparent">Uploads</a>
