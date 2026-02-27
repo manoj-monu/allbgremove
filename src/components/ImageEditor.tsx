@@ -414,9 +414,38 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                     <div className="w-full md:w-[60%] flex flex-col items-center">
                         <div className="w-full aspect-[4/3] bg-[url('https://www.remove.bg/images/transparency_demo_1.png')] bg-repeat rounded-2xl overflow-hidden flex items-center justify-center relative shadow-inner border border-gray-200" style={{ backgroundSize: '20px 20px' }}>
                             {isProcessing ? (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/50 backdrop-blur-sm z-10">
-                                    <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
-                                    <p className="font-semibold text-gray-700">Removing background...</p>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 backdrop-blur-md z-10 overflow-hidden">
+                                    {/* Rose Rain Animation */}
+                                    <div className="absolute inset-0 pointer-events-none">
+                                        {[...Array(24)].map((_, i) => (
+                                            <motion.div
+                                                key={i}
+                                                initial={{ top: '-10%', left: `${(i * 11) % 100}%`, rotate: 0, opacity: 0 }}
+                                                animate={{
+                                                    top: '110%',
+                                                    rotate: (i % 2 === 0 ? 360 : -360),
+                                                    opacity: [0, 1, 1, 0]
+                                                }}
+                                                transition={{
+                                                    duration: 3 + ((i * 0.7) % 2),
+                                                    repeat: Infinity,
+                                                    delay: (i * 0.3) % 3,
+                                                    ease: "linear"
+                                                }}
+                                                className={`absolute drop-shadow-lg ${(i % 3 === 0) ? 'text-4xl' : (i % 2 === 0) ? 'text-2xl' : 'text-3xl'}`}
+                                            >
+                                                🌹
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                    <div className="relative z-20 flex flex-col items-center bg-white/90 px-8 py-5 rounded-3xl shadow-xl border border-rose-100">
+                                        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1.5 }}>
+                                            <Sparkles className="w-10 h-10 text-rose-500 mb-3" />
+                                        </motion.div>
+                                        <p className="font-bold text-gray-800 text-lg bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-pink-500">
+                                            Removing background...
+                                        </p>
+                                    </div>
                                 </div>
                             ) : error ? (
                                 <div className="absolute inset-0 flex items-center justify-center bg-white/90 z-10 p-6 text-center">
