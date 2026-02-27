@@ -130,27 +130,44 @@ async def worker_loop():
                 r, g, b, a = output_image.split()
                 rgb_image = Image.merge('RGB', (r, g, b))
                 
-                # 1. Boost Brightness (Very important for vibrant studio lighting effect)
-                brightness_enhancer = ImageEnhance.Brightness(rgb_image)
-                rgb_image = brightness_enhancer.enhance(1.15)
-                
-                # 2. Boost Color Saturation (Makes skin and dress colors 'pop')
-                color_enhancer = ImageEnhance.Color(rgb_image)
-                rgb_image = color_enhancer.enhance(1.25)
-                
-                # 3. Boost Contrast slightly
-                contrast_enhancer = ImageEnhance.Contrast(rgb_image)
-                rgb_image = contrast_enhancer.enhance(1.10)
-                
-                # 4. Detail Filter to bring out fine textures
-                rgb_image = rgb_image.filter(ImageFilter.DETAIL)
-                
-                # 5. Subtle unsharp mask for deeper edge clarity
-                rgb_image = rgb_image.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
+                try:
+                    import cv2
+                    import numpy as np
+                    
+                    img_np = np.array(rgb_image)
+                    img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
+                    
+                    # 1. Skin Smoothing / Retouching via Bilateral Filter
+                    smoothed = cv2.bilateralFilter(img_bgr, d=11, sigmaColor=75, sigmaSpace=75)
+                    
+                    # 2. Local Contrast / Detail Enhancement (HDR Pop)
+                    detail = cv2.detailEnhance(smoothed, sigma_s=10, sigma_r=0.15)
+                    # Blend to keep it realistic
+                    blended = cv2.addWeighted(smoothed, 0.4, detail, 0.6, 0)
+                    
+                    # 3. Vivid Color Enhancement
+                    hsv = cv2.cvtColor(blended, cv2.COLOR_BGR2HSV)
+                    hsv = np.array(hsv, dtype=np.float32)
+                    hsv[:,:,1] = hsv[:,:,1] * 1.35 # Boost saturation by 35%
+                    hsv[:,:,1] = np.clip(hsv[:,:,1], 0, 255)
+                    hsv = np.array(hsv, dtype=np.uint8)
+                    vibrant = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+                    
+                    # 4. Brightness & Contrast
+                    adjusted = cv2.convertScaleAbs(vibrant, alpha=1.1, beta=15)
+                    
+                    result_rgb = cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
+                    rgb_image = Image.fromarray(result_rgb)
+                except Exception as e:
+                    print(f"OpenCV enhance failed: {e}")
+                    # Fallback to extreme PIL if OpenCV fails
+                    rgb_image = ImageEnhance.Brightness(rgb_image).enhance(1.2)
+                    rgb_image = ImageEnhance.Color(rgb_image).enhance(1.4)
+                    rgb_image = rgb_image.filter(ImageFilter.DETAIL)
                 
                 # Re-attach transparent background
-                r, g, b = rgb_image.split()
-                output_image = Image.merge('RGBA', (r, g, b, a))
+                r_ret, g_ret, b_ret = rgb_image.split()
+                output_image = Image.merge('RGBA', (r_ret, g_ret, b_ret, a))
 
             # Wipe out potentially corrupting ICC profiles and EXIF metadata that crashes Windows Photo Viewers
             output_image.info.pop('icc_profile', None)
@@ -288,20 +305,37 @@ async def remove_background_legacy(file: UploadFile = File(...), enhance: bool =
             r, g, b, a = output_image.split()
             rgb_image = Image.merge('RGB', (r, g, b))
             
-            brightness_enhancer = ImageEnhance.Brightness(rgb_image)
-            rgb_image = brightness_enhancer.enhance(1.15)
+            try:
+                import cv2
+                import numpy as np
+                
+                img_np = np.array(rgb_image)
+                img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
+                
+                smoothed = cv2.bilateralFilter(img_bgr, d=11, sigmaColor=75, sigmaSpace=75)
+                
+                detail = cv2.detailEnhance(smoothed, sigma_s=10, sigma_r=0.15)
+                blended = cv2.addWeighted(smoothed, 0.4, detail, 0.6, 0)
+                
+                hsv = cv2.cvtColor(blended, cv2.COLOR_BGR2HSV)
+                hsv = np.array(hsv, dtype=np.float32)
+                hsv[:,:,1] = hsv[:,:,1] * 1.35
+                hsv[:,:,1] = np.clip(hsv[:,:,1], 0, 255)
+                hsv = np.array(hsv, dtype=np.uint8)
+                vibrant = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+                
+                adjusted = cv2.convertScaleAbs(vibrant, alpha=1.1, beta=15)
+                
+                result_rgb = cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
+                rgb_image = Image.fromarray(result_rgb)
+            except Exception as e:
+                print(f"OpenCV enhance failed: {e}")
+                rgb_image = ImageEnhance.Brightness(rgb_image).enhance(1.2)
+                rgb_image = ImageEnhance.Color(rgb_image).enhance(1.4)
+                rgb_image = rgb_image.filter(ImageFilter.DETAIL)
             
-            color_enhancer = ImageEnhance.Color(rgb_image)
-            rgb_image = color_enhancer.enhance(1.25)
-            
-            contrast_enhancer = ImageEnhance.Contrast(rgb_image)
-            rgb_image = contrast_enhancer.enhance(1.10)
-            
-            rgb_image = rgb_image.filter(ImageFilter.DETAIL)
-            rgb_image = rgb_image.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
-            
-            r, g, b = rgb_image.split()
-            output_image = Image.merge('RGBA', (r, g, b, a))
+            r_ret, g_ret, b_ret = rgb_image.split()
+            output_image = Image.merge('RGBA', (r_ret, g_ret, b_ret, a))
 
         # Wipe out potentially corrupting ICC profiles and EXIF metadata that crashes Windows Photo Viewers
         output_image.info.pop('icc_profile', None)
