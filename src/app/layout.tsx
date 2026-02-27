@@ -48,6 +48,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Google Analytics Tracking */}
+        <Script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=G-H1LPVQJ1QL`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive" dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-H1LPVQJ1QL');
+          `
+        }} />
+
         {/* AdSense Verification & Auto Ads Script */}
         {/* Replace the ca-pub-XXX with your actual Publisher ID from AdSense once you log in and get it */}
         <Script
