@@ -31,14 +31,14 @@ rembg.sessions.base.BaseSession.__init__ = custom_init
 
 processing_lock = asyncio.Lock()
 
-def ensure_isnet_downloaded():
+def ensure_u2net_downloaded():
     u2net_home = os.path.expanduser("~/.u2net")
     os.makedirs(u2net_home, exist_ok=True)
-    model_path = os.path.join(u2net_home, "isnet-general-use.onnx")
-    url = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx"
+    model_path = os.path.join(u2net_home, "u2net.onnx")
+    url = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net.onnx"
     
     if not (os.path.exists(model_path) and os.path.getsize(model_path) > 50000000):
-        print("Pre-downloading ISNet model with robust timeout protection...")
+        print("Pre-downloading U2-Net model with robust timeout protection...")
         import urllib.request
         import socket
         socket.setdefaulttimeout(120)  # Stop strict connection timeouts
@@ -55,11 +55,11 @@ def get_session():
     global ai_session
     if ai_session is None:
         try:
-            ensure_isnet_downloaded()
+            ensure_u2net_downloaded()
         except Exception as e:
             print(f"Robust download failed: {e}")
-        print("Loading ISNet General Use model...")
-        ai_session = new_session("isnet-general-use")
+        print("Loading U2-Net model...")
+        ai_session = new_session("u2net")
     return ai_session
 
 # Configure CORS for frontend communication
