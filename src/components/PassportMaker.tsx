@@ -394,70 +394,58 @@ export default function PassportMaker({ imageUrl, onBack }: PassportMakerProps) 
             </div>
 
             {/* Sidebar Controls */}
-            <div className="w-full md:w-[35%] flex flex-col gap-6">
-                <div className="bg-neutral-900/80 border border-neutral-800 rounded-2xl p-6 backdrop-blur-lg custom-scrollbar max-h-[85vh] overflow-y-auto">
+            <div className="w-full md:w-[35%] flex flex-col gap-4">
 
-                    {/* Border Controls */}
-                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-white border-b border-neutral-800 pb-3">
-                        <ImageIcon className="w-4 h-4 text-neutral-400" />
-                        Photo Border (Outline)
-                    </h3>
+                {/* Final Actions at Top for visibility */}
+                <div className="flex gap-3">
+                    <button
+                        onClick={handleDownloadSheet}
+                        className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold flex flex-col items-center justify-center gap-1 transition-colors shadow-lg shadow-emerald-500/20 text-sm"
+                    >
+                        <Download className="w-4 h-4" />
+                        PDF / Sheet
+                    </button>
+                    <button
+                        onClick={handlePrint}
+                        className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold flex flex-col items-center justify-center gap-1 transition-colors shadow-lg shadow-blue-500/20 text-sm"
+                    >
+                        <Printer className="w-4 h-4" />
+                        Print Directly
+                    </button>
+                </div>
 
-                    <div className="grid grid-cols-2 gap-4 mb-8">
-                        <div>
-                            <label className="text-sm text-neutral-400 block mb-2 font-medium">Thickness (px)</label>
-                            <input type="number" value={borderWidth} onChange={e => setBorderWidth(Number(e.target.value))} className="w-full bg-neutral-800 text-white rounded-xl px-4 py-3 border border-neutral-700 outline-none focus:border-blue-500" />
-                        </div>
-                        <div>
-                            <label className="text-sm text-neutral-400 block mb-2 font-medium">Color</label>
-                            <div className="relative w-full h-[50px] rounded-xl border border-neutral-700 overflow-hidden cursor-pointer" style={{ background: borderColor }}>
-                                <input type="color" value={borderColor} onChange={e => setBorderColor(e.target.value)} className="absolute inset-[-10px] w-[200%] h-[200%] cursor-pointer opacity-0" />
-                            </div>
-                        </div>
-                    </div>
+                <div className="bg-neutral-900/80 border border-neutral-800 rounded-2xl p-4 backdrop-blur-lg custom-scrollbar max-h-[75vh] overflow-y-auto">
 
-                    <h3 className="text-xl font-bold mb-6 mt-8 flex items-center gap-2 text-white border-b border-neutral-800 pb-4">
-                        <LayoutIcon className="w-5 h-5 text-neutral-400" />
+                    {/* Layout Settings */}
+                    <h3 className="text-base font-bold mb-3 flex items-center gap-2 text-white border-b border-neutral-800 pb-2">
+                        <LayoutIcon className="w-4 h-4 text-neutral-400" />
                         Layout Settings
                     </h3>
 
-                    <div className="space-y-6">
-                        {/* Paper & Unit */}
-                        <div>
-                            <label className="text-sm text-neutral-400 block mb-2 font-medium">Paper Size</label>
-                            <select
-                                className="w-full bg-neutral-800 text-white rounded-xl px-4 py-3 border border-neutral-700 outline-none focus:border-blue-500"
-                                value={paperSize.name}
-                                onChange={(e) => {
-                                    const size = PAPER_SIZES.find(s => s.name === e.target.value);
-                                    if (size) {
-                                        setPaperSize(size);
-                                        setMargin(size.defaultMargin);
-                                        setGap(size.defaultGap);
-                                    }
-                                }}
-                            >
-                                {PAPER_SIZES.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
-                            </select>
-                            <p className="text-xs text-green-400 mt-2 font-medium">Margin & Gap are auto-adjusted for {paperSize.name}</p>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-4">
+                        {/* Paper & Unit row */}
+                        <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="text-sm text-neutral-400 block mb-2 font-medium">Total Copies</label>
-                                <input
-                                    type="number"
-                                    value={copies === 0 ? "" : copies}
-                                    placeholder="Auto-fill page"
-                                    onChange={e => setCopies(Number(e.target.value) || 0)}
-                                    className="w-full bg-neutral-800 text-white rounded-xl px-4 py-3 border border-neutral-700 outline-none focus:border-blue-500 placeholder:text-neutral-600"
-                                />
-                                <p className="text-xs text-neutral-500 mt-1">Leave empty to auto-fill</p>
+                                <label className="text-xs text-neutral-400 block mb-1 font-medium">Paper Size</label>
+                                <select
+                                    className="w-full bg-neutral-800 text-white rounded-lg px-2 py-2 text-sm border border-neutral-700 outline-none focus:border-blue-500"
+                                    value={paperSize.name}
+                                    onChange={(e) => {
+                                        const size = PAPER_SIZES.find(s => s.name === e.target.value);
+                                        if (size) {
+                                            setPaperSize(size);
+                                            setMargin(size.defaultMargin);
+                                            setGap(size.defaultGap);
+                                        }
+                                    }}
+                                >
+                                    {PAPER_SIZES.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
+                                </select>
                             </div>
                             <div>
-                                <label className="text-sm text-neutral-400 block mb-2 font-medium">Units</label>
+                                <label className="text-xs text-neutral-400 block mb-1 font-medium">Units</label>
                                 <select
-                                    className="w-full bg-neutral-800 text-white rounded-xl px-4 py-3 border border-neutral-700 outline-none focus:border-blue-500"
+                                    className="w-full bg-neutral-800 text-white rounded-lg px-2 py-2 text-sm border border-neutral-700 outline-none focus:border-blue-500"
                                     value={unit}
                                     onChange={(e) => setUnit(e.target.value as "cm" | "in")}
                                 >
@@ -467,67 +455,78 @@ export default function PassportMaker({ imageUrl, onBack }: PassportMakerProps) 
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-sm text-neutral-400 block mb-2 font-medium">Photo Width ({unit})</label>
-                                <input type="number" step="0.1" value={photoWidth} onChange={e => setPhotoWidth(Number(e.target.value))} className="w-full bg-neutral-800 text-white rounded-xl px-4 py-3 border border-neutral-700 outline-none focus:border-blue-500" />
+                        {/* Dimensions row */}
+                        <div className="grid grid-cols-4 gap-2">
+                            <div className="col-span-1">
+                                <label className="text-xs text-neutral-400 block mb-1 font-medium truncate">W ({unit})</label>
+                                <input type="number" step="0.1" value={photoWidth} onChange={e => setPhotoWidth(Number(e.target.value))} className="w-full bg-neutral-800 text-white rounded-lg px-2 py-2 text-sm border border-neutral-700 outline-none focus:border-blue-500" />
                             </div>
-                            <div>
-                                <label className="text-sm text-neutral-400 block mb-2 font-medium">Photo Height ({unit})</label>
-                                <input type="number" step="0.1" value={photoHeight} onChange={e => setPhotoHeight(Number(e.target.value))} className="w-full bg-neutral-800 text-white rounded-xl px-4 py-3 border border-neutral-700 outline-none focus:border-blue-500" />
+                            <div className="col-span-1">
+                                <label className="text-xs text-neutral-400 block mb-1 font-medium truncate">H ({unit})</label>
+                                <input type="number" step="0.1" value={photoHeight} onChange={e => setPhotoHeight(Number(e.target.value))} className="w-full bg-neutral-800 text-white rounded-lg px-2 py-2 text-sm border border-neutral-700 outline-none focus:border-blue-500" />
+                            </div>
+                            <div className="col-span-1">
+                                <label className="text-xs text-neutral-400 block mb-1 font-medium truncate">Margin</label>
+                                <input type="number" step="0.1" value={margin} onChange={e => setMargin(Number(e.target.value))} className="w-full bg-neutral-800 text-white rounded-lg px-2 py-2 text-sm border border-neutral-700 outline-none focus:border-blue-500" />
+                            </div>
+                            <div className="col-span-1">
+                                <label className="text-xs text-neutral-400 block mb-1 font-medium truncate">Gap</label>
+                                <input type="number" step="0.1" value={gap} onChange={e => setGap(Number(e.target.value))} className="w-full bg-neutral-800 text-white rounded-lg px-2 py-2 text-sm border border-neutral-700 outline-none focus:border-blue-500" />
                             </div>
                         </div>
+                    </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-sm text-neutral-400 block mb-2 font-medium">Margin ({unit})</label>
-                                <input type="number" step="0.1" value={margin} onChange={e => setMargin(Number(e.target.value))} className="w-full bg-neutral-800 text-white rounded-xl px-4 py-3 border border-neutral-700 outline-none focus:border-blue-500" />
+                    {/* Border Controls */}
+                    <h3 className="text-base font-bold mb-3 mt-4 flex items-center gap-2 text-white border-b border-neutral-800 pb-2">
+                        <ImageIcon className="w-4 h-4 text-neutral-400" />
+                        Border & Copies
+                    </h3>
+
+                    <div className="grid grid-cols-3 gap-3">
+                        <div>
+                            <label className="text-xs text-neutral-400 block mb-1 font-medium">Thick (px)</label>
+                            <input type="number" value={borderWidth} onChange={e => setBorderWidth(Number(e.target.value))} className="w-full bg-neutral-800 text-white rounded-lg px-2 py-2 text-sm border border-neutral-700 outline-none focus:border-blue-500" />
+                        </div>
+                        <div>
+                            <label className="text-xs text-neutral-400 block mb-1 font-medium">Color</label>
+                            <div className="relative w-full h-[38px] rounded-lg border border-neutral-700 overflow-hidden cursor-pointer" style={{ background: borderColor }}>
+                                <input type="color" value={borderColor} onChange={e => setBorderColor(e.target.value)} className="absolute inset-[-10px] w-[200%] h-[200%] cursor-pointer opacity-0" />
                             </div>
-                            <div>
-                                <label className="text-sm text-neutral-400 block mb-2 font-medium">Gap ({unit})</label>
-                                <input type="number" step="0.1" value={gap} onChange={e => setGap(Number(e.target.value))} className="w-full bg-neutral-800 text-white rounded-xl px-4 py-3 border border-neutral-700 outline-none focus:border-blue-500" />
-                            </div>
+                        </div>
+                        <div>
+                            <label className="text-xs text-neutral-400 block mb-1 font-medium">Copies</label>
+                            <input
+                                type="number"
+                                value={copies === 0 ? "" : copies}
+                                placeholder="Auto"
+                                onChange={e => setCopies(Number(e.target.value) || 0)}
+                                className="w-full bg-neutral-800 text-white rounded-lg px-2 py-2 text-sm border border-neutral-700 outline-none focus:border-blue-500 placeholder:text-neutral-600"
+                            />
                         </div>
                     </div>
 
                     {/* Adjustments */}
-                    <h3 className="text-lg font-bold mb-2 mt-8 flex items-center gap-2 text-white border-b border-neutral-800 pb-3">
+                    <h3 className="text-base font-bold mb-3 mt-4 flex items-center gap-2 text-white border-b border-neutral-800 pb-2">
                         <Settings2 className="w-4 h-4 text-neutral-400" />
                         Adjust & Clean
                     </h3>
 
-                    <div>
-                        <div className="flex justify-between mb-1"><span className="text-sm text-neutral-400">Brightness</span><span className="text-sm font-bold">{brightness}%</span></div>
-                        <input type="range" min="0" max="200" value={brightness} onChange={e => setBrightness(Number(e.target.value))} className="w-full accent-blue-500" />
-                    </div>
-                    <div>
-                        <div className="flex justify-between mb-1"><span className="text-sm text-neutral-400">Contrast</span><span className="text-sm font-bold">{contrast}%</span></div>
-                        <input type="range" min="0" max="200" value={contrast} onChange={e => setContrast(Number(e.target.value))} className="w-full accent-blue-500" />
-                    </div>
-                    <div>
-                        <div className="flex justify-between mb-1"><span className="text-sm text-neutral-400">Saturation (Color)</span><span className="text-sm font-bold">{saturation}%</span></div>
-                        <input type="range" min="0" max="200" value={saturation} onChange={e => setSaturation(Number(e.target.value))} className="w-full accent-blue-500" />
+                    <div className="space-y-3">
+                        <div>
+                            <div className="flex justify-between mb-1"><span className="text-xs text-neutral-400">Brightness</span><span className="text-xs font-bold">{brightness}%</span></div>
+                            <input type="range" min="0" max="200" value={brightness} onChange={e => setBrightness(Number(e.target.value))} className="w-full h-1.5 accent-blue-500" />
+                        </div>
+                        <div>
+                            <div className="flex justify-between mb-1"><span className="text-xs text-neutral-400">Contrast</span><span className="text-xs font-bold">{contrast}%</span></div>
+                            <input type="range" min="0" max="200" value={contrast} onChange={e => setContrast(Number(e.target.value))} className="w-full h-1.5 accent-blue-500" />
+                        </div>
+                        <div>
+                            <div className="flex justify-between mb-1"><span className="text-xs text-neutral-400">Saturation</span><span className="text-xs font-bold">{saturation}%</span></div>
+                            <input type="range" min="0" max="200" value={saturation} onChange={e => setSaturation(Number(e.target.value))} className="w-full h-1.5 accent-blue-500" />
+                        </div>
                     </div>
 
                 </div>
-            </div>
-
-            {/* Final Actions */}
-            <div className="flex flex-col gap-3">
-                <button
-                    onClick={handleDownloadSheet}
-                    className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-500/20"
-                >
-                    <Download className="w-5 h-5" />
-                    Download PDF / Sheet
-                </button>
-                <button
-                    onClick={handlePrint}
-                    className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-blue-500/20"
-                >
-                    <Printer className="w-5 h-5" />
-                    Print Directly
-                </button>
             </div>
         </div>
     );
