@@ -130,18 +130,22 @@ async def worker_loop():
                 r, g, b, a = output_image.split()
                 rgb_image = Image.merge('RGB', (r, g, b))
                 
-                # 1. Boost Color Saturation
+                # 1. Boost Brightness (Very important for vibrant studio lighting effect)
+                brightness_enhancer = ImageEnhance.Brightness(rgb_image)
+                rgb_image = brightness_enhancer.enhance(1.15)
+                
+                # 2. Boost Color Saturation (Makes skin and dress colors 'pop')
                 color_enhancer = ImageEnhance.Color(rgb_image)
-                rgb_image = color_enhancer.enhance(1.2)
+                rgb_image = color_enhancer.enhance(1.25)
                 
-                # 2. Boost Contrast
+                # 3. Boost Contrast slightly
                 contrast_enhancer = ImageEnhance.Contrast(rgb_image)
-                rgb_image = contrast_enhancer.enhance(1.1)
+                rgb_image = contrast_enhancer.enhance(1.10)
                 
-                # 3. Sharpening for clearer edges/faces
-                rgb_image = rgb_image.filter(ImageFilter.SHARPEN)
+                # 4. Detail Filter to bring out fine textures
+                rgb_image = rgb_image.filter(ImageFilter.DETAIL)
                 
-                # 4. Optional subtle unsharp mask for deeper clarity
+                # 5. Subtle unsharp mask for deeper edge clarity
                 rgb_image = rgb_image.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
                 
                 # Re-attach transparent background
@@ -284,13 +288,16 @@ async def remove_background_legacy(file: UploadFile = File(...), enhance: bool =
             r, g, b, a = output_image.split()
             rgb_image = Image.merge('RGB', (r, g, b))
             
+            brightness_enhancer = ImageEnhance.Brightness(rgb_image)
+            rgb_image = brightness_enhancer.enhance(1.15)
+            
             color_enhancer = ImageEnhance.Color(rgb_image)
-            rgb_image = color_enhancer.enhance(1.2)
+            rgb_image = color_enhancer.enhance(1.25)
             
             contrast_enhancer = ImageEnhance.Contrast(rgb_image)
-            rgb_image = contrast_enhancer.enhance(1.1)
+            rgb_image = contrast_enhancer.enhance(1.10)
             
-            rgb_image = rgb_image.filter(ImageFilter.SHARPEN)
+            rgb_image = rgb_image.filter(ImageFilter.DETAIL)
             rgb_image = rgb_image.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
             
             r, g, b = rgb_image.split()
