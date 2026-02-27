@@ -11,10 +11,10 @@ interface PassportMakerProps {
 }
 
 const PAPER_SIZES = [
-    { name: "A4 (21 x 29.7 cm)", width: 21, height: 29.7, unit: "cm" },
-    { name: "4x6 inches", width: 4, height: 6, unit: "in" },
-    { name: "8x10 inches", width: 8, height: 10, unit: "in" },
-    { name: "Custom", width: 21, height: 29.7, unit: "cm" }
+    { name: "A4 (21 x 29.7 cm)", width: 21, height: 29.7, unit: "cm", defaultMargin: 1.0, defaultGap: 0.4 },
+    { name: "4x6 inches", width: 4, height: 6, unit: "in", defaultMargin: 0.32, defaultGap: 0.2 },
+    { name: "8x10 inches", width: 8, height: 10, unit: "in", defaultMargin: 0.5, defaultGap: 0.3 },
+    { name: "Custom", width: 21, height: 29.7, unit: "cm", defaultMargin: 1.0, defaultGap: 0.4 }
 ];
 
 export default function PassportMaker({ imageUrl, onBack }: PassportMakerProps) {
@@ -371,14 +371,15 @@ export default function PassportMaker({ imageUrl, onBack }: PassportMakerProps) 
                                         style={{ width: photoWidthPx, height: photoHeightPx }}
                                     >
                                         <div
-                                            className="w-full h-full border-solid box-border overflow-hidden"
+                                            className="w-full h-full box-border overflow-hidden"
                                             style={{
-                                                borderColor,
+                                                borderStyle: borderWidth > 0 ? "solid" : "none",
+                                                borderColor: borderColor,
                                                 borderWidth: `${borderWidth}px`,
                                                 filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`
                                             }}
                                         >
-                                            <img src={croppedImage!} alt="Passport" className="w-full h-full object-cover" />
+                                            <img src={croppedImage!} alt="Passport" className="w-full h-full object-cover" style={{ display: 'block' }} />
                                         </div>
                                     </div>
                                 ))}
@@ -399,7 +400,7 @@ export default function PassportMaker({ imageUrl, onBack }: PassportMakerProps) 
                     {/* Border Controls */}
                     <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-white border-b border-neutral-800 pb-3">
                         <ImageIcon className="w-4 h-4 text-neutral-400" />
-                        Photo Border
+                        Photo Border (Outline)
                     </h3>
 
                     <div className="grid grid-cols-2 gap-4 mb-8">
@@ -429,11 +430,16 @@ export default function PassportMaker({ imageUrl, onBack }: PassportMakerProps) 
                                 value={paperSize.name}
                                 onChange={(e) => {
                                     const size = PAPER_SIZES.find(s => s.name === e.target.value);
-                                    if (size) setPaperSize(size);
+                                    if (size) {
+                                        setPaperSize(size);
+                                        setMargin(size.defaultMargin);
+                                        setGap(size.defaultGap);
+                                    }
                                 }}
                             >
                                 {PAPER_SIZES.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
                             </select>
+                            <p className="text-xs text-green-400 mt-2 font-medium">Margin & Gap are auto-adjusted for {paperSize.name}</p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
