@@ -7,6 +7,8 @@ import { ArrowLeft, Printer, Download, Settings2, Image as ImageIcon, Layout as 
 
 interface AlbumMakerProps {
     imageUrl: string;
+    bgColor?: string;
+    customBgImage?: string | null;
     onBack: () => void;
 }
 
@@ -143,7 +145,7 @@ const PAPER_SIZES = [
     { name: "Custom", width: 21, height: 29.7, unit: "cm" }
 ];
 
-export default function AlbumMaker({ imageUrl, onBack }: AlbumMakerProps) {
+export default function AlbumMaker({ imageUrl, bgColor, customBgImage, onBack }: AlbumMakerProps) {
     const [step, setStep] = useState<"crop" | "layout">("crop");
     const [selectedFrameId, setSelectedFrameId] = useState("none");
 
@@ -192,6 +194,19 @@ export default function AlbumMaker({ imageUrl, onBack }: AlbumMakerProps) {
 
             canvas.width = croppedAreaPixels.width;
             canvas.height = croppedAreaPixels.height;
+
+            if (bgColor && bgColor !== "transparent") {
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            if (customBgImage) {
+                const bgImg = new window.Image();
+                if (customBgImage.startsWith("http")) bgImg.crossOrigin = "anonymous";
+                bgImg.src = customBgImage;
+                await new Promise((resolve) => { bgImg.onload = resolve; bgImg.onerror = resolve; });
+                ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+            }
 
             ctx.drawImage(
                 image,
@@ -324,7 +339,15 @@ export default function AlbumMaker({ imageUrl, onBack }: AlbumMakerProps) {
                 </div>
 
                 <div className="w-full bg-neutral-900 rounded-3xl border border-neutral-800 shadow-2xl relative flex flex-col justify-center items-center h-[65vh] overflow-hidden">
-                    <div className="relative w-full h-full flex-grow">
+                    <div
+                        className="relative w-full h-full flex-grow"
+                        style={{
+                            backgroundColor: bgColor && bgColor !== "transparent" ? bgColor : undefined,
+                            backgroundImage: customBgImage ? `url(${customBgImage})` : undefined,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                        }}
+                    >
                         <Cropper
                             image={imageUrl}
                             crop={crop}

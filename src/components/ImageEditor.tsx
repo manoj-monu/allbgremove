@@ -306,91 +306,23 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
     };
 
     const handleCreatePassport = () => {
-        if (!processedImageUrl || !canvasRef.current) return;
-
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-
-        const imgElement = new window.Image();
-        imgElement.src = processedImageUrl;
-
-        imgElement.onload = () => {
-            canvas.width = imgElement.width;
-            canvas.height = imgElement.height;
-
-            if (bgColor && bgColor !== "transparent") {
-                ctx.fillStyle = bgColor;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-
-            if (customBgImage) {
-                const bgImgElement = new window.Image();
-                if (customBgImage.startsWith("http")) {
-                    bgImgElement.crossOrigin = "anonymous";
-                }
-                bgImgElement.src = customBgImage;
-                bgImgElement.onload = () => {
-                    ctx.drawImage(bgImgElement, 0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(imgElement, 0, 0);
-                    setPassportImageUrl(canvas.toDataURL("image/png", 1.0));
-                    setPassportMode(true);
-                };
-                return;
-            }
-
-            ctx.drawImage(imgElement, 0, 0);
-            setPassportImageUrl(canvas.toDataURL("image/png", 1.0));
-            setPassportMode(true);
-        };
+        if (!processedImageUrl) return;
+        setPassportImageUrl(processedImageUrl);
+        setPassportMode(true);
     };
 
     const handleCreateAlbum = () => {
-        if (!processedImageUrl || !canvasRef.current) return;
-
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-
-        const imgElement = new window.Image();
-        imgElement.src = processedImageUrl;
-
-        imgElement.onload = () => {
-            canvas.width = imgElement.width;
-            canvas.height = imgElement.height;
-
-            if (bgColor && bgColor !== "transparent") {
-                ctx.fillStyle = bgColor;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-
-            if (customBgImage) {
-                const bgImgElement = new window.Image();
-                if (customBgImage.startsWith("http")) {
-                    bgImgElement.crossOrigin = "anonymous";
-                }
-                bgImgElement.src = customBgImage;
-                bgImgElement.onload = () => {
-                    ctx.drawImage(bgImgElement, 0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(imgElement, 0, 0);
-                    setAlbumImageUrl(canvas.toDataURL("image/png", 1.0));
-                    setAlbumMode(true);
-                };
-                return;
-            }
-
-            ctx.drawImage(imgElement, 0, 0);
-            setAlbumImageUrl(canvas.toDataURL("image/png", 1.0));
-            setAlbumMode(true);
-        };
+        if (!processedImageUrl) return;
+        setAlbumImageUrl(processedImageUrl);
+        setAlbumMode(true);
     };
 
     if (passportMode && passportImageUrl) {
-        return <PassportMaker imageUrl={passportImageUrl} onBack={() => setPassportMode(false)} />;
+        return <PassportMaker imageUrl={passportImageUrl} bgColor={bgColor} customBgImage={customBgImage} onBack={() => setPassportMode(false)} />;
     }
 
     if (albumMode && albumImageUrl) {
-        return <AlbumMaker imageUrl={albumImageUrl} onBack={() => setAlbumMode(false)} />;
+        return <AlbumMaker imageUrl={albumImageUrl} bgColor={bgColor} customBgImage={customBgImage} onBack={() => setAlbumMode(false)} />;
     }
 
     return (
