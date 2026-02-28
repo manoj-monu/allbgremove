@@ -259,34 +259,33 @@ async def get_result(task_id: str, download_name: str = None):
         headers={"Content-Disposition": f'attachment; filename="{fn}"'}
     )
 
-stashed_blobs = {}
-
 @app.post("/api/stash")
 async def stash_blob(file: UploadFile = File(...)):
-    # Temporarily hold an explicitly encoded PNG from the frontend Canvas
+    # Save the explicitly encoded PNG from the frontend Canvas to the shared disk
     # This circumvents Chrome's Javascript Memory Blob corruption bugs via native HTTP downloads
     stash_id = str(uuid.uuid4())
     contents = await file.read()
     
-    # Optional Validation (ensure the canvas actually provided a PNG)
-    stashed_blobs[stash_id] = {
-        "content": contents,
-        "filename": file.filename or "canvas_export.png",
-        "created_at": time.time()
-    }
-    return {"stash_id": stash_id}
+    os.makedirs("results", exist_ok=True)
+    stash_path = f"results/stash_{stash_id}.png"
+    
+    with open(stash_path, "wb") as f:
+        f.write(contents)
+        
+    return {"stash_id": stash_id, "filename": file.filename or "canvas_export.png"}
 
 @app.get("/api/download-stashed/{stash_id}")
-async def download_stashed(stash_id: str):
-    if stash_id not in stashed_blobs:
+async def download_stashed(stash_id: str, download_name: str = "canvas_export.png"):
+    # Read from shared disk so any worker can answer
+    stash_path = f"results/stash_{stash_id}.png"
+    
+    if not os.path.exists(stash_path):
         raise HTTPException(status_code=404, detail="Stash expired or not found")
         
-    data = stashed_blobs[stash_id]
-    
-    return Response(
-        content=data["content"], 
+    return FileResponse(
+        stash_path, 
         media_type="image/png", 
-        headers={"Content-Disposition": f'attachment; filename="{data["filename"]}"'}
+        headers={"Content-Disposition": f'attachment; filename="{download_name}"'}
     )
 
 @app.post("/api/remove-bg")
