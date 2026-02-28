@@ -220,29 +220,41 @@ async def queue_remove_background(file: UploadFile = File(...), enhance: bool = 
 
 @app.get("/api/status/{task_id}")
 async def get_status(task_id: str):
-    if task_id not in tasks:
-        raise HTTPException(status_code=404, detail="Task not found")
+    # If this specific worker has the task, return its exact status
+    if task_id in tasks:
+        status = tasks[task_id]["status"]
+        return {
+            "status": status, 
+            "queue_length": task_queue.qsize() if status == "pending" else 0,
+            "error": tasks[task_id].get("error")
+        }
     
-    # Calculate approximate queue position
-    status = tasks[task_id]["status"]
+    # If we are in a multi-worker environment (Render Pro), another worker might have it.
+    # Check the shared disk to see if it's already done.
+    if os.path.exists(f"results/{task_id}.png"):
+        return {
+            "status": "completed",
+            "queue_length": 0,
+        }
+        
+    # Otherwise, assume it's still being processed by another worker
     return {
-        "status": status, 
-        "queue_length": task_queue.qsize() if status == "pending" else 0,
-        "error": tasks[task_id].get("error")
+        "status": "processing",
+        "queue_length": 1,
     }
 
 @app.get("/api/result/{task_id}")
 async def get_result(task_id: str, download_name: str = None):
-    if task_id not in tasks:
-        raise HTTPException(status_code=404, detail="Task not found")
+    # Bypass the dictionary and serve strictly from the shared filesystem
+    # so any worker can answer the download request
+    result_path = f"results/{task_id}.png"
     
-    task = tasks[task_id]
-    if task["status"] != "completed":
-        raise HTTPException(status_code=400, detail="Result not ready yet")
+    if not os.path.exists(result_path):
+        raise HTTPException(status_code=400, detail="Result not ready yet or task expired")
         
     fn = download_name if download_name else f"removed_bg_{task_id}.png"
     return FileResponse(
-        task["result_path"], 
+        result_path, 
         media_type="image/png", 
         headers={"Content-Disposition": f'attachment; filename="{fn}"'}
     )
