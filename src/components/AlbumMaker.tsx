@@ -195,14 +195,10 @@ export default function AlbumMaker({ imageUrl, onBack }: AlbumMakerProps) {
 
             ctx.drawImage(
                 image,
-                croppedAreaPixels.x,
-                croppedAreaPixels.y,
-                croppedAreaPixels.width,
-                croppedAreaPixels.height,
-                0,
-                0,
-                croppedAreaPixels.width,
-                croppedAreaPixels.height
+                -croppedAreaPixels.x,
+                -croppedAreaPixels.y,
+                image.width,
+                image.height
             );
 
             setCroppedImage(canvas.toDataURL("image/png", 1.0));
@@ -337,21 +333,30 @@ export default function AlbumMaker({ imageUrl, onBack }: AlbumMakerProps) {
                             onCropChange={setCrop}
                             onCropComplete={onCropComplete}
                             onZoomChange={setZoom}
+                            minZoom={0.2}
+                            maxZoom={5}
+                            restrictPosition={false}
                         />
                     </div>
                     {/* Photo zoom control */}
-                    <div className="w-full bg-neutral-900/80 border-t border-neutral-800 p-4 flex items-center justify-center gap-6 shrink-0 backdrop-blur-md z-10">
-                        <span className="text-white font-medium text-sm">Zoom Photo</span>
+                    <div className="w-full bg-neutral-900/80 border-t border-neutral-800 p-4 flex flex-col sm:flex-row items-center justify-center gap-4 shrink-0 backdrop-blur-md z-10 transition-all">
+                        <div className="text-white font-medium text-sm flex items-center gap-2 whitespace-nowrap">
+                            <LayoutIcon className="w-4 h-4 text-blue-400" />
+                            Scale & Free Move
+                        </div>
                         <input
                             type="range"
-                            min={1}
-                            max={3}
+                            min={0.2}
+                            max={5}
                             step={0.05}
                             value={zoom}
                             onChange={(e) => setZoom(Number(e.target.value))}
                             className="w-full max-w-xs accent-blue-500 cursor-pointer"
                         />
-                        <span className="text-neutral-400 text-sm">{Math.round(zoom * 100)}%</span>
+                        <span className="text-neutral-400 text-sm w-12 text-right">{Math.round(zoom * 100)}%</span>
+                        <div className="hidden sm:block text-xs text-neutral-500 italic ml-4">
+                            (Drag photo to adjust)
+                        </div>
                     </div>
                 </div>
             </div>
