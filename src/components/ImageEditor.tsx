@@ -286,7 +286,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                         const data = await res.json();
 
                         // Force real OS-level download stream through an explicit HTTP redirect!
-                        window.location.href = `${apiUrl}/api/download-stashed/${data.stash_id}`;
+                        window.location.href = `${apiUrl}/api/download-stashed/${data.stash_id}?download_name=${encodeURIComponent(filename)}`;
 
                     } catch (err) {
                         console.error("Stash download failed, falling back manually...", err);
