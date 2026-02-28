@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { useCallback } from "react";
-import Cropper from "react-easy-crop";
+import { Rnd } from "react-rnd";
 import { ArrowLeft, Printer, Download, Settings2, Image as ImageIcon, Layout as LayoutIcon, Camera } from "lucide-react";
 import { saveAs } from "file-saver";
 
@@ -23,9 +23,9 @@ export default function PassportMaker({ imageUrl, bgColor, customBgImage, onBack
     const [step, setStep] = useState<"crop" | "layout">("crop");
 
     // Crop State
-    const [crop, setCrop] = useState({ x: 0, y: 0 });
-    const [zoom, setZoom] = useState(1);
-    const [croppedAreaPixels, setCroppedAreaPixels] = useState<{ x: number, y: number, width: number, height: number } | null>(null);
+    const [rndPos, setRndPos] = useState({ x: 0, y: 0 });
+    const [rndSize, setRndSize] = useState<{ width: number | string, height: number | string }>({ width: "100%", height: "100%" });
+    const cropperContainerRef = useRef<HTMLDivElement>(null);
     const [croppedImage, setCroppedImage] = useState<string | null>(null);
 
     // Photo Dimensions (Default: 3 x 3.5 cm to fit 12 photos perfectly on 4x6)
@@ -50,24 +50,23 @@ export default function PassportMaker({ imageUrl, bgColor, customBgImage, onBack
     const previewContainerRef = useRef<HTMLDivElement>(null);
     const [previewScale, setPreviewScale] = useState(1);
 
-    const onCropComplete = useCallback((croppedArea: { x: number, y: number, width: number, height: number }, croppedAreaPixels: { x: number, y: number, width: number, height: number }) => {
-        setCroppedAreaPixels(croppedAreaPixels);
-    }, []);
-
     const createCroppedImage = async () => {
-        if (!croppedAreaPixels) return;
         try {
+            if (!cropperContainerRef.current) return;
+            const containerWidth = cropperContainerRef.current.clientWidth;
+            const containerHeight = cropperContainerRef.current.clientHeight;
+
             const image = new window.Image();
             image.crossOrigin = "anonymous";
             image.src = imageUrl;
-            await new Promise((resolve) => { image.onload = resolve; });
+            await new Promise((resolve) => { image.onload = resolve; image.onerror = resolve; });
+
+            const targetWidthPx = unit === "cm" ? photoWidth * (dpi / 2.54) : photoWidth * dpi;
+            const targetHeightPx = unit === "cm" ? photoHeight * (dpi / 2.54) : photoHeight * dpi;
 
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
             if (!ctx) return;
-
-            const targetWidthPx = unit === "cm" ? photoWidth * (dpi / 2.54) : photoWidth * dpi;
-            const targetHeightPx = unit === "cm" ? photoHeight * (dpi / 2.54) : photoHeight * dpi;
 
             canvas.width = targetWidthPx;
             canvas.height = targetHeightPx;
@@ -88,15 +87,22 @@ export default function PassportMaker({ imageUrl, bgColor, customBgImage, onBack
                 ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
             }
 
-            const scaleX = targetWidthPx / croppedAreaPixels.width;
-            const scaleY = targetHeightPx / croppedAreaPixels.height;
+            const getPx = (val: string | number, max: number) =>
+                typeof val === 'string' && val.endsWith('%') ? (parseFloat(val) / 100) * max : typeof val === 'number' ? val : parseInt(val as string, 10);
+
+            const resolvedWidth = getPx(rndSize.width, containerWidth);
+            const resolvedHeight = getPx(rndSize.height, containerHeight);
+
+            const scaleX = targetWidthPx / containerWidth;
+            const scaleY = targetHeightPx / containerHeight;
 
             ctx.drawImage(
                 image,
-                -croppedAreaPixels.x * scaleX,
-                -croppedAreaPixels.y * scaleY,
-                image.width * scaleX,
-                image.height * scaleY
+                0, 0, image.naturalWidth, image.naturalHeight,
+                rndPos.x * scaleX,
+                rndPos.y * scaleY,
+                resolvedWidth * scaleX,
+                resolvedHeight * scaleY
             );
 
             setCroppedImage(canvas.toDataURL("image/png", 1.0));
@@ -279,47 +285,79 @@ export default function PassportMaker({ imageUrl, bgColor, customBgImage, onBack
                     </div>
                 </div>
 
-                <div className="w-full bg-neutral-900 rounded-3xl border border-neutral-800 shadow-2xl relative flex flex-col justify-center items-center h-[65vh] overflow-hidden">
+                <div className="w-full flex-grow flex justify-center items-center relative py-6 bg-neutral-900 rounded-3xl border border-neutral-800 shadow-2xl h-[65vh] overflow-hidden">
                     <div
-                        className="relative w-full h-full flex-grow"
+                        ref={cropperContainerRef}
+                        className="relative ring-4 ring-neutral-700/50 shadow-2xl"
                         style={{
                             backgroundColor: bgColor && bgColor !== "transparent" ? bgColor : undefined,
                             backgroundImage: customBgImage ? `url(${customBgImage})` : undefined,
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
+                            aspectRatio: `${photoWidth} / ${photoHeight}`,
+                            maxHeight: '100%',
+                            maxWidth: '100%',
+                            height: '100%'
                         }}
                     >
-                        <Cropper
-                            image={imageUrl}
-                            crop={crop}
-                            zoom={zoom}
-                            aspect={photoWidth / photoHeight}
-                            onCropChange={setCrop}
-                            onCropComplete={onCropComplete}
-                            onZoomChange={setZoom}
-                            minZoom={0.2}
-                            maxZoom={5}
-                            restrictPosition={false}
-                        />
+                        <Rnd
+                            position={{ x: rndPos.x, y: rndPos.y }}
+                            size={{ width: rndSize.width, height: rndSize.height }}
+                            onDragStop={(e, d) => setRndPos({ x: d.x, y: d.y })}
+                            onResize={(e, direction, ref, delta, position) => {
+                                setRndSize({ width: ref.style.width, height: ref.style.height });
+                                setRndPos(position);
+                            }}
+                            lockAspectRatio={false}
+                            resizeHandleStyles={{
+                                top: { cursor: 'n-resize', background: '#3b82f6', width: '10px', height: '10px', borderRadius: '20%', top: '-5px', left: '50%', transform: 'translateX(-50%)', border: '1px solid white', boxShadow: '0 0 2px rgba(0,0,0,0.5)' },
+                                bottom: { cursor: 's-resize', background: '#3b82f6', width: '10px', height: '10px', borderRadius: '20%', bottom: '-5px', left: '50%', transform: 'translateX(-50%)', border: '1px solid white', boxShadow: '0 0 2px rgba(0,0,0,0.5)' },
+                                left: { cursor: 'w-resize', background: '#3b82f6', width: '10px', height: '10px', borderRadius: '20%', left: '-5px', top: '50%', transform: 'translateY(-50%)', border: '1px solid white', boxShadow: '0 0 2px rgba(0,0,0,0.5)' },
+                                right: { cursor: 'e-resize', background: '#3b82f6', width: '10px', height: '10px', borderRadius: '20%', right: '-5px', top: '50%', transform: 'translateY(-50%)', border: '1px solid white', boxShadow: '0 0 2px rgba(0,0,0,0.5)' },
+                                topRight: { cursor: 'ne-resize', background: '#3b82f6', width: '10px', height: '10px', borderRadius: '20%', top: '-5px', right: '-5px', border: '1px solid white', boxShadow: '0 0 2px rgba(0,0,0,0.5)' },
+                                bottomRight: { cursor: 'se-resize', background: '#3b82f6', width: '10px', height: '10px', borderRadius: '20%', bottom: '-5px', right: '-5px', border: '1px solid white', boxShadow: '0 0 2px rgba(0,0,0,0.5)' },
+                                bottomLeft: { cursor: 'sw-resize', background: '#3b82f6', width: '10px', height: '10px', borderRadius: '20%', bottom: '-5px', left: '-5px', border: '1px solid white', boxShadow: '0 0 2px rgba(0,0,0,0.5)' },
+                                topLeft: { cursor: 'nw-resize', background: '#3b82f6', width: '10px', height: '10px', borderRadius: '20%', top: '-5px', left: '-5px', border: '1px solid white', boxShadow: '0 0 2px rgba(0,0,0,0.5)' },
+                            }}
+                        >
+                            <img
+                                src={imageUrl}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    display: 'block',
+                                    outline: '1px solid rgba(59, 130, 246, 0.4)',
+                                    filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`
+                                }}
+                                draggable="false"
+                            />
+                        </Rnd>
                     </div>
-                    {/* Photo zoom control */}
-                    <div className="w-full bg-neutral-900/80 border-t border-neutral-800 p-4 flex flex-col sm:flex-row items-center justify-center gap-4 shrink-0 backdrop-blur-md z-10 transition-all">
-                        <div className="text-white font-medium text-sm flex items-center gap-2 whitespace-nowrap">
-                            <LayoutIcon className="w-4 h-4 text-blue-400" />
-                            Scale & Free Move
+                </div>
+
+                <div className="w-full mt-4 bg-neutral-900/80 border border-neutral-800 p-4 rounded-xl flex items-center justify-center gap-4 text-emerald-400 font-medium text-sm">
+                    ✨ Photoshop Mode: Drag the photo edges to stretch perfectly inside the frame!
+                </div>
+
+                {/* Adjustments */}
+                <div className="w-full mt-4 bg-neutral-900/50 border border-neutral-800 p-4 rounded-xl">
+                    <h3 className="text-sm font-bold mb-3 flex items-center gap-2 text-white border-b border-neutral-800 pb-2">
+                        <Settings2 className="w-4 h-4 text-neutral-400" />
+                        Adjust & Clean
+                    </h3>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div>
+                            <div className="flex justify-between mb-1"><span className="text-xs text-neutral-400">Brightness</span><span className="text-xs font-bold">{brightness}%</span></div>
+                            <input type="range" min="0" max="200" value={brightness} onChange={e => setBrightness(Number(e.target.value))} className="w-full h-1.5 accent-blue-500 cursor-pointer" />
                         </div>
-                        <input
-                            type="range"
-                            min={0.2}
-                            max={5}
-                            step={0.05}
-                            value={zoom}
-                            onChange={(e) => setZoom(Number(e.target.value))}
-                            className="w-full max-w-xs accent-blue-500 cursor-pointer"
-                        />
-                        <span className="text-neutral-400 text-sm w-12 text-right">{Math.round(zoom * 100)}%</span>
-                        <div className="hidden sm:block text-xs text-neutral-500 italic ml-4">
-                            (Drag photo to adjust)
+                        <div>
+                            <div className="flex justify-between mb-1"><span className="text-xs text-neutral-400">Contrast</span><span className="text-xs font-bold">{contrast}%</span></div>
+                            <input type="range" min="0" max="200" value={contrast} onChange={e => setContrast(Number(e.target.value))} className="w-full h-1.5 accent-blue-500 cursor-pointer" />
+                        </div>
+                        <div>
+                            <div className="flex justify-between mb-1"><span className="text-xs text-neutral-400">Saturation</span><span className="text-xs font-bold">{saturation}%</span></div>
+                            <input type="range" min="0" max="200" value={saturation} onChange={e => setSaturation(Number(e.target.value))} className="w-full h-1.5 accent-blue-500 cursor-pointer" />
                         </div>
                     </div>
                 </div>
@@ -529,26 +567,7 @@ export default function PassportMaker({ imageUrl, bgColor, customBgImage, onBack
                         </div>
                     </div>
 
-                    {/* Adjustments */}
-                    <h3 className="text-base font-bold mb-3 mt-4 flex items-center gap-2 text-white border-b border-neutral-800 pb-2">
-                        <Settings2 className="w-4 h-4 text-neutral-400" />
-                        Adjust & Clean
-                    </h3>
 
-                    <div className="space-y-3">
-                        <div>
-                            <div className="flex justify-between mb-1"><span className="text-xs text-neutral-400">Brightness</span><span className="text-xs font-bold">{brightness}%</span></div>
-                            <input type="range" min="0" max="200" value={brightness} onChange={e => setBrightness(Number(e.target.value))} className="w-full h-1.5 accent-blue-500" />
-                        </div>
-                        <div>
-                            <div className="flex justify-between mb-1"><span className="text-xs text-neutral-400">Contrast</span><span className="text-xs font-bold">{contrast}%</span></div>
-                            <input type="range" min="0" max="200" value={contrast} onChange={e => setContrast(Number(e.target.value))} className="w-full h-1.5 accent-blue-500" />
-                        </div>
-                        <div>
-                            <div className="flex justify-between mb-1"><span className="text-xs text-neutral-400">Saturation</span><span className="text-xs font-bold">{saturation}%</span></div>
-                            <input type="range" min="0" max="200" value={saturation} onChange={e => setSaturation(Number(e.target.value))} className="w-full h-1.5 accent-blue-500" />
-                        </div>
-                    </div>
 
                 </div>
             </div>

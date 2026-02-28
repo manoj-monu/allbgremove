@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import Link from "next/link";
 import { Metadata } from "next";
 
@@ -71,3 +72,4 @@ export default function TermsAndConditions() {
         </main>
     );
 }
+
