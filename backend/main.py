@@ -31,14 +31,14 @@ rembg.sessions.base.BaseSession.__init__ = custom_init
 
 processing_lock = asyncio.Lock()
 
-def ensure_u2net_downloaded():
+def ensure_bria_downloaded():
     u2net_home = os.path.expanduser("~/.u2net")
     os.makedirs(u2net_home, exist_ok=True)
-    model_path = os.path.join(u2net_home, "u2netp.onnx")
-    url = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2netp.onnx"
+    model_path = os.path.join(u2net_home, "bria-rmbg.onnx")
+    url = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/bria-rmbg-2.0.onnx"
     
     if not (os.path.exists(model_path) and os.path.getsize(model_path) > 4000000):
-        print("Pre-downloading U2-NetP model with robust timeout protection...")
+        print("Pre-downloading BRIA RMBG model with robust timeout protection...")
         import urllib.request
         import socket
         socket.setdefaulttimeout(120)  # Stop strict connection timeouts
@@ -55,11 +55,11 @@ def get_session():
     global ai_session
     if ai_session is None:
         try:
-            ensure_u2net_downloaded()
+            ensure_bria_downloaded()
         except Exception as e:
             print(f"Robust download failed: {e}")
-        print("Loading U2-NetP model...")
-        ai_session = new_session("u2netp")
+        print("Loading BRIA RMBG model...")
+        ai_session = new_session("bria-rmbg")
     return ai_session
 
 # Configure CORS for frontend communication
