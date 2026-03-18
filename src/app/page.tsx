@@ -4,8 +4,8 @@ import ImageEditor from "@/components/ImageEditor";
 import BulkEditor from "@/components/BulkEditor";
 import { ReactCompareSlider, ReactCompareSliderImage } from "react-compare-slider";
 import Link from "next/link";
-import { Sparkles, Zap, Palette, Check, Twitter, Instagram, Linkedin, Upload, MousePointer2, Layers, Monitor, ShieldCheck, MessageCircle, ChevronRight, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles, Zap, Camera, Lock, Tag, Upload, Download, ArrowRight, Instagram, Facebook, LayoutGrid, CheckCircle2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function Home() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -23,241 +23,275 @@ export default function Home() {
     }
   };
 
-  return (
-    <main className="min-h-screen bg-[#F9FAFB] text-slate-900 flex flex-col items-center font-sans selection:bg-blue-100">
-      {/* Dynamic Header */}
-      <header className="w-full sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-10">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="bg-blue-600 p-1.5 rounded-lg group-hover:rotate-12 transition-transform">
-                <Layers className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-black tracking-tighter text-gray-900">ALLBgremove</span>
-            </Link>
-            
-            <nav className="hidden md:flex items-center gap-8 text-[14px] font-semibold text-gray-500">
-              <Link href="#" className="hover:text-blue-600 transition">Home</Link>
-              <Link href="#" className="hover:text-blue-600 transition">How it Works</Link>
-              <Link href="#pricing" className="hover:text-blue-600 transition">Pricing</Link>
-              <Link href="#" className="hover:text-blue-600 transition">Blog</Link>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button className="text-[14px] font-bold text-gray-700 hover:text-gray-900 px-4 py-2">Login</button>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white text-[14px] font-bold px-6 py-2.5 rounded-full shadow-lg shadow-blue-500/20 transition-all active:scale-95">Sign Up</button>
-          </div>
+  // If files are uploaded, switch to editors
+  if (uploadedFiles.length > 0) {
+    return (
+      <main className="min-h-screen bg-[conic-gradient(at_top_left,_var(--tw-gradient-stops))] from-indigo-900 via-fuchsia-600 to-rose-500 font-sans">
+        <div className="w-full flex justify-center max-w-7xl mx-auto px-4 py-8 relative z-10">
+          {uploadedFiles.length === 1 ? (
+            <ImageEditor file={uploadedFiles[0]} onReset={() => setUploadedFiles([])} />
+          ) : (
+            <BulkEditor files={uploadedFiles} onReset={() => setUploadedFiles([])} />
+          )}
         </div>
-      </header>
+      </main>
+    );
+  }
 
-      <div className="w-full flex-grow flex flex-col items-center">
-        {!uploadedFiles.length ? (
-          <div className="w-full max-w-7xl mx-auto px-6 pt-16 pb-24">
-            <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+  // GLASSMORPHIC UTILITY
+  const glassPanel = "bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)]";
+
+  return (
+    <main className="min-h-screen bg-[conic-gradient(at_top,_var(--tw-gradient-stops))] from-purple-800 via-fuchsia-500 to-sky-400 text-white font-sans relative overflow-x-hidden pt-8 pb-16">
+      {/* Background ambient light blobs */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-400/30 rounded-full blur-[120px] mix-blend-screen pointer-events-none"></div>
+      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-orange-400/20 rounded-full blur-[150px] mix-blend-screen pointer-events-none"></div>
+
+      <div className="max-w-6xl mx-auto px-6 relative z-10 flex flex-col items-center gap-16">
+        
+        {/* --- HERO SECTION --- */}
+        <section className="w-full flex flex-col lg:flex-row items-center justify-between gap-12 mt-4">
+          {/* Left: Text & Upload */}
+          <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} className="w-full lg:w-1/2 flex flex-col items-start">
+            <h1 className="text-5xl lg:text-6xl font-bold leading-tight mb-4 tracking-tight drop-shadow-sm">
+              Remove Image <br/>Background Instantly
+            </h1>
+            <p className="text-lg text-white/80 mb-8 max-w-md font-medium">
+              100% automatic, free & high-quality<br/>background remover powered by AI
+            </p>
+
+            {/* Glass Dropzone */}
+            <div 
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={handleDrop}
+              className={`w-full max-w-md ${glassPanel} rounded-3xl p-6 flex flex-col items-center justify-center border-dashed border-2 border-white/40 hover:bg-white/20 transition-all group`}
+            >
+              <div className="bg-white/20 p-4 rounded-2xl mb-4 group-hover:scale-110 transition-transform">
+                <Upload className="w-8 h-8 text-white drop-shadow-md" />
+              </div>
+              <p className="text-white/90 font-medium mb-6">Drag & Drop Image Here <span className="text-white/60 text-sm">or</span></p>
               
-              {/* Left Column: Text & Upload */}
-              <motion.div 
-                initial={{ opacity: 0, x: -30 }} 
-                animate={{ opacity: 1, x: 0 }}
-                className="w-full lg:w-[45%] flex flex-col items-start"
-              >
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[11px] font-black uppercase tracking-widest mb-6">
-                  <Sparkles className="w-3.5 h-3.5" /> #1 AI Background Remover
-                </div>
-                
-                <h1 className="text-5xl md:text-[64px] font-black leading-[1.05] text-gray-900 mb-6 tracking-tight">
-                  Instant Background <br /><span className="text-blue-600">Remover</span>
-                </h1>
-                
-                <p className="text-lg text-gray-500 font-medium mb-10 leading-relaxed max-w-lg">
-                  Erase backgrounds from your photos in one click. Fast, free, and accurate. Trusted by 2M+ creators.
-                </p>
-
-                {/* PixelCut Style Dropzone */}
-                <div 
-                  className="w-full bg-white rounded-[2rem] border-2 border-dashed border-gray-200 p-2 shadow-xl shadow-gray-200/40 hover:border-blue-400 transition-all group"
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={handleDrop}
-                >
-                  <div className="w-full bg-gray-50/50 rounded-[1.8rem] py-10 flex flex-col items-center justify-center text-center px-4">
-                    <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
-                      <Upload className="w-7 h-7 text-blue-600" />
-                    </div>
-                    <div className="text-[15px] font-bold text-gray-800 mb-1 uppercase tracking-wider">Drag & Drop your image here</div>
-                    <div className="text-xs text-gray-400 font-medium mb-6 uppercase tracking-widest">or</div>
-                    
-                    <button 
-                      onClick={() => document.getElementById('file-upload')?.click()}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-4 rounded-2xl shadow-lg shadow-blue-500/30 flex items-center gap-2 transition-all active:scale-95"
-                    >
-                      <Upload className="w-5 h-5" /> Upload Image
-                    </button>
-                    <input id="file-upload" type="file" multiple className="hidden" accept="image/*" onChange={handleFileUpload} />
-                  </div>
-                </div>
-
-                {/* Features Row */}
-                <div className="mt-12 flex items-center gap-8 w-full border-t border-gray-100 pt-8">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-5 h-5 text-gray-400" />
-                    <span className="text-xs font-bold text-gray-500 tracking-tight">AI-Powered<br/>Accuracy</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Layers className="w-5 h-5 text-gray-400" />
-                    <span className="text-xs font-bold text-gray-500 tracking-tight">Batch<br/>Processing</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Monitor className="w-5 h-5 text-gray-400" />
-                    <span className="text-xs font-bold text-gray-500 tracking-tight">High-Resolution<br/>Quality</span>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Right Column: Comparison & Samples */}
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }} 
-                animate={{ opacity: 1, scale: 1 }}
-                className="w-full lg:w-[55%] flex flex-col items-center relative"
-              >
-                {/* Floating Effect Circles */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-100 rounded-full blur-[100px] opacity-20 -z-10"></div>
-
-                <div className="w-full aspect-[1.3] rounded-[2.5rem] bg-white shadow-2xl shadow-blue-900/10 border-8 border-white overflow-hidden relative group">
-                  <ReactCompareSlider
-                    className="w-full h-full"
-                    position={50}
-                    itemOne={<ReactCompareSliderImage src="/demo-before.jpg" alt="Original" className="object-cover" />}
-                    itemTwo={
-                      <div className="w-full h-full relative" style={{ backgroundImage: 'linear-gradient(45deg, #f3f4f6 25%, transparent 25%), linear-gradient(-45deg, #f3f4f6 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f3f4f6 75%), linear-gradient(-45deg, transparent 75%, #f3f4f6 75%)', backgroundSize: '20px 20px' }}>
-                        <ReactCompareSliderImage src="/demo-after.png" alt="Clean" className="object-cover absolute inset-0" />
-                      </div>
-                    }
-                  />
-                  {/* Floating Hand Indicator */}
-                  <motion.div 
-                    animate={{ x: [0, 10, 0] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
-                    className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-white/20 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-500"
-                  >
-                    <MousePointer2 className="w-3 h-3 text-blue-600" /> Slide to compare
-                  </motion.div>
-                </div>
-
-                {/* Try Sample Images Section */}
-                <div className="mt-10 bg-white/50 backdrop-blur-sm p-5 rounded-[2rem] border border-white flex items-center gap-6 shadow-sm">
-                  <span className="text-[11px] font-black uppercase tracking-widest text-gray-400">Try Sample Images</span>
-                  <div className="flex gap-3">
-                    {[1, 2, 3].map((i) => (
-                      <div 
-                        key={i} 
-                        className="w-14 h-14 rounded-2xl overflow-hidden cursor-pointer hover:border-blue-500 border-2 border-transparent transition-all hover:-translate-y-1"
-                        onClick={() => {/* Mock Sample Selection */}}
-                      >
-                        <img src="/demo-before.jpg" alt="Sample" className="w-full h-full object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
+              <div className="flex gap-3 w-full">
+                <button onClick={() => document.getElementById('file-upload')?.click()} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl shadow-lg transition-transform active:scale-95 border border-blue-400">
+                  Upload Image
+                </button>
+                <button onClick={() => document.getElementById('file-upload')?.click()} className="flex-1 bg-white text-blue-600 hover:bg-gray-50 font-bold py-3 rounded-xl shadow-lg transition-transform active:scale-95 border border-white/50">
+                  Try a Sample
+                </button>
+                <input id="file-upload" type="file" multiple className="hidden" accept="image/*" onChange={handleFileUpload} />
+              </div>
             </div>
+          </motion.div>
 
-            {/* Premium Sections integrated into main page flow for PixelCut feel */}
-            {/* Elite AI Quality showcase section... */}
-            <div className="mt-32 w-full">
-              <div className="w-full bg-[#050505] text-white py-24 px-10 rounded-[3rem] overflow-hidden relative shadow-3xl">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px]"></div>
-                <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16 relative z-10">
-                  <div className="md:w-1/2">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-6">
-                      <Sparkles className="w-3.5 h-3.5" /> Elite AI Quality
+          {/* Right: Hero Slider */}
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="w-full lg:w-1/2 flex justify-end">
+            <div className={`w-full max-w-lg aspect-square ${glassPanel} rounded-[2.5rem] p-3 overflow-hidden`}>
+              <div className="w-full h-full rounded-[2rem] overflow-hidden relative border border-white/20 shadow-inner">
+                <ReactCompareSlider
+                  itemOne={<ReactCompareSliderImage src="/demo-before.jpg" alt="Original" />}
+                  itemTwo={
+                    <div className="w-full h-full" style={{ backgroundImage: 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)', backgroundSize: '16px 16px', backgroundColor: 'white' }}>
+                      <ReactCompareSliderImage src="/demo-after.png" alt="Removed" className="absolute inset-0" />
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black mb-8 leading-[1.1] tracking-tight">Better than Adobe.<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Fast as Light.</span></h2>
-                    <div className="space-y-6 text-gray-400 text-sm font-medium">
-                      <div className="flex gap-4">
-                        <Zap className="text-blue-400 w-5 h-5 flex-shrink-0" />
-                        <p>Pixel-Perfect Alpha Matting: Handles single strands of hair with zero debris.</p>
-                      </div>
-                      <div className="flex gap-4">
-                        <Palette className="text-purple-400 w-5 h-5 flex-shrink-0" />
-                        <p>Color Isolation: Ensures colors don&apos;t bleed into transparency.</p>
-                      </div>
+                  }
+                  className="w-full h-full"
+                />
+                <div className="absolute top-4 left-4 bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold tracking-wider text-white">Before</div>
+                <div className="absolute top-4 right-4 bg-white/90 text-black px-4 py-1.5 rounded-full text-xs font-bold tracking-wider shadow-lg shadow-white/20">After</div>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* --- SEE THE MAGIC --- */}
+        <section className="w-full flex flex-col items-center">
+          <div className="flex items-center gap-4 w-full mb-8">
+            <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent to-white/30"></div>
+            <h2 className="text-2xl font-bold tracking-wide">See the Magic</h2>
+            <div className="h-[1px] flex-grow bg-gradient-to-l from-transparent to-white/30"></div>
+          </div>
+
+          <div className={`w-full max-w-4xl min-h-[400px] ${glassPanel} rounded-[2rem] p-3 relative overflow-hidden`}>
+            <div className="w-full h-full rounded-[1.5rem] overflow-hidden relative border border-white/20">
+              <ReactCompareSlider
+                itemOne={<div className="bg-gray-900 w-full h-[380px] flex items-center justify-center text-white/50">(Replace with Car Before Image)</div>}
+                itemTwo={
+                    <div className="w-full h-[380px] flex items-center justify-center text-black/50" style={{ backgroundImage: 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)', backgroundSize: '16px 16px', backgroundColor: 'white' }}>
+                      (Replace with Car After Image)
                     </div>
-                  </div>
-                  <div className="md:w-1/2 grid grid-cols-2 gap-4 w-full">
-                    <div className="bg-white/5 p-6 rounded-3xl border border-white/10 text-center">
-                      <div className="text-2xl font-black text-blue-400">0.8s</div>
-                      <div className="text-[9px] uppercase font-bold text-gray-500 tracking-widest">Speed</div>
-                    </div>
-                    <div className="bg-white/5 p-6 rounded-3xl border border-white/10 text-center">
-                      <div className="text-2xl font-black">4K</div>
-                      <div className="text-[9px] uppercase font-bold text-gray-500 tracking-widest">Export</div>
-                    </div>
+                }
+                className="w-full h-[380px]"
+              />
+              <div className="absolute top-4 right-4 bg-white/90 text-black px-4 py-1.5 rounded-full text-xs font-bold shadow-lg">After</div>
+            </div>
+          </div>
+        </section>
+
+        {/* --- WHY CHOOSE US --- */}
+        <section className="w-full flex flex-col items-center">
+          <div className="flex items-center gap-4 w-full mb-8">
+            <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent to-white/30"></div>
+            <h2 className="text-2xl font-bold tracking-wide text-white">Why Choose Us?</h2>
+            <div className="h-[1px] flex-grow bg-gradient-to-l from-transparent to-white/30"></div>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-4 w-full">
+            <div className={`${glassPanel} rounded-2xl p-4 flex flex-col items-start hover:-translate-y-1 transition-transform cursor-default min-w-[180px] flex-1`}>
+              <div className="flex items-center gap-2 mb-2 font-bold text-white"><Zap className="w-5 h-5 text-yellow-300" /> Instant Results</div>
+              <p className="text-white/70 text-xs font-medium">Remove backgrounds in seconds</p>
+            </div>
+            <div className={`${glassPanel} rounded-2xl p-4 flex flex-col items-start hover:-translate-y-1 transition-transform cursor-default min-w-[180px] flex-1`}>
+              <div className="flex items-center gap-2 mb-2 font-bold text-white"><Sparkles className="w-5 h-5 text-white" /> AI Powered</div>
+              <p className="text-white/70 text-xs font-medium">Advanced AI Technology</p>
+            </div>
+            <div className={`${glassPanel} rounded-2xl p-4 flex flex-col items-start hover:-translate-y-1 transition-transform cursor-default min-w-[180px] flex-1`}>
+              <div className="flex items-center gap-2 mb-2 font-bold text-white"><Camera className="w-5 h-5 text-white" /> HD Quality</div>
+              <p className="text-white/70 text-xs font-medium">High Resolution Output</p>
+            </div>
+            <div className={`${glassPanel} rounded-2xl p-4 flex flex-col items-start hover:-translate-y-1 transition-transform cursor-default min-w-[180px] flex-1`}>
+              <div className="flex items-center gap-2 mb-2 font-bold text-white"><Lock className="w-5 h-5 text-slate-800 fill-slate-800" /> Secure & Private</div>
+              <p className="text-white/70 text-xs font-medium">Your images are safe</p>
+            </div>
+            <div className={`${glassPanel} rounded-2xl p-4 flex flex-col items-start hover:-translate-y-1 transition-transform cursor-default min-w-[180px] flex-1`}>
+              <div className="flex items-center gap-2 mb-2 font-bold text-white"><Tag className="w-5 h-5 text-white" /> Free to Use</div>
+              <p className="text-white/70 text-xs font-medium">100% Free & Easy</p>
+            </div>
+          </div>
+        </section>
+
+        {/* --- PERFECT FOR ANY PROJECT --- */}
+        <section className="w-full flex flex-col items-center">
+          <div className="flex items-center gap-4 w-full mb-8">
+            <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent to-white/30"></div>
+            <h2 className="text-2xl font-bold tracking-wide">Perfect for Any Project</h2>
+            <div className="h-[1px] flex-grow bg-gradient-to-l from-transparent to-white/30"></div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+            {[
+              { id: 1, name: "E-Commerce", b: "bg-orange-500/20" },
+              { id: 2, name: "Profile Pictures", b: "bg-blue-600/20" },
+              { id: 3, name: "Car Photos", b: "bg-red-600/20" },
+              { id: 4, name: "Social Media", b: "bg-indigo-600/20" }
+            ].map(cat => (
+              <div key={cat.id} className={`${glassPanel} ${cat.b} rounded-2xl overflow-hidden group relative aspect-[4/3] flex flex-col justify-end p-4 border border-white/20 hover:border-white/50 transition-colors`}>
+                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <LayoutGrid className="w-8 h-8 text-white/60" />
+                </div>
+                <div className="relative z-10 w-full text-center">
+                  <div className={`w-full py-2.5 rounded-xl ${glassPanel} font-bold text-sm tracking-wide shadow-lg border-white/30`}>
+                    {cat.name}
                   </div>
                 </div>
               </div>
+            ))}
+          </div>
+        </section>
+
+        {/* --- HOW IT WORKS --- */}
+        <section className="w-full flex flex-col items-center">
+          <div className="flex items-center gap-4 w-full mb-8">
+            <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent to-white/30"></div>
+            <h2 className="text-2xl font-bold tracking-wide">How It Works</h2>
+            <div className="h-[1px] flex-grow bg-gradient-to-l from-transparent to-white/30"></div>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 w-full max-w-4xl">
+            <div className={`${glassPanel} flex-1 w-full rounded-2xl py-6 px-4 flex flex-col items-center text-center`}>
+              <Upload className="w-8 h-8 mb-3 text-white" />
+              <h3 className="font-bold text-sm">1. Upload Image</h3>
             </div>
-
-            {/* Pricing Section styled cleanly */}
-            <section id="pricing" className="mt-32 w-full text-center">
-              <h2 className="text-4xl font-black text-gray-900 mb-4 tracking-tighter">Transparent Pricing</h2>
-              <p className="text-gray-500 font-medium mb-16 underline underline-offset-8 decoration-blue-200">Start for free, upgrade when you&apos;re ready for scale.</p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Simplified Card Style */}
-                <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all flex flex-col items-start text-left group">
-                  <h3 className="text-xl font-bold text-gray-800 mb-6">Social</h3>
-                  <div className="text-4xl font-black mb-8 underline decoration-4 decoration-blue-100">$0</div>
-                  <ul className="space-y-4 mb-10 flex-grow text-gray-500 font-medium text-sm">
-                    <li className="flex items-center gap-1.5"><Check className="w-4 h-4 text-blue-500" /> SD Results</li>
-                    <li className="flex items-center gap-1.5"><Check className="w-4 h-4 text-blue-500" /> Standard Edits</li>
-                  </ul>
-                  <button className="w-full py-4 rounded-2xl bg-gray-50 text-gray-600 font-black text-[13px] hover:bg-gray-100 transition-colors uppercase tracking-widest">Get Started</button>
-                </div>
-
-                <div className="bg-blue-600 p-10 rounded-[2.5rem] shadow-2xl shadow-blue-500/30 flex flex-col items-start text-left relative overflow-hidden transform md:-translate-y-4">
-                  <div className="absolute top-0 right-0 bg-white/20 px-3 py-1 text-white text-[9px] font-black uppercase tracking-widest rounded-bl-xl">Pro</div>
-                  <h3 className="text-xl font-bold text-white mb-6">Creator</h3>
-                  <div className="text-4xl font-black text-white mb-8">$12</div>
-                  <ul className="space-y-4 mb-10 flex-grow text-blue-100 font-medium text-sm">
-                    <li className="flex items-center gap-1.5"><Check className="w-4 h-4 text-white" /> 4K Ultra HD</li>
-                    <li className="flex items-center gap-1.5"><Check className="w-4 h-4 text-white" /> AI Enhancement</li>
-                    <li className="flex items-center gap-1.5"><Check className="w-4 h-4 text-white" /> Bulk Processing</li>
-                  </ul>
-                  <button className="w-full py-4 rounded-2xl bg-white text-blue-600 font-black text-[13px] hover:bg-gray-100 transition-colors uppercase tracking-widest">Start Trial</button>
-                </div>
-
-                <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all flex flex-col items-start text-left group">
-                  <h3 className="text-xl font-bold text-gray-800 mb-6">Agency</h3>
-                  <div className="text-4xl font-black mb-8 underline decoration-4 decoration-blue-100">$49</div>
-                  <ul className="space-y-4 mb-10 flex-grow text-gray-500 font-medium text-sm">
-                    <li className="flex items-center gap-1.5"><Check className="w-4 h-4 text-blue-500" /> API Access</li>
-                    <li className="flex items-center gap-1.5"><Check className="w-4 h-4 text-blue-500" /> Account Manager</li>
-                  </ul>
-                  <button className="w-full py-4 rounded-2xl bg-gray-50 text-gray-600 font-black text-[13px] hover:bg-gray-100 transition-colors uppercase tracking-widest">Contact Sales</button>
-                </div>
-              </div>
-            </section>
+            <ArrowRight className="hidden md:block w-8 h-8 text-white/50" />
+            <div className={`${glassPanel} flex-1 w-full rounded-2xl py-6 px-4 flex flex-col items-center text-center border-white/50 shadow-[0_0_20px_rgba(255,255,255,0.3)] bg-white/20`}>
+              <Sparkles className="w-8 h-8 mb-3 text-white drop-shadow" />
+              <h3 className="font-bold text-sm text-white">2. AI Removes Background</h3>
+            </div>
+            <ArrowRight className="hidden md:block w-8 h-8 text-white/50" />
+            <div className={`${glassPanel} flex-1 w-full rounded-2xl py-6 px-4 flex flex-col items-center text-center`}>
+              <Download className="w-8 h-8 mb-3 text-white" />
+              <h3 className="font-bold text-sm">3. Download HD Image</h3>
+            </div>
           </div>
-        ) : (
-          <div className="w-full flex justify-center max-w-7xl px-4 py-8">
-            {uploadedFiles.length === 1 ? (
-              <ImageEditor file={uploadedFiles[0]} onReset={() => setUploadedFiles([])} />
-            ) : (
-              <BulkEditor files={uploadedFiles} onReset={() => setUploadedFiles([])} />
-            )}
+        </section>
+
+        {/* --- PRICING PLANS --- */}
+        <section className="w-full flex flex-col items-center mb-10">
+          <div className="flex items-center gap-4 w-full mb-8">
+            <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent to-white/30"></div>
+            <h2 className="text-2xl font-bold tracking-wide">Pricing Plans</h2>
+            <div className="h-[1px] flex-grow bg-gradient-to-l from-transparent to-white/30"></div>
           </div>
-        )}
+
+          <div className={`${glassPanel} rounded-[2.5rem] p-2 w-full max-w-4xl relative overflow-hidden group border border-white/30`}>
+            {/* The golden glow behind dark card */}
+            <div className="absolute right-0 bottom-0 top-0 w-1/2 bg-gradient-to-br from-amber-400/20 via-rose-500/20 to-purple-700/20 blur-3xl opacity-50"></div>
+            
+            <div className="flex flex-col md:flex-row relative z-10 h-[320px]">
+               
+               {/* VS Badge */}
+               <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-gradient-to-r from-orange-500 to-rose-500 rounded-lg items-center justify-center font-black text-white shadow-xl z-20">
+                 VS
+               </div>
+
+               {/* Free Plan Card */}
+               <div className="bg-white text-gray-900 rounded-[2rem] p-8 md:w-1/2 flex flex-col relative overflow-hidden shadow-2xl z-10 border border-white/50 m-1">
+                 {/* Internal swoop for free plan */}
+                 <div className="absolute bottom-0 right-0 w-[150%] h-[100px] bg-gradient-to-tr from-amber-100/50 via-rose-50/50 to-transparent blur-xl -rotate-12 translate-y-10 translate-x-10"></div>
+                 
+                 <h3 className="text-2xl font-black text-center mb-6">Free Plan</h3>
+                 
+                 <ul className="space-y-4 mb-10 text-sm font-semibold flex-grow px-4 text-gray-700">
+                   <li className="flex items-center gap-3"><CheckCircle2 className="w-4 h-4 text-gray-500" /> Basic Resolution</li>
+                   <li className="flex items-center gap-3"><CheckCircle2 className="w-4 h-4 text-gray-500" /> Limited Features</li>
+                 </ul>
+                 
+                 <button className="w-full max-w-[200px] mx-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition-transform active:scale-95 z-20">
+                   Get Started
+                 </button>
+               </div>
+
+               {/* Premium Dark Card */}
+               <div className="bg-[#1a1442]/90 backdrop-blur-xl text-white rounded-[2rem] p-8 md:pl-16 md:w-1/2 flex flex-col relative overflow-hidden shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] border border-white/10 z-0 m-1">
+                  <div className="absolute bottom-0 left-0 w-[150%] h-[100px] bg-gradient-to-tr from-rose-500/20 via-orange-400/20 to-transparent blur-2xl rotate-12 translate-y-10 -translate-x-10"></div>
+                 
+                 <div className="mb-6 flex items-end gap-2 justify-center pb-2">
+                   <span className="text-4xl font-black tracking-tighter">₹0</span>
+                   <span className="text-sm text-white/80 font-semibold mb-1">Always Free</span>
+                 </div>
+                 
+                 <ul className="space-y-4 mb-10 text-sm font-medium flex-grow md:pl-4 text-white/90">
+                   <li className="flex items-center gap-3"><CheckCircle2 className="w-4 h-4 text-white" /> Gemini-Grade Resolution</li>
+                   <li className="flex items-center gap-3"><CheckCircle2 className="w-4 h-4 text-white" /> Absolute Full Features</li>
+                 </ul>
+                 
+                 <button className="w-full max-w-[200px] mx-auto bg-gradient-to-r from-[#201040] to-[#1a103c] border border-white/20 hover:border-white/40 text-white font-bold py-3.5 rounded-xl shadow-2xl transition-all active:scale-95 z-20 hover:shadow-purple-500/20 relative overflow-hidden mix-blend-screen">
+                   <span className="relative z-10">Upgrade Now</span>
+                 </button>
+               </div>
+
+            </div>
+          </div>
+        </section>
+
       </div>
 
-      {/* Floating Chat Button (Mockup detail) */}
-      <motion.button 
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        className="fixed bottom-8 right-8 w-14 h-14 bg-blue-600 rounded-full shadow-2xl shadow-blue-600/40 flex items-center justify-center text-white z-[150]"
-      >
-        <MessageCircle className="w-6 h-6" />
-      </motion.button>
+      {/* --- FOOTER --- */}
+      <div className="w-full mt-6 pb-6">
+        <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-10 text-xs font-semibold text-white/80 px-6 max-w-4xl mx-auto">
+          <Link href="#" className="hover:text-white transition-colors">About</Link>
+          <Link href="#" className="hover:text-white transition-colors">Features</Link>
+          <Link href="#" className="hover:text-white transition-colors">Pricing</Link>
+          <Link href="#" className="hover:text-white transition-colors">Contact</Link>
+          <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
+          
+          <div className="flex gap-4 ml-auto">
+             <Facebook className="w-4 h-4 hover:text-white cursor-pointer transition-colors" />
+             <Instagram className="w-4 h-4 hover:text-white cursor-pointer transition-colors" />
+             <div className="w-4 h-4 rounded-full border-2 border-current hover:text-white cursor-pointer transition-colors flex items-center justify-center"><div className="w-1.5 h-1.5 bg-current rounded-full" /></div>
+          </div>
+        </div>
+      </div>
+
     </main>
   );
 }
