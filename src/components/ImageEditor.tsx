@@ -306,23 +306,91 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
     };
 
     const handleCreatePassport = () => {
-        if (!processedImageUrl) return;
-        setPassportImageUrl(processedImageUrl);
-        setPassportMode(true);
+        if (!processedImageUrl || !canvasRef.current) return;
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        const imgElement = new window.Image();
+        imgElement.src = processedImageUrl;
+
+        imgElement.onload = () => {
+            canvas.width = imgElement.width;
+            canvas.height = imgElement.height;
+
+            if (bgColor && bgColor !== "transparent") {
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            if (customBgImage) {
+                const bgImgElement = new window.Image();
+                if (customBgImage.startsWith("http")) {
+                    bgImgElement.crossOrigin = "anonymous";
+                }
+                bgImgElement.src = customBgImage;
+                bgImgElement.onload = () => {
+                    ctx.drawImage(bgImgElement, 0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(imgElement, 0, 0);
+                    setPassportImageUrl(canvas.toDataURL("image/png", 1.0));
+                    setPassportMode(true);
+                };
+                return;
+            }
+
+            ctx.drawImage(imgElement, 0, 0);
+            setPassportImageUrl(canvas.toDataURL("image/png", 1.0));
+            setPassportMode(true);
+        };
     };
 
     const handleCreateAlbum = () => {
-        if (!processedImageUrl) return;
-        setAlbumImageUrl(processedImageUrl);
-        setAlbumMode(true);
+        if (!processedImageUrl || !canvasRef.current) return;
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        const imgElement = new window.Image();
+        imgElement.src = processedImageUrl;
+
+        imgElement.onload = () => {
+            canvas.width = imgElement.width;
+            canvas.height = imgElement.height;
+
+            if (bgColor && bgColor !== "transparent") {
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            if (customBgImage) {
+                const bgImgElement = new window.Image();
+                if (customBgImage.startsWith("http")) {
+                    bgImgElement.crossOrigin = "anonymous";
+                }
+                bgImgElement.src = customBgImage;
+                bgImgElement.onload = () => {
+                    ctx.drawImage(bgImgElement, 0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(imgElement, 0, 0);
+                    setAlbumImageUrl(canvas.toDataURL("image/png", 1.0));
+                    setAlbumMode(true);
+                };
+                return;
+            }
+
+            ctx.drawImage(imgElement, 0, 0);
+            setAlbumImageUrl(canvas.toDataURL("image/png", 1.0));
+            setAlbumMode(true);
+        };
     };
 
     if (passportMode && passportImageUrl) {
-        return <PassportMaker imageUrl={passportImageUrl} bgColor={bgColor} customBgImage={customBgImage} onBack={() => setPassportMode(false)} />;
+        return <PassportMaker imageUrl={passportImageUrl} onBack={() => setPassportMode(false)} />;
     }
 
     if (albumMode && albumImageUrl) {
-        return <AlbumMaker imageUrl={albumImageUrl} bgColor={bgColor} customBgImage={customBgImage} onBack={() => setAlbumMode(false)} />;
+        return <AlbumMaker imageUrl={albumImageUrl} onBack={() => setAlbumMode(false)} />;
     }
 
     return (
@@ -334,17 +402,15 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                 {/* Close Button top right */}
                 <button
                     onClick={onReset}
-                    className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors"
+                    className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-100 text-gray-400 transition-colors z-[110]"
                 >
                     <X className="w-6 h-6" />
                 </button>
 
-                {/* Tabs removed as interactive Before/After slider now handles this elegantly */}
-
-                <div className="w-full flex flex-col md:flex-row gap-8">
+                <div className="w-full flex flex-col md:flex-row gap-10">
                     {/* Left side: Image Display */}
-                    <div className="w-full md:w-[60%] flex flex-col items-center">
-                        <div className="w-full aspect-[4/3] bg-[url('https://www.remove.bg/images/transparency_demo_1.png')] bg-repeat rounded-2xl overflow-hidden flex items-center justify-center relative shadow-inner border border-gray-200" style={{ backgroundSize: '20px 20px' }}>
+                    <div className="w-full md:w-[65%] flex flex-col items-center">
+                        <div className="w-full aspect-[4/3] bg-[url('https://www.remove.bg/images/transparency_demo_1.png')] bg-repeat rounded-[2rem] overflow-hidden flex items-center justify-center relative shadow-inner border border-gray-100" style={{ backgroundSize: '20px 20px' }}>
                             {isProcessing ? (
                                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 backdrop-blur-md z-10 overflow-hidden">
                                     {/* Rose Rain Animation */}
@@ -370,65 +436,63 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                             </motion.div>
                                         ))}
                                     </div>
-                                    <div className="relative z-20 flex flex-col items-center bg-white/90 px-8 py-5 rounded-3xl shadow-xl border border-rose-100">
+                                    <div className="relative z-20 flex flex-col items-center bg-white/90 px-10 py-6 rounded-[2.5rem] shadow-2xl border border-rose-50">
                                         <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1.5 }}>
-                                            <Sparkles className="w-10 h-10 text-rose-500 mb-3" />
+                                            <Sparkles className="w-12 h-12 text-blue-600 mb-3" />
                                         </motion.div>
-                                        <p className="font-bold text-gray-800 text-lg bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-pink-500">
-                                            Removing background...
+                                        <p className="font-black text-gray-900 text-lg uppercase tracking-tighter">
+                                            Removing Background...
                                         </p>
                                     </div>
                                 </div>
                             ) : error ? (
                                 <div className="absolute inset-0 flex items-center justify-center bg-white/90 z-10 p-6 text-center">
-                                    <p className="text-red-500 font-medium">{error}</p>
+                                    <p className="text-red-500 font-bold">{error}</p>
                                 </div>
                             ) : null}
 
                             {!isProcessing && !error && (
                                 <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
                                     className="w-full h-full relative"
                                 >
                                     {processedImageUrl && originalImageUrl ? (
                                         <div className="w-full h-full relative">
                                             {/* Top Toggle Switch */}
-                                            <div className="absolute top-4 right-4 z-20 flex bg-white/90 backdrop-blur-md rounded-full p-1 shadow-md border border-gray-100">
+                                            <div className="absolute top-6 right-6 z-20 flex bg-white/90 backdrop-blur-md rounded-full p-1 shadow-xl border border-gray-100">
                                                 <button
                                                     onClick={() => setViewMode("original")}
-                                                    className={`px-4 py-1.5 text-sm font-bold rounded-full transition-all ${viewMode === "original" ? "bg-gray-800 shadow-md text-white" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
+                                                    className={`px-5 py-2 text-xs font-black uppercase tracking-widest rounded-full transition-all ${viewMode === "original" ? "bg-gray-900 text-white shadow-lg shadow-black/20" : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"}`}
                                                 >
                                                     Original
                                                 </button>
                                                 <button
                                                     onClick={() => setViewMode("removed")}
-                                                    className={`px-4 py-1.5 text-sm font-bold rounded-full transition-all ${viewMode === "removed" ? "bg-gray-800 shadow-md text-white" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
+                                                    className={`px-5 py-2 text-xs font-black uppercase tracking-widest rounded-full transition-all ${viewMode === "removed" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"}`}
                                                 >
-                                                    Removed BG
+                                                    Removed
                                                 </button>
                                             </div>
 
                                             {viewMode === "original" ? (
                                                 <div className="w-full h-full relative bg-white">
-                                                    <div className="absolute inset-4">
-                                                        <img src={originalImageUrl} alt="Original" className="w-full h-full object-contain absolute inset-0" />
+                                                    <div className="absolute inset-4 flex items-center justify-center">
+                                                        <img src={originalImageUrl} alt="Original" className="w-full h-full object-contain" />
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="w-full h-full relative" style={{
+                                                <div className="w-full h-full relative flex items-center justify-center" style={{
                                                     backgroundColor: bgColor !== "transparent" ? bgColor : undefined,
                                                     backgroundImage: customBgImage ? `url(${customBgImage})` : undefined,
                                                     backgroundSize: 'cover',
                                                     backgroundPosition: 'center',
                                                 }}>
-
-                                                    {/* LIVE CSS FILTER RENDERER (replicates the backend perfectly at 60fps) */}
-                                                    <div className="absolute inset-4">
+                                                    <div className="absolute inset-4 h-full w-full flex items-center justify-center">
                                                         <img
                                                             src={processedImageUrl}
                                                             alt="Removed Background"
-                                                            className="w-full h-full object-contain absolute inset-0"
+                                                            className="w-full h-full object-contain"
                                                             style={{
                                                                 filter: enhance ? `contrast(${1 + (enhanceLevel * 0.002)}) saturate(${1 + (enhanceLevel * 0.004)}) brightness(${1 + (enhanceLevel * 0.001)})` : 'none'
                                                             }}
@@ -437,19 +501,15 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                                             <img
                                                                 src={processedImageUrl}
                                                                 alt="Smoothing Layer"
-                                                                className="w-full h-full object-contain absolute inset-0 pointer-events-none"
+                                                                className="w-full h-full object-contain absolute opacity-0 pointer-events-none"
                                                                 style={{
-                                                                    opacity: enhanceLevel * 0.006, // Max density 0.6
-                                                                    filter: 'blur(4px) brightness(1.15) contrast(1.1)',
+                                                                    opacity: enhanceLevel * 0.005,
+                                                                    filter: 'blur(3px) brightness(1.1) contrast(1.1)',
                                                                     mixBlendMode: 'screen',
                                                                     WebkitMaskImage: `url(${processedImageUrl})`,
                                                                     WebkitMaskSize: 'contain',
                                                                     WebkitMaskPosition: 'center',
-                                                                    WebkitMaskRepeat: 'no-repeat',
-                                                                    maskImage: `url(${processedImageUrl})`,
-                                                                    maskSize: 'contain',
-                                                                    maskPosition: 'center',
-                                                                    maskRepeat: 'no-repeat'
+                                                                    WebkitMaskRepeat: 'no-repeat'
                                                                 }}
                                                             />
                                                         )}
@@ -464,73 +524,69 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
 
                         {/* Tools Toolbar under image */}
                         {!isProcessing && !error && (
-                            <div className="mt-4 flex flex-wrap gap-3 justify-center w-full">
+                            <div className="mt-8 flex flex-wrap gap-3 justify-center w-full">
                                 <button
                                     onClick={() => setShowBackgroundOptions(!showBackgroundOptions)}
-                                    className={`px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 shadow-sm hover:shadow-md ${showBackgroundOptions ? 'bg-blue-600 text-white shadow-blue-500/30 ring-2 ring-blue-600 ring-offset-2' : 'bg-blue-50 text-blue-700 hover:bg-blue-100'}`}
+                                    className={`px-6 py-3 rounded-full text-[13px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${showBackgroundOptions ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 ring-4 ring-blue-50' : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md'}`}
                                 >
-                                    <Palette className="w-4 h-4" /> Add Background
+                                    <Palette className="w-4 h-4" /> Background
                                 </button>
                                 <button
                                     onClick={() => setEnhance(!enhance)}
-                                    className={`px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 shadow-sm hover:shadow-md ${enhance ? 'bg-purple-600 text-white shadow-purple-500/30 ring-2 ring-purple-600 ring-offset-2' : 'bg-purple-50 text-purple-700 hover:bg-purple-100'}`}
+                                    className={`px-6 py-3 rounded-full text-[13px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${enhance ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-500/30' : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md'}`}
                                 >
-                                    <Sparkles className="w-4 h-4" /> AI Enhance {enhance ? 'On' : 'Off'}
+                                    <Sparkles className="w-4 h-4" /> AI Enhance
                                 </button>
                                 <button
                                     onClick={handleCreatePassport}
-                                    className="px-5 py-2.5 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 shadow-sm hover:shadow-md"
+                                    className="px-6 py-3 bg-white text-gray-700 hover:bg-gray-50 rounded-full text-[13px] font-black uppercase tracking-widest flex items-center gap-2 transition-all shadow-md"
                                 >
-                                    <LayoutGrid className="w-4 h-4" /> Passport Photo
+                                    <LayoutGrid className="w-4 h-4" /> Passport 
                                 </button>
                                 <button
                                     onClick={handleCreateAlbum}
-                                    className="px-5 py-2.5 bg-teal-50 text-teal-700 hover:bg-teal-100 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 shadow-sm hover:shadow-md"
+                                    className="px-6 py-3 bg-white text-gray-700 hover:bg-gray-50 rounded-full text-[13px] font-black uppercase tracking-widest flex items-center gap-2 transition-all shadow-md"
                                 >
-                                    <ImageIcon className="w-4 h-4" /> Album Picture
+                                    <ImageIcon className="w-4 h-4" /> Album
                                 </button>
                             </div>
                         )}
-
-
                     </div>
 
                     {/* Right side: Download Panel */}
-                    <div className="w-full md:w-[40%] flex flex-col pt-4">
-                        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 flex flex-col h-full">
-                            <h3 className="text-xl font-bold text-gray-900 mb-6">Download Image</h3>
+                    <div className="w-full md:w-[35%] flex flex-col">
+                        <div className="bg-gray-50/50 rounded-[2.5rem] p-8 border border-gray-100 flex flex-col h-full shadow-sm">
+                            <h3 className="text-[14px] font-black text-gray-400 uppercase tracking-[0.2em] mb-8">Export Settings</h3>
 
                             {/* Standard Download Option */}
-                            <div className="flex flex-col mb-6">
-                                <div className="flex justify-between items-center mb-2">
-                                    <span className="font-semibold text-gray-800 text-lg">Preview Image</span>
-                                    <span className="text-sm text-gray-500 font-medium">600 × 400</span>
+                            <div className="flex flex-col mb-10">
+                                <div className="flex justify-between items-center mb-4">
+                                    <span className="font-black text-gray-900 text-xl tracking-tight">Full Result</span>
+                                    <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-black uppercase tracking-widest">HD Ready</div>
                                 </div>
                                 <button
                                     onClick={handleDownload}
                                     disabled={isProcessing || !processedImageUrl || !!error}
-                                    className="w-full py-3.5 bg-[#0066FF] hover:bg-blue-600 disabled:bg-blue-300 text-white rounded-full font-bold text-lg transition-colors shadow-lg shadow-blue-500/30 flex justify-center items-center"
+                                    className="w-full py-5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-2xl font-black text-lg transition-all shadow-xl shadow-blue-500/30 flex justify-center items-center group active:scale-95"
                                 >
-                                    Download
+                                    Download <Download className="w-5 h-5 ml-2 group-hover:translate-y-1 transition-transform" />
                                 </button>
-                                <p className="text-xs text-gray-500 text-center mt-2 font-medium">Good quality up to 0.25 megapixels</p>
+                                <p className="text-[10px] text-gray-400 text-center mt-4 font-black uppercase tracking-widest leading-relaxed">Compressed with high-fidelity for <br/> professional printing & web</p>
                             </div>
 
-                            <div className="h-px bg-gray-200 w-full mb-6"></div>
+                            <div className="h-px bg-gray-200/50 w-full mb-8"></div>
 
-                            {/* Interactive Tool Panels moved to Right Side */}
-                            <div className="flex flex-col mb-auto space-y-4">
-                                {/* Enhance Slider UI */}
+                            {/* Feature Sliders */}
+                            <div className="flex flex-col space-y-6">
                                 {!isProcessing && !error && enhance && (
                                     <motion.div
-                                        initial={{ height: 0, opacity: 0 }}
-                                        animate={{ height: 'auto', opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }}
-                                        className="w-full flex flex-col items-center bg-purple-50 rounded-xl p-4 border border-purple-100"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="w-full bg-white rounded-[2rem] p-6 shadow-sm border border-gray-50"
                                     >
-                                        <div className="flex justify-between w-full mb-2">
-                                            <span className="text-sm font-semibold text-purple-800">Beauty & Smooth</span>
-                                            <span className="text-sm font-bold text-purple-600">{enhanceLevel}%</span>
+                                        <div className="flex justify-between items-center mb-4">
+                                            <span className="text-[11px] font-black uppercase tracking-widest text-indigo-600">Smoothing Filter</span>
+                                            <span className="text-[11px] font-black text-gray-900 bg-indigo-50 px-2 py-0.5 rounded-lg">{enhanceLevel}%</span>
                                         </div>
                                         <input
                                             type="range"
@@ -538,93 +594,78 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                             max="100"
                                             value={enhanceLevel}
                                             onChange={(e) => setEnhanceLevel(Number(e.target.value))}
-                                            className="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                                            className="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                                         />
                                     </motion.div>
                                 )}
 
-                                {/* Background Options Panel */}
-                                <AnimatePresence>
-                                    {showBackgroundOptions && (
+                                {showBackgroundOptions && (
+                                    <AnimatePresence>
                                         <motion.div
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: 'auto', opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                            className="w-full overflow-hidden"
+                                            initial={{ opacity: 0, scale: 0.95 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            className="w-full bg-white rounded-[2rem] p-6 shadow-sm border border-gray-50"
                                         >
-                                            <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-                                                <div className="flex gap-4 mb-4 border-b border-gray-200 pb-2">
-                                                    <button
-                                                        onClick={() => setBgTab("color")}
-                                                        className={`text-sm font-semibold transition-colors ${bgTab === "color" ? "text-blue-600" : "text-gray-500 hover:text-gray-800"}`}
-                                                    >
-                                                        Color
-                                                    </button>
-                                                    <button
-                                                        onClick={() => setBgTab("image")}
-                                                        className={`text-sm font-semibold transition-colors ${bgTab === "image" ? "text-blue-600" : "text-gray-500 hover:text-gray-800"}`}
-                                                    >
-                                                        Image
-                                                    </button>
-                                                </div>
-
-                                                {bgTab === "color" && (
-                                                    <div className="flex flex-wrap gap-2">
-                                                        <button
-                                                            onClick={() => { setBgColor("transparent"); setCustomBgImage(null); }}
-                                                            className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-transform hover:scale-110 bg-[url('https://www.remove.bg/images/transparency_demo_1.png')] bg-repeat ${bgColor === "transparent" && !customBgImage ? "border-blue-500" : "border-gray-200"}`}
-                                                            style={{ backgroundSize: '10px 10px' }}
-                                                            title="Transparent"
-                                                        >
-                                                            <Ban className="w-3 h-3 text-gray-600" />
-                                                        </button>
-
-                                                        <div className="relative w-8 h-8 rounded-full border-2 border-gray-200 overflow-hidden cursor-pointer hover:scale-110 transition-transform"
-                                                            title="Custom Color"
-                                                            style={{ background: 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)' }}>
-                                                            <input
-                                                                type="color"
-                                                                className="absolute inset-[0] w-[200%] h-[200%] cursor-pointer opacity-0"
-                                                                onChange={(e) => { setBgColor(e.target.value); setCustomBgImage(null); }}
-                                                            />
-                                                        </div>
-
-                                                        {PREDEFINED_COLORS.map(color => (
-                                                            <button
-                                                                key={color}
-                                                                onClick={() => { setBgColor(color); setCustomBgImage(null); }}
-                                                                className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 shadow-sm ${bgColor === color && !customBgImage ? 'border-black' : 'border-transparent'}`}
-                                                                style={{ background: color, border: bgColor === color ? '2px solid black' : color === '#ffffff' ? '1px solid #e5e5e5' : 'none' }}
-                                                                title={color}
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                )}
-
-                                                {bgTab === "image" && (
-                                                    <div className="flex flex-wrap gap-2">
-                                                        <label className="w-12 h-12 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-all">
-                                                            <Upload className="w-4 h-4 text-gray-400" />
-                                                            <input type="file" className="hidden" accept="image/*" onChange={handleCustomBgUpload} />
-                                                        </label>
-
-                                                        {PREDEFINED_PHOTOS.map((photo, i) => (
-                                                            <button
-                                                                key={i}
-                                                                onClick={() => { setCustomBgImage(photo); setBgColor(""); }}
-                                                                className={`w-12 h-12 rounded-lg border-2 overflow-hidden transition-transform hover:scale-105 ${customBgImage === photo ? 'border-blue-500 scale-105' : 'border-transparent'}`}
-                                                            >
-                                                                <img src={photo} alt="bg" className="w-full h-full object-cover" />
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                )}
+                                            <div className="flex gap-6 mb-6">
+                                                <button
+                                                    onClick={() => setBgTab("color")}
+                                                    className={`text-[11px] font-black uppercase tracking-widest transition-all ${bgTab === "color" ? "text-blue-600 underline underline-offset-8" : "text-gray-400"}`}
+                                                >
+                                                    Solid
+                                                </button>
+                                                <button
+                                                    onClick={() => setBgTab("image")}
+                                                    className={`text-[11px] font-black uppercase tracking-widest transition-all ${bgTab === "image" ? "text-blue-600 underline underline-offset-8" : "text-gray-400"}`}
+                                                >
+                                                    Visuals
+                                                </button>
                                             </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
 
+                                            {bgTab === "color" && (
+                                                <div className="flex flex-wrap gap-2.5">
+                                                    <button
+                                                        onClick={() => { setBgColor("transparent"); setCustomBgImage(null); }}
+                                                        className={`w-9 h-9 rounded-full border-2 transition-transform hover:scale-110 bg-[url('https://www.remove.bg/images/transparency_demo_1.png')] bg-repeat flex items-center justify-center ${bgColor === "transparent" ? 'border-blue-600' : 'border-transparent'}`}
+                                                        style={{ backgroundSize: '10px 10px' }}
+                                                    >
+                                                        <Ban className="w-4 h-4 text-gray-500" />
+                                                    </button>
+                                                    <div className="relative w-9 h-9 rounded-full border-2 border-transparent overflow-hidden cursor-pointer hover:scale-110 transition-transform"
+                                                        style={{ background: 'conic-gradient(from 180deg at 50% 50%, #FF0000 0deg, #FFFF00 60deg, #00FF00 120deg, #00FFFF 180deg, #0000FF 240deg, #FF00FF 300deg, #FF0000 360deg)' }}>
+                                                        <input type="color" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" onChange={(e) => { setBgColor(e.target.value); setCustomBgImage(null); }} />
+                                                    </div>
+                                                    {PREDEFINED_COLORS.map(color => (
+                                                        <button
+                                                            key={color}
+                                                            onClick={() => { setBgColor(color); setCustomBgImage(null); }}
+                                                            className={`w-9 h-9 rounded-full transition-all hover:scale-110 shadow-sm border-2 ${bgColor === color ? 'border-blue-600 scale-110' : 'border-transparent'}`}
+                                                            style={{ background: color }}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {bgTab === "image" && (
+                                                <div className="flex flex-wrap gap-3">
+                                                    <label className="w-14 h-14 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center cursor-pointer hover:border-blue-500 transition-all">
+                                                        <Upload className="w-5 h-5 text-gray-400" />
+                                                        <input type="file" className="hidden" accept="image/*" onChange={handleCustomBgUpload} />
+                                                    </label>
+                                                    {PREDEFINED_PHOTOS.map((photo, i) => (
+                                                        <button
+                                                            key={i}
+                                                            onClick={() => { setCustomBgImage(photo); setBgColor(""); }}
+                                                            className={`w-14 h-14 rounded-2xl border-2 transition-all hover:scale-105 overflow-hidden ${customBgImage === photo ? 'border-blue-600 scale-110' : 'border-transparent'}`}
+                                                        >
+                                                            <img src={photo} alt="bg" className="w-full h-full object-cover" />
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </motion.div>
+                                    </AnimatePresence>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

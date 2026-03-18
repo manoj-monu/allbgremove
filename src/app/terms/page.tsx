@@ -1,10 +1,9 @@
-/* eslint-disable react/no-unescaped-entities */
 import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
     title: "Terms and Conditions | ALLBgremove Rules of Usage",
-    description: "Read the Terms and Conditions for using ALLBgremove's free AI background removal tool and photo editing services.",
+    description: "Read the Terms and Conditions for using ALLBgremove&apos;s free AI background removal tool and photo editing services.",
 };
 
 export default function TermsAndConditions() {
@@ -16,7 +15,7 @@ export default function TermsAndConditions() {
                 <div className="space-y-6 text-lg text-gray-600 leading-relaxed font-medium">
                     <p className="text-sm font-bold text-gray-500 mb-6">Last Updated: October 2023</p>
                     <p>
-                        Welcome to ALLBgremove! These terms and conditions outline the rules and regulations for the use of ALLBgremove's Website, located at https://allbgremove.com.
+                        Welcome to ALLBgremove! These terms and conditions outline the rules and regulations for the use of ALLBgremove&apos;s Website, located at https://allbgremove.com.
                     </p>
                     <p>
                         By accessing this website we assume you accept these terms and conditions. Do not continue to use ALLBgremove if you do not agree to take all of the terms and conditions stated on this page.
@@ -51,7 +50,7 @@ export default function TermsAndConditions() {
 
                     <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">4. Cookies and Advertisements</h2>
                     <p>
-                        We employ the use of cookies. By accessing ALLBgremove, you agreed to use cookies in agreement with the ALLBgremove's Privacy Policy. Most interactive websites use cookies to let us retrieve the user's details for each visit. We also utilize third-party ad networks such as Google AdSense which utilize tracking cookies to display relevant advertisements to you.
+                        We employ the use of cookies. By accessing ALLBgremove, you agreed to use cookies in agreement with the ALLBgremove&apos;s Privacy Policy. Most interactive websites use cookies to let us retrieve the user&apos;s details for each visit. We also utilize third-party ad networks such as Google AdSense which utilize tracking cookies to display relevant advertisements to you.
                     </p>
 
                     <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">5. Modifications and Interruptions</h2>
@@ -61,7 +60,7 @@ export default function TermsAndConditions() {
 
                     <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">6. Disclaimer of Warranties</h2>
                     <p>
-                        This website and the materials on it are provided "as is". ALLBgremove makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties, including without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
+                        This website and the materials on it are provided &quot;as is&quot;. ALLBgremove makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties, including without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
                     </p>
 
                     <div className="mt-12 text-center text-blue-600 font-semibold text-base hover:underline">
@@ -72,4 +71,3 @@ export default function TermsAndConditions() {
         </main>
     );
 }
-
