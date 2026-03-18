@@ -72,12 +72,12 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
             try {
                 setIsProcessing(true);
 
-                // FRONTEND COMPRESSION: Maximum speed optimizations
+                // FRONTEND COMPRESSION: Prioritize quality (Gemini-Level)
                 const options = {
-                    maxSizeMB: 0.8, // Reduced to 800KB for lightning fast upload
-                    maxWidthOrHeight: 1024, // 1024px limit guarantees backend won't lag
+                    maxSizeMB: 2.5, // 2.5MB keeps details
+                    maxWidthOrHeight: 2048, // High-res for perfect hair edges
                     useWebWorker: true,
-                    initialQuality: 0.8 // Good quality, faster processing
+                    initialQuality: 0.95 // Maximum edge retention
                 };
 
                 let fileToUpload = file;

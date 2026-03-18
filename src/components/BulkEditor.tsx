@@ -64,11 +64,11 @@ export default function BulkEditor({ files, onReset }: BulkEditorProps) {
       try {
         updateTask(task.id, { status: "uploading" });
 
-        // Compress
+        // Compress minimally to prevent artifacts
         let fileToUpload = task.originalFile;
         try {
             fileToUpload = await imageCompression(task.originalFile, {
-                maxSizeMB: 0.8, maxWidthOrHeight: 1024, useWebWorker: true
+                maxSizeMB: 2.5, maxWidthOrHeight: 2048, useWebWorker: true, initialQuality: 0.95
             });
         } catch (e) {
             console.warn("Compression failed for", task.originalFile.name);
