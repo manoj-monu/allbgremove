@@ -88,10 +88,10 @@ export default function Home() {
             <div className={`w-full max-w-lg aspect-square ${glassPanel} rounded-[2.5rem] p-3 overflow-hidden`}>
               <div className="w-full h-full rounded-[2rem] overflow-hidden relative border border-white/20 shadow-inner">
                 <ReactCompareSlider
-                  itemOne={<ReactCompareSliderImage src="/demo-before.jpg" alt="Original" />}
+                  itemOne={<ReactCompareSliderImage src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop" alt="Original" />}
                   itemTwo={
                     <div className="w-full h-full" style={{ backgroundImage: 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)', backgroundSize: '16px 16px', backgroundColor: 'white' }}>
-                      <ReactCompareSliderImage src="/demo-after.png" alt="Removed" className="absolute inset-0" />
+                      <ReactCompareSliderImage src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop" alt="Removed" className="absolute inset-0 mask-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-black to-transparent" />
                     </div>
                   }
                   className="w-full h-full"
@@ -114,15 +114,16 @@ export default function Home() {
           <div className={`w-full max-w-4xl min-h-[400px] ${glassPanel} rounded-[2rem] p-3 relative overflow-hidden`}>
             <div className="w-full h-full rounded-[1.5rem] overflow-hidden relative border border-white/20">
               <ReactCompareSlider
-                itemOne={<div className="bg-gray-900 w-full h-[380px] flex items-center justify-center text-white/50">(Replace with Car Before Image)</div>}
+                itemOne={<ReactCompareSliderImage src="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?q=80&w=1200&auto=format&fit=crop" alt="Original Car" />}
                 itemTwo={
                     <div className="w-full h-[380px] flex items-center justify-center text-black/50" style={{ backgroundImage: 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)', backgroundSize: '16px 16px', backgroundColor: 'white' }}>
-                      (Replace with Car After Image)
+                      <ReactCompareSliderImage src="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?q=80&w=1200&auto=format&fit=crop" alt="Removed Car" className="absolute inset-0 z-10" />
                     </div>
                 }
                 className="w-full h-[380px]"
               />
-              <div className="absolute top-4 right-4 bg-white/90 text-black px-4 py-1.5 rounded-full text-xs font-bold shadow-lg">After</div>
+              <div className="absolute top-4 left-4 z-20 bg-black/40 px-4 py-1.5 rounded-full text-xs font-bold shadow-lg">Before</div>
+              <div className="absolute top-4 right-4 z-20 bg-white/90 text-black px-4 py-1.5 rounded-full text-xs font-bold shadow-lg">After</div>
             </div>
           </div>
         </section>
@@ -169,15 +170,14 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
             {[
-              { id: 1, name: "E-Commerce", b: "bg-orange-500/20" },
-              { id: 2, name: "Profile Pictures", b: "bg-blue-600/20" },
-              { id: 3, name: "Car Photos", b: "bg-red-600/20" },
-              { id: 4, name: "Social Media", b: "bg-indigo-600/20" }
+              { id: 1, name: "E-Commerce", b: "bg-orange-500/20", img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop" },
+              { id: 2, name: "Profile Pictures", b: "bg-blue-600/20", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800&auto=format&fit=crop" },
+              { id: 3, name: "Car Photos", b: "bg-red-600/20", img: "https://images.unsplash.com/photo-1614200187524-dc4b892acf16?q=80&w=800&auto=format&fit=crop" },
+              { id: 4, name: "Social Media", b: "bg-indigo-600/20", img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=800&auto=format&fit=crop" }
             ].map(cat => (
               <div key={cat.id} className={`${glassPanel} ${cat.b} rounded-2xl overflow-hidden group relative aspect-[4/3] flex flex-col justify-end p-4 border border-white/20 hover:border-white/50 transition-colors`}>
-                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <LayoutGrid className="w-8 h-8 text-white/60" />
-                </div>
+                <img src={cat.img} alt={cat.name} className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 mix-blend-overlay" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                 <div className="relative z-10 w-full text-center">
                   <div className={`w-full py-2.5 rounded-xl ${glassPanel} font-bold text-sm tracking-wide shadow-lg border-white/30`}>
                     {cat.name}
