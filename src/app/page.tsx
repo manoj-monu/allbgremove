@@ -1,24 +1,25 @@
 "use client";
 import { useState } from "react";
 import ImageEditor from "@/components/ImageEditor";
+import BulkEditor from "@/components/BulkEditor";
 import { ReactCompareSlider, ReactCompareSliderImage } from "react-compare-slider";
 import Link from "next/link";
 import { Sparkles, Zap, Palette, Check, Twitter, Instagram, Linkedin, Upload, MousePointer2, Layers, Monitor, ShieldCheck, MessageCircle, ChevronRight, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setUploadedFile(e.target.files[0]);
+      setUploadedFiles(Array.from(e.target.files));
     }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setUploadedFile(e.dataTransfer.files[0]);
+      setUploadedFiles(Array.from(e.dataTransfer.files));
     }
   };
 
@@ -51,7 +52,7 @@ export default function Home() {
       </header>
 
       <div className="w-full flex-grow flex flex-col items-center">
-        {!uploadedFile ? (
+        {!uploadedFiles.length ? (
           <div className="w-full max-w-7xl mx-auto px-6 pt-16 pb-24">
             <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
               
@@ -92,7 +93,7 @@ export default function Home() {
                     >
                       <Upload className="w-5 h-5" /> Upload Image
                     </button>
-                    <input id="file-upload" type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
+                    <input id="file-upload" type="file" multiple className="hidden" accept="image/*" onChange={handleFileUpload} />
                   </div>
                 </div>
 
@@ -239,8 +240,12 @@ export default function Home() {
             </section>
           </div>
         ) : (
-          <div className="w-full flex justify-center max-w-7xl px-4 py-16">
-            <ImageEditor file={uploadedFile} onReset={() => setUploadedFile(null)} />
+          <div className="w-full flex justify-center max-w-7xl px-4 py-8">
+            {uploadedFiles.length === 1 ? (
+              <ImageEditor file={uploadedFiles[0]} onReset={() => setUploadedFiles([])} />
+            ) : (
+              <BulkEditor files={uploadedFiles} onReset={() => setUploadedFiles([])} />
+            )}
           </div>
         )}
       </div>
