@@ -225,6 +225,17 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                             </div>
                         )}
                     </div>
+
+                    {/* Mobile Only Download Bar */}
+                    <div className="w-full mt-10 md:hidden animate-in slide-in-from-bottom duration-700">
+                        <button 
+                           disabled={isProcessing || !processedUrl}
+                           onClick={handleDownload}
+                           className="w-full py-5 bg-blue-600 text-white rounded-2xl shadow-xl shadow-blue-500/30 font-black text-lg flex items-center justify-center gap-3 active:scale-95 transition-all"
+                        >
+                            <Download className="w-6 h-6" /> {isProcessing ? "Processing..." : "Save Image Now"}
+                        </button>
+                    </div>
                 </div>
         </div>
     </div>
