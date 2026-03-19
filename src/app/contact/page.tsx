@@ -25,7 +25,7 @@ export default function ContactPage() {
                                 <h3 className="text-xl font-black text-slate-900 mb-6 tracking-tight">Direct Support</h3>
                                 <div className="space-y-4 w-full">
                                     <div className="flex items-center gap-4 text-slate-600 font-medium">
-                                        <Mail className="w-5 h-5 text-blue-600" /> support@pixelcut.com
+                                        <Mail className="w-5 h-5 text-blue-600" /> support@allbgremove.com
                                     </div>
                                     <div className="flex items-center gap-4 text-slate-600 font-medium">
                                         <Phone className="w-5 h-5 text-blue-600" /> +1 (555) 012-3456

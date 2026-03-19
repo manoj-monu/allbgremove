@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
                             <p className="text-xl font-bold text-slate-900 mb-12 border-b border-slate-200 pb-8 tracking-tight italic">Effective Date: October 12, 2026</p>
                             
                             <h2 id="data-collection">1. Data Minimization</h2>
-                            <p>PixelCut is designed from the ground up to collect as little data as possible. We do not require account creation for basic functional use. When you upload an image for processing, the image is buffered in our server&apos;s volatile memory during the AI inference phase and immediately purged once the download link is provided or the session expires.</p>
+                            <p>ALLBgremove is designed from the ground up to collect as little data as possible. We do not require account creation for basic functional use. When you upload an image for processing, the image is buffered in our server&apos;s volatile memory during the AI inference phase and immediately purged once the download link is provided or the session expires.</p>
 
                             <h2 id="usage-tracking">2. Usage Tracking</h2>
                             <p>We use industry-standard, privacy-respecting analytics tools to understand how many users visit our service. This data is aggregated and does not personally identify you. We use this to monitor server capacity and improve our AI models&apos; response times.</p>
@@ -36,7 +36,7 @@ export default function PrivacyPolicyPage() {
                             <p>Our AI models run on secured infrastructure. Your images are never sent to third-party marketplaces or used to publicly aggregate data. We do not sell your data to anyone.</p>
 
                             <h2 id="contact">5. Privacy Inquiries</h2>
-                            <p>If you have questions about our data protocol or wish to request information, please contact our privacy lead at <a href="mailto:privacy@pixelcut.com" className="text-blue-600 hover:underline">privacy@pixelcut.com</a>.</p>
+                            <p>If you have questions about our data protocol or wish to request information, please contact our privacy lead at <a href="mailto:privacy@allbgremove.com" className="text-blue-600 hover:underline">privacy@allbgremove.com</a>.</p>
                         </article>
 
                         <div className="pt-10 border-t border-slate-200 text-center flex flex-col items-center">

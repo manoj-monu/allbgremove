@@ -50,7 +50,7 @@ export default function AuthModal({ isOpen, onClose, initialType = "login" }: Au
                     {type === "login" ? "Welcome Back" : "Create Account"}
                 </h2>
                 <p className="text-slate-500 font-medium mb-10 text-center">
-                    {type === "login" ? "Enter your credentials to manage your subscriptions." : "Join 20,000+ creators building with PixelCut."}
+                    {type === "login" ? "Enter your credentials to manage your subscriptions." : "Join 20,000+ creators building with ALLBgremove."}
                 </p>
 
                 <form onSubmit={handleSubmit} className="w-full space-y-4">

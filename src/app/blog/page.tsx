@@ -16,7 +16,7 @@ const POSTS = [
     },
     { 
         title: "Top 10 Free AI Design Tools for Modern Content Creators", 
-        excerpt: "A curated list of tools like PixelCut that help you produce high-end content on a zero budget...", 
+        excerpt: "A curated list of tools like ALLBgremove that help you produce high-end content on a zero budget...", 
         date: "Oct 05, 2026",
         img: "https://images.unsplash.com/photo-1550745165-9bc0b252723f?q=80&w=800&auto=format&fit=crop"
     },
@@ -29,7 +29,7 @@ export default function BlogPage() {
                 
                 {/* Header */}
                 <div className="text-center mb-24">
-                    <div className="px-5 py-2 rounded-full bg-blue-50 text-blue-600 text-[11px] font-black uppercase tracking-[2px] border border-blue-100 mb-8 inline-block">PixelCut Stories</div>
+                    <div className="px-5 py-2 rounded-full bg-blue-50 text-blue-600 text-[11px] font-black uppercase tracking-[2px] border border-blue-100 mb-8 inline-block">ALLBgremove Stories</div>
                     <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter mb-8 tracking-tighter">Insights & <span className="text-blue-600">Guides</span></h1>
                     <p className="max-w-2xl mx-auto text-slate-500 font-medium text-lg md:text-xl">
                         Become a visual editing expert with our latest research and tutorials on AI photography.

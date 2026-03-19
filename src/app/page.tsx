@@ -38,8 +38,8 @@ export default function Home() {
       <main className="min-h-screen bg-slate-50 flex flex-col">
         <nav className="w-full bg-white border-b border-slate-100 px-8 h-16 flex items-center justify-between">
            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white font-black text-[10px]">P</div>
-              <span className="font-black text-slate-900 tracking-tighter">PixelCut</span>
+              <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white font-black text-[10px]">A</div>
+              <span className="font-black text-slate-900 tracking-tighter">ALLBgremove</span>
            </div>
            <button onClick={() => setUploadedFiles([])} className="text-xs font-bold text-slate-500 hover:text-slate-900">Exit Studio</button>
         </nav>
@@ -70,7 +70,7 @@ export default function Home() {
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
               <Sparkles className="w-6 h-6" />
             </div>
-            <span className="text-2xl font-black text-slate-900 tracking-tighter">PixelCut</span>
+            <span className="text-2xl font-black text-slate-900 tracking-tighter">ALLBgremove</span>
           </div>
 
           {/* Desktop Nav */}
@@ -228,7 +228,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-20">
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">Built for Professionals. <br/> Free for Everyone.</h2>
-              <p className="text-slate-500 font-medium text-lg mt-4">Why users choose PixelCut for their everyday editing.</p>
+              <p className="text-slate-500 font-medium text-lg mt-4">Why users choose ALLBgremove for their everyday editing.</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -280,8 +280,8 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-20">
             <div className="col-span-2 lg:col-span-2">
               <div className="flex items-center gap-2 mb-8">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black">P</div>
-                <span className="text-2xl font-black tracking-tighter">PixelCut</span>
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black">A</div>
+                <span className="text-2xl font-black tracking-tighter">ALLBgremove</span>
               </div>
               <p className="text-slate-400 font-medium leading-relaxed max-w-sm">
                 Empowering creators with elite AI tools. World&apos;s most accurate background removal at the cost of zero.
@@ -321,7 +321,7 @@ export default function Home() {
           </div>
 
           <div className="pt-12 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-slate-500 text-sm">© Copyright 2026 PixelCut AI. All rights reserved.</p>
+            <p className="text-slate-500 text-sm">© Copyright 2026 ALLBgremove.com. All rights reserved.</p>
             <p className="text-slate-500 text-xs flex items-center gap-2">Built with ♥ for Creators everywhere.</p>
           </div>
         </div>

@@ -11,7 +11,7 @@ export default function AboutPage() {
                     <div className="px-5 py-2 rounded-full bg-blue-50 text-blue-600 text-[11px] font-black uppercase tracking-[2px] border border-blue-100 mb-8 inline-block">The Mission</div>
                     <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter mb-8">Empowering <span className="text-blue-600">Creators</span> Worldwide</h1>
                     <p className="max-w-2xl mx-auto text-slate-500 font-medium text-lg md:text-xl">
-                        Design shouldn&apos;t be a struggle. We built PixelCut to democratize high-end AI editing tools for everyone.
+                        Design shouldn&apos;t be a struggle. We built ALLBgremove.com to democratize high-end AI editing tools for everyone.
                     </p>
                 </div>
 
@@ -25,7 +25,7 @@ export default function AboutPage() {
                             <div>
                                 <h3 className="text-2xl font-black text-slate-900 mb-4 tracking-tight">Our Story</h3>
                                 <p className="text-slate-600 leading-relaxed font-medium text-lg">
-                                    Founded in 2023, PixelCut emerged from a simple observation: removing backgrounds is the most common but tedious task in visual design. We gathered a team of AI researchers and product designers to build a tool that isn&apos;t just fast, but incredibly precise.
+                                    Founded in 2023, ALLBgremove emerged from a simple observation: removing backgrounds is the most common but tedious task in visual design. We gathered a team of AI researchers and product designers to build a tool that isn&apos;t just fast, but incredibly precise.
                                 </p>
                             </div>
                         </section>
@@ -53,7 +53,7 @@ export default function AboutPage() {
                         <div className="pt-10 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6">
                             <div className="flex flex-col text-center md:text-left">
                                 <span className="text-[10px] font-black uppercase text-slate-400 tracking-[3px] mb-2">Developed with focus</span>
-                                <span className="text-xl font-black text-slate-900 tracking-tighter">— The PixelCut Team</span>
+                                <span className="text-xl font-black text-slate-900 tracking-tighter">— The ALLBgremove Team</span>
                             </div>
                             <Link href="/" className="btn-primary px-10 shadow-xl shadow-blue-500/20">
                                 Try It Yourself

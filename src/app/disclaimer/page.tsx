@@ -24,7 +24,7 @@ export default function DisclaimerPage() {
                             <p className="text-xl font-bold text-slate-900 mb-12 border-b border-slate-200 pb-8 tracking-tight italic">Revision: October 12, 2026</p>
                             
                             <h2 id="ai-accuracy">1. AI Model Variance</h2>
-                            <p>PixelCut uses current transformer models for image segmentation. While they are world-class, they are not 100% perfect. Results may vary on extremely low-resolution images, heavy motion blur, or when subjects share a nearly identical color with the background. We provide the "Magic" tool but do not guarantee specific quality for any given input.</p>
+                            <p>ALLBgremove uses current transformer models for image segmentation. While they are world-class, they are not 100% perfect. Results may vary on extremely low-resolution images, heavy motion blur, or when subjects share a nearly identical color with the background. We provide the "Magic" tool but do not guarantee specific quality for any given input.</p>
 
                             <h2 id="financial">2. No Financial Advice</h2>
                             <p>Nothing on this website, including our pricing comparisons or ROI claims, constitutes financial or legal advice. Our pricing is reflective of our market position and AI processing costs.</p>
@@ -33,7 +33,7 @@ export default function DisclaimerPage() {
                             <p>We may link to external tools, stock photo sites, or design inspiration. We do not control or endorse the content on these sites and are not responsible for their data policies or service levels.</p>
 
                             <h2 id="liability">4. Limitation of Liability</h2>
-                            <p>To the maximum extent permitted by law, PixelCut AI and its developers are not liable for any indirect, incidental, or consequential damages arising from the use of our image processing tool or our website as a whole.</p>
+                            <p>To the maximum extent permitted by law, ALLBgremove AI and its developers are not liable for any indirect, incidental, or consequential damages arising from the use of our image processing tool or our website as a whole.</p>
 
                             <h2 id="contact">5. Clarification</h2>
                             <p>If you need clarification on any point of this disclosure, feel free to visit our <Link href="/contact" className="text-blue-600 hover:underline">Help Center</Link>.</p>

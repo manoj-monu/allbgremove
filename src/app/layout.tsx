@@ -2,17 +2,17 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PixelCut — Professional AI Background Remover & Studio",
+  title: "ALLBgremove.com — Professional AI Background Remover & Studio",
   description: "The world's most accurate AI background remover. 100% free and automatic. Perfect for e-commerce, photographers, and content creators. Process HD images in seconds.",
-  keywords: ["background remover", "image background remover", "free background remover", "photo editor", "remove background from image", "AI background removal", "pixelcut", "transparent background", "batch photo editor"],
+  keywords: ["background remover", "image background remover", "free background remover", "photo editor", "remove background from image", "AI background removal", "allbgremove", "transparent background", "batch photo editor"],
   icons: {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "PixelCut — Professional AI Background Remover",
+    title: "ALLBgremove.com — Professional AI Background Remover",
     description: "Remove image backgrounds instantly with high precision AI.",
     url: "https://allbgremove.com",
-    siteName: "PixelCut",
+    siteName: "ALLBgremove",
     images: [
       {
         url: "/og-image.jpg",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "PixelCut AI Background Remover",
+    title: "ALLBgremove.com AI Background Remover",
     description: "Instant, HD background removal in your browser.",
     images: ["/og-image.jpg"],
   },
@@ -39,7 +39,7 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "PixelCut",
+    "name": "ALLBgremove",
     "operatingSystem": "Web",
     "applicationCategory": "DesignApplication",
     "offers": {
