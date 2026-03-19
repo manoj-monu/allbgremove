@@ -133,8 +133,10 @@ export default function BulkEditor({ files, onReset }: BulkEditorProps) {
                  )}
 
                  {task.status === "done" && (
-                    <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                       <button onClick={() => saveAs(task.processedUrl!, "export.png")} className="bg-white text-blue-600 p-3 rounded-xl shadow-xl hover:scale-110 transition-transform"><Download className="w-6 h-6" /></button>
+                    <div className="absolute inset-x-0 bottom-4 px-4 z-20">
+                       <button onClick={() => saveAs(task.processedUrl!, "export.png")} className="w-full bg-white text-blue-600 py-3 rounded-xl shadow-xl flex items-center justify-center gap-2 font-black text-xs hover:scale-105 active:scale-95 transition-all">
+                         <Download className="w-4 h-4" /> Download
+                       </button>
                     </div>
                  )}
               </div>

@@ -1,135 +1,98 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 import { 
-  Download, Loader2, Image as ImageIcon, PaintBucket, 
-  Ban, Upload, Sparkles, LayoutGrid, Palette, X,
-  ChevronRight, ArrowLeft, RefreshCw, ZoomIn, ZoomOut,
-  Type, Move
+  AnimatePresence, motion 
+} from "framer-motion";
+import { 
+  X, Download, Loader2, Sparkles, Image as ImageIcon, 
+  Palette, Layers, Maximize2, Undo2, Redo2, ChevronRight,
+  ZoomIn, ZoomOut, Upload, Ban
 } from "lucide-react";
 import { saveAs } from "file-saver";
-import imageCompression from 'browser-image-compression';
 
 interface ImageEditorProps {
-    file: File;
-    onReset: () => void;
+  file: File;
+  onReset: () => void;
 }
 
 const PREDEFINED_COLORS = [
-    "#ef4444", "#ec4899", "#d946ef", "#8b5cf6", "#6366f1", "#3b82f6",
-    "#0ea5e9", "#06b6d4", "#14b8a6", "#10b981", "#22c55e", "#84cc16",
-    "#eab308", "#f59e0b", "#f97316", "#ffffff", "#000000"
+  "#ffffff", "#000000", "#f8fafc", "#f1f5f9", "#e2e8f0", "#cbd5e1",
+  "#ff4d4d", "#ffaf40", "#fffa65", "#32ff7e", "#7efff5", "#18dcff", 
+  "#7d5fff", "#c56cf0", "#ff9ff3", "#feca57", "#ff6b6b", "#48dbfb"
 ];
 
 export default function ImageEditor({ file, onReset }: ImageEditorProps) {
-    const [originalImageUrl, setOriginalImageUrl] = useState<string>("");
-    const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(null);
-    const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
-    const [isProcessing, setIsProcessing] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-    const [bgColor, setBgColor] = useState<string>("transparent");
-    const [customBgImage, setCustomBgImage] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState<"background" | "enhance" | "export">("background");
-    const [enhanceLevel, setEnhanceLevel] = useState<number>(20);
-    const [zoom, setZoom] = useState<number>(1);
-    
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://bg-remover-api-vbi7.onrender.com";
+  const [activeTab, setActiveTab] = useState<"background" | "enhance" | "export">("background");
+  const [isProcessing, setIsProcessing] = useState(true);
+  const [processedUrl, setProcessedUrl] = useState<string | null>(null);
+  const [originalUrl, setOriginalUrl] = useState<string | null>(null);
+  const [bgColor, setBgColor] = useState<string>("transparent");
+  const [customBgImage, setCustomBgImage] = useState<string | null>(null);
+  const [enhanceLevel, setEnhanceLevel] = useState(50);
+  const [zoom, setZoom] = useState(1);
+  const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const objectUrl = URL.createObjectURL(file);
-        setOriginalImageUrl(objectUrl);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://bg-remover-api-vbi7.onrender.com";
 
-        const processImage = async () => {
-            try {
-                setIsProcessing(true);
-                const options = { maxSizeMB: 2, maxWidthOrHeight: 2048, useWebWorker: true };
-                let fileToUpload = file;
-                try { fileToUpload = await imageCompression(file, options); } catch (e) {}
+  useEffect(() => {
+    const url = URL.createObjectURL(file);
+    setOriginalUrl(url);
+    processImage();
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
 
-                const formData = new FormData();
-                formData.append("file", fileToUpload);
+  const processImage = async () => {
+    setIsProcessing(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
 
-                const response = await fetch(`${apiUrl}/api/remove-bg-async?enhance=false`, {
-                    method: "POST", body: formData,
-                });
+      const response = await fetch(`${apiUrl}/api/remove-bg-async?enhance=false`, {
+        method: "POST",
+        body: formData,
+      });
 
-                if (!response.ok) throw new Error("Server error");
-                const data = await response.json();
-                const taskId = data.task_id;
-                setCurrentTaskId(taskId);
+      if (!response.ok) throw new Error("Upload failed. Please try again.");
+      const data = await response.json();
+      const taskId = data.task_id;
 
-                let isCompleted = false;
-                while (!isCompleted) {
-                    await new Promise(r => setTimeout(r, 2000));
-                    const statusRes = await fetch(`${apiUrl}/api/status/${taskId}`);
-                    const statusData = await statusRes.json();
-                    if (statusData.status === "completed") isCompleted = true;
-                    else if (statusData.status === "failed") throw new Error("Processing failed");
-                }
+      let isCompleted = false;
+      let attempts = 0;
+      while (!isCompleted && attempts < 30) {
+        await new Promise(r => setTimeout(r, 2000));
+        const statusRes = await fetch(`${apiUrl}/api/status/${taskId}`);
+        const statusData = await statusRes.json();
 
-                const resultRes = await fetch(`${apiUrl}/api/result/${taskId}`);
-                const blob = await resultRes.blob();
-                setProcessedImageUrl(URL.createObjectURL(blob));
-            } catch (err) {
-                setError(err instanceof Error ? err.message : "An error occurred");
-            } finally {
-                setIsProcessing(false);
-            }
-        };
+        if (statusData.status === "completed") {
+          isCompleted = true;
+          const resultRes = await fetch(`${apiUrl}/api/result/${taskId}`);
+          const blob = await resultRes.blob();
+          setProcessedUrl(URL.createObjectURL(blob));
+        } else if (statusData.status === "failed") {
+          throw new Error("AI processing failed. The image might be too complex.");
+        }
+        attempts++;
+      }
+      if (!isCompleted) throw new Error("Processing timed out.");
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
-        processImage();
-        return () => URL.revokeObjectURL(objectUrl);
-    }, [file]);
+  const handleDownload = () => {
+    if (processedUrl) {
+      saveAs(processedUrl, "allbgremove_export.png");
+    }
+  };
 
-    const handleDownload = async () => {
-        if (!processedImageUrl || !canvasRef.current) return;
-        let filename = file.name.replace(/\.[^/.]+$/, "") + "-no-bg.png";
-        
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-
-        const imgElement = new window.Image();
-        imgElement.crossOrigin = "anonymous";
-        imgElement.src = processedImageUrl;
-
-        imgElement.onload = () => {
-            canvas.width = imgElement.width;
-            canvas.height = imgElement.height;
-            if (bgColor && bgColor !== "transparent") {
-                ctx.fillStyle = bgColor;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-            if (customBgImage) {
-                const bgImg = new window.Image();
-                bgImg.crossOrigin = "anonymous";
-                bgImg.src = customBgImage;
-                bgImg.onload = () => {
-                    ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(imgElement, 0, 0);
-                    triggerDownload(canvas, filename);
-                };
-                return;
-            }
-            ctx.drawImage(imgElement, 0, 0);
-            triggerDownload(canvas, filename);
-        };
-    };
-
-    const triggerDownload = (canvas: HTMLCanvasElement, filename: string) => {
-        canvas.toBlob((blob) => {
-            if (blob) saveAs(blob, filename);
-        }, "image/png", 1.0);
-    };
-
-    return (
-        <div className="w-full flex justify-center py-10">
-            <canvas ref={canvasRef} className="hidden" />
-
-            <div className="w-full max-w-6xl bg-white rounded-[2rem] shadow-2xl border border-slate-100 flex flex-col md:flex-row overflow-hidden min-h-[700px]">
-                
-                {/* --- Left Sidebar (Controls) --- */}
+  return (
+    <div className="w-full max-w-7xl mx-auto py-4">
+        <div className="bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100 flex flex-col md:flex-row min-h-[700px]">
+            
+                {/* --- Sidebar --- */}
                 <div className="w-full md:w-[350px] border-r border-slate-100 flex flex-col bg-slate-50 relative z-10">
                     <div className="p-8 border-b border-slate-100 flex items-center justify-between">
                          <div className="flex items-center gap-2">
@@ -142,24 +105,23 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                          </button>
                     </div>
 
-                    <div className="p-6 flex-grow flex flex-col gap-8">
-                        {/* Tab Switcher */}
-                        <div className="flex bg-slate-200/50 p-1.5 rounded-2xl">
-                             {[
-                               { id: "background", icon: <Palette className="w-4 h-4" /> },
-                               { id: "enhance", icon: <Sparkles className="w-4 h-4" /> },
-                               { id: "export", icon: <Download className="w-4 h-4" /> }
-                             ].map(tab => (
-                               <button 
-                                 key={tab.id}
-                                 onClick={() => setActiveTab(tab.id as any)}
-                                 className={`flex-1 flex items-center justify-center py-2.5 rounded-xl transition-all ${activeTab === tab.id ? "bg-white text-blue-600 shadow-sm shadow-blue-500/10" : "text-slate-500 hover:text-slate-900"}`}
-                               >
-                                 {tab.icon}
-                               </button>
-                             ))}
-                        </div>
+                    <div className="p-4 border-b border-slate-100 flex gap-2">
+                         {[
+                                { id: "background", icon: <Layers className="w-4 h-4" /> },
+                                { id: "enhance", icon: <Sparkles className="w-4 h-4" /> },
+                                { id: "export", icon: <Download className="w-4 h-4" /> }
+                              ].map(tab => (
+                                <button 
+                                  key={tab.id}
+                                  onClick={() => setActiveTab(tab.id as any)}
+                                  className={`flex-1 flex items-center justify-center py-2.5 rounded-xl transition-all ${activeTab === tab.id ? "bg-white text-blue-600 shadow-sm shadow-blue-500/10" : "text-slate-500 hover:text-slate-900"}`}
+                                >
+                                  {tab.icon}
+                                </button>
+                              ))}
+                    </div>
 
+                    <div className="flex-grow p-8 overflow-y-auto custom-scrollbar relative z-10">
                         <AnimatePresence mode="wait">
                             {activeTab === "background" && (
                                 <motion.div key="bg" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="flex flex-col gap-6">
@@ -210,8 +172,16 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                         </AnimatePresence>
                     </div>
 
-                    <div className="p-8 border-t border-slate-100 text-center">
-                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[2px]">Cloud storage included</p>
+                    {/* ALWAYS VISIBLE DOWNLOAD ACTION */}
+                    <div className="p-8 border-t border-slate-100 bg-white">
+                         <button 
+                            disabled={isProcessing || !processedUrl}
+                            onClick={handleDownload} 
+                            className="w-full btn-primary bg-blue-600 shadow-xl shadow-blue-500/30 font-black py-5 rounded-2xl flex items-center justify-center gap-2 group disabled:opacity-50 disabled:shadow-none transition-all"
+                         >
+                             <Download className="w-5 h-5 group-hover:translate-y-1 transition-transform" /> {isProcessing ? "Processing..." : "Download HD"}
+                         </button>
+                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[2px] mt-4 text-center">Export in Transparent PNG</p>
                     </div>
                 </div>
 
@@ -248,34 +218,15 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                 <button onClick={() => window.location.reload()} className="mt-4 px-8 py-3 bg-slate-900 text-white rounded-xl font-bold">Try again</button>
                             </div>
                         ) : (
-                            <div 
-                              className="w-full h-full relative p-12 transition-transform duration-300" 
-                              style={{ transform: `scale(${zoom})`, backgroundColor: bgColor, backgroundImage: customBgImage ? `url(${customBgImage})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }}
-                            >
-                                <div className="absolute inset-0 bg-[url('https://www.remove.bg/images/transparency_demo_1.png')] bg-repeat opacity-5 z-0" style={{ backgroundSize: '20px 20px', display: bgColor === "transparent" && !customBgImage ? "block" : "none" }}></div>
-                                <img 
-                                    src={processedImageUrl || originalImageUrl} 
-                                    alt="Result" 
-                                    className="w-full h-full object-contain relative z-10 transition-all duration-300 pointer-events-none drop-shadow-2xl"
-                                    style={{ filter: `contrast(${1 + (enhanceLevel * 0.001)}) saturate(${1 + (enhanceLevel * 0.002)}) brightness(${1 + (enhanceLevel * 0.001)})` }}
-                                />
+                            <div className="relative w-full h-full flex items-center justify-center transition-transform duration-300" style={{ transform: `scale(${zoom})` }}>
+                                {customBgImage && <img src={customBgImage} alt="bg" className="absolute inset-0 w-full h-full object-cover" />}
+                                {!customBgImage && bgColor !== "transparent" && <div className="absolute inset-0 w-full h-full" style={{ backgroundColor: bgColor }}></div>}
+                                <img src={processedUrl || originalUrl || ""} alt="Processed" className="relative z-10 max-w-full max-h-full object-contain shadow-2xl" />
                             </div>
                         )}
                     </div>
-
-                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex bg-white/80 backdrop-blur-md rounded-2xl px-6 py-3 shadow-xl border border-white gap-8 pointer-events-none">
-                         <div className="flex flex-col items-center gap-1">
-                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                             <span className="text-[10px] font-black text-slate-400 tracking-widest uppercase">AI Online</span>
-                         </div>
-                         <div className="h-8 w-px bg-slate-200"></div>
-                         <div className="flex flex-col items-center gap-1">
-                             <span className="text-[10px] font-black text-slate-900">4096 x 3072</span>
-                             <span className="text-[10px] font-black text-slate-400 tracking-widest uppercase">HD Resolution</span>
-                         </div>
-                    </div>
                 </div>
-            </div>
         </div>
-    );
+    </div>
+  );
 }
