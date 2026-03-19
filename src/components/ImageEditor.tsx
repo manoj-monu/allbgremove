@@ -133,8 +133,9 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                 <div className="w-full md:w-[350px] border-r border-slate-100 flex flex-col bg-slate-50 relative z-10">
                     <div className="p-8 border-b border-slate-100 flex items-center justify-between">
                          <div className="flex items-center gap-2">
-                             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black text-xs">P</div>
-                             <span className="text-xl font-bold text-slate-900 tracking-tighter">PixelCut Studio</span>
+                             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black text-xs shadow-lg shadow-blue-500/20">P</div>
+                             <span className="text-xl font-bold text-slate-900 tracking-tighter">Studio</span>
+                             <div className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[9px] font-black uppercase tracking-wider border border-amber-200">Free</div>
                          </div>
                          <button onClick={onReset} className="p-2 text-slate-400 hover:text-slate-900 transition-colors">
                              <X className="w-5 h-5" />
@@ -198,8 +199,11 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                      <div className="bg-blue-600/5 p-8 rounded-[2rem] border border-blue-600/10 flex flex-col items-center">
                                          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-500/20 mb-6"><Download className="w-8 h-8" /></div>
                                          <h4 className="text-xl font-bold text-slate-900 mb-2">High Resolution</h4>
-                                         <p className="text-slate-500 text-sm font-medium text-center mb-8 px-4">Your image is ready to download in full transparent PNG format.</p>
-                                         <button onClick={handleDownload} className="w-full btn-primary shadow-xl shadow-blue-500/30 font-black">Download JPG/PNG</button>
+                                         <p className="text-slate-500 text-sm font-medium text-center mb-8 px-4 font-jakarta">Your image is ready in transparent PNG format.</p>
+                                         <button onClick={handleDownload} className="w-full btn-primary bg-blue-600 shadow-xl shadow-blue-500/30 font-black mb-4 py-4">Download HD</button>
+                                         <button className="text-[11px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-2 group">
+                                             Upgrade to 4K Ultra <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                         </button>
                                      </div>
                                 </motion.div>
                             )}

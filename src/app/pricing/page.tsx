@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { Check, ArrowRight, ShieldCheck, Zap, Sparkles, LayoutGrid } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import AuthModal from "@/components/AuthModal";
 
 const PLANS = [
   {
@@ -51,8 +53,11 @@ const PLANS = [
 ];
 
 export default function PricingPage() {
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+
   return (
     <main className="min-h-screen bg-slate-50 py-32 px-6">
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} initialType="signup" />
       <div className="max-w-7xl mx-auto flex flex-col items-center">
         
         {/* Header */}
@@ -100,7 +105,9 @@ export default function PricingPage() {
                  ))}
               </ul>
 
-              <button className={`w-full py-5 rounded-2xl font-black text-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${plan.highlight ? 'bg-white text-blue-600 hover:bg-slate-50 shadow-xl' : 'bg-slate-900 text-white hover:bg-black shadow-lg shadow-black/10'}`}>
+              <button 
+                onClick={() => setIsAuthOpen(true)}
+                className={`w-full py-5 rounded-2xl font-black text-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${plan.highlight ? 'bg-white text-blue-600 hover:bg-slate-50 shadow-xl' : 'bg-slate-900 text-white hover:bg-black shadow-lg shadow-black/10'}`}>
                 {plan.button} <ArrowRight className="w-5 h-5" />
               </button>
             </motion.div>

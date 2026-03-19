@@ -8,12 +8,17 @@ import {
   X, Menu, ChevronRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import ImageEditor from "@/components/ImageEditor";
-import BulkEditor from "@/components/BulkEditor";
+import ImageEditor from "../components/ImageEditor";
+import BulkEditor from "../components/BulkEditor";
+import AuthModal from "../components/AuthModal";
 
 export default function Home() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [authModal, setAuthModal] = useState<{ isOpen: boolean; type: "login" | "signup" }>({
+    isOpen: false,
+    type: "login"
+  });
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -30,13 +35,22 @@ export default function Home() {
 
   if (uploadedFiles.length > 0) {
     return (
-      <main className="min-h-screen bg-neutral-50 p-8 flex justify-center items-start">
-        <div className="w-full max-w-7xl animate-in fade-in zoom-in duration-500">
-           {uploadedFiles.length === 1 ? (
-             <ImageEditor file={uploadedFiles[0]} onReset={() => setUploadedFiles([])} />
-           ) : (
-             <BulkEditor files={uploadedFiles} onReset={() => setUploadedFiles([])} />
-           )}
+      <main className="min-h-screen bg-slate-50 flex flex-col">
+        <nav className="w-full bg-white border-b border-slate-100 px-8 h-16 flex items-center justify-between">
+           <div className="flex items-center gap-2">
+              <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white font-black text-[10px]">P</div>
+              <span className="font-black text-slate-900 tracking-tighter">PixelCut</span>
+           </div>
+           <button onClick={() => setUploadedFiles([])} className="text-xs font-bold text-slate-500 hover:text-slate-900">Exit Studio</button>
+        </nav>
+        <div className="flex-grow flex justify-center items-start p-8">
+          <div className="w-full max-w-7xl animate-in fade-in zoom-in duration-500">
+             {uploadedFiles.length === 1 ? (
+               <ImageEditor file={uploadedFiles[0]} onReset={() => setUploadedFiles([])} />
+             ) : (
+               <BulkEditor files={uploadedFiles} onReset={() => setUploadedFiles([])} />
+             )}
+          </div>
         </div>
       </main>
     );
@@ -44,6 +58,11 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
+      <AuthModal 
+        isOpen={authModal.isOpen} 
+        onClose={() => setAuthModal({ ...authModal, isOpen: false })} 
+        initialType={authModal.type} 
+      />
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -62,7 +81,18 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="/contact" className="hidden md:flex text-slate-900 font-bold px-6 py-2 rounded-xl hover:bg-slate-50 transition-all border border-slate-200">Help center</Link>
+            <button 
+              onClick={() => setAuthModal({ isOpen: true, type: "login" })}
+              className="hidden md:flex text-slate-900 font-bold px-6 py-2 rounded-xl hover:bg-slate-50 transition-all border border-slate-200"
+            >
+              Sign In
+            </button>
+            <button 
+              onClick={() => setAuthModal({ isOpen: true, type: "signup" })}
+              className="btn-primary py-2.5 px-6 hidden lg:flex"
+            >
+              Get Started
+            </button>
             <button className="md:hidden p-2 text-slate-900" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
               <Menu className="w-8 h-8" />
             </button>
@@ -154,6 +184,42 @@ export default function Home() {
                 <span className="text-2xl font-black tracking-tighter text-blue-900 underline">PHOTO</span>
                 <span className="text-2xl font-black tracking-tighter border border-current px-4 py-1">HQ</span>
              </div>
+          </div>
+        </section>
+
+        {/* --- PRICING / SUBSCRIPTION SECTION --- */}
+        <section id="pricing" className="max-w-7xl mx-auto px-6 py-32 border-t border-slate-100">
+          <div className="text-center mb-20">
+            <div className="px-5 py-2 rounded-full bg-blue-50 text-blue-600 text-[11px] font-black uppercase tracking-[2px] border border-blue-100 mb-8 inline-block">Best Value</div>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">Elite Subscription Plans</h2>
+            <p className="text-slate-500 font-medium text-lg mt-4">Unleash the full power of AI with our pro features.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+             {[
+               { name: "Free", price: "0", feat: ["5 Images/Day", "Standard AI"], btn: "Current Plan", color: "slate" },
+               { name: "Creator Pro", price: "12", feat: ["Unlimited Images", "4K Ultra-Res", "Bulk Mode"], btn: "Go Pro Now", color: "blue", hot: true },
+               { name: "Business", price: "49", feat: ["API Access", "Team Seats", "Whitelabel"], btn: "Contact Sales", color: "slate" }
+             ].map(plan => (
+               <div key={plan.name} className={`p-10 rounded-[2.5rem] border ${plan.hot ? 'bg-blue-600 text-white border-blue-600 shadow-2xl shadow-blue-500/30' : 'bg-white text-slate-900 border-slate-100 shadow-sm'} flex flex-col relative overflow-hidden group hover:scale-[1.02] transition-all`}>
+                  {plan.hot && <Sparkles className="absolute top-0 right-0 p-6 w-32 h-32 opacity-10" />}
+                  <h3 className="text-2xl font-black mb-2">{plan.name}</h3>
+                  <div className="flex items-baseline gap-2 mb-8">
+                     <span className="text-5xl font-black tracking-tighter">${plan.price}</span>
+                     <span className={`text-sm font-bold opacity-60`}>/mo</span>
+                  </div>
+                  <ul className="space-y-4 mb-10 flex-grow">
+                     {plan.feat.map(f => (
+                       <li key={f} className="flex items-center gap-3 font-bold text-sm">
+                          <CheckCircle className={`w-4 h-4 ${plan.hot ? 'text-white' : 'text-blue-600'}`} /> {f}
+                       </li>
+                     ))}
+                  </ul>
+                  <button onClick={() => setAuthModal({ isOpen: true, type: "signup" })} className={`w-full py-5 rounded-2xl font-black shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 ${plan.hot ? 'bg-white text-blue-600' : 'bg-slate-900 text-white'}`}>
+                    {plan.btn} <ArrowRight className="w-5 h-5" />
+                  </button>
+               </div>
+             ))}
           </div>
         </section>
 
