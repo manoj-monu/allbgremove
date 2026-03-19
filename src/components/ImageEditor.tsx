@@ -31,6 +31,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
   const [customBgImage, setCustomBgImage] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const [error, setError] = useState<string | null>(null);
+  const [blurAmount, setBlurAmount] = useState(0);
   
   // Repair Tools State
   const [brushMode, setBrushMode] = useState<"erase" | "restore">("restore");
@@ -205,7 +206,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                     <div className="p-4 border-b border-slate-100 flex gap-2">
                          {[
                                 { id: "background", icon: <Layers className="w-4 h-4" /> },
-                                { id: "enhance", icon: <Sparkles className="w-4 h-4" /> },
+                                { id: "refine", icon: <Scissors className="w-4 h-4" /> },
                                 { id: "export", icon: <Download className="w-4 h-4" /> }
                               ].map(tab => (
                                 <button 
@@ -287,6 +288,16 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                              Upgrade to 4K Ultra <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                                          </button>
                                      </div>
+                                     <div>
+                                        <h4 className="text-xs font-black uppercase tracking-[2px] text-slate-400 mb-4">Depth</h4>
+                                        <div className="bg-white p-4 rounded-xl border border-slate-100">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Background Blur</span>
+                                                <span className="text-[10px] font-black text-blue-600">{blurAmount}%</span>
+                                            </div>
+                                            <input type="range" min="0" max="20" value={blurAmount} onChange={(e) => setBlurAmount(Number(e.target.value))} className="w-full h-1.5 bg-blue-100 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                                        </div>
+                                    </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -339,8 +350,8 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                             </div>
                         ) : (
                             <div className="relative w-full h-full flex items-center justify-center transition-transform duration-300" style={{ transform: `scale(${zoom})` }}>
-                                {customBgImage && <img src={customBgImage} alt="bg" className="absolute inset-0 w-full h-full object-cover" />}
-                                {!customBgImage && bgColor !== "transparent" && <div className="absolute inset-0 w-full h-full" style={{ backgroundColor: bgColor }}></div>}
+                                {customBgImage && <img src={customBgImage} alt="bg" className="absolute inset-0 w-full h-full object-cover" style={{ filter: `blur(${blurAmount}px)` }} />}
+                                {!customBgImage && bgColor !== "transparent" && <div className="absolute inset-0 w-full h-full" style={{ backgroundColor: bgColor, filter: `blur(${blurAmount}px)` }}></div>}
                                 <img src={processedUrl || originalUrl || ""} alt="Processed" className={`relative z-10 max-w-full max-h-full object-contain ${activeTab === 'refine' ? 'opacity-0' : 'shadow-2xl'}`} />
                                 
                                 {processedUrl && (
