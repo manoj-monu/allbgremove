@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import CookieConsent from "@/components/CookieConsent";
 
 export const metadata: Metadata = {
   title: "ALLBgremove.com — Professional AI Background Remover & Studio",
@@ -65,8 +66,9 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="antialiased min-h-screen">
+      <body className="antialiased min-h-screen relative">
         {children}
+        <CookieConsent />
       </body>
     </html>
   );

@@ -6,8 +6,9 @@ import {
 import { 
   X, Download, Loader2, Sparkles, Image as ImageIcon, 
   Palette, Layers, Maximize2, Undo2, Redo2, ChevronRight,
-  ZoomIn, ZoomOut, Upload, Ban
+  ZoomIn, ZoomOut, Upload, Ban, Eraser, Move, Scissors
 } from "lucide-react";
+import { useRef } from "react";
 import { saveAs } from "file-saver";
 
 interface ImageEditorProps {
@@ -22,15 +23,22 @@ const PREDEFINED_COLORS = [
 ];
 
 export default function ImageEditor({ file, onReset }: ImageEditorProps) {
-  const [activeTab, setActiveTab] = useState<"background" | "enhance" | "export">("background");
+  const [activeTab, setActiveTab] = useState<"background" | "refine" | "export">("background");
   const [isProcessing, setIsProcessing] = useState(true);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
   const [bgColor, setBgColor] = useState<string>("transparent");
   const [customBgImage, setCustomBgImage] = useState<string | null>(null);
-  const [enhanceLevel, setEnhanceLevel] = useState(50);
   const [zoom, setZoom] = useState(1);
   const [error, setError] = useState<string | null>(null);
+  
+  // Repair Tools State
+  const [brushMode, setBrushMode] = useState<"erase" | "restore">("restore");
+  const [brushSize, setBrushSize] = useState(30);
+  const [isDrawing, setIsDrawing] = useState(false);
+  
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const originalImageRef = useRef<HTMLImageElement | null>(null);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://manojkumarsh-allbgremove-api.hf.space";
 
@@ -82,51 +90,99 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
     }
   };
 
-  const handleDownload = async () => {
-    if (!processedUrl) return;
+  // Initialize Canvas when AI result is ready
+  useEffect(() => {
+    if (processedUrl && canvasRef.current) {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = processedUrl;
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx?.drawImage(img, 0, 0);
+        };
+        
+        // Cache original image for restoration
+        const origImg = new Image();
+        origImg.src = originalUrl!;
+        origImg.onload = () => { originalImageRef.current = origImg; };
+    }
+  }, [processedUrl]);
 
-    // Create a temporary canvas to composite the final result
-    const canvas = document.createElement("canvas");
+  const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
+    if (activeTab !== "refine" || !processedUrl) return;
+    setIsDrawing(true);
+    draw(e);
+  };
+
+  const stopDrawing = () => {
+    setIsDrawing(false);
+    const canvas = canvasRef.current;
+    if (canvas) {
+        setProcessedUrl(canvas.toDataURL("image/png"));
+    }
+  };
+
+  const draw = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDrawing || !canvasRef.current || !originalImageRef.current) return;
+    const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Create image objects for the subject and background
-    const subjectImg = new Image();
-    subjectImg.crossOrigin = "anonymous";
-    subjectImg.src = processedUrl;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    let clientX, clientY;
+    if ('touches' in e) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+    } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
 
-    await new Promise((resolve) => { subjectImg.onload = resolve; });
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
 
-    // Set canvas dimensions to match the processed image
-    canvas.width = subjectImg.width;
-    canvas.height = subjectImg.height;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, brushSize / zoom, 0, Math.PI * 2);
+    ctx.clip();
 
-    // 1. Draw Background
+    if (brushMode === "restore") {
+        ctx.drawImage(originalImageRef.current, 0, 0);
+    } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    ctx.restore();
+  };
+
+  const handleDownload = async () => {
+    if (!canvasRef.current) return;
+    const canvas = document.createElement("canvas");
+    const mainCanvas = canvasRef.current;
+    canvas.width = mainCanvas.width;
+    canvas.height = mainCanvas.height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
     if (customBgImage) {
       const bgImg = new Image();
       bgImg.crossOrigin = "anonymous";
       bgImg.src = customBgImage;
       await new Promise((resolve) => { bgImg.onload = resolve; });
-
-      // Draw background image (cover style)
       const scale = Math.max(canvas.width / bgImg.width, canvas.height / bgImg.height);
-      const x = (canvas.width / 2) - (bgImg.width / 2) * scale;
-      const y = (canvas.height / 2) - (bgImg.height / 2) * scale;
-      ctx.drawImage(bgImg, x, y, bgImg.width * scale, bgImg.height * scale);
+      ctx.drawImage(bgImg, (canvas.width / 2) - (bgImg.width / 2) * scale, (canvas.height / 2) - (bgImg.height / 2) * scale, bgImg.width * scale, bgImg.height * scale);
     } else if (bgColor !== "transparent") {
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    // 2. Draw Subject
-    ctx.drawImage(subjectImg, 0, 0);
-
-    // 3. Export & Download
-    canvas.toBlob((blob) => {
-      if (blob) {
-        saveAs(blob, `allbgremove_${Date.now()}.png`);
-      }
-    }, "image/png");
+    ctx.drawImage(mainCanvas, 0, 0);
+    canvas.toBlob((blob) => { if (blob) saveAs(blob, `allbgremove_${Date.now()}.png`); }, "image/png");
   };
 
   return (
@@ -185,14 +241,37 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                 </motion.div>
                             )}
 
-                            {activeTab === "enhance" && (
+                             {activeTab === "refine" && (
                                 <motion.div key="enh" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="flex flex-col gap-6">
-                                    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm overflow-hidden relative">
-                                        <div className="absolute top-0 right-0 p-3 opacity-5 text-blue-600"><Sparkles className="w-20 h-20" /></div>
-                                        <h4 className="text-slate-900 font-bold mb-2">AI Edge Smoothing</h4>
-                                        <p className="text-slate-500 text-xs font-medium mb-6 leading-relaxed">Refine hair and complex edges for a professional cut-out.</p>
-                                        <input type="range" min="0" max="100" value={enhanceLevel} onChange={(e) => setEnhanceLevel(Number(e.target.value))} className="w-full h-1.5 bg-blue-100 rounded-lg appearance-none cursor-pointer accent-blue-600 mb-2" />
-                                        <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest"><span>Fast</span><span>Precise</span></div>
+                                    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                                        <h4 className="text-slate-900 font-bold mb-4 flex items-center gap-2"><Scissors className="w-4 h-4 text-blue-600" /> Magic Repair Tool</h4>
+                                        <p className="text-slate-500 text-xs font-medium mb-6 leading-relaxed">Fix cut-out errors by painting back missing pieces or erasing edges.</p>
+                                        
+                                        <div className="flex gap-2 mb-6">
+                                            <button 
+                                                onClick={() => setBrushMode("restore")}
+                                                className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest border-2 transition-all ${brushMode === "restore" ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/20" : "bg-white border-slate-100 text-slate-500"}`}
+                                            >
+                                                <Sparkles className="w-3 h-3" /> Restore
+                                            </button>
+                                            <button 
+                                                onClick={() => setBrushMode("erase")}
+                                                className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest border-2 transition-all ${brushMode === "erase" ? "bg-slate-900 border-slate-900 text-white shadow-lg" : "bg-white border-slate-100 text-slate-500"}`}
+                                            >
+                                                <Eraser className="w-3 h-3" /> Erase
+                                            </button>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Brush Size</span>
+                                                <span className="text-[10px] font-black text-blue-600">{brushSize}px</span>
+                                            </div>
+                                            <input type="range" min="5" max="100" value={brushSize} onChange={(e) => setBrushSize(Number(e.target.value))} className="w-full h-1.5 bg-blue-100 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                                        </div>
+                                    </div>
+                                    <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl">
+                                        <p className="text-[11px] font-bold text-amber-700 leading-relaxed">Pro Tip: Use 'Restore' to paint back ears or hair that the AI cut by mistake.</p>
                                     </div>
                                 </motion.div>
                             )}
@@ -262,7 +341,22 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                             <div className="relative w-full h-full flex items-center justify-center transition-transform duration-300" style={{ transform: `scale(${zoom})` }}>
                                 {customBgImage && <img src={customBgImage} alt="bg" className="absolute inset-0 w-full h-full object-cover" />}
                                 {!customBgImage && bgColor !== "transparent" && <div className="absolute inset-0 w-full h-full" style={{ backgroundColor: bgColor }}></div>}
-                                <img src={processedUrl || originalUrl || ""} alt="Processed" className="relative z-10 max-w-full max-h-full object-contain shadow-2xl" />
+                                <img src={processedUrl || originalUrl || ""} alt="Processed" className={`relative z-10 max-w-full max-h-full object-contain ${activeTab === 'refine' ? 'opacity-0' : 'shadow-2xl'}`} />
+                                
+                                {processedUrl && (
+                                    <canvas 
+                                        ref={canvasRef}
+                                        onMouseDown={startDrawing}
+                                        onMouseMove={draw}
+                                        onMouseUp={stopDrawing}
+                                        onMouseLeave={stopDrawing}
+                                        onTouchStart={startDrawing}
+                                        onTouchMove={draw}
+                                        onTouchEnd={stopDrawing}
+                                        className={`absolute inset-0 w-full h-full z-20 object-contain touch-none ${activeTab === 'refine' ? 'cursor-crosshair' : 'pointer-events-none'}`}
+                                        style={{ display: activeTab === 'refine' || isProcessing ? 'block' : 'none' }}
+                                    />
+                                )}
                             </div>
                         )}
                     </div>
