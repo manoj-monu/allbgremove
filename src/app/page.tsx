@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { 
   Upload, Sparkles, Zap, Shield, Tag, 
@@ -15,10 +15,37 @@ import AuthModal from "../components/AuthModal";
 export default function Home() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [authModal, setAuthModal] = useState<{ isOpen: boolean; type: "login" | "signup" }>({
-    isOpen: false,
-    type: "login"
-  });
+  const [isBulkMode, setIsBulkMode] = useState(false);
+  const [authModal, setAuthModal] = useState<{isOpen: boolean, type: "login" | "signup"}>({ isOpen: false, type: "login" });
+  
+  // Geo-Pricing State
+  const [currency, setCurrency] = useState({ code: "USD", symbol: "$" });
+  const [pricing, setPricing] = useState([
+    { name: "Free", price: "0", feat: ["5 Images/Day", "Standard AI"], btn: "Current Plan", color: "slate" },
+    { name: "Creator Pro", price: "12", feat: ["Unlimited Images", "4K Ultra-Res", "Bulk Mode"], btn: "Go Pro Now", color: "blue", hot: true },
+    { name: "Business", price: "49", feat: ["API Access", "Team Seats", "Whitelabel"], btn: "Contact Sales", color: "slate" }
+  ]);
+
+  useEffect(() => {
+    // Detect Country for Currency
+    const detectGeo = async () => {
+        try {
+            const res = await fetch("https://ipapi.co/json/");
+            const data = await res.json();
+            if (data.country_code === "IN") {
+                setCurrency({ code: "INR", symbol: "₹" });
+                setPricing([
+                    { name: "Free", price: "0", feat: ["5 Images/Day", "Standard AI"], btn: "Current Plan", color: "slate" },
+                    { name: "Creator Pro", price: "999", feat: ["Unlimited Images", "4K Ultra-Res", "Bulk Mode"], btn: "Go Pro Now", color: "blue", hot: true },
+                    { name: "Business", price: "3999", feat: ["API Access", "Team Seats", "Whitelabel"], btn: "Contact Sales", color: "slate" }
+                ]);
+            }
+        } catch (e) {
+            console.error("Geo detection failed, sticking to USD");
+        }
+    };
+    detectGeo();
+  }, []);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -196,16 +223,12 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-             {[
-               { name: "Free", price: "0", feat: ["5 Images/Day", "Standard AI"], btn: "Current Plan", color: "slate" },
-               { name: "Creator Pro", price: "12", feat: ["Unlimited Images", "4K Ultra-Res", "Bulk Mode"], btn: "Go Pro Now", color: "blue", hot: true },
-               { name: "Business", price: "49", feat: ["API Access", "Team Seats", "Whitelabel"], btn: "Contact Sales", color: "slate" }
-             ].map(plan => (
+             {pricing.map(plan => (
                <div key={plan.name} className={`p-10 rounded-[2.5rem] border ${plan.hot ? 'bg-blue-600 text-white border-blue-600 shadow-2xl shadow-blue-500/30' : 'bg-white text-slate-900 border-slate-100 shadow-sm'} flex flex-col relative overflow-hidden group hover:scale-[1.02] transition-all`}>
                   {plan.hot && <Sparkles className="absolute top-0 right-0 p-6 w-32 h-32 opacity-10" />}
                   <h3 className="text-2xl font-black mb-2">{plan.name}</h3>
                   <div className="flex items-baseline gap-2 mb-8">
-                     <span className="text-5xl font-black tracking-tighter">${plan.price}</span>
+                     <span className="text-5xl font-black tracking-tighter">{currency.symbol}{plan.price}</span>
                      <span className={`text-sm font-bold opacity-60`}>/mo</span>
                   </div>
                   <ul className="space-y-4 mb-10 flex-grow">
