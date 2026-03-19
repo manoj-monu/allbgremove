@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Background Remover",
-  description: "Free automated image background removal",
+  title: "PixelCut — Free AI Background Remover & Image Editor",
+  description: "Remove image backgrounds instantly with the world's most accurate AI background remover. 100% free and automatic for professionals and creators.",
+  keywords: ["background remover", "image background remover", "free background remover", "photo editor", "remove background from image", "AI background removal"],
 };
 
 export default function RootLayout({
@@ -13,7 +14,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+      </head>
+      <body className="antialiased min-h-screen">
         {children}
       </body>
     </html>
