@@ -32,7 +32,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
   const [zoom, setZoom] = useState(1);
   const [error, setError] = useState<string | null>(null);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://bg-remover-api-vbi7.onrender.com";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://manojkumarsh-allbgremove-api.hf.space";
 
   useEffect(() => {
     const url = URL.createObjectURL(file);
