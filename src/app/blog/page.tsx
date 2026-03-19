@@ -54,6 +54,12 @@ export default function BlogPage() {
                     </div>
                 </div>
 
+                {/* AdSense Placeholder */}
+                <div className="w-full h-[250px] bg-slate-50 border border-slate-100 rounded-3xl mb-20 flex flex-col items-center justify-center text-slate-300">
+                   <span className="text-[10px] font-black uppercase tracking-[4px]">Google AdSense Placeholder</span>
+                   <span className="text-[9px] font-medium mt-1">Responsive Horizontal Banner</span>
+                </div>
+
                 {/* Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 w-full">
                     {POSTS.map((post, i) => (

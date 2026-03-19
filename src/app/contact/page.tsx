@@ -20,26 +20,32 @@ export default function ContactPage() {
                     <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                     
                     <div className="space-y-12 relative z-10 w-full">
-                        <section className="bg-white p-10 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col items-center text-center">
-                            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white flex-shrink-0 shadow-lg mb-8"><Mail className="w-8 h-8"/></div>
-                            <h3 className="text-2xl font-black text-slate-900 mb-4 tracking-tight">Direct Support</h3>
-                            <p className="text-slate-500 font-medium mb-12">We respond to every single valid inquiry within 12 hours.</p>
-                            <a href="mailto:support@pixelcut.com" className="text-3xl font-black text-blue-600 tracking-tighter hover:underline">support@pixelcut.com</a>
-                        </section>
-
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                            <section className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col items-start">
-                                <h3 className="text-xl font-black text-slate-900 mb-4 tracking-tight">Partnerships</h3>
-                                <p className="text-slate-500 font-medium leading-relaxed">
-                                    Are you looking to integrate our AI into your app or marketplace? Our developer team will help you with custom API endpoints.
-                                </p>
+                            <section className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col items-start w-full">
+                                <h3 className="text-xl font-black text-slate-900 mb-6 tracking-tight">Direct Support</h3>
+                                <div className="space-y-4 w-full">
+                                    <div className="flex items-center gap-4 text-slate-600 font-medium">
+                                        <Mail className="w-5 h-5 text-blue-600" /> support@pixelcut.com
+                                    </div>
+                                    <div className="flex items-center gap-4 text-slate-600 font-medium">
+                                        <Phone className="w-5 h-5 text-blue-600" /> +1 (555) 012-3456
+                                    </div>
+                                </div>
+                                <div className="mt-10 pt-10 border-t border-slate-50 w-full">
+                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+                                        Response time: Under 12 Hours
+                                    </p>
+                                </div>
                             </section>
 
-                            <section className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col items-start">
-                                <h3 className="text-xl font-black text-slate-900 mb-4 tracking-tight">Report a Bug</h3>
-                                <p className="text-slate-500 font-medium leading-relaxed">
-                                    Encountered an issue with your specific image resolution? Send us the original file and we&apos;ll use it to improve our edge neural network.
-                                </p>
+                            <section className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm w-full">
+                                <h3 className="text-xl font-black text-slate-900 mb-6 tracking-tight">Send a Message</h3>
+                                <form className="space-y-4">
+                                    <input type="text" placeholder="Your Name" className="w-full bg-slate-50 border border-slate-100 rounded-xl py-3 px-4 text-sm font-medium focus:ring-2 focus:ring-blue-600/10 focus:outline-none" />
+                                    <input type="email" placeholder="Email Address" className="w-full bg-slate-50 border border-slate-100 rounded-xl py-3 px-4 text-sm font-medium focus:ring-2 focus:ring-blue-600/10 focus:outline-none" />
+                                    <textarea placeholder="How can we help?" className="w-full bg-slate-50 border border-slate-100 rounded-xl py-3 px-4 text-sm font-medium h-32 focus:ring-2 focus:ring-blue-600/10 focus:outline-none resize-none"></textarea>
+                                    <button className="btn-primary w-full py-4 text-sm">Submit Inquiry</button>
+                                </form>
                             </section>
                         </div>
 
