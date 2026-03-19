@@ -82,10 +82,51 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
     }
   };
 
-  const handleDownload = () => {
-    if (processedUrl) {
-      saveAs(processedUrl, "allbgremove_export.png");
+  const handleDownload = async () => {
+    if (!processedUrl) return;
+
+    // Create a temporary canvas to composite the final result
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Create image objects for the subject and background
+    const subjectImg = new Image();
+    subjectImg.crossOrigin = "anonymous";
+    subjectImg.src = processedUrl;
+
+    await new Promise((resolve) => { subjectImg.onload = resolve; });
+
+    // Set canvas dimensions to match the processed image
+    canvas.width = subjectImg.width;
+    canvas.height = subjectImg.height;
+
+    // 1. Draw Background
+    if (customBgImage) {
+      const bgImg = new Image();
+      bgImg.crossOrigin = "anonymous";
+      bgImg.src = customBgImage;
+      await new Promise((resolve) => { bgImg.onload = resolve; });
+
+      // Draw background image (cover style)
+      const scale = Math.max(canvas.width / bgImg.width, canvas.height / bgImg.height);
+      const x = (canvas.width / 2) - (bgImg.width / 2) * scale;
+      const y = (canvas.height / 2) - (bgImg.height / 2) * scale;
+      ctx.drawImage(bgImg, x, y, bgImg.width * scale, bgImg.height * scale);
+    } else if (bgColor !== "transparent") {
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
+
+    // 2. Draw Subject
+    ctx.drawImage(subjectImg, 0, 0);
+
+    // 3. Export & Download
+    canvas.toBlob((blob) => {
+      if (blob) {
+        saveAs(blob, `allbgremove_${Date.now()}.png`);
+      }
+    }, "image/png");
   };
 
   return (
