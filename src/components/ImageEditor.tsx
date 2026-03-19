@@ -48,7 +48,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch(`${apiUrl}/api/remove-bg-async?enhance=false`, {
+      const response = await fetch(`${apiUrl}/api/remove-bg-async?enhance=true`, {
         method: "POST",
         body: formData,
       });
