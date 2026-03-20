@@ -2,32 +2,32 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://allbgremove.com/</loc>
-    <lastmod>2026-03-19</lastmod>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://allbgremove.com/pricing</loc>
-    <lastmod>2026-03-19</lastmod>
+    <loc>https://allbgremove.com/about</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://allbgremove.com/about</loc>
-    <lastmod>2026-03-19</lastmod>
-    <priority>0.5</priority>
-  </url>
-  <url>
     <loc>https://allbgremove.com/contact</loc>
-    <lastmod>2026-03-19</lastmod>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://allbgremove.com/blog</loc>
-    <lastmod>2026-03-19</lastmod>
-    <priority>0.7</priority>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://allbgremove.com/privacy-policy</loc>
-    <lastmod>2026-03-19</lastmod>
-    <priority>0.3</priority>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://allbgremove.com/terms</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 </urlset>
