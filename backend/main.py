@@ -139,6 +139,8 @@ async def startup_event():
         import threading
         # Load session in background thread so startup is fast but model is ready ASAP
         threading.Thread(target=get_session, daemon=True).start()
+        # Also preload upscaler so premium users don't wait for its first init
+        threading.Thread(target=get_upscaler, daemon=True).start()
     except Exception as e:
         print(f"Startup pre-load warning: {e}")
     
