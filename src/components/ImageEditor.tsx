@@ -25,6 +25,7 @@ const PREDEFINED_COLORS = [
 export default function ImageEditor({ file, onReset }: ImageEditorProps) {
   const [activeTab, setActiveTab] = useState<"background" | "refine" | "export">("background");
   const [isProcessing, setIsProcessing] = useState(true);
+  const [elapsedTime, setElapsedTime] = useState(0);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
   const [bgColor, setBgColor] = useState<string>("transparent");
@@ -42,6 +43,19 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
   const originalImageRef = useRef<HTMLImageElement | null>(null);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://manojkumarsh-allbgremove-api.hf.space";
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isProcessing) {
+      setElapsedTime(0);
+      interval = setInterval(() => {
+        setElapsedTime(prev => prev + 1);
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isProcessing]);
 
   useEffect(() => {
     const url = URL.createObjectURL(file);
@@ -318,6 +332,14 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
 
                 {/* --- Main Area (Preview) --- */}
                 <div className="flex-grow bg-slate-100 flex items-center justify-center relative p-8">
+                    {/* Processing Timer */}
+                    <div className="absolute top-6 left-6 z-20">
+                         <div className="px-4 py-2 bg-white rounded-xl shadow-lg border border-slate-200 text-[11px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                             <Loader2 className={`w-3 h-3 ${isProcessing ? 'animate-spin text-blue-600' : 'hidden'}`} />
+                             {isProcessing ? `Processing: ${elapsedTime}s` : `Took: ${elapsedTime}s`}
+                         </div>
+                    </div>
+
                     {/* Viewport UI Tabs */}
                     <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 flex bg-white rounded-full p-1 shadow-2xl border border-slate-200">
                          <button className="px-6 py-2 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-900 text-white shadow-lg">Preview</button>

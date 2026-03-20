@@ -29,7 +29,21 @@ interface ProcessedFile {
 export default function BulkEditor({ files, onReset }: BulkEditorProps) {
   const [tasks, setTasks] = useState<ProcessedFile[]>([]);
   const [isProcessingAll, setIsProcessingAll] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://bg-remover-api-vbi7.onrender.com";
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isProcessingAll) {
+      setElapsedTime(0);
+      interval = setInterval(() => {
+        setElapsedTime(prev => prev + 1);
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isProcessingAll]);
 
   useEffect(() => {
     const newTasks = files.map(file => ({
@@ -106,6 +120,10 @@ export default function BulkEditor({ files, onReset }: BulkEditorProps) {
         </div>
         
         <div className="flex items-center gap-6">
+          <div className="hidden lg:flex flex-col items-end border-r border-slate-100 pr-6">
+             <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Total Time</span>
+             <span className="text-lg font-black text-slate-600">{elapsedTime}s</span>
+          </div>
           <div className="hidden lg:flex flex-col items-end">
              <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Processing Progress</span>
              <span className="text-lg font-black text-blue-600">{tasks.filter(t => t.status === "done").length} <span className="text-slate-300">/</span> {tasks.length}</span>
