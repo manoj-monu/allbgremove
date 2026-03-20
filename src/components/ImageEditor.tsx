@@ -189,6 +189,11 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
     
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    
+    if (isPremium) {
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+    }
 
     if (customBgImage) {
       const bgImg = new Image();
