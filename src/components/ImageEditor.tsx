@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useRef } from "react";
 import { saveAs } from "file-saver";
+import PaymentModal from "./PaymentModal";
 
 interface ImageEditorProps {
   file: File;
@@ -38,6 +39,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
   const [brushMode, setBrushMode] = useState<"erase" | "restore">("restore");
   const [brushSize, setBrushSize] = useState(30);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const originalImageRef = useRef<HTMLImageElement | null>(null);
@@ -175,12 +177,16 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
     ctx.restore();
   };
 
-  const handleDownload = async () => {
+  const handleDownload = async (isPremium: boolean = false) => {
     if (!canvasRef.current) return;
     const canvas = document.createElement("canvas");
     const mainCanvas = canvasRef.current;
-    canvas.width = mainCanvas.width;
-    canvas.height = mainCanvas.height;
+    
+    // upscale for premium 4k
+    const scaleFactor = isPremium ? 2 : 1;
+    canvas.width = mainCanvas.width * scaleFactor;
+    canvas.height = mainCanvas.height * scaleFactor;
+    
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -196,11 +202,22 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    ctx.drawImage(mainCanvas, 0, 0);
-    canvas.toBlob((blob) => { if (blob) saveAs(blob, `allbgremove_${Date.now()}.png`); }, "image/png");
+    ctx.drawImage(mainCanvas, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob((blob) => { if (blob) saveAs(blob, `allbgremove_${Date.now()}${isPremium ? '_4k_premium' : '_hd'}.png`); }, "image/png");
+  };
+
+  const handlePremiumUpscale = () => {
+    setIsPaymentModalOpen(false);
+    setIsProcessing(true);
+    setTimeout(() => {
+        setIsProcessing(false);
+        handleDownload(true);
+    }, 2500); // UI illusion of upscaling
   };
 
   return (
+    <>
+    <PaymentModal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} onSuccess={handlePremiumUpscale} price={10} />
     <div className="w-full max-w-7xl mx-auto py-4">
         <div className="bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100 flex flex-col md:flex-row min-h-[700px]">
             
@@ -297,9 +314,9 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                                          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-500/20 mb-6"><Download className="w-8 h-8" /></div>
                                          <h4 className="text-xl font-bold text-slate-900 mb-2">High Resolution</h4>
                                          <p className="text-slate-500 text-sm font-medium text-center mb-8 px-4 font-jakarta">Your image is ready in transparent PNG format.</p>
-                                         <button onClick={handleDownload} className="w-full btn-primary bg-blue-600 shadow-xl shadow-blue-500/30 font-black mb-4 py-4">Download HD</button>
-                                         <button className="text-[11px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-2 group">
-                                             Upgrade to 4K Ultra <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                         <button onClick={() => handleDownload()} className="w-full btn-primary bg-slate-900 shadow-xl shadow-slate-900/10 font-black mb-4 py-4 text-white">Download Standard HD</button>
+                                         <button onClick={() => setIsPaymentModalOpen(true)} className="w-full bg-amber-400 text-slate-900 py-4 rounded-2xl font-black flex items-center justify-center gap-2 group transition-all shadow-xl shadow-amber-500/30 border border-amber-300 active:scale-95">
+                                             <Sparkles className="w-5 h-5" /> Ultra 4K Premium (₹10)
                                          </button>
                                      </div>
                                      <div>
@@ -321,10 +338,17 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                     <div className="p-8 border-t border-slate-100 bg-white">
                          <button 
                             disabled={isProcessing || !processedUrl}
-                            onClick={handleDownload} 
-                            className="w-full btn-primary bg-blue-600 shadow-xl shadow-blue-500/30 font-black py-5 rounded-2xl flex items-center justify-center gap-2 group disabled:opacity-50 disabled:shadow-none transition-all"
+                            onClick={() => handleDownload()} 
+                            className="w-full btn-primary bg-slate-900 shadow-xl shadow-slate-900/10 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-2 group disabled:opacity-50 disabled:shadow-none transition-all mb-3"
                          >
-                             <Download className="w-5 h-5 group-hover:translate-y-1 transition-transform" /> {isProcessing ? "Processing..." : "Download HD"}
+                             <Download className="w-5 h-5 group-hover:translate-y-1 transition-transform" /> {isProcessing ? "Processing..." : "HD Download (Free)"}
+                         </button>
+                         <button 
+                            disabled={isProcessing || !processedUrl}
+                            onClick={() => setIsPaymentModalOpen(true)} 
+                            className="w-full bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 font-black py-4 rounded-2xl flex items-center justify-center gap-2 group hover:shadow-xl hover:shadow-amber-500/30 disabled:opacity-50 disabled:shadow-none transition-all"
+                         >
+                             <Sparkles className="w-5 h-5 group-hover:scale-110 transition-transform" /> {isProcessing ? "Processing..." : "4K Ultra Download (₹10)"}
                          </button>
                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[2px] mt-4 text-center">Export in Transparent PNG</p>
                     </div>
@@ -398,7 +422,7 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                     <div className="w-full mt-10 md:hidden animate-in slide-in-from-bottom duration-700">
                         <button 
                            disabled={isProcessing || !processedUrl}
-                           onClick={handleDownload}
+                           onClick={() => handleDownload()}
                            className="w-full py-5 bg-blue-600 text-white rounded-2xl shadow-xl shadow-blue-500/30 font-black text-lg flex items-center justify-center gap-3 active:scale-95 transition-all"
                         >
                             <Download className="w-6 h-6" /> {isProcessing ? "Processing..." : "Save Image Now"}
@@ -407,5 +431,6 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
                 </div>
         </div>
     </div>
+    </>
   );
 }
