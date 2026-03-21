@@ -12,6 +12,8 @@ app = FastAPI(title="AI Background Remover API")
 # Making it lazily loaded to prevent Render startup healthcheck timeouts
 ai_session = None
 upscaler = None
+MODAL_API_URL = os.getenv("MODAL_API_URL", "https://manoj-watkar61--allbgremove-premium-process.modal.run")
+
 
 def get_upscaler():
     global upscaler
@@ -45,7 +47,7 @@ def get_upscaler():
             print("Real-ESRGAN Successfully Ready!")
         except Exception as e:
             print(f"Failed to load ESRGAN: {e}")
-            upscaler = False
+            upscaler = "FAILED"
     return upscaler
 
 import os
@@ -161,9 +163,14 @@ async def worker_loop():
 
 async def process_task(task):
     is_upscale = False
+    is_remove_bg_premium = False
+    
     if len(task) == 3 and task[2] == "upscale_only":
         task_id, input_image, action = task
         is_upscale = True
+    elif len(task) == 3 and task[2] == "remove_bg_premium":
+        task_id, input_image, action = task
+        is_remove_bg_premium = True
     elif len(task) == 4:
         task_id, input_image, enhance, intensity = task
     else:
@@ -174,28 +181,70 @@ async def process_task(task):
     
     try:
         if is_upscale:
-            print(f"Task {task_id}: Running Real-ESRGAN Premium Upscale")
-            current_upscaler = get_upscaler()
-            if not current_upscaler:
-                raise Exception("Upscaler model failed to initialize on backend.")
-            from fastapi.concurrency import run_in_threadpool
+            # HYBRID STRATEGY: Check if we should use Modal GPU for Premium Upscale
+            # If MODAL_API_URL is set and we are in a production environment, use Modal.
+            # Otherwise, try to use local ESRGAN (which might be slow on CPU).
+            use_modal = True # Defaulting to True for Hybrid strategy
             
-            def blocking_upscale():
-                import numpy as np
-                import cv2
-                # input_image is RGBA
-                img_np = np.array(input_image)
-                if img_np.shape[2] == 4:
-                    img_bgra = cv2.cvtColor(img_np, cv2.COLOR_RGBA2BGRA)
-                    output_bgra, _ = current_upscaler.enhance(img_bgra, outscale=4)
-                    output_rgba = cv2.cvtColor(output_bgra, cv2.COLOR_BGRA2RGBA)
+            if use_modal:
+                print(f"Task {task_id}: Routing to Modal Premium GPU...")
+                import httpx
+                
+                # Prepare the file for Modal
+                img_byte_arr = io.BytesIO()
+                input_image.save(img_byte_arr, format='PNG')
+                img_byte_arr.seek(0)
+                
+                async with httpx.AsyncClient(timeout=600.0) as client:
+                    files = {'file': ('image.png', img_byte_arr, 'image/png')}
+                    data = {'task': 'upscale'}
+                    response = await client.post(MODAL_API_URL, data=data, files=files)
+                    
+                    if response.status_code == 200:
+                        output_image = Image.open(io.BytesIO(response.content))
+                    else:
+                        print(f"Modal Error: {response.text}")
+                        raise Exception(f"Modal Premium Backend failed: {response.status_code}")
+            else:
+                print(f"Task {task_id}: Running Real-ESRGAN Local (Slow)")
+                current_upscaler = get_upscaler()
+                if current_upscaler == "FAILED" or current_upscaler is None or isinstance(current_upscaler, str):
+                    raise Exception("Upscaler model failed to initialize on backend.")
+                from fastapi.concurrency import run_in_threadpool
+                
+                def blocking_upscale():
+                    import numpy as np
+                    import cv2
+                    # input_image is RGBA
+                    img_np = np.array(input_image)
+                    if img_np.shape[2] == 4:
+                        img_bgra = cv2.cvtColor(img_np, cv2.COLOR_RGBA2BGRA)
+                        # current_upscaler is now guaranteed to be the RealESRGANer object
+                        output_bgra, _ = current_upscaler.enhance(img_bgra, outscale=4) # type: ignore
+                        output_rgba = cv2.cvtColor(output_bgra, cv2.COLOR_BGRA2RGBA)
+                    else:
+                        img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
+                        output_bgra, _ = current_upscaler.enhance(img_bgr, outscale=4) # type: ignore
+                        output_rgba = cv2.cvtColor(output_bgra, cv2.COLOR_BGR2RGBA)
+                    return Image.fromarray(output_rgba)
+                output_image = await run_in_threadpool(blocking_upscale)
+        elif is_remove_bg_premium:
+            print(f"Task {task_id}: Routing to Modal Premium Removal (BiRefNet)...")
+            
+            img_byte_arr = io.BytesIO()
+            input_image.save(img_byte_arr, format='PNG')
+            img_byte_arr.seek(0)
+            
+            async with httpx.AsyncClient(timeout=600.0) as client:
+                url = f"{MODAL_API_URL}"
+                files = {'file': ('image.png', img_byte_arr, 'image/png')}
+                data = {'task': 'remove-bg-premium'}
+                response = await client.post(url, data=data, files=files)
+                
+                if response.status_code == 200:
+                    output_image = Image.open(io.BytesIO(response.content))
                 else:
-                    img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
-                    output_bgr, _ = current_upscaler.enhance(img_bgr, outscale=4)
-                    output_rgba = cv2.cvtColor(output_bgr, cv2.COLOR_BGR2RGBA)
-                return Image.fromarray(output_rgba)
-
-            output_image = await run_in_threadpool(blocking_upscale)
+                    raise Exception(f"Modal Premium Removal failed: {response.text}")
         else:
             # 1. 2K Resolution (High Fidelity)
             # Reduced from 1536 to 1024 to massively improve CPU speed (brings 30s processing down to ~5-10s)
@@ -286,7 +335,7 @@ async def queue_upscale(file: UploadFile = File(...)):
         
         task_id = str(uuid.uuid4())
         tasks[task_id] = {"status": "pending"}
-        # "upscale_only" tag tells worker thread to route it to ESRGAN provider
+        # Consistent 3-tuple for action tasks
         await task_queue.put((task_id, input_image, "upscale_only"))
         
         return {"task_id": task_id, "position": task_queue.qsize()}
@@ -379,7 +428,7 @@ async def remove_background_legacy(file: UploadFile = File(...), enhance: bool =
         if input_image.size[0] > max_size or input_image.size[1] > max_size:
             input_image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
         
-        import time
+        
         from fastapi.concurrency import run_in_threadpool
         start = time.time()
         
