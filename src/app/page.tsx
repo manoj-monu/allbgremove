@@ -14,9 +14,7 @@ import AuthModal from "../components/AuthModal";
 
 export default function Home() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBulkMode, setIsBulkMode] = useState(false);
-  const [authModal, setAuthModal] = useState<{isOpen: boolean, type: "login" | "signup"}>({ isOpen: false, type: "login" });
   
   // Geo-Pricing State
   const [currency, setCurrency] = useState({ code: "USD", symbol: "$" });
@@ -85,64 +83,11 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      <AuthModal 
-        isOpen={authModal.isOpen} 
-        onClose={() => setAuthModal({ ...authModal, isOpen: false })} 
-        initialType={authModal.type} 
-      />
+
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2 group cursor-pointer">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
-              <Sparkles className="w-6 h-6" />
-            </div>
-            <span className="text-2xl font-black text-slate-900 tracking-tighter">ALLBgremove</span>
-          </div>
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-10">
-            <Link href="#how-it-works" className="text-slate-600 font-bold text-sm uppercase tracking-widest hover:text-blue-600 transition-colors">How it works</Link>
-            <Link href="/pricing" className="text-slate-600 font-bold text-sm uppercase tracking-widest hover:text-blue-600 transition-colors">Pricing</Link>
-            <Link href="/about" className="text-slate-600 font-bold text-sm uppercase tracking-widest hover:text-blue-600 transition-colors">About Us</Link>
-          </div>
 
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setAuthModal({ isOpen: true, type: "login" })}
-              className="hidden md:flex text-slate-900 font-bold px-6 py-2 rounded-xl hover:bg-slate-50 transition-all border border-slate-200"
-            >
-              Sign In
-            </button>
-            <button 
-              onClick={() => setAuthModal({ isOpen: true, type: "signup" })}
-              className="btn-primary py-2.5 px-6 hidden lg:flex"
-            >
-              Get Started
-            </button>
-            <button className="md:hidden p-2 text-slate-900" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-              <Menu className="w-8 h-8" />
-            </button>
-          </div>
-        </div>
-      </nav>
 
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="fixed inset-0 z-[60] bg-white p-6 flex flex-col pt-24 gap-8">
-            <button className="absolute top-6 right-6 p-2" onClick={() => setIsMobileMenuOpen(false)}>
-              <X className="w-8 h-8" />
-            </button>
-            <Link href="#how-it-works" onClick={() => setIsMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">How it works</Link>
-            <Link href="/pricing" onClick={() => setIsMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Pricing</Link>
-            <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">About Us</Link>
-            <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Contact</Link>
-            <div className="mt-auto pb-10">
-              <button className="w-full btn-primary" onClick={() => setIsMobileMenuOpen(false)}>Close Menu</button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <main className="flex-grow pt-32">
         {/* HERO SECTION */}
@@ -238,9 +183,10 @@ export default function Home() {
                        </li>
                      ))}
                   </ul>
-                  <button onClick={() => setAuthModal({ isOpen: true, type: "signup" })} className={`w-full py-5 rounded-2xl font-black shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 ${plan.hot ? 'bg-white text-blue-600' : 'bg-slate-900 text-white'}`}>
+                  <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className={`w-full py-5 rounded-2xl font-black shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 ${plan.hot ? 'bg-white text-blue-600' : 'bg-slate-900 text-white'}`}>
                     {plan.btn} <ArrowRight className="w-5 h-5" />
                   </button>
+
                </div>
              ))}
           </div>
@@ -298,57 +244,7 @@ export default function Home() {
       </main>
 
       {/* FOOTER */}
-      <footer className="bg-slate-900 text-white pt-24 pb-12 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-20">
-            <div className="col-span-2 lg:col-span-2">
-              <div className="flex items-center gap-2 mb-8">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black">A</div>
-                <span className="text-2xl font-black tracking-tighter">ALLBgremove</span>
-              </div>
-              <p className="text-slate-400 font-medium leading-relaxed max-w-sm">
-                Empowering creators with elite AI tools. World&apos;s most accurate background removal at the cost of zero.
-              </p>
-              <div className="flex gap-4 mt-8">
-                 <div className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors cursor-pointer"><Instagram className="w-5 h-5" /></div>
-                 <div className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors cursor-pointer"><FbIcon className="w-5 h-5" /></div>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-black text-sm uppercase tracking-[3px] mb-8 text-blue-500">Products</h4>
-              <ul className="space-y-4 text-slate-400 font-medium">
-                <li><Link href="/" className="hover:text-white transition-colors">Free Removal</Link></li>
-                <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
-                <li><Link href="#features" className="hover:text-white transition-colors">Bulk Editor</Link></li>
-              </ul>
-            </div>
 
-            <div>
-              <h4 className="font-black text-sm uppercase tracking-[3px] mb-8 text-blue-500">Company</h4>
-              <ul className="space-y-4 text-slate-400 font-medium">
-                <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
-                <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-black text-sm uppercase tracking-[3px] mb-8 text-blue-500">Legal</h4>
-              <ul className="space-y-4 text-slate-400 font-medium">
-                <li><Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-                <li><Link href="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="pt-12 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-slate-500 text-sm">© Copyright 2026 ALLBgremove.com. All rights reserved.</p>
-            <p className="text-slate-500 text-xs flex items-center gap-2">Built with ♥ for Creators everywhere.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

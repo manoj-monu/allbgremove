@@ -2,11 +2,17 @@ import type { Metadata } from "next";
 import "./globals.css";
 import CookieConsent from "@/components/CookieConsent";
 import Script from "next/script";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://allbgremove.com"),
   title: "ALLBgremove.com — Professional AI Background Remover & Studio",
   description: "The world's most accurate AI background remover. 100% free and automatic. Perfect for e-commerce, photographers, and content creators. Process HD images in seconds.",
   keywords: ["background remover", "image background remover", "free background remover", "photo editor", "remove background from image", "AI background removal", "allbgremove", "transparent background", "batch photo editor"],
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: "/favicon.ico",
   },
@@ -31,6 +37,9 @@ export const metadata: Metadata = {
     description: "Instant, HD background removal in your browser.",
     images: ["/og-image.jpg"],
   },
+  verification: {
+    google: "googled246e8208342ca63.html",
+  }
 };
 
 export default function RootLayout({
@@ -59,7 +68,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -69,7 +78,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="antialiased min-h-screen relative">
+      <body className="antialiased min-h-screen relative flex flex-col">
         {GA_TRACKING_ID && (
           <>
             <Script
@@ -86,9 +95,14 @@ export default function RootLayout({
             </Script>
           </>
         )}
-        {children}
+        <Navbar />
+        <main className="flex-grow">
+          {children}
+        </main>
+        <Footer />
         <CookieConsent />
       </body>
     </html>
   );
 }
+

@@ -44,7 +44,8 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const originalImageRef = useRef<HTMLImageElement | null>(null);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://manojkumarsh-allbgremove-api.hf.space";
+  const apiUrl = "https://manoj-watkar61--allbgremove-process.modal.run";
+
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -72,40 +73,24 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("task", "remove-bg");
 
-      const response = await fetch(`${apiUrl}/api/remove-bg-async?enhance=true`, {
+      const response = await fetch(apiUrl, {
         method: "POST",
         body: formData,
       });
 
-      if (!response.ok) throw new Error("Upload failed. Please try again.");
-      const data = await response.json();
-      const taskId = data.task_id;
-
-      let isCompleted = false;
-      let attempts = 0;
-      while (!isCompleted && attempts < 30) {
-        await new Promise(r => setTimeout(r, 2000));
-        const statusRes = await fetch(`${apiUrl}/api/status/${taskId}`);
-        const statusData = await statusRes.json();
-
-        if (statusData.status === "completed") {
-          isCompleted = true;
-          const resultRes = await fetch(`${apiUrl}/api/result/${taskId}`);
-          const blob = await resultRes.blob();
-          setProcessedUrl(URL.createObjectURL(blob));
-        } else if (statusData.status === "failed") {
-          throw new Error("AI processing failed. The image might be too complex.");
-        }
-        attempts++;
-      }
-      if (!isCompleted) throw new Error("Processing timed out.");
+      if (!response.ok) throw new Error("Modal processing failed. Please check backend.");
+      
+      const blob = await response.blob();
+      setProcessedUrl(URL.createObjectURL(blob));
     } catch (err: any) {
       setError(err.message);
     } finally {
       setIsProcessing(false);
     }
   };
+
 
   // Initialize Canvas when AI result is ready
   useEffect(() => {
@@ -211,14 +196,39 @@ export default function ImageEditor({ file, onReset }: ImageEditorProps) {
     canvas.toBlob((blob) => { if (blob) saveAs(blob, `allbgremove_${Date.now()}${isPremium ? '_4k_premium' : '_hd'}.png`); }, "image/png");
   };
 
-  const handlePremiumUpscale = () => {
+  const handlePremiumUpscale = async () => {
     setIsPaymentModalOpen(false);
     setIsProcessing(true);
-    setTimeout(() => {
+    setError(null);
+    try {
+        if (!canvasRef.current) throw new Error("No image to upscale");
+        
+        const blob = await new Promise<Blob>((resolve, reject) => {
+            canvasRef.current!.toBlob(b => {
+                if (b) resolve(b);
+                else reject(new Error("Canvas to blob failed"));
+            }, "image/png");
+        });
+        
+        const formData = new FormData();
+        formData.append("file", blob, "canvas.png");
+        formData.append("task", "upscale");
+        
+        const response = await fetch(apiUrl, {
+            method: "POST", body: formData
+        });
+        
+        if (!response.ok) throw new Error("Modal Upscale failed. Check backend.");
+        
+        const upscaledBlob = await response.blob();
+        saveAs(upscaledBlob, `allbgremove_${Date.now()}_4K_Modal.png`);
+    } catch (err: any) {
+        setError(err.message);
+    } finally {
         setIsProcessing(false);
-        handleDownload(true);
-    }, 2500); // UI illusion of upscaling
+    }
   };
+
 
   return (
     <>

@@ -30,7 +30,7 @@ export default function BulkEditor({ files, onReset }: BulkEditorProps) {
   const [tasks, setTasks] = useState<ProcessedFile[]>([]);
   const [isProcessingAll, setIsProcessingAll] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://bg-remover-api-vbi7.onrender.com";
+  const apiUrl = process.env.NEXT_PUBLIC_MODAL_API_URL || "https://manoj-watkar61--allbgremove-process.modal.run";
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -70,25 +70,16 @@ export default function BulkEditor({ files, onReset }: BulkEditorProps) {
         updateTask(task.id, { status: "uploading" });
         const formData = new FormData();
         formData.append("file", task.originalFile);
-        const response = await fetch(`${apiUrl}/api/remove-bg-async?enhance=false`, {
+        formData.append("task", "remove-bg");
+
+        updateTask(task.id, { status: "processing" });
+        const response = await fetch(apiUrl, {
             method: "POST", body: formData,
         });
-        if (!response.ok) throw new Error("Upload failed");
-        const data = await response.json();
-        const taskId = data.task_id;
-        updateTask(task.id, { status: "processing" });
 
-        let isCompleted = false;
-        while (!isCompleted) {
-            await new Promise(r => setTimeout(r, 2000));
-            const statusRes = await fetch(`${apiUrl}/api/status/${taskId}`);
-            const statusData = await statusRes.json();
-            if (statusData.status === "completed") isCompleted = true;
-            else if (statusData.status === "failed") throw new Error("Failed");
-        }
-
-        const resultRes = await fetch(`${apiUrl}/api/result/${taskId}`);
-        const blob = await resultRes.blob();
+        if (!response.ok) throw new Error("Modal failed");
+        
+        const blob = await response.blob();
         updateTask(task.id, { status: "done", processedUrl: URL.createObjectURL(blob) });
       } catch (err) {
         updateTask(task.id, { status: "error", errorMsg: "Error" });
@@ -96,6 +87,7 @@ export default function BulkEditor({ files, onReset }: BulkEditorProps) {
     }
     setIsProcessingAll(false);
   };
+
 
   const downloadAllZip = async () => {
     const zip = new JSZip();
