@@ -13,6 +13,7 @@ except ImportError:
 
 # 🚀 FastAPI Instance
 api = FastAPI()
+app = api # Expose for Uvicorn/Hugging Face
 
 api.add_middleware(
     CORSMiddleware,
@@ -52,7 +53,9 @@ def get_session():
     global ai_session
     if ai_session is None:
         from rembg import new_session
-        ai_session = new_session("u2netp")
+        # Using BiRefNet (User's original favorite premium model) 
+        # for flawless quality without the u2net diamond glitches.
+        ai_session = new_session("birefnet-general")
     return ai_session
 
 @api.post("/api/remove-bg")
@@ -80,15 +83,29 @@ async def enhance_photo(file: UploadFile = File(...)):
         import cv2
         contents = await file.read()
         nparr = np.frombuffer(contents, np.uint8)
-        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        # Read with IMREAD_UNCHANGED to keep the transparent background
+        img = cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)
         
-        # CPU-friendly fast enhancement: Detail Enhance + subtle upscale
-        # 1. Enhance Details
-        enhanced = cv2.detailEnhance(img, sigma_s=10, sigma_r=0.15)
+        if len(img.shape) == 3 and img.shape[2] == 4:
+            bgr = img[:, :, :3]
+            alpha = img[:, :, 3:]
+        else:
+            bgr = img
+            alpha = None
+            
+        # Just perform a clean, high-quality HD Upscale without ANY harsh filters.
+        # This guarantees the face remains 100% natural and identical to the original, just higher resolution.
+        height, width = bgr.shape[:2]
+        bgr = cv2.resize(bgr, (width * 2, height * 2), interpolation=cv2.INTER_LANCZOS4)
         
-        # 2. 2x Upscale using Lanczos4 (sharp interpolation)
-        height, width = enhanced.shape[:2]
-        output = cv2.resize(enhanced, (width * 2, height * 2), interpolation=cv2.INTER_LANCZOS4)
+        # Re-attach the transparent background cleanly
+        if alpha is not None:
+            alpha = cv2.resize(alpha, (width * 2, height * 2), interpolation=cv2.INTER_LANCZOS4)
+            if len(alpha.shape) == 2:
+                alpha = np.expand_dims(alpha, axis=2)
+            output = np.concatenate((bgr, alpha), axis=2)
+        else:
+            output = bgr
         
         # Convert back to PNG
         _, buffer = cv2.imencode('.png', output)

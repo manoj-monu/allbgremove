@@ -1,7 +1,7 @@
 fastapi
 uvicorn
 python-multipart
-rembg[cpu]
+rembg[cpu]>=2.0.57
 pillow
 huggingface_hub
 opencv-python-headless
