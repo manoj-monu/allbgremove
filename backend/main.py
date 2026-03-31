@@ -70,6 +70,34 @@ async def remove_bg(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# ----------------------------------------------------------
+# ✨ AI Enhancer (Fast CPU-Optimized Logic)
+# ----------------------------------------------------------
+@api.post("/api/enhance-photo")
+async def enhance_photo(file: UploadFile = File(...)):
+    try:
+        import numpy as np
+        import cv2
+        contents = await file.read()
+        nparr = np.frombuffer(contents, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        
+        # CPU-friendly fast enhancement: Detail Enhance + subtle upscale
+        # 1. Enhance Details
+        enhanced = cv2.detailEnhance(img, sigma_s=10, sigma_r=0.15)
+        
+        # 2. 2x Upscale using Lanczos4 (sharp interpolation)
+        height, width = enhanced.shape[:2]
+        output = cv2.resize(enhanced, (width * 2, height * 2), interpolation=cv2.INTER_LANCZOS4)
+        
+        # Convert back to PNG
+        _, buffer = cv2.imencode('.png', output)
+        return Response(content=buffer.tobytes(), media_type="image/png")
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api.get("/")
 async def root():
     return {"engine": "ALLBgremove Ultra Lite (Instant CPU) ACTIVE"}

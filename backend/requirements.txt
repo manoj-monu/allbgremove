@@ -6,8 +6,3 @@ pillow
 huggingface_hub
 opencv-python-headless
 numpy
-realesrgan
-torch
-torchvision
-basicsr
-httpx
