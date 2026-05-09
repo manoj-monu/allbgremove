@@ -8,18 +8,20 @@ import {
   Image as ImageIcon, 
   Printer, 
   X, 
-  Sun, 
+  Settings,
   Maximize2,
   CheckCircle2,
   Layers,
   Crop as CropIcon,
-  Palette
+  Palette,
+  ArrowRight,
+  Info
 } from 'lucide-react';
 import { saveAs } from 'file-saver';
 
 export default function Home() {
-  // VERSION 5.0 - PREMIUM STUDIO EDITION
-  console.log('Passport Studio v5.0 - Premium UI Active');
+  // VERSION 6.0 - STUDIO LAB EDITION (COMPACT & PROFESSIONAL)
+  console.log('Passport Studio v6.0 - Studio Lab Active');
   const [image, setImage] = useState<string | null>(null);
   const [transparentImage, setTransparentImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -126,139 +128,141 @@ export default function Home() {
   };
 
   return (
-    <div className="app-container">
-      {/* MODERN GLASS HEADER */}
-      <header className="premium-header">
-        <div className="header-content">
-          <div className="logo-section">
-            <div className="logo-icon"><Layers size={24} /></div>
-            <div className="logo-text">
-              <h1>PASSPORT <span>STUDIO</span></h1>
-              <span className="version-badge">PRO v5.0</span>
-            </div>
-          </div>
-          <div className="status-indicator">
-            <CheckCircle2 size={16} />
-            <span>AI Processing Active</span>
+    <div className="studio-root">
+      {/* PROFESSIONAL SLIM HEADER */}
+      <header className="studio-header">
+        <div className="header-left">
+          <div className="app-logo"><Layers size={20} /></div>
+          <span className="app-name">PASSPORT <b>STUDIO</b> <small>v6.0</small></span>
+        </div>
+        <div className="header-right">
+          <div className="ai-badge">
+            <div className="pulse-dot"></div>
+            AI ENGINE ACTIVE
           </div>
         </div>
       </header>
 
-      <main className="main-workspace">
-        <div className="workspace-container">
-          {/* CONTROL SIDEBAR */}
-          <aside className="control-sidebar">
-            <section className="control-card">
-              <div className="card-header">
-                <Upload size={18} />
-                <h3>1. SOURCE IMAGE</h3>
-              </div>
-              <button className="primary-btn" onClick={() => fileInputRef.current?.click()}>
-                <ImageIcon size={18} />
-                Choose Photo
+      <main className="studio-main">
+        {/* COMPACT CONTROL PANEL */}
+        <aside className="studio-panel">
+          <div className="panel-section">
+            <label className="section-label">1. SOURCE</label>
+            <div className="control-group">
+              <button className="upload-zone" onClick={() => fileInputRef.current?.click()}>
+                <Upload size={16} />
+                <span>Upload New Photo</span>
               </button>
               <input type="file" hidden ref={fileInputRef} onChange={handleUpload} accept="image/*" />
-            </section>
+            </div>
+          </div>
 
-            <section className="control-card">
-              <div className="card-header">
-                <Palette size={18} />
-                <h3>2. BACKGROUND</h3>
-              </div>
-              <div className="color-grid">
+          <div className="panel-section">
+            <label className="section-label">2. CUSTOMIZE</label>
+            <div className="control-group">
+              <div className="sub-label">Background Color</div>
+              <div className="swatch-grid">
                 {[
-                  { name: 'Pure White', hex: '#ffffff' },
-                  { name: 'Sky Blue', hex: '#3b82f6' },
+                  { name: 'White', hex: '#ffffff' },
+                  { name: 'Sky', hex: '#3b82f6' },
                   { name: 'Red', hex: '#ef4444' },
                   { name: 'Green', hex: '#10b981' },
-                  { name: 'Yellow', hex: '#fbbf24' },
-                  { name: 'Deep Black', hex: '#000000' }
+                  { name: 'Pila', hex: '#fbbf24' },
+                  { name: 'Black', hex: '#000000' }
                 ].map(c => (
                   <button 
                     key={c.hex} 
-                    className={`color-swatch ${bgColor === c.hex ? 'active' : ''}`}
+                    className={`swatch-btn ${bgColor === c.hex ? 'active' : ''}`}
                     style={{ background: c.hex }}
                     onClick={() => setBgColor(c.hex)}
-                    title={c.name}
                   />
                 ))}
               </div>
-            </section>
+            </div>
+            <div className="control-group mt-15">
+              <button className="tool-btn" onClick={() => setShowCropper(true)} disabled={!image}>
+                <CropIcon size={14} /> Refine Crop
+              </button>
+            </div>
+          </div>
 
-            <section className="control-card">
-              <div className="card-header">
-                <Printer size={18} />
-                <h3>3. FINAL OUTPUT</h3>
-              </div>
+          <div className="panel-section last">
+            <label className="section-label">3. EXPORT</label>
+            <div className="control-group">
               <button 
-                className="action-btn" 
+                className="export-btn" 
                 disabled={!image} 
                 onClick={generateSheet}
               >
-                Generate Print Sheet
+                Generate 4x6 Sheet <ArrowRight size={16} />
               </button>
-              <p className="hint">Auto-scales to 12 photos on 4x6 sheet</p>
-            </section>
-          </aside>
+            </div>
+            <div className="info-tag">
+              <Info size={12} />
+              Outputs 12 photos (3x4)
+            </div>
+          </div>
+        </aside>
 
-          {/* PREVIEW AREA */}
-          <section className="preview-canvas">
-            <div className="canvas-frame">
-              {isProcessing && (
-                <div className="processing-overlay">
-                  <div className="premium-spinner"></div>
-                  <p>AI REMOVING BACKGROUND...</p>
-                </div>
-              )}
+        {/* WORKSPACE AREA */}
+        <section className="studio-workspace">
+          <div className="workspace-inner">
+            {isProcessing && (
+              <div className="lab-overlay">
+                <div className="lab-spinner"></div>
+                <span>PROCESSING ASSET...</span>
+              </div>
+            )}
+            
+            <div className="canvas-wrapper">
               {image ? (
-                <div className="image-wrapper">
-                  <img src={image} alt="Preview" className="main-preview" />
-                  <div className="image-badge">Preview</div>
+                <div className="preview-container">
+                  <div className="preview-label">Live Preview</div>
+                  <img src={image} alt="Studio Preview" className="studio-img" />
                 </div>
               ) : (
-                <div className="empty-state">
-                  <div className="empty-icon"><ImageIcon size={64} /></div>
-                  <h2>Ready to start?</h2>
-                  <p>Upload a photo to see the magic happen</p>
+                <div className="studio-empty">
+                  <ImageIcon size={48} />
+                  <h3>Studio Workspace</h3>
+                  <p>Start by uploading a high-quality portrait</p>
                 </div>
               )}
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </main>
 
-      {/* PRINT MODAL */}
+      {/* COMPACT MODALS */}
       {showPrintModal && (
-        <div className="modal-overlay">
-          <div className="modal-card">
-            <div className="modal-header">
-              <h3>Professional Print Sheet (4x6)</h3>
-              <button className="close-btn" onClick={() => setShowPrintModal(false)}><X size={24} /></button>
+        <div className="studio-modal-overlay">
+          <div className="studio-modal">
+            <div className="modal-top">
+              <h3>Ready for Print</h3>
+              <button className="close-icon" onClick={() => setShowPrintModal(false)}><X size={20} /></button>
             </div>
-            <div className="modal-body">
-              <div className="print-preview-scroll">
-                <img src={printPreview!} alt="Final Sheet" />
+            <div className="modal-content">
+              <div className="sheet-view">
+                <img src={printPreview!} alt="Final Lab Sheet" />
               </div>
             </div>
-            <div className="modal-footer">
-              <button className="download-btn" onClick={() => saveAs(printPreview!, 'Passport_Pro_Sheet.png')}>
-                <Download size={20} />
-                Download PNG for Print
+            <div className="modal-bottom">
+              <button className="lab-download-btn" onClick={() => saveAs(printPreview!, 'Passport_Lab_Sheet.png')}>
+                Download 4x6 Sheet (300 DPI)
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* CROPPER MODAL */}
       {showCropper && (
-        <div className="modal-overlay">
-          <div className="modal-card cropper-card">
-            <div className="modal-header">
-              <h3><CropIcon size={20} /> Refine Portrait</h3>
+        <div className="studio-modal-overlay">
+          <div className="studio-modal compact">
+            <div className="modal-top">
+              <h3>Adjust Portrait</h3>
+              <button className="close-icon" onClick={() => setShowCropper(false)}><X size={20} /></button>
             </div>
-            <div className="modal-body">
-              <div className="cropper-container">
+            <div className="modal-content">
+              <div className="lab-cropper-box">
                 <Cropper 
                   image={transparentImage!} 
                   crop={crop} 
@@ -269,452 +273,437 @@ export default function Home() {
                   onZoomChange={setZoom} 
                 />
               </div>
-              <div className="cropper-controls">
+              <div className="lab-zoom-panel">
                 <span>Zoom</span>
-                <input 
-                  type="range" 
-                  value={zoom} 
-                  min={1} 
-                  max={3} 
-                  step={0.1} 
-                  onChange={(e) => setZoom(Number(e.target.value))} 
-                />
+                <input type="range" value={zoom} min={1} max={3} step={0.1} onChange={(e) => setZoom(Number(e.target.value))} />
               </div>
             </div>
-            <div className="modal-footer">
-              <button className="primary-btn" onClick={applyCrop}>Confirm Crop & Background</button>
+            <div className="modal-bottom">
+              <button className="confirm-btn" onClick={applyCrop}>Apply Adjustments</button>
             </div>
           </div>
         </div>
       )}
 
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap');
 
         :root {
-          --primary: #6366f1;
-          --primary-hover: #4f46e5;
-          --bg-app: #f1f5f9;
-          --bg-sidebar: rgba(255, 255, 255, 0.8);
-          --text-main: #1e293b;
-          --text-muted: #64748b;
-          --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.1);
-          --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+          --studio-bg: #f8fafc;
+          --studio-sidebar: #ffffff;
+          --studio-border: #e2e8f0;
+          --studio-primary: #2563eb;
+          --studio-text: #0f172a;
+          --studio-text-muted: #64748b;
+          --studio-accent: #10b981;
         }
 
         body {
           margin: 0;
           font-family: 'Inter', sans-serif;
-          background-color: var(--bg-app);
-          color: var(--text-main);
+          background-color: var(--studio-bg);
+          color: var(--studio-text);
+          overflow: hidden;
         }
 
-        .app-container {
-          min-height: 100vh;
+        .studio-root {
+          height: 100vh;
           display: flex;
           flex-direction: column;
         }
 
         /* HEADER */
-        .premium-header {
-          background: rgba(255, 255, 255, 0.8);
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid rgba(0,0,0,0.05);
-          position: sticky;
-          top: 0;
-          z-index: 50;
-          padding: 0 24px;
-          height: 72px;
+        .studio-header {
+          height: 48px;
+          background: #ffffff;
+          border-bottom: 1px solid var(--studio-border);
           display: flex;
           align-items: center;
-        }
-
-        .header-content {
-          max-width: 1400px;
-          width: 100%;
-          margin: 0 auto;
-          display: flex;
           justify-content: space-between;
-          align-items: center;
+          padding: 0 16px;
+          z-index: 100;
         }
 
-        .logo-section {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .logo-icon {
-          background: var(--primary);
-          color: white;
-          width: 40px;
-          height: 40px;
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-        }
-
-        .logo-text h1 {
-          margin: 0;
-          font-family: 'Outfit', sans-serif;
-          font-size: 20px;
-          font-weight: 800;
-          letter-spacing: -0.5px;
-        }
-
-        .logo-text h1 span {
-          color: var(--primary);
-        }
-
-        .version-badge {
-          background: #fef3c7;
-          color: #92400e;
-          font-size: 10px;
-          font-weight: 700;
-          padding: 2px 6px;
-          border-radius: 4px;
-          margin-left: 4px;
-        }
-
-        .status-indicator {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 13px;
-          color: #10b981;
-          font-weight: 600;
-          background: #ecfdf5;
-          padding: 6px 12px;
-          border-radius: 20px;
-        }
-
-        /* WORKSPACE */
-        .main-workspace {
-          flex: 1;
-          padding: 32px 24px;
-          display: flex;
-          justify-content: center;
-        }
-
-        .workspace-container {
-          max-width: 1300px;
-          width: 100%;
-          display: grid;
-          grid-template-columns: 360px 1fr;
-          gap: 32px;
-        }
-
-        /* SIDEBAR */
-        .control-sidebar {
-          display: flex;
-          flex-direction: column;
-          gap: 24px;
-        }
-
-        .control-card {
-          background: var(--bg-sidebar);
-          backdrop-filter: blur(8px);
-          border: 1px solid white;
-          padding: 24px;
-          border-radius: 24px;
-          box-shadow: var(--shadow-sm);
-        }
-
-        .card-header {
+        .header-left {
           display: flex;
           align-items: center;
           gap: 10px;
-          margin-bottom: 20px;
-          color: var(--text-muted);
         }
 
-        .card-header h3 {
-          margin: 0;
-          font-size: 13px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        }
-
-        .primary-btn {
-          width: 100%;
-          padding: 14px;
-          background: var(--primary);
+        .app-logo {
+          background: var(--studio-primary);
           color: white;
-          border: none;
-          border-radius: 14px;
+          width: 28px;
+          height: 28px;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .app-name {
+          font-size: 14px;
+          font-weight: 500;
+          letter-spacing: -0.2px;
+        }
+
+        .app-name b {
           font-weight: 700;
+          color: var(--studio-primary);
+        }
+
+        .app-name small {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 10px;
+          background: #f1f5f9;
+          padding: 2px 4px;
+          border-radius: 4px;
+          margin-left: 4px;
+          color: var(--studio-text-muted);
+        }
+
+        .ai-badge {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--studio-accent);
+          background: #f0fdf4;
+          padding: 4px 10px;
+          border-radius: 6px;
+          border: 1px solid #dcfce7;
+        }
+
+        .pulse-dot {
+          width: 6px;
+          height: 6px;
+          background: var(--studio-accent);
+          border-radius: 50%;
+          animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+          0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+          70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+          100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* MAIN LAYOUT */
+        .studio-main {
+          flex: 1;
+          display: flex;
+          overflow: hidden;
+        }
+
+        /* SIDE PANEL */
+        .studio-panel {
+          width: 280px;
+          background: var(--studio-sidebar);
+          border-right: 1px solid var(--studio-border);
+          display: flex;
+          flex-direction: column;
+          padding: 20px;
+        }
+
+        .panel-section {
+          margin-bottom: 24px;
+        }
+
+        .section-label {
+          display: block;
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--studio-text-muted);
+          margin-bottom: 12px;
+          letter-spacing: 0.5px;
+        }
+
+        .upload-zone {
+          width: 100%;
+          padding: 12px;
+          background: #f1f5f9;
+          border: 1px dashed #cbd5e1;
+          border-radius: 8px;
+          color: var(--studio-text);
+          font-size: 13px;
+          font-weight: 600;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 8px;
           cursor: pointer;
-          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .primary-btn:hover {
-          background: var(--primary-hover);
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-        }
-
-        .action-btn {
-          width: 100%;
-          padding: 16px;
-          background: #10b981;
-          color: white;
-          border: none;
-          border-radius: 14px;
-          font-weight: 700;
-          font-size: 15px;
-          cursor: pointer;
           transition: all 0.2s;
         }
 
-        .action-btn:disabled {
-          background: #cbd5e1;
-          cursor: not-allowed;
+        .upload-zone:hover {
+          background: #e2e8f0;
+          border-color: var(--studio-primary);
         }
 
-        .action-btn:not(:disabled):hover {
-          background: #059669;
-          transform: scale(1.02);
-        }
-
-        .color-grid {
-          display: grid;
-          grid-template-columns: repeat(6, 1fr);
-          gap: 10px;
-        }
-
-        .color-swatch {
-          aspect-ratio: 1;
-          border-radius: 10px;
-          border: 2px solid white;
-          cursor: pointer;
-          transition: all 0.2s;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .color-swatch:hover {
-          transform: scale(1.1);
-        }
-
-        .color-swatch.active {
-          transform: scale(1.1);
-          border-color: var(--primary);
-          box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-        }
-
-        .hint {
-          font-size: 11px;
-          color: var(--text-muted);
-          text-align: center;
-          margin-top: 12px;
-        }
-
-        /* PREVIEW AREA */
-        .preview-canvas {
-          height: 100%;
-        }
-
-        .canvas-frame {
-          background: white;
-          height: 100%;
-          min-height: 600px;
-          border-radius: 32px;
-          border: 1px solid rgba(0,0,0,0.05);
-          box-shadow: var(--shadow-lg);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .image-wrapper {
-          position: relative;
-          max-width: 90%;
-        }
-
-        .main-preview {
-          max-width: 100%;
-          max-height: 70vh;
-          border-radius: 16px;
-          display: block;
-        }
-
-        .image-badge {
-          position: absolute;
-          top: -12px;
-          right: -12px;
-          background: var(--primary);
-          color: white;
-          padding: 4px 12px;
-          border-radius: 8px;
-          font-size: 11px;
-          font-weight: 700;
-          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        .empty-state {
-          text-align: center;
-          color: var(--text-muted);
-        }
-
-        .empty-icon {
-          opacity: 0.2;
-          margin-bottom: 16px;
-        }
-
-        .empty-state h2 {
-          font-family: 'Outfit', sans-serif;
-          color: var(--text-main);
+        .sub-label {
+          font-size: 12px;
+          font-weight: 500;
+          color: var(--studio-text-muted);
           margin-bottom: 8px;
         }
 
-        /* MODALS */
-        .modal-overlay {
-          position: fixed;
-          inset: 0;
-          background: rgba(15, 23, 42, 0.9);
-          backdrop-filter: blur(8px);
-          z-index: 100;
+        .swatch-grid {
+          display: grid;
+          grid-template-columns: repeat(6, 1fr);
+          gap: 6px;
+        }
+
+        .swatch-btn {
+          aspect-ratio: 1;
+          border-radius: 4px;
+          border: 1px solid var(--studio-border);
+          cursor: pointer;
+          transition: transform 0.1s;
+        }
+
+        .swatch-btn.active {
+          box-shadow: 0 0 0 2px white, 0 0 0 4px var(--studio-primary);
+        }
+
+        .tool-btn {
+          width: 100%;
+          padding: 8px;
+          background: white;
+          border: 1px solid var(--studio-border);
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 24px;
+          gap: 6px;
+          cursor: pointer;
         }
 
-        .modal-card {
-          background: white;
-          border-radius: 32px;
+        .tool-btn:hover:not(:disabled) {
+          background: var(--studio-bg);
+        }
+
+        .export-btn {
           width: 100%;
+          padding: 12px;
+          background: var(--studio-primary);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-weight: 700;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          cursor: pointer;
+          box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+        }
+
+        .export-btn:disabled {
+          background: #cbd5e1;
+          box-shadow: none;
+          cursor: not-allowed;
+        }
+
+        .info-tag {
+          margin-top: 12px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 10px;
+          color: var(--studio-text-muted);
+          background: #f8fafc;
+          padding: 6px;
+          border-radius: 4px;
+        }
+
+        .mt-15 { margin-top: 15px; }
+
+        /* WORKSPACE */
+        .studio-workspace {
+          flex: 1;
+          background: #f1f5f9;
+          padding: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: auto;
+        }
+
+        .workspace-inner {
+          width: 100%;
+          height: 100%;
+          background: white;
+          border-radius: 12px;
+          border: 1px solid var(--studio-border);
+          box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
           max-width: 900px;
+          max-height: 700px;
+        }
+
+        .preview-container {
+          position: relative;
+          max-width: 80%;
+          max-height: 80%;
+        }
+
+        .preview-label {
+          position: absolute;
+          top: -30px;
+          left: 0;
+          font-size: 12px;
+          font-weight: 700;
+          color: var(--studio-text-muted);
+        }
+
+        .studio-img {
+          max-width: 100%;
+          max-height: 100%;
+          border-radius: 4px;
+          box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .studio-empty {
+          text-align: center;
+          color: var(--studio-text-muted);
+        }
+
+        .studio-empty h3 {
+          color: var(--studio-text);
+          margin: 12px 0 4px;
+        }
+
+        .studio-empty p {
+          font-size: 13px;
+        }
+
+        /* MODALS */
+        .studio-modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(15, 23, 42, 0.7);
+          backdrop-filter: blur(4px);
+          z-index: 200;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+        }
+
+        .studio-modal {
+          background: white;
+          width: 100%;
+          max-width: 800px;
+          border-radius: 12px;
           display: flex;
           flex-direction: column;
-          max-height: 90vh;
           overflow: hidden;
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        .cropper-card {
-          max-width: 550px;
-        }
+        .studio-modal.compact { max-width: 450px; }
 
-        .modal-header {
-          padding: 24px 32px;
-          border-bottom: 1px solid #f1f5f9;
+        .modal-top {
+          padding: 16px 20px;
+          border-bottom: 1px solid var(--studio-border);
           display: flex;
           justify-content: space-between;
           align-items: center;
         }
 
-        .modal-header h3 {
-          margin: 0;
-          font-family: 'Outfit', sans-serif;
-          font-size: 20px;
-        }
+        .modal-top h3 { margin: 0; font-size: 16px; }
 
-        .close-btn {
+        .close-icon {
           background: none;
           border: none;
-          color: #94a3b8;
+          color: var(--studio-text-muted);
           cursor: pointer;
-          transition: color 0.2s;
         }
 
-        .close-btn:hover {
-          color: var(--text-main);
-        }
-
-        .modal-body {
-          flex: 1;
+        .modal-content {
+          padding: 24px;
+          max-height: 70vh;
           overflow-y: auto;
-          padding: 32px;
         }
 
-        .print-preview-scroll {
+        .sheet-view {
           background: #334155;
-          padding: 40px;
-          border-radius: 16px;
+          padding: 24px;
+          border-radius: 8px;
           display: flex;
           justify-content: center;
         }
 
-        .print-preview-scroll img {
+        .sheet-view img {
           max-width: 100%;
-          box-shadow: 0 0 40px rgba(0,0,0,0.5);
           border: 4px solid white;
+          box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
-        .modal-footer {
-          padding: 24px 32px;
+        .modal-bottom {
+          padding: 16px 20px;
           background: #f8fafc;
-          border-top: 1px solid #f1f5f9;
+          border-top: 1px solid var(--studio-border);
         }
 
-        .download-btn {
+        .lab-download-btn, .confirm-btn {
           width: 100%;
-          padding: 18px;
-          background: #10b981;
+          padding: 12px;
+          background: var(--studio-accent);
           color: white;
           border: none;
-          border-radius: 16px;
+          border-radius: 6px;
           font-weight: 700;
-          font-size: 16px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
           cursor: pointer;
         }
 
-        /* CROPPER STYLES */
-        .cropper-container {
-          height: 400px;
+        .confirm-btn { background: var(--studio-primary); }
+
+        .lab-cropper-box {
+          height: 350px;
           position: relative;
-          background: #0f172a;
-          border-radius: 16px;
+          background: #000;
+          border-radius: 8px;
           overflow: hidden;
         }
 
-        .cropper-controls {
-          margin-top: 24px;
+        .lab-zoom-panel {
+          margin-top: 16px;
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 12px;
+          font-size: 13px;
         }
 
-        .cropper-controls input {
-          flex: 1;
-        }
+        .lab-zoom-panel input { flex: 1; }
 
-        /* SPINNER */
-        .premium-spinner {
-          width: 48px;
-          height: 48px;
-          border: 4px solid rgba(99, 102, 241, 0.1);
-          border-top: 4px solid var(--primary);
-          border-radius: 50%;
-          animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-          margin-bottom: 20px;
-        }
-
-        .processing-overlay {
+        /* OVERLAYS */
+        .lab-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(255, 255, 255, 0.9);
-          z-index: 10;
+          background: rgba(255, 255, 255, 0.8);
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          font-weight: 700;
-          letter-spacing: 1px;
-          color: var(--primary);
+          gap: 12px;
+          z-index: 10;
+        }
+
+        .lab-spinner {
+          width: 32px;
+          height: 32px;
+          border: 3px solid #f1f5f9;
+          border-top: 3px solid var(--studio-primary);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
@@ -722,16 +711,11 @@ export default function Home() {
           100% { transform: rotate(360deg); }
         }
 
-        @media (max-width: 900px) {
-          .workspace-container {
-            grid-template-columns: 1fr;
-          }
-          .control-sidebar {
-            order: 2;
-          }
-          .preview-canvas {
-            order: 1;
-          }
+        @media (max-width: 800px) {
+          .studio-panel { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--studio-border); }
+          .studio-main { flex-direction: column; }
+          .studio-workspace { padding: 16px; }
+          body { overflow: auto; }
         }
       `}</style>
     </div>
