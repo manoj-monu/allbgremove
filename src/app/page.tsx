@@ -20,12 +20,16 @@ import {
   Trash2,
   Settings2,
   Printer,
-  X
+  X,
+  Sun,
+  Contrast,
+  Palette,
+  RotateCw
 } from 'lucide-react';
 import { saveAs } from 'file-saver';
 
 export default function Home() {
-  console.log('Passport Photo Maker v2.6 Active - Cropping Fixed');
+  console.log('Passport Photo Maker v2.7 Active - Photoshop Tools');
   const [image, setImage] = useState<string | null>(null);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [transparentImage, setTransparentImage] = useState<string | null>(null);
@@ -39,6 +43,12 @@ export default function Home() {
   const [enhance, setEnhance] = useState(true);
   const [bgColor, setBgColor] = useState('#ffffff');
   
+  // Photoshop Tools State
+  const [brightness, setBrightness] = useState(100);
+  const [contrast, setContrast] = useState(100);
+  const [saturation, setSaturation] = useState(100);
+  const [rotation, setRotation] = useState(0);
+
   // Cropping State
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -47,16 +57,17 @@ export default function Home() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Automatically merge background color when it changes
+  // Automatically merge background color and apply filters
   useEffect(() => {
     if (transparentImage && !showCropper) {
-      renderMergedPreview(transparentImage, bgColor);
+      renderProcessedPreview();
     }
-  }, [bgColor, transparentImage, showCropper]);
+  }, [bgColor, transparentImage, showCropper, brightness, contrast, saturation, rotation]);
 
-  const renderMergedPreview = (imgUrl: string, color: string) => {
+  const renderProcessedPreview = () => {
+    if (!transparentImage) return;
     const img = new Image();
-    img.src = imgUrl;
+    img.src = transparentImage;
     img.crossOrigin = "anonymous";
     img.onload = () => {
       const canvas = document.createElement('canvas');
@@ -64,9 +75,25 @@ export default function Home() {
       if (!ctx) return;
       canvas.width = img.width;
       canvas.height = img.height;
-      ctx.fillStyle = color;
+
+      // Draw background color
+      ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
+
+      // Apply Filters
+      ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+      
+      // Handle Rotation
+      if (rotation !== 0) {
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((rotation * Math.PI) / 180);
+        ctx.drawImage(img, -img.width / 2, -img.height / 2);
+        ctx.restore();
+      } else {
+        ctx.drawImage(img, 0, 0);
+      }
+      
       setImage(canvas.toDataURL('image/png'));
     };
   };
@@ -77,7 +104,7 @@ export default function Home() {
       const url = URL.createObjectURL(file);
       setOriginalImage(url);
       setImage(url);
-      setTransparentImage(null); // Reset
+      setTransparentImage(null);
       if (removeBg) {
         processBackgroundRemoval(file);
       } else {
@@ -104,7 +131,7 @@ export default function Home() {
         const cleanedUrl = await cleanBackground(url);
         setTransparentImage(cleanedUrl);
         setActiveTab('preview');
-        setShowCropper(true); // Open cropper immediately after removal
+        setShowCropper(true);
       }
     } catch (err) {
       console.error('Error connecting to backend:', err);
@@ -149,15 +176,12 @@ export default function Home() {
 
   const generateCroppedImage = async () => {
     if (!croppedAreaPixels) return;
-    
-    // Always crop from the transparent source if available, otherwise original
     const sourceUrl = transparentImage || originalImage;
     if (!sourceUrl) return;
 
     const img = new Image();
     img.src = sourceUrl;
     img.crossOrigin = "anonymous";
-    
     await new Promise((resolve) => { img.onload = resolve; });
 
     const canvas = document.createElement('canvas');
@@ -167,11 +191,12 @@ export default function Home() {
     canvas.width = croppedAreaPixels.width;
     canvas.height = croppedAreaPixels.height;
 
-    // Fill background color
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw the cropped portion
+    // Apply Photoshop Filters during crop
+    ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+    
     ctx.drawImage(
       img,
       croppedAreaPixels.x,
@@ -187,27 +212,14 @@ export default function Home() {
     const croppedUrl = canvas.toDataURL('image/png');
     setImage(croppedUrl);
     
-    // VERY IMPORTANT: Update transparentImage to the cropped version WITHOUT background
-    // so future color changes work on the cropped version
-    const transparentCanvas = document.createElement('canvas');
-    const tCtx = transparentCanvas.getContext('2d');
+    // Update transparent source to cropped version for future color changes
+    const tCanvas = document.createElement('canvas');
+    const tCtx = tCanvas.getContext('2d');
     if (tCtx) {
-      transparentCanvas.width = canvas.width;
-      transparentCanvas.height = canvas.height;
-      tCtx.drawImage(
-        img,
-        croppedAreaPixels.x,
-        croppedAreaPixels.y,
-        croppedAreaPixels.width,
-        croppedAreaPixels.height,
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-      setTransparentImage(transparentCanvas.toDataURL('image/png'));
+      tCanvas.width = canvas.width; tCanvas.height = canvas.height;
+      tCtx.drawImage(img, croppedAreaPixels.x, croppedAreaPixels.y, croppedAreaPixels.width, croppedAreaPixels.height, 0, 0, canvas.width, canvas.height);
+      setTransparentImage(tCanvas.toDataURL('image/png'));
     }
-
     setShowCropper(false);
   };
 
@@ -253,12 +265,11 @@ export default function Home() {
         <div className="container header-inner">
           <div className="logo">
             <div className="logo-icon"><User size={24} /></div>
-            <span className="logo-text">Passport Photo Maker <small style={{fontSize: '10px', opacity: 0.5}}>v2.6</small></span>
+            <span className="logo-text">Passport Photo Maker <small style={{fontSize: '10px', opacity: 0.5}}>v2.7</small></span>
           </div>
           <nav className="nav">
             <a href="#" className="nav-link active">Home</a>
-            <a href="#" className="nav-link">Photo Requirements</a>
-            <a href="#" className="nav-link">Guidelines</a>
+            <a href="#" className="nav-link">Requirements</a>
             <a href="#" className="nav-link">Pricing</a>
             <a href="#" className="nav-link">Blog</a>
           </nav>
@@ -268,13 +279,6 @@ export default function Home() {
           </div>
         </div>
       </header>
-
-      <section className="hero">
-        <div className="container hero-inner">
-          <h1>Create Perfect Passport Photos <span className="text-primary">in Seconds</span></h1>
-          <p>Professional AI-powered tool for official documents. 100% compliant and ready to print.</p>
-        </div>
-      </section>
 
       <main className="container workspace-container">
         <div className="workspace-grid">
@@ -289,31 +293,15 @@ export default function Home() {
             </div>
 
             <div className="step-item">
-              <h3 className="step-title">STEP 2: SELECT DOCUMENT</h3>
-              <div className="input-group">
-                <label>Document Type</label>
-                <select value={docType} onChange={(e) => setDocType(e.target.value)}>
-                  <option>Passport</option><option>Visa</option><option>ID Card</option>
-                </select>
-              </div>
-              <div className="input-group">
-                <label>Country</label>
-                <select value={country} onChange={(e) => setCountry(e.target.value)}>
-                  <option>India</option><option>USA</option><option>UK</option>
-                </select>
-              </div>
+              <h3 className="step-title">STEP 2: DOCUMENT & BG</h3>
               <div className="input-group">
                 <label>Photo Size</label>
                 <select value={photoSize} onChange={(e) => setPhotoSize(e.target.value)}>
                   <option>35mm x 45mm</option><option>2 x 2 inch</option>
                 </select>
               </div>
-            </div>
-
-            <div className="step-item">
-              <h3 className="step-title">STEP 3: OPTIONS</h3>
               <div className="option-row">
-                <div className="option-label"><ImageIcon size={18} /><span>Background</span></div>
+                <div className="option-label"><ImageIcon size={18} /><span>BG Color</span></div>
                 <div className="color-presets">
                   <button className={`color-circle ${bgColor === '#ffffff' ? 'active' : ''}`} style={{ background: '#ffffff', border: '1px solid #ddd' }} onClick={() => setBgColor('#ffffff')}></button>
                   <button className={`color-circle ${bgColor === '#3b82f6' ? 'active' : ''}`} style={{ background: '#3b82f6' }} onClick={() => setBgColor('#3b82f6')}></button>
@@ -322,17 +310,31 @@ export default function Home() {
                   <label htmlFor="custom-bg"><Settings2 size={16} className="settings-icon" /></label>
                 </div>
               </div>
-              
-              <div className="option-row">
-                <div className="option-label"><Trash2 size={18} /><span>Remove Background</span></div>
-                <label className="switch"><input type="checkbox" checked={removeBg} onChange={(e) => setRemoveBg(e.target.checked)} /><span className="slider round"></span></label>
-              </div>
+            </div>
 
-              <div className="option-row">
-                <div className="option-label"><Maximize2 size={18} /><span>Crop & Align</span></div>
-                <label className="switch"><input type="checkbox" checked={cropAlign} onChange={(e) => setCropAlign(e.target.checked)} /><span className="slider round"></span></label>
+            <div className="step-item">
+              <h3 className="step-title">STEP 3: PHOTOSHOP TOOLS</h3>
+              <div className="tool-control">
+                <label><Sun size={16} /> Brightness</label>
+                <input type="range" min="0" max="200" value={brightness} onChange={(e) => setBrightness(Number(e.target.value))} />
               </div>
+              <div className="tool-control">
+                <label><Contrast size={16} /> Contrast</label>
+                <input type="range" min="0" max="200" value={contrast} onChange={(e) => setContrast(Number(e.target.value))} />
+              </div>
+              <div className="tool-control">
+                <label><Palette size={16} /> Saturation</label>
+                <input type="range" min="0" max="200" value={saturation} onChange={(e) => setSaturation(Number(e.target.value))} />
+              </div>
+              <div className="tool-control">
+                <label><RotateCw size={16} /> Rotation ({rotation}°)</label>
+                <input type="range" min="-180" max="180" value={rotation} onChange={(e) => setRotation(Number(e.target.value))} />
+              </div>
+              <button className="btn btn-secondary btn-full" onClick={() => { setBrightness(100); setContrast(100); setSaturation(100); setRotation(0); }}><RotateCcw size={16} /> Reset All</button>
+            </div>
 
+            <div className="step-item">
+              <h3 className="step-title">STEP 4: DOWNLOAD & PRINT</h3>
               <div className="action-buttons">
                 <button className="btn btn-primary" onClick={() => generatePrintLayout('4x6')}><Printer size={20} />4x6 (12)</button>
                 <button className="btn btn-primary" onClick={() => generatePrintLayout('A4')}><Printer size={20} />A4 (30)</button>
@@ -354,7 +356,7 @@ export default function Home() {
               {isProcessing && <div className="loader-overlay"><div className="loader"></div><p>AI Removing Background...</p></div>}
               {image ? (
                 <div className="image-container">
-                  <img src={activeTab === 'preview' ? image : originalImage!} alt="Preview" className="main-preview-img" />
+                  <img src={activeTab === 'preview' ? image : originalImage!} alt="Preview" className="main-preview-img" style={{ transform: activeTab === 'preview' ? 'none' : `rotate(${rotation}deg)` }} />
                 </div>
               ) : (
                 <div className="empty-preview" onClick={() => fileInputRef.current?.click()}><ImageIcon size={64} className="text-border" /><p>No photo uploaded yet</p></div>
@@ -364,26 +366,24 @@ export default function Home() {
             <div className="preview-controls">
               <button className="control-btn" onClick={() => setShowCropper(true)}><Maximize2 size={20} /><span>Crop</span></button>
               <div className="v-divider"></div>
-              <button className="control-btn"><ZoomOut size={20} /></button>
+              <button className="control-btn" onClick={() => setZoom(z => Math.max(1, z - 0.1))}><ZoomOut size={20} /></button>
               <span className="zoom-text">100%</span>
-              <button className="control-btn"><ZoomIn size={20} /></button>
+              <button className="control-btn" onClick={() => setZoom(z => Math.min(3, z + 0.1))}><ZoomIn size={20} /></button>
             </div>
           </div>
 
           <div className="info-panel">
             <div className="card status-card">
-              <div className="status-header"><h3>Photo Requirements</h3><span className="status-badge"><CheckCircle2 size={16} />Looks good</span></div>
+              <div className="status-header"><h3>Photo Check</h3><span className="status-badge"><CheckCircle2 size={16} />Professional</span></div>
               <ul className="requirements-list">
-                <li className="good">Face centered <span>Good</span></li>
-                <li className="good">Size correct <span>Good</span></li>
-                <li className="good">Lighting <span>Good</span></li>
-                <li className="good">Background <span>Good</span></li>
-                <li className="good">Clear <span>Good</span></li>
+                <li className="good">Face Centered <span>✓</span></li>
+                <li className="good">Sharp Details <span>✓</span></li>
+                <li className="good">Correct Lighting <span>✓</span></li>
               </ul>
             </div>
 
             <div className="card preview-grid-card">
-              <h3 className="card-title">Photo Preview</h3>
+              <h3 className="card-title">Sheet Preview</h3>
               <div className="photo-preview-grid">
                 {[1,2,3,4,5,6,7,8].map(i => (
                   <div key={i} className="mini-photo">{image && <img src={image} alt="mini" />}</div>
@@ -412,7 +412,7 @@ export default function Home() {
 
       <footer className="footer">
         <div className="container footer-inner">
-          <div className="footer-bottom">© 2024 Passport Photo Maker. All rights reserved.</div>
+          <div className="footer-bottom">© 2024 Passport Photo Maker Pro. All rights reserved.</div>
         </div>
       </footer>
 
@@ -424,32 +424,28 @@ export default function Home() {
         .logo { display: flex; align-items: center; gap: 10px; }
         .logo-icon { background: var(--primary); color: #fff; padding: 8px; border-radius: 8px; display: flex; }
         .logo-text { font-size: 20px; font-weight: 700; color: var(--text-main); }
-        .hero { padding: 30px 0; background: radial-gradient(circle at top right, #f0f4ff, transparent 40%), radial-gradient(circle at bottom left, #f0f4ff, transparent 40%); text-align: center; }
-        .hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
-        .hero p { font-size: 15px; color: var(--text-muted); }
         .workspace-grid { display: grid; grid-template-columns: 340px 1fr 300px; gap: 24px; padding: 40px 0; }
         .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: var(--shadow-sm); }
         .step-item { margin-bottom: 24px; }
-        .step-title { font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 1px; margin-bottom: 12px; }
+        .step-title { font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 1px; margin-bottom: 12px; border-bottom: 1px solid var(--secondary); padding-bottom: 8px; }
         .upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
         .upload-area:hover { border-color: var(--primary); background: var(--secondary); }
         .input-group { margin-bottom: 12px; }
         .input-group label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px; }
         .input-group select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa; font-weight: 600; }
+        
+        .tool-control { margin-bottom: 16px; }
+        .tool-control label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; }
+        .tool-control input { width: 100%; }
+        
         .option-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .option-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
         .color-presets { display: flex; align-items: center; gap: 6px; }
         .color-circle { width: 22px; height: 22px; border-radius: 50%; border: none; cursor: pointer; }
         .color-circle.active { outline: 2px solid var(--primary); outline-offset: 2px; }
-        .color-input-hidden { display: none; }
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; inset: 0; background: #e2e8f0; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background: var(--primary); }
-        input:checked + .slider:before { transform: translateX(20px); }
-        .action-buttons { display: flex; gap: 10px; margin-top: 24px; }
+        .action-buttons { display: flex; gap: 10px; margin-top: 16px; }
         .btn { border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-sm { padding: 8px 16px; font-size: 13px; }
         .btn-full { width: 100%; padding: 12px; margin-top: 10px; }
         .btn-primary { background: var(--primary); color: #fff; flex: 1; padding: 12px; }
         .btn-success { background: var(--success); color: #fff; }
