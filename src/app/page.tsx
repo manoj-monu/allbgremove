@@ -12,8 +12,9 @@ import {
 import { saveAs } from 'file-saver';
 
 export default function Home() {
-  // VERSION 7.0 - ULTIMATE STUDIO (EXACT UI CLONE)
-  console.log('Passport Studio v7.0 - Ultimate Edition Active');
+  // VERSION 7.1 - ULTIMATE STUDIO (FORCE LIVE BUILD)
+  // Build Timestamp: 2026-05-09 14:53:00
+  console.log('Passport Studio v7.1 - Ultimate Edition (Live Sync)');
   
   const [image, setImage] = useState<string | null>(null);
   const [transparentImage, setTransparentImage] = useState<string | null>(null);
