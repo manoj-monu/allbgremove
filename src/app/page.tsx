@@ -34,7 +34,7 @@ import {
 import { saveAs } from 'file-saver';
 
 export default function Home() {
-  console.log('Passport Photo Maker v3.0 Active - Smart Print Studio');
+  console.log('Passport Photo Maker v3.1 Active - Precise Lab Printing');
   const [image, setImage] = useState<string | null>(null);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [transparentImage, setTransparentImage] = useState<string | null>(null);
@@ -48,14 +48,9 @@ export default function Home() {
   // Tools State
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
-  const [saturation, setSaturation] = useState(100);
   const [rotation, setRotation] = useState(0);
-  const [blur, setBlur] = useState(0);
-  const [exposure, setExposure] = useState(100);
   const [flipH, setFlipH] = useState(1);
   const [flipV, setFlipV] = useState(1);
-  const [sharpen, setSharpen] = useState(0);
-  const [vignette, setVignette] = useState(0);
   const [showLabel, setShowLabel] = useState(false);
   const [userName, setUserName] = useState('');
   const [userDate, setUserDate] = useState(new Date().toISOString().split('T')[0]);
@@ -75,7 +70,7 @@ export default function Home() {
 
   useEffect(() => {
     if (transparentImage && !showCropper) { renderFinalPreview(); }
-  }, [bgColor, transparentImage, showCropper, brightness, contrast, saturation, rotation, blur, exposure, flipH, flipV, sharpen, vignette, showLabel, userName, userDate]);
+  }, [bgColor, transparentImage, showCropper, brightness, contrast, rotation, flipH, flipV, showLabel, userName, userDate]);
 
   const renderFinalPreview = () => {
     if (!transparentImage) return;
@@ -88,18 +83,13 @@ export default function Home() {
       if (!ctx) return;
       canvas.width = img.width; canvas.height = img.height;
       ctx.fillStyle = bgColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) blur(${blur}px) opacity(${exposure}%) contrast(${100 + sharpen}%)`;
+      ctx.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
       ctx.save();
       ctx.translate(canvas.width / 2, canvas.height / 2);
       ctx.scale(flipH, flipV);
       ctx.rotate((rotation * Math.PI) / 180);
       ctx.drawImage(img, -img.width / 2, -img.height / 2);
       ctx.restore();
-      if (vignette > 0) {
-        const grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width);
-        grad.addColorStop(0, 'rgba(0,0,0,0)'); grad.addColorStop(1, `rgba(0,0,0,${vignette / 100})`);
-        ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height);
-      }
       if (showLabel) {
         const labelHeight = canvas.height * 0.15;
         ctx.fillStyle = '#ffffff'; ctx.fillRect(0, canvas.height - labelHeight, canvas.width, labelHeight);
@@ -172,7 +162,8 @@ export default function Home() {
     img.crossOrigin = "anonymous";
     img.onload = () => {
       const dpi = 300;
-      const mmToPx = (mm: number) => (mm * dpi) / 25.4;
+      const mmToPx = (mm: number) => Math.round((mm * dpi) / 25.4);
+      
       let width, height, cols, rows;
       if (paper === '4x6') { width = 4 * dpi; height = 6 * dpi; cols = 3; rows = 4; }
       else { width = mmToPx(210); height = mmToPx(297); cols = 5; rows = 6; }
@@ -184,22 +175,36 @@ export default function Home() {
       const paperMargin = mmToPx(3);
       const photoGap = mmToPx(3);
 
+      // Draw Grid with Dashed Lines First
+      ctx.setLineDash([10, 10]);
+      ctx.strokeStyle = '#aaaaaa'; // Darker dashed lines
+      ctx.lineWidth = 1;
+
+      // Vertical lines
+      for (let c = 0; c <= cols; c++) {
+        const x = paperMargin + c * (photoWidth + photoGap) - photoGap/2;
+        if (x > 0 && x < width) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+        }
+      }
+      // Horizontal lines
+      for (let r = 0; r <= rows; r++) {
+        const y = paperMargin + r * (photoHeight + photoGap) - photoGap/2;
+        if (y > 0 && y < height) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+        }
+      }
+
+      // Draw Photos
+      ctx.setLineDash([]); // Reset dash for photo borders
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const x = paperMargin + c * (photoWidth + photoGap);
           const y = paperMargin + r * (photoHeight + photoGap);
           
-          // Draw dashed cutting lines
-          ctx.setLineDash([10, 10]);
-          ctx.strokeStyle = '#eeeeee';
-          ctx.beginPath();
-          ctx.moveTo(x - photoGap/2, 0); ctx.lineTo(x - photoGap/2, height); ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(0, y - photoGap/2); ctx.lineTo(width, y - photoGap/2); ctx.stroke();
-          
-          // Draw Photo Border
-          ctx.setLineDash([]);
-          ctx.strokeStyle = '#dddddd'; ctx.lineWidth = 1;
+          // Photo Border (Black)
+          ctx.strokeStyle = '#333333';
+          ctx.lineWidth = 2;
           ctx.strokeRect(x, y, photoWidth, photoHeight);
           
           // Draw Photo
@@ -213,35 +218,29 @@ export default function Home() {
 
   return (
     <div className="app-root">
-      <header className="header"><div className="container header-inner"><div className="logo"><div className="logo-icon"><Printer size={20} /></div><span className="logo-text">Lab Studio Pro <small>v3.0</small></span></div><div className="header-actions"><button className="btn btn-primary btn-sm">Sign In</button></div></div></header>
+      <header className="header"><div className="container header-inner"><div className="logo"><div className="logo-icon"><Printer size={20} /></div><span className="logo-text">Digital Lab Studio <small>v3.1</small></span></div><div className="header-actions"><button className="btn btn-primary btn-sm">Sign In</button></div></div></header>
 
       <main className="container workspace-container">
         <div className="workspace-grid">
           <div className="steps-panel card">
             <div className="step-item">
-              <h3 className="step-title">1. UPLOAD PHOTO</h3>
-              <div className="upload-area" onClick={() => fileInputRef.current?.click()}><Upload size={24} /><p>Choose Photo</p><input type="file" hidden ref={fileInputRef} onChange={handleUpload} accept="image/*" /></div>
+              <h3 className="step-title">1. UPLOAD</h3>
+              <div className="upload-area" onClick={() => fileInputRef.current?.click()}><Upload size={24} /><p>Upload Photo</p><input type="file" hidden ref={fileInputRef} onChange={handleUpload} accept="image/*" /></div>
             </div>
-
             <div className="step-item">
-              <h3 className="step-title">2. EDITING TOOLS</h3>
+              <h3 className="step-title">2. PHOTO EDIT</h3>
               <div className="tool-row"><Sun size={14} /><span>Brightness</span><input type="range" min="0" max="200" value={brightness} onChange={(e) => setBrightness(Number(e.target.value))} /></div>
               <div className="tool-row"><Contrast size={14} /><span>Contrast</span><input type="range" min="0" max="200" value={contrast} onChange={(e) => setContrast(Number(e.target.value))} /></div>
-              <div className="flip-actions">
-                <button className="btn btn-secondary btn-sm" onClick={() => setFlipH(f => f * -1)}>Flip H</button>
-                <button className="btn btn-secondary btn-sm" onClick={() => setFlipV(f => f * -1)}>Flip V</button>
-              </div>
             </div>
-
             <div className="step-item">
-              <h3 className="step-title">3. LAB SPECIAL</h3>
+              <h3 className="step-title">3. STUDIO OPTIONS</h3>
               <div className="option-row">
-                <div className="option-label"><TypeIcon size={16} /><span>Name & Date Label</span></div>
+                <div className="option-label"><TypeIcon size={16} /><span>Add Name & Date</span></div>
                 <label className="switch"><input type="checkbox" checked={showLabel} onChange={(e) => setShowLabel(e.target.checked)} /><span className="slider round"></span></label>
               </div>
               {showLabel && (
                 <div className="label-inputs">
-                  <input type="text" placeholder="STUDENT NAME" value={userName} onChange={(e) => setUserName(e.target.value)} />
+                  <input type="text" placeholder="NAME" value={userName} onChange={(e) => setUserName(e.target.value)} />
                   <input type="date" value={userDate} onChange={(e) => setUserDate(e.target.value)} />
                 </div>
               )}
@@ -251,40 +250,38 @@ export default function Home() {
                 ))}
               </div>
             </div>
-
             <div className="step-item">
-              <h3 className="step-title">4. PRINT LAYOUT</h3>
+              <h3 className="step-title">4. PRINT SHEETS</h3>
               <div className="action-buttons">
-                <button className="btn btn-primary btn-sm" onClick={() => openPrintPreview('4x6')}><Eye size={16} /> 4x6 (12)</button>
-                <button className="btn btn-primary btn-sm" onClick={() => openPrintPreview('A4')}><Eye size={16} /> A4 (30)</button>
+                <button className="btn btn-primary btn-sm" onClick={() => openPrintPreview('4x6')}><Printer size={16} /> 4x6 (12)</button>
+                <button className="btn btn-primary btn-sm" onClick={() => openPrintPreview('A4')}><Printer size={16} /> A4 (30)</button>
               </div>
-              <button className="btn btn-success btn-full" onClick={() => saveAs(image!, 'photo.png')}><Download size={18} /> Download Single</button>
+              <button className="btn btn-success btn-full" style={{marginTop: '8px'}} onClick={() => saveAs(image!, 'photo.png')}><Download size={18} /> Download Single</button>
             </div>
           </div>
 
           <div className="preview-panel card">
             <div className="preview-canvas-area" style={{ background: '#fff', aspectRatio: '35/45' }}>
-              {isProcessing && <div className="loader-overlay"><div className="loader"></div><p>AI Studio Processing...</p></div>}
-              {image ? <img src={image} alt="Preview" className="main-preview-img" /> : <div className="empty-preview" onClick={() => fileInputRef.current?.click()}><ImageIcon size={48} /><p>Select a Photo</p></div>}
+              {isProcessing && <div className="loader-overlay"><div className="loader"></div><p>AI Studio...</p></div>}
+              {image ? <img src={image} alt="Preview" className="main-preview-img" /> : <div className="empty-preview" onClick={() => fileInputRef.current?.click()}><ImageIcon size={48} /><p>No Photo</p></div>}
             </div>
             <div className="preview-controls">
               <button className="control-btn" onClick={() => setShowCropper(true)}><Maximize2 size={18} /><span>Crop</span></button>
-              <div className="v-divider"></div>
               <button className="control-btn" onClick={() => { setBrightness(100); setContrast(100); setShowLabel(false); }}><RotateCcw size={14} /> Reset</button>
             </div>
           </div>
 
           <div className="info-panel">
             <div className="card status-card">
-              <h3>Lab Quality Check</h3>
+              <h3>Lab Ready</h3>
               <ul className="requirements-list">
-                <li className="good">3mm Lab Margins <span>✓</span></li>
-                <li className="good">Cutting Lines <span>✓</span></li>
-                <li className="good">DPI 300 Optimized <span>✓</span></li>
+                <li className="good">3mm Lab Gaps <span>✓</span></li>
+                <li className="good">Cutting Guides <span>✓</span></li>
+                <li className="good">High Res 300DPI <span>✓</span></li>
               </ul>
             </div>
             <div className="card preview-grid-card">
-              <h3>Grid Preview</h3>
+              <h3>Sheet Grid</h3>
               <div className="photo-preview-grid">
                 {[1,2,3,4,5,6,7,8].map(i => (
                   <div key={i} className="mini-photo">{image && <img src={image} alt="mini" />}</div>
@@ -297,14 +294,14 @@ export default function Home() {
 
       {showPrintModal && (
         <div className="modal-overlay">
-          <div className="modal-content card" style={{maxWidth: '800px'}}>
-            <div className="modal-header"><h3>Print Sheet Preview ({currentPaper})</h3><button onClick={() => setShowPrintModal(false)}><X /></button></div>
-            <div className="print-preview-container" style={{maxHeight: '70vh', overflowY: 'auto', background: '#ccc', padding: '20px', textAlign: 'center'}}>
-              <img src={printPreview!} alt="Print Preview" style={{width: '100%', boxShadow: '0 0 20px rgba(0,0,0,0.3)'}} />
+          <div className="modal-content card" style={{maxWidth: '850px'}}>
+            <div className="modal-header"><h3>Lab Sheet Preview ({currentPaper})</h3><button onClick={() => setShowPrintModal(false)}><X /></button></div>
+            <div className="print-preview-container" style={{maxHeight: '70vh', overflowY: 'auto', background: '#555', padding: '30px', textAlign: 'center'}}>
+              <img src={printPreview!} alt="Print Preview" style={{width: '100%', boxShadow: '0 0 30px rgba(0,0,0,0.5)', border: '1px solid #fff'}} />
             </div>
             <div className="modal-footer">
-              <p style={{fontSize: '12px', color: '#666'}}>* 3mm margins and cutting lines included.</p>
-              <button className="btn btn-success btn-full" onClick={() => saveAs(printPreview!, `Print_Sheet_${currentPaper}.png`)}><Download size={18} /> Download Final Sheet</button>
+              <p style={{fontSize: '13px', color: '#666'}}>* Dashed lines and borders added for easy cutting.</p>
+              <button className="btn btn-success btn-full" onClick={() => saveAs(printPreview!, `Final_Print_Sheet_${currentPaper}.png`)}><Download size={18} /> Download High-Quality Sheet</button>
             </div>
           </div>
         </div>
@@ -313,7 +310,7 @@ export default function Home() {
       {showCropper && (
         <div className="modal-overlay">
           <div className="modal-content card" style={{maxWidth: '500px'}}>
-            <div className="modal-header"><h3>Crop Photo</h3><button onClick={() => setShowCropper(false)}><X /></button></div>
+            <div className="modal-header"><h3>Crop Photo</h3><button onClick={() => setShowPrintModal(false)}><X /></button></div>
             <div className="cropper-container" style={{height: '400px'}}><Cropper image={transparentImage || image!} crop={crop} zoom={zoom} aspect={35/45} onCropChange={setCrop} onCropComplete={onCropComplete} onZoomChange={setZoom} /></div>
             <div className="modal-footer"><button className="btn btn-primary btn-full" onClick={generateCroppedImage}>Apply Crop</button></div>
           </div>
@@ -334,7 +331,6 @@ export default function Home() {
         .upload-area { border: 2px dashed var(--border); border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; color: var(--primary); font-weight: 700; }
         .tool-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
         .tool-row input { flex: 1; height: 4px; }
-        .flip-actions { display: flex; gap: 8px; margin-bottom: 12px; }
         .label-inputs { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
         .label-inputs input { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-weight: 700; }
         .option-row { display: flex; justify-content: space-between; align-items: center; }
