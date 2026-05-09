@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
-  Crop as CropIcon, Scaling, RotateCcw, Palette, Settings, Brush, Zap, Type, 
-  Frame, Layers, Globe, ChevronDown, Upload, Download, Search, Undo2, Redo2, 
-  CheckCircle2, ImageIcon, ArrowRight, ShieldCheck, Wand2, Smile, Ghost, Info, 
-  Grid, Maximize2, X, Printer, CloudLightning, Sun, Contrast, Aperture, Wind, 
-  MoreHorizontal, Play, Heart, Star, Share2, Mail, Instagram, Facebook, Twitter, Linkedin, Youtube,
-  Sticker, Sliders, Monitor, ScanLine, AlignCenter
+  Crop as CropIcon, Scaling, RotateCcw, Palette, Settings, Brush, Zap, 
+  Layers, Globe, ChevronDown, Upload, Download, Search, Undo2, Redo2, 
+  CheckCircle2, ImageIcon, ArrowRight, ShieldCheck, Wand2, Smile, Ghost, 
+  Grid, Maximize2, X, Printer, Sun, Contrast, Wind, Aperture
 } from 'lucide-react';
 import { saveAs } from 'file-saver';
 
@@ -25,7 +23,6 @@ export default function Home() {
     brightness: 0,
     contrast: 0,
     saturation: 0,
-    sharpness: 0
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -60,7 +57,7 @@ export default function Home() {
       }
     } catch (err) {
       console.error("BG Removal Failed", err);
-      alert("Background removal service unavailable. Please check backend.");
+      alert("Background removal service unavailable.");
     } finally {
       setIsProcessing(false);
     }
@@ -70,32 +67,21 @@ export default function Home() {
     setAdjustments(prev => ({ ...prev, [key]: parseInt(val) }));
   };
 
-  // --- PRINT GENERATION (3mm Margin & 3mm Gap) ---
+  // --- PRINT GENERATION (Precise 3mm Logic) ---
   const generateSheet = async () => {
     if (!processedImage) return;
 
-    // Standard 300 DPI: 1mm = 11.811 pixels
     const MM_TO_PX = 11.811;
-    const marginPx = 3 * MM_TO_PX; // 3mm Margin
-    const gapPx = 3 * MM_TO_PX;    // 3mm Gap
-    const photoWidthMm = 35;       // Standard Passport Width
-    const photoHeightMm = 45;      // Standard Passport Height
-    const pw = photoWidthMm * MM_TO_PX;
-    const ph = photoHeightMm * MM_TO_PX;
+    const marginPx = 3 * MM_TO_PX;
+    const gapPx = 3 * MM_TO_PX;
+    const pw = 35 * MM_TO_PX;
+    const ph = 45 * MM_TO_PX;
 
     let canvasWidth, canvasHeight, rows, cols;
-
     if (printSize === '4x6') {
-      canvasWidth = 4 * 300;  // 1200px
-      canvasHeight = 6 * 300; // 1800px
-      cols = 3;
-      rows = 4; // Total 12
+      canvasWidth = 1200; canvasHeight = 1800; cols = 3; rows = 4;
     } else {
-      // A4: 210mm x 297mm approx 2480x3508 at 300DPI
-      canvasWidth = 2480;
-      canvasHeight = 3508;
-      cols = 5;
-      rows = 6; // Total 30
+      canvasWidth = 2480; canvasHeight = 3508; cols = 5; rows = 6;
     }
 
     const canvas = document.createElement('canvas');
@@ -104,7 +90,6 @@ export default function Home() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Fill Page BG
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
@@ -113,267 +98,253 @@ export default function Home() {
     img.src = processedImage;
     await new Promise(r => img.onload = r);
 
-    // Draw grid
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const x = marginPx + col * (pw + gapPx);
         const y = marginPx + row * (ph + gapPx);
-
-        // Draw Custom Background Color behind image if image has transparency
         ctx.fillStyle = bgColor;
         ctx.fillRect(x, y, pw, ph);
-
-        // Draw the image
         ctx.drawImage(img, x, y, pw, ph);
-
-        // Draw a light cutting border
         ctx.strokeStyle = '#e2e8f0';
         ctx.lineWidth = 1;
         ctx.strokeRect(x, y, pw, ph);
       }
     }
 
-    canvas.toBlob((blob) => { 
-      if (blob) saveAs(blob, `passport_${printSize}_3mm.png`); 
-    }, 'image/png');
+    canvas.toBlob((blob) => { if (blob) saveAs(blob, `passport_${printSize}.png`); });
   };
 
   return (
-    <div className="v10-studio">
-      {/* 1. HEADER */}
-      <header className="header">
-        <div className="logo">
-          <div className="logo-box"><Layers size={20} /></div>
-          Passport Photo Maker
+    <div className="min-h-screen bg-[#050816] text-white font-sans selection:bg-blue-500 selection:text-white">
+      {/* Header */}
+      <header className="flex items-center justify-between px-8 py-5 border-b border-white/10 backdrop-blur-lg sticky top-0 z-50 bg-[#050816]/90">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-2xl font-bold shadow-lg shadow-blue-600/30">
+            P
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tighter">Passport Studio</h1>
+            <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">AI Professional v10.5</p>
+          </div>
         </div>
-        <nav className="nav-links">
-          <a href="#">Home</a>
-          <a href="#">Requirements</a>
-          <a href="#">Pricing</a>
-          <a href="#">A4 Prints (30 Pcs)</a>
-        </nav>
-        <div className="header-btns">
-          <button className="sign-in" onClick={() => setPrintSize(prev => prev === '4x6' ? 'A4' : '4x6')}>
-            Switch to {printSize === '4x6' ? 'A4' : '4x6'}
+        
+        <nav className="hidden lg:flex items-center gap-10 text-sm font-medium text-gray-400">
+          <a href="#" className="hover:text-white transition">Features</a>
+          <a href="#" className="hover:text-white transition">Pricing</a>
+          <button className="text-blue-500 font-bold" onClick={() => setPrintSize(printSize === '4x6' ? 'A4' : '4x6')}>
+            MODE: {printSize}
           </button>
-          <button className="sign-in" style={{background:'#059669'}}>Login</button>
+        </nav>
+
+        <div className="flex items-center gap-6">
+          <button className="hidden sm:flex items-center gap-2 text-sm font-bold text-gray-300 hover:text-white transition">
+            <Globe size={18} /> EN <ChevronDown size={14} />
+          </button>
+          <button className="px-8 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 transition font-bold shadow-xl shadow-blue-600/20 active:scale-95">
+            Sign In
+          </button>
         </div>
       </header>
 
-      {/* 2. HERO */}
+      {/* Hero / Upload */}
       {!image && (
-        <section className="hero">
-          <div className="hero-left">
-            <h1>Bulk Passport Printing <br/> <span>3mm Margins</span></h1>
-            <p>Generate 12 photos on 4x6 or 30 photos on A4 sheet with precise 3mm gaps. Professional grade studio tool.</p>
-            <div className="trust-badges">
-              <div className="badge"><ShieldCheck size={16} color="#3b82f6"/> 3mm Gaps Enabled</div>
-              <div className="badge"><Printer size={16} color="#3b82f6"/> Print Ready</div>
+        <section className="relative pt-20 pb-32 px-6 overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-600/10 via-transparent to-transparent -z-10"></div>
+          
+          <div className="max-w-4xl mx-auto text-center space-y-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600/10 border border-blue-500/20 text-blue-400 text-xs font-black uppercase tracking-widest animate-pulse">
+              <Zap size={14} /> Next-Gen AI Processing
             </div>
-          </div>
-          <div className="quick-start">
-            <div className="quick-head">Upload Subject Photo</div>
-            <div className="upload-dashed" onClick={() => fileInputRef.current?.click()}>
-              <Upload size={32} color="#3b82f6" />
-              <h3>Drop Image Here</h3>
-              <p>Supports PNG, JPG, JPEG</p>
-              <button className="choose-btn">Select File</button>
+            
+            <h2 className="text-6xl lg:text-8xl font-black tracking-tighter leading-none">
+              Perfect <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-400">Photos.</span>
+            </h2>
+            
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto font-medium leading-relaxed">
+              Transform any selfie into a government-compliant passport photo in seconds. AI-driven background removal and 3mm margin print layouts.
+            </p>
+
+            <div className="flex flex-col items-center gap-6 pt-10">
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="group relative flex items-center gap-4 px-12 py-6 rounded-[30px] bg-white text-black font-black text-xl hover:bg-blue-500 hover:text-white transition-all duration-500 shadow-2xl hover:shadow-blue-500/40"
+              >
+                <Upload size={24} /> Upload Photo
+                <div className="absolute -inset-1 rounded-[32px] bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-20 blur transition duration-500"></div>
+              </button>
+              <p className="text-gray-500 font-bold text-xs uppercase tracking-widest">Supports 4x6 (12 Pcs) & A4 (30 Pcs)</p>
             </div>
-            <input type="file" hidden ref={fileInputRef} onChange={handleUpload} accept="image/*" />
           </div>
         </section>
       )}
 
-      {/* 4. EDITOR SECTION */}
+      {/* Editor Interface */}
       {image && (
-        <section className="editor-section">
-          <div className="editor-main-card">
-            {/* TOOLS */}
-            <aside className="sidebar-tools">
-              {[
-                { id: 'crop', icon: <CropIcon size={18} />, label: 'Crop' },
-                { id: 'bg', icon: <Palette size={18} />, label: 'BG Color' },
-                { id: 'adjust', icon: <Settings size={18} />, label: 'Adjust' },
-                { id: 'print', icon: <Printer size={18} />, label: 'Print' },
-              ].map(t => (
-                <button key={t.id} className={`tool-btn ${activeTool === t.id ? 'active' : ''}`} onClick={() => setActiveTool(t.id)}>
-                  {t.icon}
-                  <span>{t.label}</span>
-                </button>
-              ))}
-            </aside>
+        <section className="p-6 lg:p-12">
+          <div className="max-w-[1600px] mx-auto bg-white/[0.02] border border-white/10 rounded-[40px] overflow-hidden backdrop-blur-3xl shadow-2xl">
+            <div className="grid lg:grid-cols-[1fr_400px] min-h-[800px]">
+              {/* Left Side: Canvas Area */}
+              <div className="p-8 lg:p-12 flex flex-col gap-10 border-r border-white/10">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <button className="p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition text-gray-400 hover:text-white" onClick={() => setImage(null)}>
+                      <X size={20} />
+                    </button>
+                    <h3 className="text-xl font-bold">Studio Workspace</h3>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button className="px-6 py-3 rounded-xl bg-white/5 text-sm font-bold border border-white/10 hover:bg-white/10 transition" onClick={() => setZoom(prev => Math.max(prev - 0.1, 0.5))}>−</button>
+                    <span className="w-16 text-center font-mono font-bold text-blue-500">{Math.round(zoom * 100)}%</span>
+                    <button className="px-6 py-3 rounded-xl bg-white/5 text-sm font-bold border border-white/10 hover:bg-white/10 transition" onClick={() => setZoom(prev => Math.min(prev + 0.1, 3))}>+</button>
+                  </div>
+                </div>
 
-            {/* TOOL OPTIONS */}
-            <aside className="tool-options">
-              <h3>{activeTool === 'bg' ? 'Background Color' : 'Editor Options'}</h3>
-              
-              {activeTool === 'bg' && (
-                <div className="option-group">
-                  <label>Select Custom Color</label>
-                  <div style={{display:'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginTop: 15}}>
+                <div className="flex-1 bg-black/40 rounded-[35px] border border-white/5 relative flex items-center justify-center overflow-hidden group">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-600/5 via-transparent to-transparent"></div>
+                  
+                  <div 
+                    className="relative shadow-2xl transition-transform duration-300"
+                    style={{ 
+                      transform: `scale(${zoom})`,
+                      width: 350, height: 450,
+                      background: bgColor,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}
+                  >
+                    {processedImage && (
+                      <img 
+                        src={processedImage} 
+                        alt="Preview" 
+                        className="w-full h-full object-contain"
+                        style={{ filter: `brightness(${100 + adjustments.brightness}%) contrast(${100 + adjustments.contrast}%)` }}
+                      />
+                    )}
+                    {isProcessing && (
+                      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
+                        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-xs font-black uppercase tracking-widest text-blue-500">AI Processing...</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/10 flex items-center gap-3 shadow-2xl">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span className="text-xs font-bold text-gray-300">Live Studio Engine Ready</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-4">
+                  <button onClick={generateSheet} className="px-10 py-5 rounded-2xl bg-blue-600 hover:bg-blue-700 transition font-black flex items-center gap-3 shadow-xl shadow-blue-600/20 active:scale-95">
+                    <Printer size={20} /> Export {printSize} Sheet
+                  </button>
+                  <button onClick={handleRemoveBackground} className="px-10 py-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition font-black flex items-center gap-3 active:scale-95">
+                    <Palette size={20} /> Remove Background
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Side: Toolbars */}
+              <div className="p-8 lg:p-12 space-y-12 bg-black/20">
+                <div className="space-y-8">
+                  <h4 className="text-gray-400 font-bold text-xs uppercase tracking-widest">Adjustments</h4>
+                  <div className="space-y-10">
+                    {[
+                      { id: 'brightness', label: 'Brightness', icon: <Sun size={18} /> },
+                      { id: 'contrast', label: 'Contrast', icon: <Contrast size={18} /> },
+                    ].map(item => (
+                      <div key={item.id} className="space-y-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3 text-gray-300 font-bold text-sm">
+                            {item.icon} {item.label}
+                          </div>
+                          <span className="text-blue-500 font-bold text-sm">{adjustments[item.id as keyof typeof adjustments]}%</span>
+                        </div>
+                        <input 
+                          type="range" min="-50" max="50"
+                          value={adjustments[item.id as keyof typeof adjustments]}
+                          onChange={(e) => handleSliderChange(item.id as any, e.target.value)}
+                          className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-600" 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-8">
+                  <h4 className="text-gray-400 font-bold text-xs uppercase tracking-widest">Background Color</h4>
+                  <div className="grid grid-cols-4 gap-4">
                     {['#ffffff', '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#000000', '#f1f5f9', '#ffeb3b'].map(c => (
-                      <div 
+                      <button 
                         key={c} 
                         onClick={() => setBgColor(c)}
-                        style={{
-                          width:35, height:35, background:c, borderRadius:8, cursor:'pointer', 
-                          border: bgColor === c ? '3px solid #2563eb' : '1px solid #ddd'
-                        }} 
+                        className={`aspect-square rounded-xl border-2 transition-all duration-300 ${bgColor === c ? 'border-blue-500 scale-110 shadow-lg shadow-blue-500/20' : 'border-transparent hover:border-white/20'}`}
+                        style={{ background: c }}
                       />
                     ))}
                   </div>
-                  <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} style={{width:'100%', marginTop:20}} />
+                  <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-full h-12 bg-white/5 border border-white/10 rounded-xl cursor-pointer" />
                 </div>
-              )}
 
-              {activeTool === 'crop' && (
-                <div className="option-group">
-                   <label>Aspect Ratio</label>
-                   <select className="option-select">
-                     <option>35mm x 45mm (India)</option>
-                     <option>2in x 2in (US)</option>
-                   </select>
-                   <button className="choose-btn" style={{marginTop:20}} onClick={handleRemoveBackground} disabled={isProcessing}>
-                     {isProcessing ? 'Removing...' : 'AI Remove BG'}
-                   </button>
-                </div>
-              )}
-
-              {activeTool === 'print' && (
-                <div className="option-group">
-                   <label>Paper Size</label>
-                   <div className="size-card" style={{borderColor: printSize==='4x6'?'var(--primary)':'#eee'}} onClick={()=>setPrintSize('4x6')}>
-                      <h4>4x6 Inch Sheet</h4>
-                      <p>12 Photos (3x4 Grid)</p>
-                   </div>
-                   <div className="size-card" style={{marginTop:10, borderColor: printSize==='A4'?'var(--primary)':'#eee'}} onClick={()=>setPrintSize('A4')}>
-                      <h4>A4 Sheet</h4>
-                      <p>30 Photos (5x6 Grid)</p>
-                   </div>
-                   <div style={{marginTop:20, padding:15, background:'#f8fafc', borderRadius:10, fontSize:12}}>
-                      <b>Settings:</b><br/>
-                      Margin: 3mm<br/>
-                      Gap: 3mm
-                   </div>
-                </div>
-              )}
-            </aside>
-
-            {/* CANVAS */}
-            <main className="canvas-area">
-              <div className="canvas-toolbar">
-                <div style={{display:'flex', gap:10}}>
-                  <button className="option-select" style={{width: 'auto', padding: '6px 15px'}} onClick={() => { setImage(null); setProcessedImage(null); }}><X size={14}/> Reset</button>
-                </div>
-                <div style={{display:'flex', alignItems:'center', gap:15}}>
-                   <button onClick={() => setZoom(z => Math.max(z - 0.1, 1))}>−</button>
-                   <span style={{fontWeight:800, fontSize:13}}>{Math.round(zoom * 100)}%</span>
-                   <button onClick={() => setZoom(z => Math.min(z + 0.1, 3))}>+</button>
-                </div>
-                <div style={{display:'flex', gap:10}}>
-                  <button className="choose-btn" style={{padding: '8px 25px'}} onClick={generateSheet}><Download size={14}/> Download Print Sheet</button>
+                <div className="space-y-8 pt-8 border-t border-white/10">
+                  <h4 className="text-gray-400 font-bold text-xs uppercase tracking-widest">Print Configuration</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button 
+                      onClick={() => setPrintSize('4x6')}
+                      className={`p-6 rounded-2xl border-2 transition-all ${printSize === '4x6' ? 'bg-blue-600/10 border-blue-500' : 'bg-white/5 border-transparent hover:bg-white/10'}`}
+                    >
+                      <div className="font-black text-xl mb-1 text-white">4x6</div>
+                      <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">12 Photos</div>
+                    </button>
+                    <button 
+                      onClick={() => setPrintSize('A4')}
+                      className={`p-6 rounded-2xl border-2 transition-all ${printSize === 'A4' ? 'bg-blue-600/10 border-blue-500' : 'bg-white/5 border-transparent hover:bg-white/10'}`}
+                    >
+                      <div className="font-black text-xl mb-1 text-white">A4</div>
+                      <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">30 Photos</div>
+                    </button>
+                  </div>
+                  <div className="p-6 rounded-2xl bg-blue-600/5 border border-blue-500/20 space-y-2">
+                    <div className="flex justify-between text-xs font-bold"><span className="text-gray-500">Margin</span><span className="text-blue-500">3mm Precise</span></div>
+                    <div className="flex justify-between text-xs font-bold"><span className="text-gray-500">Photo Gap</span><span className="text-blue-500">3mm Precise</span></div>
+                  </div>
                 </div>
               </div>
-              
-              <div className="canvas-view">
-                <div className="photo-canvas" style={{ 
-                  transform: `scale(${zoom})`, 
-                  background: bgColor,
-                  width: 350, height: 450,
-                  display:'flex', alignItems:'center', justifyContent:'center'
-                }}>
-                  {processedImage && (
-                    <img src={processedImage} alt="Preview" style={{ 
-                      width: '100%', height: '100%', objectFit: 'contain',
-                      filter: `brightness(${100 + adjustments.brightness}%) contrast(${100 + adjustments.contrast}%)` 
-                    }} />
-                  )}
-                  {isProcessing && <div style={{position:'absolute', inset:0, background:'rgba(255,255,255,0.7)', display:'flex', alignItems:'center', justifyContent:'center'}}>AI Processing...</div>}
-                </div>
-                <div className="face-badge"><CheckCircle2 size={14}/> Auto-aligned for {printSize} print</div>
-              </div>
-            </main>
-
-            {/* ADJUSTMENTS */}
-            <aside className="adjustments-panel">
-              <div className="panel-tabs">
-                <button className="panel-tab active">Adjust</button>
-              </div>
-              
-              <div className="adjust-group">
-                 {[
-                   { id: 'brightness', label: 'Brightness' },
-                   { id: 'contrast', label: 'Contrast' },
-                   { id: 'saturation', label: 'Saturation' },
-                 ].map(item => (
-                   <div key={item.id} className="slider-wrap">
-                     <div className="slider-head"><span>{item.label}</span><span>{adjustments[item.id as keyof typeof adjustments]}</span></div>
-                     <input type="range" min="-50" max="50" value={adjustments[item.id as keyof typeof adjustments]} onChange={(e) => handleSliderChange(item.id as any, e.target.value)} />
-                   </div>
-                 ))}
-              </div>
-
-              <div style={{marginTop:40}}>
-                <button className="option-select" style={{marginBottom:10, display:'flex', alignItems:'center', gap:10, fontWeight:700}} onClick={() => setBgColor('#3b82f6')}>
-                  <Palette size={16} color="#3b82f6"/> Blue Background
-                </button>
-                <button className="option-select" style={{marginBottom:10, display:'flex', alignItems:'center', gap:10, fontWeight:700}} onClick={() => setBgColor('#ffffff')}>
-                  <Palette size={16} color="#3b82f6"/> White Background
-                </button>
-              </div>
-            </aside>
+            </div>
           </div>
         </section>
       )}
 
-      {/* 5. FEATURES STRIP */}
-      <section className="features-strip">
+      {/* Features Strip */}
+      <section className="px-6 lg:px-24 py-24 grid md:grid-cols-2 lg:grid-cols-4 gap-8">
         {[
-          { icon: <ScanLine />, title: '3mm Margin', desc: 'Paper edge safety' },
-          { icon: <Palette />, title: '3mm Gap', desc: 'Easy photo cutting' },
-          { icon: <Printer />, title: 'A4 Support', desc: '30 Pcs per sheet' },
-          { icon: <Scaling />, title: '4x6 Support', desc: '12 Pcs per sheet' },
-          { icon: <ShieldCheck />, title: 'High Res', desc: '300 DPI Quality' },
-        ].map((f, i) => (
-          <div key={i} className="f-card">
-            <div className="f-icon-box">{f.icon}</div>
-            <div className="f-info"><h4>{f.title}</h4><p>{f.desc}</p></div>
+          { title: 'AI Face Sync', desc: 'Auto alignment for professional prints.', icon: <Search size={28}/> },
+          { title: '3mm Precision', desc: 'Standard margins for photo studios.', icon: <Scaling size={28}/> },
+          { icon: <Printer size={28}/>, title: 'A4 Support', desc: '30 Pcs per sheet ready to print.' },
+          { icon: <ShieldCheck size={28}/>, title: 'Ultra HD', desc: '300 DPI high resolution export.' },
+        ].map((feature, index) => (
+          <div key={index} className="bg-white/5 border border-white/10 rounded-[35px] p-10 backdrop-blur-xl hover:border-blue-500/50 transition-all duration-500 group">
+            <div className="w-16 h-16 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-500 mb-8 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
+              {feature.icon}
+            </div>
+            <h3 className="text-2xl font-black mb-4">{feature.title}</h3>
+            <p className="text-gray-500 leading-relaxed text-sm font-medium">{feature.desc}</p>
           </div>
         ))}
       </section>
 
-      {/* 8. FOOTER */}
-      <footer className="footer-main">
-        <div className="foot-col">
-          <div className="logo"><div className="logo-box"><Layers size={20}/></div> Passport Studio Pro</div>
-          <p>Professional passport printing tool with precise margins and AI background removal.</p>
-        </div>
-        <div className="foot-col">
-          <h4>Support</h4>
-          <div className="foot-links">
-            <a href="#">Help Center</a>
-            <a href="#">Print Guidelines</a>
+      {/* Footer */}
+      <footer className="border-t border-white/10 px-6 lg:px-24 py-20 bg-black/40 backdrop-blur-2xl text-center">
+        <div className="flex flex-col items-center gap-10">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-2xl font-bold">P</div>
+            <h3 className="text-2xl font-black tracking-tighter">Passport Studio Pro</h3>
           </div>
-        </div>
-        <div className="foot-col">
-          <h4>Paper Sizes</h4>
-          <div className="foot-links">
-            <a href="#">4x6 Inch (12 Pcs)</a>
-            <a href="#">A4 Sheet (30 Pcs)</a>
-          </div>
-        </div>
-        <div className="foot-col">
-          <h4>Newsletter</h4>
-          <div className="news-box">
-            <input type="email" placeholder="Email" />
-            <button>Join</button>
-          </div>
+          <p className="text-gray-500 max-w-xl font-medium">The world's most advanced AI-powered passport photo studio. Professional results with precise 3mm margins.</p>
+          <p className="text-gray-600 text-sm font-medium">© 2026 Passport Studio Pro. All rights reserved.</p>
         </div>
       </footer>
-      
-      <div style={{background: '#050816', color: '#475569', textAlign:'center', padding:'20px', fontSize:12, borderTop:'1px solid rgba(255,255,255,0.05)'}}>
-        © 2024 Passport Studio Pro. Precise Margins & Gaps Enabled.
-      </div>
+
+      <input type="file" hidden ref={fileInputRef} onChange={handleUpload} accept="image/*" />
     </div>
   );
 }
