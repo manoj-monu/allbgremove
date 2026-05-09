@@ -25,7 +25,7 @@ import {
 import { saveAs } from 'file-saver';
 
 export default function Home() {
-  console.log('Passport Photo Maker v2.5 Active - Live API');
+  console.log('Passport Photo Maker v2.6 Active - Cropping Fixed');
   const [image, setImage] = useState<string | null>(null);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [transparentImage, setTransparentImage] = useState<string | null>(null);
@@ -49,10 +49,10 @@ export default function Home() {
 
   // Automatically merge background color when it changes
   useEffect(() => {
-    if (transparentImage) {
+    if (transparentImage && !showCropper) {
       renderMergedPreview(transparentImage, bgColor);
     }
-  }, [bgColor, transparentImage]);
+  }, [bgColor, transparentImage, showCropper]);
 
   const renderMergedPreview = (imgUrl: string, color: string) => {
     const img = new Image();
@@ -64,14 +64,9 @@ export default function Home() {
       if (!ctx) return;
       canvas.width = img.width;
       canvas.height = img.height;
-      
-      // Draw background color
       ctx.fillStyle = color;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw subject on top
       ctx.drawImage(img, 0, 0);
-      
       setImage(canvas.toDataURL('image/png'));
     };
   };
@@ -82,6 +77,7 @@ export default function Home() {
       const url = URL.createObjectURL(file);
       setOriginalImage(url);
       setImage(url);
+      setTransparentImage(null); // Reset
       if (removeBg) {
         processBackgroundRemoval(file);
       } else {
@@ -96,7 +92,6 @@ export default function Home() {
     formData.append('file', file);
 
     try {
-      // Using the live HuggingFace API URL discovered from the screenshot
       const apiUrl = 'https://manojkumarsh-allbgremove-api.hf.space';
       const response = await fetch(`${apiUrl}/api/remove-bg`, {
         method: 'POST',
@@ -106,12 +101,10 @@ export default function Home() {
       if (response.ok) {
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
-        
-        // Clean the background one last time for safety
         const cleanedUrl = await cleanBackground(url);
         setTransparentImage(cleanedUrl);
         setActiveTab('preview');
-        setShowCropper(true);
+        setShowCropper(true); // Open cropper immediately after removal
       }
     } catch (err) {
       console.error('Error connecting to backend:', err);
@@ -124,6 +117,7 @@ export default function Home() {
     return new Promise((resolve) => {
       const img = new Image();
       img.src = url;
+      img.crossOrigin = "anonymous";
       img.onload = () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -154,22 +148,53 @@ export default function Home() {
   };
 
   const generateCroppedImage = async () => {
-    if (!transparentImage || !croppedAreaPixels) return;
+    if (!croppedAreaPixels) return;
+    
+    // Always crop from the transparent source if available, otherwise original
+    const sourceUrl = transparentImage || originalImage;
+    if (!sourceUrl) return;
+
+    const img = new Image();
+    img.src = sourceUrl;
+    img.crossOrigin = "anonymous";
+    
+    await new Promise((resolve) => { img.onload = resolve; });
 
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    const img = new Image();
-    img.src = transparentImage;
-
-    await new Promise((resolve) => { img.onload = resolve; });
+    if (!ctx) return;
 
     canvas.width = croppedAreaPixels.width;
     canvas.height = croppedAreaPixels.height;
 
-    if (ctx) {
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(
+    // Fill background color
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the cropped portion
+    ctx.drawImage(
+      img,
+      croppedAreaPixels.x,
+      croppedAreaPixels.y,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    const croppedUrl = canvas.toDataURL('image/png');
+    setImage(croppedUrl);
+    
+    // VERY IMPORTANT: Update transparentImage to the cropped version WITHOUT background
+    // so future color changes work on the cropped version
+    const transparentCanvas = document.createElement('canvas');
+    const tCtx = transparentCanvas.getContext('2d');
+    if (tCtx) {
+      transparentCanvas.width = canvas.width;
+      transparentCanvas.height = canvas.height;
+      tCtx.drawImage(
         img,
         croppedAreaPixels.x,
         croppedAreaPixels.y,
@@ -177,13 +202,12 @@ export default function Home() {
         croppedAreaPixels.height,
         0,
         0,
-        croppedAreaPixels.width,
-        croppedAreaPixels.height
+        canvas.width,
+        canvas.height
       );
+      setTransparentImage(transparentCanvas.toDataURL('image/png'));
     }
 
-    const croppedUrl = canvas.toDataURL('image/png');
-    setImage(croppedUrl);
     setShowCropper(false);
   };
 
@@ -199,6 +223,7 @@ export default function Home() {
     if (!ctx) return;
     const img = new Image();
     img.src = image;
+    img.crossOrigin = "anonymous";
     img.onload = () => {
       let width, height, cols, rows;
       const dpi = 300;
@@ -228,7 +253,7 @@ export default function Home() {
         <div className="container header-inner">
           <div className="logo">
             <div className="logo-icon"><User size={24} /></div>
-            <span className="logo-text">Passport Photo Maker <small style={{fontSize: '10px', opacity: 0.5}}>v2.5</small></span>
+            <span className="logo-text">Passport Photo Maker <small style={{fontSize: '10px', opacity: 0.5}}>v2.6</small></span>
           </div>
           <nav className="nav">
             <a href="#" className="nav-link active">Home</a>
@@ -248,11 +273,6 @@ export default function Home() {
         <div className="container hero-inner">
           <h1>Create Perfect Passport Photos <span className="text-primary">in Seconds</span></h1>
           <p>Professional AI-powered tool for official documents. 100% compliant and ready to print.</p>
-          <div className="hero-badges">
-            <div className="trust-badge"><ShieldCheck size={18} /><span>100% Compliant</span></div>
-            <div className="trust-badge"><BadgeCheck size={18} /><span>Background Removed</span></div>
-            <div className="trust-badge"><Zap size={18} /><span>High Quality</span></div>
-          </div>
         </div>
       </section>
 
@@ -264,7 +284,6 @@ export default function Home() {
               <div className="upload-area" onClick={() => fileInputRef.current?.click()}>
                 <Upload size={32} className="text-primary" />
                 <p className="upload-main-text">Upload Your Photo</p>
-                <p className="upload-sub-text">JPG, JPEG or PNG. Max size 10MB</p>
                 <input type="file" hidden ref={fileInputRef} onChange={handleUpload} accept="image/*" />
               </div>
             </div>
@@ -314,11 +333,6 @@ export default function Home() {
                 <label className="switch"><input type="checkbox" checked={cropAlign} onChange={(e) => setCropAlign(e.target.checked)} /><span className="slider round"></span></label>
               </div>
 
-              <div className="option-row">
-                <div className="option-label"><Zap size={18} /><span>Enhance Photo</span></div>
-                <label className="switch"><input type="checkbox" checked={enhance} onChange={(e) => setEnhance(e.target.checked)} /><span className="slider round"></span></label>
-              </div>
-
               <div className="action-buttons">
                 <button className="btn btn-primary" onClick={() => generatePrintLayout('4x6')}><Printer size={20} />4x6 (12)</button>
                 <button className="btn btn-primary" onClick={() => generatePrintLayout('A4')}><Printer size={20} />A4 (30)</button>
@@ -360,11 +374,11 @@ export default function Home() {
             <div className="card status-card">
               <div className="status-header"><h3>Photo Requirements</h3><span className="status-badge"><CheckCircle2 size={16} />Looks good</span></div>
               <ul className="requirements-list">
-                <li className="good">Face is centered <span>Good</span></li>
-                <li className="good">Face size is correct <span>Good</span></li>
-                <li className="good">Lighting is good <span>Good</span></li>
-                <li className="good">Background is plain <span>Good</span></li>
-                <li className="good">Image is clear <span>Good</span></li>
+                <li className="good">Face centered <span>Good</span></li>
+                <li className="good">Size correct <span>Good</span></li>
+                <li className="good">Lighting <span>Good</span></li>
+                <li className="good">Background <span>Good</span></li>
+                <li className="good">Clear <span>Good</span></li>
               </ul>
             </div>
 
@@ -381,6 +395,21 @@ export default function Home() {
         </div>
       </main>
 
+      {showCropper && (
+        <div className="modal-overlay">
+          <div className="modal-content card">
+            <div className="modal-header"><h3>Adjust Photo Crop</h3><button onClick={() => setShowCropper(false)}><X /></button></div>
+            <div className="cropper-container">
+              <Cropper image={activeTab === 'preview' ? (transparentImage || image!) : originalImage!} crop={crop} zoom={zoom} aspect={getAspectRatio()} onCropChange={setCrop} onCropComplete={onCropComplete} onZoomChange={setZoom} />
+            </div>
+            <div className="modal-footer">
+              <div className="zoom-control"><ZoomOut size={20} /><input type="range" min={1} max={3} step={0.1} value={zoom} onChange={(e) => setZoom(Number(e.target.value))} /><ZoomIn size={20} /></div>
+              <div className="modal-actions"><button className="btn btn-secondary" onClick={() => setShowCropper(false)}>Cancel</button><button className="btn btn-primary" onClick={generateCroppedImage}>Apply Crop</button></div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <footer className="footer">
         <div className="container footer-inner">
           <div className="footer-bottom">© 2024 Passport Photo Maker. All rights reserved.</div>
@@ -390,94 +419,65 @@ export default function Home() {
       <style jsx>{`
         .app-root { min-height: 100vh; display: flex; flex-direction: column; --primary: #3b82f6; --primary-hover: #2563eb; --secondary: #f1f5f9; --border: #e2e8f0; --text-main: #0f172a; --text-muted: #64748b; --success: #22c55e; --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; width: 100%; }
-        
-        /* Header */
         .header { background: #fff; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
         .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; }
         .logo { display: flex; align-items: center; gap: 10px; }
         .logo-icon { background: var(--primary); color: #fff; padding: 8px; border-radius: 8px; display: flex; }
         .logo-text { font-size: 20px; font-weight: 700; color: var(--text-main); }
-        .nav { display: flex; align-items: center; gap: 32px; }
-        .nav-link { color: var(--text-muted); font-weight: 600; font-size: 15px; transition: color 0.2s; white-space: nowrap; }
-        .nav-link:hover, .nav-link.active { color: var(--primary); }
-        
-        /* Hero */
-        .hero { padding: 40px 0; background: radial-gradient(circle at top right, #f0f4ff, transparent 40%), radial-gradient(circle at bottom left, #f0f4ff, transparent 40%); text-align: center; }
-        .hero h1 { font-size: 40px; font-weight: 800; margin-bottom: 12px; letter-spacing: -1px; }
-        .hero p { font-size: 16px; color: var(--text-muted); max-width: 600px; margin: 0 auto 20px; }
-        .hero-badges { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
-        .trust-badge { display: flex; align-items: center; gap: 8px; background: #fff; padding: 8px 16px; border-radius: 50px; border: 1px solid var(--border); font-size: 13px; font-weight: 600; box-shadow: var(--shadow-sm); }
-        
-        /* Workspace */
+        .hero { padding: 30px 0; background: radial-gradient(circle at top right, #f0f4ff, transparent 40%), radial-gradient(circle at bottom left, #f0f4ff, transparent 40%); text-align: center; }
+        .hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+        .hero p { font-size: 15px; color: var(--text-muted); }
         .workspace-grid { display: grid; grid-template-columns: 340px 1fr 300px; gap: 24px; padding: 40px 0; }
-        .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: var(--shadow-sm); }
+        .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: var(--shadow-sm); }
         .step-item { margin-bottom: 24px; }
         .step-title { font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 1px; margin-bottom: 12px; }
-        
         .upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
         .upload-area:hover { border-color: var(--primary); background: var(--secondary); }
-        .upload-main-text { font-weight: 700; margin-top: 8px; }
-        
         .input-group { margin-bottom: 12px; }
         .input-group label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px; }
         .input-group select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa; font-weight: 600; }
-        
         .option-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .option-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
         .color-presets { display: flex; align-items: center; gap: 6px; }
-        .color-circle { width: 22px; height: 22px; border-radius: 50%; border: none; cursor: pointer; transition: transform 0.2s; }
+        .color-circle { width: 22px; height: 22px; border-radius: 50%; border: none; cursor: pointer; }
         .color-circle.active { outline: 2px solid var(--primary); outline-offset: 2px; }
         .color-input-hidden { display: none; }
-        
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; inset: 0; background: #e2e8f0; transition: .4s; border-radius: 34px; }
         .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background: var(--primary); }
         input:checked + .slider:before { transform: translateX(20px); }
-        
         .action-buttons { display: flex; gap: 10px; margin-top: 24px; }
-        .btn { border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
-        .btn-sm { padding: 8px 16px; font-size: 13px; }
+        .btn { border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-full { width: 100%; padding: 12px; margin-top: 10px; }
         .btn-primary { background: var(--primary); color: #fff; flex: 1; padding: 12px; }
         .btn-success { background: var(--success); color: #fff; }
         .btn-secondary { background: #fff; border: 1px solid var(--border); color: var(--text-main); }
-        
-        /* Preview */
         .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .tabs { display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 8px; }
         .tab { background: none; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 700; color: var(--text-muted); cursor: pointer; font-size: 13px; }
         .tab.active { background: #fff; color: var(--primary); box-shadow: var(--shadow-sm); }
-        
         .preview-canvas-area { border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 450px; margin: 0 auto; background-color: #fff; }
         .image-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
         .main-preview-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
         .loader-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
         .loader { width: 30px; height: 30px; border: 3px solid var(--secondary); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
         .preview-controls { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 20px; }
         .control-btn { background: none; border: none; display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 11px; cursor: pointer; }
-        
-        /* Info Panel */
-        .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .status-badge { display: flex; align-items: center; gap: 4px; color: var(--success); font-weight: 700; font-size: 12px; }
         .requirements-list { list-style: none; }
         .requirements-list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 12px; color: var(--text-muted); font-weight: 600; }
-        .requirements-list li span { color: var(--success); }
-        
         .photo-preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .mini-photo { aspect-ratio: 35/45; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #f8fafc; }
         .mini-photo img { width: 100%; height: 100%; object-fit: cover; }
-        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { width: 100%; max-width: 600px; padding: 24px; }
+        .cropper-container { position: relative; height: 400px; width: 100%; background: #000; border-radius: 8px; }
+        .modal-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+        .zoom-control { display: flex; align-items: center; gap: 10px; flex: 1; }
+        .zoom-control input { flex: 1; }
         .footer { padding: 40px 0; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--text-muted); }
-
-        @media (max-width: 1024px) {
-          .workspace-grid { grid-template-columns: 1fr; }
-          .info-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-        }
       `}</style>
     </div>
   );
