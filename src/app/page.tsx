@@ -228,9 +228,9 @@ export default function Home() {
               >
                 {t.icon}
                 <span>{t.label}</span>
-              </button>
-            ))}
-          </          {/* B. TOOL PANEL (CONTEXTUAL) */}
+          </aside>
+
+          {/* B. TOOL PANEL (CONTEXTUAL) */}
           <div className="tool-panel">
             {activeTool === 'crop' && (
               <>
