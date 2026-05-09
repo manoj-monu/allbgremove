@@ -228,6 +228,8 @@ export default function Home() {
               >
                 {t.icon}
                 <span>{t.label}</span>
+              </button>
+            ))}
           </aside>
 
           {/* B. TOOL PANEL (CONTEXTUAL) */}
@@ -436,7 +438,6 @@ export default function Home() {
               </div>
             </div>
           </aside>
-  </aside>
 
         </div>
       </section>
