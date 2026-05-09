@@ -25,7 +25,7 @@ import {
 import { saveAs } from 'file-saver';
 
 export default function Home() {
-  console.log('Passport Photo Maker v2.4 Active');
+  console.log('Passport Photo Maker v2.5 Active - Live API');
   const [image, setImage] = useState<string | null>(null);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [transparentImage, setTransparentImage] = useState<string | null>(null);
@@ -96,7 +96,8 @@ export default function Home() {
     formData.append('file', file);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7860';
+      // Using the live HuggingFace API URL discovered from the screenshot
+      const apiUrl = 'https://manojkumarsh-allbgremove-api.hf.space';
       const response = await fetch(`${apiUrl}/api/remove-bg`, {
         method: 'POST',
         body: formData,
@@ -132,8 +133,7 @@ export default function Home() {
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
         for (let i = 0; i < data.length; i += 4) {
-          // If pixel is white or very bright, make it transparent
-          if (data[i] > 240 && data[i+1] > 240 && data[i+2] > 240) {
+          if (data[i] > 248 && data[i+1] > 248 && data[i+2] > 248) {
             data[i+3] = 0;
           }
         }
@@ -184,8 +184,6 @@ export default function Home() {
 
     const croppedUrl = canvas.toDataURL('image/png');
     setImage(croppedUrl);
-    // Since we cropped, the transparent source is now this cropped one but without background for future color changes
-    // Actually, for simplicity, let's keep the transparent source as the full image for now
     setShowCropper(false);
   };
 
@@ -230,7 +228,7 @@ export default function Home() {
         <div className="container header-inner">
           <div className="logo">
             <div className="logo-icon"><User size={24} /></div>
-            <span className="logo-text">Passport Photo Maker <small style={{fontSize: '10px', opacity: 0.5}}>v2.4</small></span>
+            <span className="logo-text">Passport Photo Maker <small style={{fontSize: '10px', opacity: 0.5}}>v2.5</small></span>
           </div>
           <nav className="nav">
             <a href="#" className="nav-link active">Home</a>
@@ -383,21 +381,6 @@ export default function Home() {
         </div>
       </main>
 
-      {showCropper && (
-        <div className="modal-overlay">
-          <div className="modal-content card">
-            <div className="modal-header"><h3>Adjust Photo Crop</h3><button onClick={() => setShowCropper(false)}><X /></button></div>
-            <div className="cropper-container">
-              <Cropper image={activeTab === 'preview' ? (transparentImage || image!) : originalImage!} crop={crop} zoom={zoom} aspect={getAspectRatio()} onCropChange={setCrop} onCropComplete={onCropComplete} onZoomChange={setZoom} />
-            </div>
-            <div className="modal-footer">
-              <div className="zoom-control"><ZoomOut size={20} /><input type="range" min={1} max={3} step={0.1} value={zoom} onChange={(e) => setZoom(Number(e.target.value))} /><ZoomIn size={20} /></div>
-              <div className="modal-actions"><button className="btn btn-secondary" onClick={() => setShowCropper(false)}>Cancel</button><button className="btn btn-primary" onClick={generateCroppedImage}>Apply Crop</button></div>
-            </div>
-          </div>
-        </div>
-      )}
-
       <footer className="footer">
         <div className="container footer-inner">
           <div className="footer-bottom">© 2024 Passport Photo Maker. All rights reserved.</div>
@@ -488,14 +471,6 @@ export default function Home() {
         .photo-preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .mini-photo { aspect-ratio: 35/45; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #f8fafc; }
         .mini-photo img { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* Modal */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { width: 100%; max-width: 600px; padding: 24px; }
-        .cropper-container { position: relative; height: 400px; width: 100%; background: #000; border-radius: 8px; }
-        .modal-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
-        .zoom-control { display: flex; align-items: center; gap: 10px; flex: 1; }
-        .zoom-control input { flex: 1; }
         
         .footer { padding: 40px 0; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--text-muted); }
 
