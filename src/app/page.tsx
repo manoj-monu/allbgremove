@@ -34,7 +34,7 @@ import {
 import { saveAs } from 'file-saver';
 
 export default function Home() {
-  console.log('Passport Photo Maker v3.1 Active - Precise Lab Printing');
+  console.log('Passport Photo Maker v3.2 Active - Reference Match');
   const [image, setImage] = useState<string | null>(null);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [transparentImage, setTransparentImage] = useState<string | null>(null);
@@ -74,22 +74,13 @@ export default function Home() {
 
   const renderFinalPreview = () => {
     if (!transparentImage) return;
-    const img = new Image();
-    img.src = transparentImage;
-    img.crossOrigin = "anonymous";
+    const img = new Image(); img.src = transparentImage; img.crossOrigin = "anonymous";
     img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); if (!ctx) return;
       canvas.width = img.width; canvas.height = img.height;
       ctx.fillStyle = bgColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
-      ctx.save();
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.scale(flipH, flipV);
-      ctx.rotate((rotation * Math.PI) / 180);
-      ctx.drawImage(img, -img.width / 2, -img.height / 2);
-      ctx.restore();
+      ctx.save(); ctx.translate(canvas.width / 2, canvas.height / 2); ctx.scale(flipH, flipV); ctx.rotate((rotation * Math.PI) / 180); ctx.drawImage(img, -img.width / 2, -img.height / 2); ctx.restore();
       if (showLabel) {
         const labelHeight = canvas.height * 0.15;
         ctx.fillStyle = '#ffffff'; ctx.fillRect(0, canvas.height - labelHeight, canvas.width, labelHeight);
@@ -158,8 +149,7 @@ export default function Home() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const img = new Image();
-    img.src = image;
-    img.crossOrigin = "anonymous";
+    img.src = image; img.crossOrigin = "anonymous";
     img.onload = () => {
       const dpi = 300;
       const mmToPx = (mm: number) => Math.round((mm * dpi) / 25.4);
@@ -172,42 +162,61 @@ export default function Home() {
       ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
       
       const photoWidth = mmToPx(35), photoHeight = mmToPx(45);
-      const paperMargin = mmToPx(3);
-      const photoGap = mmToPx(3);
+      const paperMargin = mmToPx(8); // Wider margins to accommodate text
+      const photoGap = mmToPx(4); // Professional gap
 
-      // Draw Grid with Dashed Lines First
-      ctx.setLineDash([10, 10]);
-      ctx.strokeStyle = '#aaaaaa'; // Darker dashed lines
+      // Draw Dashed Lines in Gaps
+      ctx.setLineDash([15, 10]);
+      ctx.strokeStyle = '#666666';
       ctx.lineWidth = 1;
 
-      // Vertical lines
+      // Vertical dashed lines
       for (let c = 0; c <= cols; c++) {
-        const x = paperMargin + c * (photoWidth + photoGap) - photoGap/2;
-        if (x > 0 && x < width) {
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+        const x = paperMargin + c * (photoWidth + photoGap) - (photoGap / 2);
+        if (x > paperMargin/2 && x < width - paperMargin/2) {
+          ctx.beginPath(); ctx.moveTo(x, paperMargin/2); ctx.lineTo(x, height - paperMargin/2); ctx.stroke();
         }
       }
-      // Horizontal lines
+      // Horizontal dashed lines
       for (let r = 0; r <= rows; r++) {
-        const y = paperMargin + r * (photoHeight + photoGap) - photoGap/2;
-        if (y > 0 && y < height) {
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+        const y = paperMargin + r * (photoHeight + photoGap) - (photoGap / 2);
+        if (y > paperMargin/2 && y < height - paperMargin/2) {
+          ctx.beginPath(); ctx.moveTo(paperMargin/2, y); ctx.lineTo(width - paperMargin/2, y); ctx.stroke();
         }
       }
 
-      // Draw Photos
-      ctx.setLineDash([]); // Reset dash for photo borders
+      // Add Margin Text (Exactly like reference)
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#333333';
+      ctx.font = `bold ${mmToPx(4)}px Arial`;
+      
+      // Left vertical text
+      ctx.save();
+      ctx.translate(paperMargin/2, height/2);
+      ctx.rotate(-Math.PI/2);
+      ctx.textAlign = 'center';
+      ctx.fillText("PASSPORT SIZE PHOTOS", 0, 0);
+      ctx.restore();
+
+      // Right vertical text
+      ctx.save();
+      ctx.translate(width - paperMargin/2, height/2);
+      ctx.rotate(Math.PI/2);
+      ctx.textAlign = 'center';
+      ctx.fillText(`PRINT READY ${paper}`, 0, 0);
+      ctx.restore();
+
+      // Draw Photos with Border
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const x = paperMargin + c * (photoWidth + photoGap);
           const y = paperMargin + r * (photoHeight + photoGap);
           
-          // Photo Border (Black)
-          ctx.strokeStyle = '#333333';
-          ctx.lineWidth = 2;
+          // Photo Outline
+          ctx.strokeStyle = '#000000';
+          ctx.lineWidth = 1;
           ctx.strokeRect(x, y, photoWidth, photoHeight);
           
-          // Draw Photo
           ctx.drawImage(img, x, y, photoWidth, photoHeight);
         }
       }
@@ -218,7 +227,7 @@ export default function Home() {
 
   return (
     <div className="app-root">
-      <header className="header"><div className="container header-inner"><div className="logo"><div className="logo-icon"><Printer size={20} /></div><span className="logo-text">Digital Lab Studio <small>v3.1</small></span></div><div className="header-actions"><button className="btn btn-primary btn-sm">Sign In</button></div></div></header>
+      <header className="header"><div className="container header-inner"><div className="logo"><div className="logo-icon"><Printer size={20} /></div><span className="logo-text">Premium Studio Pro <small>v3.2</small></span></div><div className="header-actions"><button className="btn btn-primary btn-sm">Sign In</button></div></div></header>
 
       <main className="container workspace-container">
         <div className="workspace-grid">
@@ -275,9 +284,9 @@ export default function Home() {
             <div className="card status-card">
               <h3>Lab Ready</h3>
               <ul className="requirements-list">
-                <li className="good">3mm Lab Gaps <span>✓</span></li>
-                <li className="good">Cutting Guides <span>✓</span></li>
-                <li className="good">High Res 300DPI <span>✓</span></li>
+                <li className="good">Lab Reference Match <span>✓</span></li>
+                <li className="good">Dashed Cut Guides <span>✓</span></li>
+                <li className="good">Margin Branding <span>✓</span></li>
               </ul>
             </div>
             <div className="card preview-grid-card">
@@ -295,13 +304,13 @@ export default function Home() {
       {showPrintModal && (
         <div className="modal-overlay">
           <div className="modal-content card" style={{maxWidth: '850px'}}>
-            <div className="modal-header"><h3>Lab Sheet Preview ({currentPaper})</h3><button onClick={() => setShowPrintModal(false)}><X /></button></div>
-            <div className="print-preview-container" style={{maxHeight: '70vh', overflowY: 'auto', background: '#555', padding: '30px', textAlign: 'center'}}>
-              <img src={printPreview!} alt="Print Preview" style={{width: '100%', boxShadow: '0 0 30px rgba(0,0,0,0.5)', border: '1px solid #fff'}} />
+            <div className="modal-header"><h3>Final Print Preview ({currentPaper})</h3><button onClick={() => setShowPrintModal(false)}><X /></button></div>
+            <div className="print-preview-container" style={{maxHeight: '70vh', overflowY: 'auto', background: '#333', padding: '40px', textAlign: 'center'}}>
+              <img src={printPreview!} alt="Print Preview" style={{width: '100%', boxShadow: '0 0 40px rgba(0,0,0,0.6)', border: '1px solid #fff'}} />
             </div>
             <div className="modal-footer">
-              <p style={{fontSize: '13px', color: '#666'}}>* Dashed lines and borders added for easy cutting.</p>
-              <button className="btn btn-success btn-full" onClick={() => saveAs(printPreview!, `Final_Print_Sheet_${currentPaper}.png`)}><Download size={18} /> Download High-Quality Sheet</button>
+              <p style={{fontSize: '13px', color: '#666'}}>* Exactly matching professional lab reference.</p>
+              <button className="btn btn-success btn-full" onClick={() => saveAs(printPreview!, `Studio_Print_Sheet_${currentPaper}.png`)}><Download size={18} /> Download High-Quality Sheet</button>
             </div>
           </div>
         </div>
@@ -310,7 +319,7 @@ export default function Home() {
       {showCropper && (
         <div className="modal-overlay">
           <div className="modal-content card" style={{maxWidth: '500px'}}>
-            <div className="modal-header"><h3>Crop Photo</h3><button onClick={() => setShowPrintModal(false)}><X /></button></div>
+            <div className="modal-header"><h3>Crop Photo</h3><button onClick={() => setShowCropper(false)}><X /></button></div>
             <div className="cropper-container" style={{height: '400px'}}><Cropper image={transparentImage || image!} crop={crop} zoom={zoom} aspect={35/45} onCropChange={setCrop} onCropComplete={onCropComplete} onZoomChange={setZoom} /></div>
             <div className="modal-footer"><button className="btn btn-primary btn-full" onClick={generateCroppedImage}>Apply Crop</button></div>
           </div>
@@ -325,7 +334,7 @@ export default function Home() {
         .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 18px; }
         .logo-icon { background: var(--primary); color: #fff; padding: 6px; border-radius: 6px; }
         .workspace-grid { display: grid; grid-template-columns: 320px 1fr 280px; gap: 20px; padding: 30px 0; }
-        .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
         .step-item { margin-bottom: 24px; }
         .step-title { font-size: 10px; font-weight: 900; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 12px; border-bottom: 1px solid var(--secondary); padding-bottom: 6px; text-transform: uppercase; }
         .upload-area { border: 2px dashed var(--border); border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; color: var(--primary); font-weight: 700; }
@@ -334,7 +343,6 @@ export default function Home() {
         .label-inputs { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
         .label-inputs input { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-weight: 700; }
         .option-row { display: flex; justify-content: space-between; align-items: center; }
-        .option-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
         .color-presets { display: flex; gap: 8px; }
         .color-circle { width: 20px; height: 20px; border-radius: 50%; border: none; cursor: pointer; }
         .color-circle.active { outline: 2px solid var(--primary); outline-offset: 2px; }
@@ -355,8 +363,6 @@ export default function Home() {
         .loader-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.8); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; font-weight: 700; }
         .loader { width: 24px; height: 24px; border: 3px solid var(--secondary); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .preview-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 16px; }
-        .control-btn { background: none; border: none; display: flex; flex-direction: column; align-items: center; font-size: 10px; color: var(--text-muted); cursor: pointer; }
         .requirements-list { list-style: none; margin-top: 12px; }
         .requirements-list li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--secondary); font-size: 12px; font-weight: 600; }
         .requirements-list li span { color: var(--success); }
