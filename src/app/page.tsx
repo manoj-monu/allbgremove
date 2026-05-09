@@ -34,7 +34,7 @@ import {
 import { saveAs } from 'file-saver';
 
 export default function Home() {
-  console.log('Passport Photo Maker v3.2 Active - Reference Match');
+  console.log('Passport Photo Maker v3.3 Active - Final Code Clear');
   const [image, setImage] = useState<string | null>(null);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [transparentImage, setTransparentImage] = useState<string | null>(null);
@@ -153,7 +153,6 @@ export default function Home() {
     img.onload = () => {
       const dpi = 300;
       const mmToPx = (mm: number) => Math.round((mm * dpi) / 25.4);
-      
       let width, height, cols, rows;
       if (paper === '4x6') { width = 4 * dpi; height = 6 * dpi; cols = 3; rows = 4; }
       else { width = mmToPx(210); height = mmToPx(297); cols = 5; rows = 6; }
@@ -162,61 +161,40 @@ export default function Home() {
       ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
       
       const photoWidth = mmToPx(35), photoHeight = mmToPx(45);
-      const paperMargin = mmToPx(8); // Wider margins to accommodate text
-      const photoGap = mmToPx(4); // Professional gap
+      const paperMargin = mmToPx(10);
+      const photoGap = mmToPx(4);
 
-      // Draw Dashed Lines in Gaps
-      ctx.setLineDash([15, 10]);
-      ctx.strokeStyle = '#666666';
+      // Draw Dashed Lines in Gaps (BLACK & THICK)
+      ctx.setLineDash([20, 10]);
+      ctx.strokeStyle = '#000000';
       ctx.lineWidth = 1;
 
-      // Vertical dashed lines
       for (let c = 0; c <= cols; c++) {
         const x = paperMargin + c * (photoWidth + photoGap) - (photoGap / 2);
         if (x > paperMargin/2 && x < width - paperMargin/2) {
-          ctx.beginPath(); ctx.moveTo(x, paperMargin/2); ctx.lineTo(x, height - paperMargin/2); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(x, 10); ctx.lineTo(x, height - 10); ctx.stroke();
         }
       }
-      // Horizontal dashed lines
       for (let r = 0; r <= rows; r++) {
         const y = paperMargin + r * (photoHeight + photoGap) - (photoGap / 2);
         if (y > paperMargin/2 && y < height - paperMargin/2) {
-          ctx.beginPath(); ctx.moveTo(paperMargin/2, y); ctx.lineTo(width - paperMargin/2, y); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(10, y); ctx.lineTo(width - 10, y); ctx.stroke();
         }
       }
 
-      // Add Margin Text (Exactly like reference)
+      // Add Margin Text
       ctx.setLineDash([]);
-      ctx.fillStyle = '#333333';
-      ctx.font = `bold ${mmToPx(4)}px Arial`;
-      
-      // Left vertical text
-      ctx.save();
-      ctx.translate(paperMargin/2, height/2);
-      ctx.rotate(-Math.PI/2);
-      ctx.textAlign = 'center';
-      ctx.fillText("PASSPORT SIZE PHOTOS", 0, 0);
-      ctx.restore();
+      ctx.fillStyle = '#000000';
+      ctx.font = `bold ${mmToPx(5)}px Arial`;
+      ctx.save(); ctx.translate(paperMargin/2, height/2); ctx.rotate(-Math.PI/2); ctx.textAlign = 'center'; ctx.fillText("PASSPORT SIZE PHOTOS", 0, 0); ctx.restore();
+      ctx.save(); ctx.translate(width - paperMargin/2, height/2); ctx.rotate(Math.PI/2); ctx.textAlign = 'center'; ctx.fillText(`PRINT READY ${paper}`, 0, 0); ctx.restore();
 
-      // Right vertical text
-      ctx.save();
-      ctx.translate(width - paperMargin/2, height/2);
-      ctx.rotate(Math.PI/2);
-      ctx.textAlign = 'center';
-      ctx.fillText(`PRINT READY ${paper}`, 0, 0);
-      ctx.restore();
-
-      // Draw Photos with Border
+      // Draw Photos
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const x = paperMargin + c * (photoWidth + photoGap);
           const y = paperMargin + r * (photoHeight + photoGap);
-          
-          // Photo Outline
-          ctx.strokeStyle = '#000000';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(x, y, photoWidth, photoHeight);
-          
+          ctx.strokeStyle = '#000000'; ctx.lineWidth = 1; ctx.strokeRect(x, y, photoWidth, photoHeight);
           ctx.drawImage(img, x, y, photoWidth, photoHeight);
         }
       }
@@ -227,7 +205,7 @@ export default function Home() {
 
   return (
     <div className="app-root">
-      <header className="header"><div className="container header-inner"><div className="logo"><div className="logo-icon"><Printer size={20} /></div><span className="logo-text">Premium Studio Pro <small>v3.2</small></span></div><div className="header-actions"><button className="btn btn-primary btn-sm">Sign In</button></div></div></header>
+      <header className="header"><div className="container header-inner"><div className="logo"><div className="logo-icon"><Printer size={20} /></div><span className="logo-text">Studio Pro <small style={{color: 'red'}}>v3.3</small></span></div><div className="header-actions"><button className="btn btn-primary btn-sm">Sign In</button></div></div></header>
 
       <main className="container workspace-container">
         <div className="workspace-grid">
@@ -237,14 +215,14 @@ export default function Home() {
               <div className="upload-area" onClick={() => fileInputRef.current?.click()}><Upload size={24} /><p>Upload Photo</p><input type="file" hidden ref={fileInputRef} onChange={handleUpload} accept="image/*" /></div>
             </div>
             <div className="step-item">
-              <h3 className="step-title">2. PHOTO EDIT</h3>
+              <h3 className="step-title">2. EDIT</h3>
               <div className="tool-row"><Sun size={14} /><span>Brightness</span><input type="range" min="0" max="200" value={brightness} onChange={(e) => setBrightness(Number(e.target.value))} /></div>
               <div className="tool-row"><Contrast size={14} /><span>Contrast</span><input type="range" min="0" max="200" value={contrast} onChange={(e) => setContrast(Number(e.target.value))} /></div>
             </div>
             <div className="step-item">
-              <h3 className="step-title">3. STUDIO OPTIONS</h3>
+              <h3 className="step-title">3. OPTIONS</h3>
               <div className="option-row">
-                <div className="option-label"><TypeIcon size={16} /><span>Add Name & Date</span></div>
+                <div className="option-label"><TypeIcon size={16} /><span>Name & Date</span></div>
                 <label className="switch"><input type="checkbox" checked={showLabel} onChange={(e) => setShowLabel(e.target.checked)} /><span className="slider round"></span></label>
               </div>
               {showLabel && (
@@ -260,12 +238,11 @@ export default function Home() {
               </div>
             </div>
             <div className="step-item">
-              <h3 className="step-title">4. PRINT SHEETS</h3>
+              <h3 className="step-title">4. PRINT</h3>
               <div className="action-buttons">
                 <button className="btn btn-primary btn-sm" onClick={() => openPrintPreview('4x6')}><Printer size={16} /> 4x6 (12)</button>
                 <button className="btn btn-primary btn-sm" onClick={() => openPrintPreview('A4')}><Printer size={16} /> A4 (30)</button>
               </div>
-              <button className="btn btn-success btn-full" style={{marginTop: '8px'}} onClick={() => saveAs(image!, 'photo.png')}><Download size={18} /> Download Single</button>
             </div>
           </div>
 
@@ -282,20 +259,11 @@ export default function Home() {
 
           <div className="info-panel">
             <div className="card status-card">
-              <h3>Lab Ready</h3>
+              <h3>Lab v3.3</h3>
               <ul className="requirements-list">
-                <li className="good">Lab Reference Match <span>✓</span></li>
-                <li className="good">Dashed Cut Guides <span>✓</span></li>
-                <li className="good">Margin Branding <span>✓</span></li>
+                <li className="good">Exact Ref Match <span>✓</span></li>
+                <li className="good">Dark Cut Lines <span>✓</span></li>
               </ul>
-            </div>
-            <div className="card preview-grid-card">
-              <h3>Sheet Grid</h3>
-              <div className="photo-preview-grid">
-                {[1,2,3,4,5,6,7,8].map(i => (
-                  <div key={i} className="mini-photo">{image && <img src={image} alt="mini" />}</div>
-                ))}
-              </div>
             </div>
           </div>
         </div>
@@ -304,13 +272,12 @@ export default function Home() {
       {showPrintModal && (
         <div className="modal-overlay">
           <div className="modal-content card" style={{maxWidth: '850px'}}>
-            <div className="modal-header"><h3>Final Print Preview ({currentPaper})</h3><button onClick={() => setShowPrintModal(false)}><X /></button></div>
-            <div className="print-preview-container" style={{maxHeight: '70vh', overflowY: 'auto', background: '#333', padding: '40px', textAlign: 'center'}}>
-              <img src={printPreview!} alt="Print Preview" style={{width: '100%', boxShadow: '0 0 40px rgba(0,0,0,0.6)', border: '1px solid #fff'}} />
+            <div className="modal-header"><h3>Print Sheet Preview ({currentPaper})</h3><button onClick={() => setShowPrintModal(false)}><X /></button></div>
+            <div className="print-preview-container" style={{maxHeight: '70vh', overflowY: 'auto', background: '#222', padding: '40px', textAlign: 'center'}}>
+              <img src={printPreview!} alt="Print Preview" style={{width: '100%', boxShadow: '0 0 50px rgba(0,0,0,0.8)', border: '1px solid #fff'}} />
             </div>
             <div className="modal-footer">
-              <p style={{fontSize: '13px', color: '#666'}}>* Exactly matching professional lab reference.</p>
-              <button className="btn btn-success btn-full" onClick={() => saveAs(printPreview!, `Studio_Print_Sheet_${currentPaper}.png`)}><Download size={18} /> Download High-Quality Sheet</button>
+              <button className="btn btn-success btn-full" onClick={() => saveAs(printPreview!, `Final_Studio_Sheet.png`)}><Download size={18} /> Download High-Quality Sheet</button>
             </div>
           </div>
         </div>
@@ -334,7 +301,7 @@ export default function Home() {
         .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 18px; }
         .logo-icon { background: var(--primary); color: #fff; padding: 6px; border-radius: 6px; }
         .workspace-grid { display: grid; grid-template-columns: 320px 1fr 280px; gap: 20px; padding: 30px 0; }
-        .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .step-item { margin-bottom: 24px; }
         .step-title { font-size: 10px; font-weight: 900; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 12px; border-bottom: 1px solid var(--secondary); padding-bottom: 6px; text-transform: uppercase; }
         .upload-area { border: 2px dashed var(--border); border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; color: var(--primary); font-weight: 700; }
