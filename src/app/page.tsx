@@ -236,10 +236,10 @@ export default function Home() {
             <div style={{marginTop: 30, display:'flex', gap:12, overflowX:'auto', paddingBottom:10}}>
                {image && [1,2,3,4,5].map(i => (
                  <div key={i} style={{minWidth:80, height:100, borderRadius:12, overflow:'hidden', border: i===1 ? '3px solid var(--primary)' : '1px solid var(--border)'}}>
-                   <img src={image} style={{width:'100%', height:'100%', objectCover:'cover'}} />
+                   <img src={image} style={{width:'100%', height:'100%', objectFit:'cover'}} />
                  </div>
                ))}
-               <div style={{minWidth:80, height:100, borderRadius:12, border: '2px dashed var(--border)', display:'flex', alignItems:'center', justifyCenter:'center', cursor:'pointer'}} onClick={() => fileInputRef.current?.click()}>
+               <div style={{minWidth:80, height:100, borderRadius:12, border: '2px dashed var(--border)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer'}} onClick={() => fileInputRef.current?.click()}>
                   <X size={20} style={{transform: 'rotate(45deg)', color: '#cbd5e1'}}/>
                </div>
             </div>
