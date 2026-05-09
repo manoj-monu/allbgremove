@@ -27,15 +27,14 @@ import {
   RotateCw,
   FlipHorizontal,
   FlipVertical,
-  Aperture,
-  Wind,
   Type as TypeIcon,
-  Sparkles
+  Sparkles,
+  Eye
 } from 'lucide-react';
 import { saveAs } from 'file-saver';
 
 export default function Home() {
-  console.log('Passport Photo Maker v2.9 Active - Studio Special');
+  console.log('Passport Photo Maker v3.0 Active - Smart Print Studio');
   const [image, setImage] = useState<string | null>(null);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [transparentImage, setTransparentImage] = useState<string | null>(null);
@@ -46,24 +45,25 @@ export default function Home() {
   const [removeBg, setRemoveBg] = useState(true);
   const [bgColor, setBgColor] = useState('#ffffff');
   
-  // Mega Studio & Special Tools State
+  // Tools State
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
   const [saturation, setSaturation] = useState(100);
   const [rotation, setRotation] = useState(0);
   const [blur, setBlur] = useState(0);
   const [exposure, setExposure] = useState(100);
-  const [grayscale, setGrayscale] = useState(0);
-  const [sepia, setSepia] = useState(0);
   const [flipH, setFlipH] = useState(1);
   const [flipV, setFlipV] = useState(1);
-  
-  // Studio Special
   const [sharpen, setSharpen] = useState(0);
   const [vignette, setVignette] = useState(0);
   const [showLabel, setShowLabel] = useState(false);
   const [userName, setUserName] = useState('');
   const [userDate, setUserDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // Print Preview State
+  const [printPreview, setPrintPreview] = useState<string | null>(null);
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [currentPaper, setCurrentPaper] = useState<'4x6' | 'A4'>('4x6');
 
   // Cropping State
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -75,7 +75,7 @@ export default function Home() {
 
   useEffect(() => {
     if (transparentImage && !showCropper) { renderFinalPreview(); }
-  }, [bgColor, transparentImage, showCropper, brightness, contrast, saturation, rotation, blur, exposure, grayscale, sepia, flipH, flipV, sharpen, vignette, showLabel, userName, userDate]);
+  }, [bgColor, transparentImage, showCropper, brightness, contrast, saturation, rotation, blur, exposure, flipH, flipV, sharpen, vignette, showLabel, userName, userDate]);
 
   const renderFinalPreview = () => {
     if (!transparentImage) return;
@@ -87,43 +87,26 @@ export default function Home() {
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
       canvas.width = img.width; canvas.height = img.height;
-
-      // Draw background
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Filters
-      ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) blur(${blur}px) opacity(${exposure}%) grayscale(${grayscale}%) sepia(${sepia}%) contrast(${100 + sharpen}%)`;
-      
+      ctx.fillStyle = bgColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) blur(${blur}px) opacity(${exposure}%) contrast(${100 + sharpen}%)`;
       ctx.save();
       ctx.translate(canvas.width / 2, canvas.height / 2);
       ctx.scale(flipH, flipV);
       ctx.rotate((rotation * Math.PI) / 180);
       ctx.drawImage(img, -img.width / 2, -img.height / 2);
       ctx.restore();
-
-      // Apply Vignette (Simulated with Gradient)
       if (vignette > 0) {
         const grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width);
-        grad.addColorStop(0, 'rgba(0,0,0,0)');
-        grad.addColorStop(1, `rgba(0,0,0,${vignette / 100})`);
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        grad.addColorStop(0, 'rgba(0,0,0,0)'); grad.addColorStop(1, `rgba(0,0,0,${vignette / 100})`);
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
-
-      // Add Name & Date Label
       if (showLabel) {
         const labelHeight = canvas.height * 0.15;
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, canvas.height - labelHeight, canvas.width, labelHeight);
-        ctx.fillStyle = '#000000';
-        ctx.textAlign = 'center';
-        ctx.font = `bold ${labelHeight * 0.3}px Arial`;
-        ctx.fillText(userName.toUpperCase(), canvas.width / 2, canvas.height - (labelHeight * 0.55));
-        ctx.font = `${labelHeight * 0.25}px Arial`;
-        ctx.fillText(userDate, canvas.width / 2, canvas.height - (labelHeight * 0.2));
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, canvas.height - labelHeight, canvas.width, labelHeight);
+        ctx.fillStyle = '#000000'; ctx.textAlign = 'center';
+        ctx.font = `bold ${labelHeight * 0.3}px Arial`; ctx.fillText(userName.toUpperCase(), canvas.width / 2, canvas.height - (labelHeight * 0.55));
+        ctx.font = `${labelHeight * 0.25}px Arial`; ctx.fillText(userDate, canvas.width / 2, canvas.height - (labelHeight * 0.2));
       }
-      
       setImage(canvas.toDataURL('image/png'));
     };
   };
@@ -131,8 +114,7 @@ export default function Home() {
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setOriginalImage(url); setImage(url); setTransparentImage(null);
+      const url = URL.createObjectURL(file); setOriginalImage(url); setImage(url); setTransparentImage(null);
       if (removeBg) processBackgroundRemoval(file); else setShowCropper(true);
     }
   };
@@ -155,8 +137,7 @@ export default function Home() {
 
   const cleanBackground = (url: string): Promise<string> => {
     return new Promise((resolve) => {
-      const img = new Image();
-      img.src = url; img.crossOrigin = "anonymous";
+      const img = new Image(); img.src = url; img.crossOrigin = "anonymous";
       img.onload = () => {
         const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); if (!ctx) return resolve(url);
         canvas.width = img.width; canvas.height = img.height; ctx.drawImage(img, 0, 0);
@@ -177,27 +158,75 @@ export default function Home() {
     canvas.width = croppedAreaPixels.width; canvas.height = croppedAreaPixels.height;
     ctx.fillStyle = bgColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, croppedAreaPixels.x, croppedAreaPixels.y, croppedAreaPixels.width, croppedAreaPixels.height, 0, 0, canvas.width, canvas.height);
-    setTransparentImage(canvas.toDataURL('image/png'));
-    setShowCropper(false);
+    setTransparentImage(canvas.toDataURL('image/png')); setShowCropper(false);
+  };
+
+  const openPrintPreview = (paper: '4x6' | 'A4') => {
+    if (!image) return;
+    setCurrentPaper(paper);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const img = new Image();
+    img.src = image;
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const dpi = 300;
+      const mmToPx = (mm: number) => (mm * dpi) / 25.4;
+      let width, height, cols, rows;
+      if (paper === '4x6') { width = 4 * dpi; height = 6 * dpi; cols = 3; rows = 4; }
+      else { width = mmToPx(210); height = mmToPx(297); cols = 5; rows = 6; }
+      
+      canvas.width = width; canvas.height = height;
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
+      
+      const photoWidth = mmToPx(35), photoHeight = mmToPx(45);
+      const paperMargin = mmToPx(3);
+      const photoGap = mmToPx(3);
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const x = paperMargin + c * (photoWidth + photoGap);
+          const y = paperMargin + r * (photoHeight + photoGap);
+          
+          // Draw dashed cutting lines
+          ctx.setLineDash([10, 10]);
+          ctx.strokeStyle = '#eeeeee';
+          ctx.beginPath();
+          ctx.moveTo(x - photoGap/2, 0); ctx.lineTo(x - photoGap/2, height); ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(0, y - photoGap/2); ctx.lineTo(width, y - photoGap/2); ctx.stroke();
+          
+          // Draw Photo Border
+          ctx.setLineDash([]);
+          ctx.strokeStyle = '#dddddd'; ctx.lineWidth = 1;
+          ctx.strokeRect(x, y, photoWidth, photoHeight);
+          
+          // Draw Photo
+          ctx.drawImage(img, x, y, photoWidth, photoHeight);
+        }
+      }
+      setPrintPreview(canvas.toDataURL('image/png'));
+      setShowPrintModal(true);
+    };
   };
 
   return (
     <div className="app-root">
-      <header className="header"><div className="container header-inner"><div className="logo"><div className="logo-icon"><User size={24} /></div><span className="logo-text">Studio Pro <small>v2.9</small></span></div><button className="btn btn-primary btn-sm">Sign In</button></div></header>
+      <header className="header"><div className="container header-inner"><div className="logo"><div className="logo-icon"><Printer size={20} /></div><span className="logo-text">Lab Studio Pro <small>v3.0</small></span></div><div className="header-actions"><button className="btn btn-primary btn-sm">Sign In</button></div></div></header>
 
       <main className="container workspace-container">
         <div className="workspace-grid">
           <div className="steps-panel card">
             <div className="step-item">
-              <h3 className="step-title">1. UPLOAD</h3>
-              <div className="upload-area" onClick={() => fileInputRef.current?.click()}><Upload size={24} /><p>Upload Photo</p><input type="file" hidden ref={fileInputRef} onChange={handleUpload} accept="image/*" /></div>
+              <h3 className="step-title">1. UPLOAD PHOTO</h3>
+              <div className="upload-area" onClick={() => fileInputRef.current?.click()}><Upload size={24} /><p>Choose Photo</p><input type="file" hidden ref={fileInputRef} onChange={handleUpload} accept="image/*" /></div>
             </div>
 
             <div className="step-item">
-              <h3 className="step-title">2. MEGA STUDIO TOOLS</h3>
+              <h3 className="step-title">2. EDITING TOOLS</h3>
               <div className="tool-row"><Sun size={14} /><span>Brightness</span><input type="range" min="0" max="200" value={brightness} onChange={(e) => setBrightness(Number(e.target.value))} /></div>
               <div className="tool-row"><Contrast size={14} /><span>Contrast</span><input type="range" min="0" max="200" value={contrast} onChange={(e) => setContrast(Number(e.target.value))} /></div>
-              <div className="tool-row"><RotateCw size={14} /><span>Rotate</span><input type="range" min="-180" max="180" value={rotation} onChange={(e) => setRotation(Number(e.target.value))} /></div>
               <div className="flip-actions">
                 <button className="btn btn-secondary btn-sm" onClick={() => setFlipH(f => f * -1)}>Flip H</button>
                 <button className="btn btn-secondary btn-sm" onClick={() => setFlipV(f => f * -1)}>Flip V</button>
@@ -205,56 +234,57 @@ export default function Home() {
             </div>
 
             <div className="step-item">
-              <h3 className="step-title">3. STUDIO SPECIAL</h3>
-              <div className="tool-row"><Sparkles size={14} /><span>Sharpen</span><input type="range" min="0" max="100" value={sharpen} onChange={(e) => setSharpen(Number(e.target.value))} /></div>
-              <div className="tool-row"><Wind size={14} /><span>Vignette</span><input type="range" min="0" max="100" value={vignette} onChange={(e) => setVignette(Number(e.target.value))} /></div>
-              <div className="option-row" style={{marginTop: '12px'}}>
+              <h3 className="step-title">3. LAB SPECIAL</h3>
+              <div className="option-row">
                 <div className="option-label"><TypeIcon size={16} /><span>Name & Date Label</span></div>
                 <label className="switch"><input type="checkbox" checked={showLabel} onChange={(e) => setShowLabel(e.target.checked)} /><span className="slider round"></span></label>
               </div>
               {showLabel && (
                 <div className="label-inputs">
-                  <input type="text" placeholder="FULL NAME" value={userName} onChange={(e) => setUserName(e.target.value)} />
+                  <input type="text" placeholder="STUDENT NAME" value={userName} onChange={(e) => setUserName(e.target.value)} />
                   <input type="date" value={userDate} onChange={(e) => setUserDate(e.target.value)} />
                 </div>
               )}
-            </div>
-
-            <div className="step-item">
-              <h3 className="step-title">4. COLORS & DOWNLOAD</h3>
-              <div className="color-presets">
+              <div className="color-presets" style={{marginTop: '12px'}}>
                 {['#ffffff', '#3b82f6', '#ef4444', '#10b981'].map(c => (
                   <button key={c} className={`color-circle ${bgColor === c ? 'active' : ''}`} style={{ background: c }} onClick={() => setBgColor(c)}></button>
                 ))}
-                <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} />
               </div>
-              <div className="action-buttons"><button className="btn btn-primary btn-sm" onClick={() => saveAs(image!, 'photo_4x6.png')}>4x6 (12)</button><button className="btn btn-primary btn-sm" onClick={() => saveAs(image!, 'photo_A4.png')}>A4 (30)</button></div>
-              <button className="btn btn-success btn-full" onClick={() => saveAs(image!, 'passport.png')}><Download size={18} /> Download</button>
+            </div>
+
+            <div className="step-item">
+              <h3 className="step-title">4. PRINT LAYOUT</h3>
+              <div className="action-buttons">
+                <button className="btn btn-primary btn-sm" onClick={() => openPrintPreview('4x6')}><Eye size={16} /> 4x6 (12)</button>
+                <button className="btn btn-primary btn-sm" onClick={() => openPrintPreview('A4')}><Eye size={16} /> A4 (30)</button>
+              </div>
+              <button className="btn btn-success btn-full" onClick={() => saveAs(image!, 'photo.png')}><Download size={18} /> Download Single</button>
             </div>
           </div>
 
           <div className="preview-panel card">
-            <div className="preview-header">
-              <div className="tabs"><button className="tab active">Preview</button></div>
-              <button className="btn btn-secondary btn-sm" onClick={() => { setBrightness(100); setContrast(100); setRotation(0); setSharpen(0); setVignette(0); setShowLabel(false); }}><RotateCcw size={14} /> Reset</button>
-            </div>
             <div className="preview-canvas-area" style={{ background: '#fff', aspectRatio: '35/45' }}>
-              {isProcessing && <div className="loader-overlay"><div className="loader"></div><p>AI Working...</p></div>}
-              {image ? <img src={image} alt="Preview" className="main-preview-img" /> : <div className="empty-preview" onClick={() => fileInputRef.current?.click()}><ImageIcon size={48} /><p>Upload Photo</p></div>}
+              {isProcessing && <div className="loader-overlay"><div className="loader"></div><p>AI Studio Processing...</p></div>}
+              {image ? <img src={image} alt="Preview" className="main-preview-img" /> : <div className="empty-preview" onClick={() => fileInputRef.current?.click()}><ImageIcon size={48} /><p>Select a Photo</p></div>}
+            </div>
+            <div className="preview-controls">
+              <button className="control-btn" onClick={() => setShowCropper(true)}><Maximize2 size={18} /><span>Crop</span></button>
+              <div className="v-divider"></div>
+              <button className="control-btn" onClick={() => { setBrightness(100); setContrast(100); setShowLabel(false); }}><RotateCcw size={14} /> Reset</button>
             </div>
           </div>
 
           <div className="info-panel">
             <div className="card status-card">
-              <h3>Photo Quality</h3>
+              <h3>Lab Quality Check</h3>
               <ul className="requirements-list">
-                <li className="good">Studio Finish <span>✓</span></li>
-                <li className="good">Sharp Edges <span>✓</span></li>
-                <li className="good">Government Ready <span>✓</span></li>
+                <li className="good">3mm Lab Margins <span>✓</span></li>
+                <li className="good">Cutting Lines <span>✓</span></li>
+                <li className="good">DPI 300 Optimized <span>✓</span></li>
               </ul>
             </div>
             <div className="card preview-grid-card">
-              <h3>Sheet Preview</h3>
+              <h3>Grid Preview</h3>
               <div className="photo-preview-grid">
                 {[1,2,3,4,5,6,7,8].map(i => (
                   <div key={i} className="mini-photo">{image && <img src={image} alt="mini" />}</div>
@@ -265,12 +295,27 @@ export default function Home() {
         </div>
       </main>
 
+      {showPrintModal && (
+        <div className="modal-overlay">
+          <div className="modal-content card" style={{maxWidth: '800px'}}>
+            <div className="modal-header"><h3>Print Sheet Preview ({currentPaper})</h3><button onClick={() => setShowPrintModal(false)}><X /></button></div>
+            <div className="print-preview-container" style={{maxHeight: '70vh', overflowY: 'auto', background: '#ccc', padding: '20px', textAlign: 'center'}}>
+              <img src={printPreview!} alt="Print Preview" style={{width: '100%', boxShadow: '0 0 20px rgba(0,0,0,0.3)'}} />
+            </div>
+            <div className="modal-footer">
+              <p style={{fontSize: '12px', color: '#666'}}>* 3mm margins and cutting lines included.</p>
+              <button className="btn btn-success btn-full" onClick={() => saveAs(printPreview!, `Print_Sheet_${currentPaper}.png`)}><Download size={18} /> Download Final Sheet</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showCropper && (
         <div className="modal-overlay">
-          <div className="modal-content card">
+          <div className="modal-content card" style={{maxWidth: '500px'}}>
             <div className="modal-header"><h3>Crop Photo</h3><button onClick={() => setShowCropper(false)}><X /></button></div>
-            <div className="cropper-container"><Cropper image={transparentImage || image!} crop={crop} zoom={zoom} aspect={35/45} onCropChange={setCrop} onCropComplete={onCropComplete} onZoomChange={setZoom} /></div>
-            <div className="modal-footer"><button className="btn btn-primary btn-sm btn-full" onClick={generateCroppedImage}>Apply Crop</button></div>
+            <div className="cropper-container" style={{height: '400px'}}><Cropper image={transparentImage || image!} crop={crop} zoom={zoom} aspect={35/45} onCropChange={setCrop} onCropComplete={onCropComplete} onZoomChange={setZoom} /></div>
+            <div className="modal-footer"><button className="btn btn-primary btn-full" onClick={generateCroppedImage}>Apply Crop</button></div>
           </div>
         </div>
       )}
@@ -283,9 +328,9 @@ export default function Home() {
         .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 18px; }
         .logo-icon { background: var(--primary); color: #fff; padding: 6px; border-radius: 6px; }
         .workspace-grid { display: grid; grid-template-columns: 320px 1fr 280px; gap: 20px; padding: 30px 0; }
-        .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .step-item { margin-bottom: 24px; }
-        .step-title { font-size: 11px; font-weight: 900; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 12px; border-bottom: 1px solid var(--secondary); padding-bottom: 6px; text-transform: uppercase; }
+        .step-title { font-size: 10px; font-weight: 900; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 12px; border-bottom: 1px solid var(--secondary); padding-bottom: 6px; text-transform: uppercase; }
         .upload-area { border: 2px dashed var(--border); border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; color: var(--primary); font-weight: 700; }
         .tool-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
         .tool-row input { flex: 1; height: 4px; }
@@ -294,13 +339,13 @@ export default function Home() {
         .label-inputs input { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-weight: 700; }
         .option-row { display: flex; justify-content: space-between; align-items: center; }
         .option-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
-        .color-presets { display: flex; gap: 8px; margin-bottom: 12px; }
-        .color-circle { width: 24px; height: 24px; border-radius: 50%; border: none; cursor: pointer; }
+        .color-presets { display: flex; gap: 8px; }
+        .color-circle { width: 20px; height: 20px; border-radius: 50%; border: none; cursor: pointer; }
         .color-circle.active { outline: 2px solid var(--primary); outline-offset: 2px; }
-        .switch { position: relative; display: inline-block; width: 36px; height: 18px; }
+        .switch { position: relative; display: inline-block; width: 34px; height: 16px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; inset: 0; background: #e2e8f0; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 2px; bottom: 2px; background: white; transition: .4s; border-radius: 50%; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background: var(--primary); }
         input:checked + .slider:before { transform: translateX(18px); }
         .action-buttons { display: flex; gap: 8px; margin-top: 12px; }
@@ -309,24 +354,21 @@ export default function Home() {
         .btn-primary { background: var(--primary); color: #fff; flex: 1; }
         .btn-success { background: var(--success); color: #fff; }
         .btn-secondary { background: var(--secondary); color: var(--text-main); }
-        .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .tabs { display: flex; gap: 4px; background: var(--secondary); padding: 4px; border-radius: 8px; }
-        .tab { background: none; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 12px; }
         .preview-canvas-area { border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 100%; background-color: #fff; }
         .main-preview-img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .loader-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.8); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; font-weight: 700; }
         .loader { width: 24px; height: 24px; border: 3px solid var(--secondary); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .preview-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 16px; }
+        .control-btn { background: none; border: none; display: flex; flex-direction: column; align-items: center; font-size: 10px; color: var(--text-muted); cursor: pointer; }
         .requirements-list { list-style: none; margin-top: 12px; }
         .requirements-list li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--secondary); font-size: 12px; font-weight: 600; }
         .requirements-list li span { color: var(--success); }
         .photo-preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
         .mini-photo { aspect-ratio: 35/45; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #f8fafc; }
         .mini-photo img { width: 100%; height: 100%; object-fit: cover; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: center; justify-content: center; }
-        .modal-content { width: 100%; max-width: 500px; padding: 20px; }
-        .cropper-container { height: 350px; width: 100%; background: #000; border-radius: 8px; }
-        .modal-footer { margin-top: 16px; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
       `}</style>
     </div>
   );
