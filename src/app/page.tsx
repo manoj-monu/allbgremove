@@ -280,7 +280,7 @@ export default function Home() {
                   transform: `scale(${zoom})`, 
                   background: bgColor,
                   width: 350, height: 450,
-                  display:'flex', alignItems:'center', justifyCenter:'center'
+                  display:'flex', alignItems:'center', justifyContent:'center'
                 }}>
                   {processedImage && (
                     <img src={processedImage} alt="Preview" style={{ 
