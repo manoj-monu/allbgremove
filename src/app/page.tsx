@@ -827,10 +827,10 @@ export default function Home() {
         .editor-section { padding: 40px; background: #000; }
         .editor-container {
           max-width: 1440px; margin: 0 auto; background: var(--bg-card); border-radius: 32px; border: 1px solid var(--bg-border);
-          display: grid; grid-template-columns: 80px 300px 1fr 320px; height: 900px; overflow: hidden;
+          display: grid; grid-template-columns: 80px 300px 1fr 320px; min-height: 850px; max-height: 95vh; overflow: hidden;
         }
 
-        .tool-sidebar { background: #020617; border-right: 1px solid var(--bg-border); padding: 20px 0; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .tool-sidebar { background: #020617; border-right: 1px solid var(--bg-border); padding: 20px 0; display: flex; flex-direction: column; align-items: center; gap: 20px; overflow-y: auto; }
         .tool-icon-btn {
           background: none; border: none; color: var(--text-dim); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; transition: 0.2s;
         }
@@ -899,11 +899,11 @@ export default function Home() {
         .thumb img { width: 100%; height: 100%; object-fit: cover; }
         .thumb.add { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: var(--text-dim); border-style: dashed; }
 
-        .adjust-sidebar { border-left: 1px solid var(--bg-border); background: #020617; }
-        .adjust-tabs { display: flex; border-bottom: 1px solid var(--bg-border); }
+        .adjust-sidebar { border-left: 1px solid var(--bg-border); background: #020617; display: flex; flex-direction: column; overflow: hidden; }
+        .adjust-tabs { display: flex; border-bottom: 1px solid var(--bg-border); flex-shrink: 0; }
         .adjust-tabs button { flex: 1; padding: 16px; background: none; border: none; color: var(--text-dim); font-weight: 600; cursor: pointer; }
         .adjust-tabs button.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
-        .adjust-content { padding: 24px; overflow-y: auto; height: calc(100% - 50px); }
+        .adjust-content { padding: 24px; overflow-y: auto; flex: 1; padding-bottom: 100px; }
         .adjust-section { margin-bottom: 32px; }
         .section-head { font-weight: 700; display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 14px; }
         .slider-box { margin-bottom: 16px; }
