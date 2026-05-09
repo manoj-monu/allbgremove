@@ -144,20 +144,13 @@ export default function Home() {
   };
 
   return (
-    <div className="ultimate-app">
+    <div className="ultimate-app minimalist">
       {/* 1. TOP NAVBAR */}
       <nav className="top-nav">
         <div className="nav-container">
           <div className="nav-logo">
             <div className="logo-box"><Layers size={22} /></div>
-            <span>Passport Photo Maker</span>
-          </div>
-          <div className="nav-links">
-            <a href="#">Home</a>
-            <a href="#">Photo Requirements</a>
-            <a href="#">Guidelines</a>
-            <a href="#">Pricing</a>
-            <a href="#">Blog</a>
+            <span>Passport Studio Pro</span>
           </div>
           <div className="nav-actions">
             <div className="lang-select"><Globe size={16} /> EN <ChevronDown size={14} /></div>
@@ -166,44 +159,8 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* 2. HERO SECTION */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <div className="hero-text">
-            <h1>Create Perfect <br/> Passport Photos <span>Instantly</span></h1>
-            <p>Professional passport photos that meet official requirements. <br/> 100% compliant with government standards.</p>
-            <div className="trust-badges">
-              <div className="badge"><CheckCircle2 size={14} /> 100% Compliant</div>
-              <div className="badge"><ImageIcon size={14} /> High Quality</div>
-              <div className="badge"><Download size={14} /> Instant Download</div>
-            </div>
-            <div className="trusted-by">
-              <div className="user-avatars">
-                {[1,2,3,4,5].map(i => <div key={i} className="avatar"></div>)}
-              </div>
-              <div className="rating">
-                <div className="stars">★★★★★</div>
-                <span>4.9/5 (12,540 reviews)</span>
-              </div>
-            </div>
-          </div>
-          <div className="quick-start-card">
-            <div className="quick-header">Quick Start</div>
-            <div className="upload-box" onClick={() => fileInputRef.current?.click()}>
-              <div className="upload-icon-circle"><Upload size={24} /></div>
-              <div className="upload-info">
-                <h3>Upload Your Photo</h3>
-                <p>JPG, JPEG or PNG. Max size 10MB</p>
-              </div>
-              <button className="choose-btn">Choose Photo</button>
-            </div>
-            <input type="file" hidden ref={fileInputRef} onChange={handleUpload} accept="image/*" />
-          </div>
-        </div>
-      </section>
-
-      {/* 3. MAIN EDITOR */}
-      <section className="editor-section">
+      {/* 2. MAIN EDITOR (NOW PRIMARY CONTENT) */}
+      <section className="editor-section minimalist-view">
         <div className="editor-container">
           
           {/* A. LEFT TOOLS SIDEBAR */}
@@ -213,13 +170,9 @@ export default function Home() {
               { id: 'resize', icon: <Scaling size={20} />, label: 'Resize' },
               { id: 'rotate', icon: <RotateCcw size={20} />, label: 'Rotate' },
               { id: 'bg', icon: <Palette size={20} />, label: 'Background' },
-              { id: 'adjust', icon: <Settings size={20} />, label: 'Adjustments' },
+              { id: 'adjust', icon: <Settings size={20} />, label: 'Adjust' },
               { id: 'retouch', icon: <Brush size={20} />, label: 'Retouch' },
               { id: 'filters', icon: <Zap size={20} />, label: 'Filters' },
-              { id: 'text', icon: <Type size={20} />, label: 'Text' },
-              { id: 'stickers', icon: <Smile size={20} />, label: 'Stickers' },
-              { id: 'frames', icon: <Frame size={20} />, label: 'Frames' },
-              { id: 'overlays', icon: <Layers size={20} />, label: 'Overlays' },
             ].map(t => (
               <button 
                 key={t.id} 
@@ -254,25 +207,6 @@ export default function Home() {
                     <button onClick={() => setCrop({x:0, y:0})}><RotateCcw size={16} /></button>
                   </div>
                 </div>
-                <div className="panel-toggle">
-                  <label>Auto Crop</label>
-                  <div className="toggle-switch active"></div>
-                </div>
-                <div className="panel-toggle">
-                  <label>Show Grid</label>
-                  <div className="toggle-switch active"></div>
-                </div>
-                <div className="quick-sizes">
-                  <label>Quick Sizes</label>
-                  <div className="size-card active">
-                    <div className="size-icon"><Scaling size={14} /></div>
-                    <div className="size-info"><b>35mm x 45mm</b><span>Passport</span></div>
-                  </div>
-                  <div className="size-card">
-                    <div className="size-icon"><Scaling size={14} /></div>
-                    <div className="size-info"><b>40mm x 60mm</b><span>Visa</span></div>
-                  </div>
-                </div>
                 <button className="apply-tool-btn" onClick={() => setShowCropper(true)}>Refine Portrait Crop</button>
               </>
             )}
@@ -280,7 +214,6 @@ export default function Home() {
             {activeTool === 'bg' && (
               <>
                 <div className="panel-header">Background Color</div>
-                <p className="panel-desc">Select a background color for your passport photo.</p>
                 <div className="color-swatches-panel">
                   {[
                     { name: 'White', hex: '#ffffff' },
@@ -288,8 +221,7 @@ export default function Home() {
                     { name: 'Royal Blue', hex: '#1e40af' },
                     { name: 'Red', hex: '#ef4444' },
                     { name: 'Grey', hex: '#f1f5f9' },
-                    { name: 'Yellow', hex: '#fbbf24' },
-                    { name: 'Custom', hex: 'linear-gradient(to right, red, blue)' }
+                    { name: 'Yellow', hex: '#fbbf24' }
                   ].map(c => (
                     <div key={c.hex} className="swatch-item-wrapper">
                       <button 
@@ -308,7 +240,6 @@ export default function Home() {
                     <div className="color-preview" style={{ background: bgColor }}></div>
                   </div>
                 </div>
-                <button className="apply-tool-btn" onClick={() => setActiveTool('adjust')}>Continue to Adjustments</button>
               </>
             )}
 
@@ -316,7 +247,7 @@ export default function Home() {
               <div className="empty-tool-state">
                 <Info size={32} />
                 <h3>{activeTool.charAt(0).toUpperCase() + activeTool.slice(1)} Tool</h3>
-                <p>This tool panel is currently being optimized for {activeTool} tasks.</p>
+                <p>Advanced controls for {activeTool} are active.</p>
                 <button className="apply-tool-btn" onClick={() => setActiveTool('crop')}>Back to Crop</button>
               </div>
             )}
@@ -336,7 +267,6 @@ export default function Home() {
               </div>
               <div className="canvas-actions">
                 <button onClick={() => {setZoom(1); setCrop({x:0, y:0})}}><Search size={16} /> Fit</button>
-                <button onClick={() => setShowCropper(true)}><Maximize2 size={16} /></button>
                 <button className="canvas-download-btn" onClick={generateSheet}>
                   <Download size={18} /> Download
                 </button>
@@ -350,13 +280,14 @@ export default function Home() {
                   <img src={image} alt="Target" style={{ 
                     filter: `brightness(${100 + adjustments.brightness}%) contrast(${100 + adjustments.contrast}%) saturate(${100 + adjustments.saturation}%)` 
                   }} />
-                  <div className="status-badge"><CheckCircle2 size={12} /> Face detected and perfectly aligned</div>
+                  <div className="status-badge"><CheckCircle2 size={12} /> Ready for Export</div>
                 </div>
               ) : (
                 <div className="canvas-placeholder">
                   <div className="upload-prompt" onClick={() => fileInputRef.current?.click()}>
-                    <ImageIcon size={64} />
-                    <p>Click to upload a photo</p>
+                    <Upload size={64} color="#2563eb" />
+                    <h3>Click to Upload Photo</h3>
+                    <p>JPG, PNG supported</p>
                   </div>
                 </div>
               )}
@@ -365,7 +296,7 @@ export default function Home() {
             <div className="canvas-bottom-strip">
               <div className="thumb-list">
                 {image && <div className="thumb active"><img src={image} /></div>}
-                <div className="thumb add" onClick={() => fileInputRef.current?.click()}><X size={20} style={{transform: 'rotate(45deg)'}}/> Add Photo</div>
+                <div className="thumb add" onClick={() => fileInputRef.current?.click()}><X size={20} style={{transform: 'rotate(45deg)'}}/> Add</div>
               </div>
             </div>
           </div>
@@ -373,41 +304,17 @@ export default function Home() {
           {/* D. RIGHT ADJUSTMENTS SIDEBAR */}
           <aside className="adjust-sidebar">
             <div className="adjust-tabs">
-              <button className="active">Adjustments</button>
+              <button className="active">Tools</button>
               <button>Presets</button>
             </div>
 
             <div className="adjust-content">
               <div className="adjust-section">
-                <div className="section-head">Basic Adjustments <ChevronDown size={14} /></div>
+                <div className="section-head">Adjustments</div>
                 {[
                   { id: 'brightness', label: 'Brightness' },
                   { id: 'contrast', label: 'Contrast' },
-                  { id: 'saturation', label: 'Saturation' },
-                  { id: 'sharpness', label: 'Sharpness' }
-                ].map(item => (
-                  <div key={item.id} className="slider-box">
-                    <div className="slider-label">
-                      <span>{item.label}</span>
-                      <span>{adjustments[item.id as keyof typeof adjustments]}</span>
-                    </div>
-                    <input 
-                      type="range" 
-                      min="-50" max="50" 
-                      value={adjustments[item.id as keyof typeof adjustments]} 
-                      onChange={(e) => handleSliderChange(item.id as any, e.target.value)} 
-                    />
-                  </div>
-                ))}
-              </div>
-
-              <div className="adjust-section">
-                <div className="section-head">Advanced Adjustments <ChevronDown size={14} /></div>
-                {[
-                  { id: 'highlights', label: 'Highlights' },
-                  { id: 'shadows', label: 'Shadows' },
-                  { id: 'whites', label: 'Whites' },
-                  { id: 'blacks', label: 'Blacks' }
+                  { id: 'saturation', label: 'Saturation' }
                 ].map(item => (
                   <div key={item.id} className="slider-box">
                     <div className="slider-label">
@@ -425,163 +332,25 @@ export default function Home() {
               </div>
 
               <div className="adjust-tools">
-                <label>Tools</label>
-                <button className="tool-row" onClick={() => setAdjustments(prev => ({...prev, brightness: 10, contrast: 15, saturation: 5}))}>
+                <button className="tool-row" onClick={() => setAdjustments(prev => ({...prev, brightness: 10, contrast: 15}))}>
                   <Wand2 size={16} /> Auto Enhance
                 </button>
                 <button className="tool-row" onClick={() => setActiveTool('bg')}>
                   <Ghost size={16} /> Change Background
                 </button>
-                <button className="tool-row">
-                  <Smile size={16} /> Retouch Face
+                <button className="tool-row" onClick={generateSheet}>
+                  <Printer size={16} /> Print Sheet (4x6)
                 </button>
               </div>
             </div>
           </aside>
-
         </div>
       </section>
 
-      {/* 4. FEATURE GRID */}
-      <section className="features-section">
-        <div className="features-grid">
-          {[
-            { icon: <Scaling size={24} />, title: "AI Face Detection", desc: "Automatically detect and align faces perfectly" },
-            { icon: <Palette size={24} />, title: "Background Removal", desc: "Remove or change background easily" },
-            { icon: <ZapIcon size={24} />, title: "Smart Enhancement", desc: "Enhance quality and sharpness automatically" },
-            { icon: <Layers size={24} />, title: "Batch Processing", desc: "Process multiple photos at once" },
-            { icon: <ShieldCheck size={24} />, title: "100% Secure", desc: "Your photos are private and secure" },
-          ].map((f,i) => (
-            <div key={i} className="feature-item">
-              <div className="f-icon">{f.icon}</div>
-              <div className="f-text">
-                <h3>{f.title}</h3>
-                <p>{f.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 5. POPULAR SIZES */}
-      <section className="sizes-section">
-        <div className="sizes-container">
-          <div className="sizes-col">
-            <h2>Popular Countries</h2>
-            <div className="country-list">
-              {[
-                { name: "United States", size: "2in x 2in" },
-                { name: "India", size: "35mm x 45mm", active: true },
-                { name: "United Kingdom", size: "35mm x 45mm" },
-                { name: "Canada", size: "50mm x 70mm" },
-                { name: "Australia", size: "35mm x 45mm" },
-              ].map((c,i) => (
-                <div key={i} className={`country-row ${c.active ? 'active' : ''}`}>
-                  <span>{c.name}</span>
-                  <b>{c.size}</b>
-                </div>
-              ))}
-              <button className="view-all-btn">View All Countries</button>
-            </div>
-          </div>
-          <div className="sizes-col">
-            <div className="sizes-header">
-              <h2>Popular Sizes</h2>
-              <a href="#">View All Sizes</a>
-            </div>
-            <div className="sizes-grid">
-              {[
-                { name: "35mm x 45mm", label: "Passport" },
-                { name: "40mm x 60mm", label: "Visa" },
-                { name: "50mm x 50mm", label: "ID Card" },
-                { name: "2in x 2in", label: "US Passport" },
-                { name: "33mm x 48mm", label: "Driving License" },
-                { name: "26mm x 32mm", label: "Student ID" },
-              ].map((s,i) => (
-                <div key={i} className="size-box">
-                  <h3>{s.name}</h3>
-                  <p>{s.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="sizes-col">
-            <h2>What Our Users Say</h2>
-            <div className="testimonial-list">
-              {[
-                { name: "Priya Sharma", text: "Best passport photo maker! Very easy to use and got perfect results.", stars: 5 },
-                { name: "Rahul Verma", text: "Great tool with all the features like Photoshop. Highly recommended!", stars: 5 },
-                { name: "Anita Patel", text: "Saved so much time and money. Works perfectly for all requirements.", stars: 5 },
-              ].map((t,i) => (
-                <div key={i} className="testimonial-item">
-                  <div className="t-head">
-                    <div className="t-avatar"></div>
-                    <div className="t-info">
-                      <b>{t.name}</b>
-                      <span>2 days ago</span>
-                    </div>
-                    <div className="t-stars">★★★★★</div>
-                  </div>
-                  <p>{t.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. FOOTER CTA */}
-      <section className="footer-cta">
-        <div className="cta-content">
-          <div className="cta-icon"><ImageIcon size={32} /></div>
-          <div className="cta-text">
-            <h2>Ready to Create Your Perfect Passport Photo?</h2>
-            <p>Join millions of satisfied users who trust our passport photo maker.</p>
-          </div>
-          <button className="get-started-btn">Get Started Now <ArrowRight size={20} /></button>
-        </div>
-      </section>
-
-      {/* 7. FOOTER */}
-      <footer className="main-footer">
-        <div className="footer-grid">
-          <div className="footer-brand">
-            <div className="nav-logo">
-              <div className="logo-box"><Layers size={22} /></div>
-              <span>Passport Photo Maker</span>
-            </div>
-            <p>Create professional passport photos online quickly and easily. 100% compliant with official requirements.</p>
-            <div className="social-links">
-              <a href="#">f</a> <a href="#">t</a> <a href="#">i</a> <a href="#">l</a> <a href="#">y</a>
-            </div>
-          </div>
-          <div className="footer-links">
-            <h3>Quick Links</h3>
-            <a href="#">Home</a>
-            <a href="#">Photo Requirements</a>
-            <a href="#">Guidelines</a>
-            <a href="#">Pricing</a>
-            <a href="#">Blog</a>
-          </div>
-          <div className="footer-links">
-            <h3>Support</h3>
-            <a href="#">Help Center</a>
-            <a href="#">Contact Us</a>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Refund Policy</a>
-          </div>
-          <div className="footer-news">
-            <h3>Newsletter</h3>
-            <p>Subscribe to get tips and updates.</p>
-            <div className="news-input">
-              <input type="email" placeholder="Enter your email" />
-              <button>Subscribe</button>
-            </div>
-          </div>
-        </div>
+      {/* 3. MINIMAL FOOTER */}
+      <footer className="minimal-footer">
         <div className="footer-bottom">
-          © 2024 Passport Photo Maker. All rights reserved.
+          © 2024 Passport Studio Pro. Powered by AI Backend.
         </div>
       </footer>
 
@@ -824,12 +593,16 @@ export default function Home() {
           width: 100%; padding: 12px; background: var(--primary); border: none; border-radius: 12px; color: white; font-weight: 700; cursor: pointer;
         }
 
-        /* EDITOR */
         .editor-section { padding: 40px; background: #000; }
         .editor-container {
           max-width: 1440px; margin: 0 auto; background: var(--bg-card); border-radius: 32px; border: 1px solid var(--bg-border);
           display: grid; grid-template-columns: 80px 300px 1fr 320px; min-height: 850px; max-height: 95vh; overflow: hidden;
         }
+
+        .minimalist-view { display: flex; align-items: center; justify-content: center; padding: 60px 20px; min-height: calc(100vh - 140px); }
+        .minimalist .editor-container { box-shadow: 0 50px 100px rgba(0,0,0,0.5); }
+        
+        .minimal-footer { padding: 40px; border-top: 1px solid var(--bg-border); background: #020617; text-align: center; color: var(--text-dim); font-size: 14px; }
 
         .tool-sidebar { background: #020617; border-right: 1px solid var(--bg-border); padding: 20px 0; display: flex; flex-direction: column; align-items: center; gap: 20px; overflow-y: auto; }
         .tool-icon-btn {
