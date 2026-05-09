@@ -230,58 +230,94 @@ export default function Home() {
                 <span>{t.label}</span>
               </button>
             ))}
-          </aside>
-
-          {/* B. TOOL PANEL (CONTEXTUAL) */}
+          </          {/* B. TOOL PANEL (CONTEXTUAL) */}
           <div className="tool-panel">
-            <div className="panel-header">Crop & Align</div>
-            
-            <div className="panel-group">
-              <label>Aspect Ratio</label>
-              <select className="panel-select">
-                <option>35mm x 45mm (Passport)</option>
-                <option>40mm x 60mm (Visa)</option>
-                <option>2in x 2in (US Passport)</option>
-              </select>
-            </div>
-
-            <div className="panel-group">
-              <label>Alignment Tools</label>
-              <div className="align-grid">
-                <button><Scaling size={16} /></button>
-                <button><Grid size={16} /></button>
-                <button><Maximize2 size={16} /></button>
-                <button><RotateCcw size={16} /></button>
-              </div>
-            </div>
-
-            <div className="panel-toggle">
-              <label>Auto Crop</label>
-              <div className="toggle-switch active"></div>
-            </div>
-
-            <div className="panel-toggle">
-              <label>Show Grid</label>
-              <div className="toggle-switch active"></div>
-            </div>
-
-            <div className="quick-sizes">
-              <label>Quick Sizes</label>
-              <div className="size-card active">
-                <div className="size-icon"><Scaling size={14} /></div>
-                <div className="size-info">
-                  <b>35mm x 45mm</b>
-                  <span>Passport</span>
+            {activeTool === 'crop' && (
+              <>
+                <div className="panel-header">Crop & Align</div>
+                <div className="panel-group">
+                  <label>Aspect Ratio</label>
+                  <select className="panel-select">
+                    <option>35mm x 45mm (Passport)</option>
+                    <option>40mm x 60mm (Visa)</option>
+                    <option>2in x 2in (US Passport)</option>
+                  </select>
                 </div>
-              </div>
-              <div className="size-card">
-                <div className="size-icon"><Scaling size={14} /></div>
-                <div className="size-info">
-                  <b>40mm x 60mm</b>
-                  <span>Visa</span>
+                <div className="panel-group">
+                  <label>Alignment Tools</label>
+                  <div className="align-grid">
+                    <button onClick={() => setZoom(z => Math.min(z + 0.1, 3))}><Scaling size={16} /></button>
+                    <button><Grid size={16} /></button>
+                    <button onClick={() => setZoom(1)}><Maximize2 size={16} /></button>
+                    <button onClick={() => setCrop({x:0, y:0})}><RotateCcw size={16} /></button>
+                  </div>
                 </div>
+                <div className="panel-toggle">
+                  <label>Auto Crop</label>
+                  <div className="toggle-switch active"></div>
+                </div>
+                <div className="panel-toggle">
+                  <label>Show Grid</label>
+                  <div className="toggle-switch active"></div>
+                </div>
+                <div className="quick-sizes">
+                  <label>Quick Sizes</label>
+                  <div className="size-card active">
+                    <div className="size-icon"><Scaling size={14} /></div>
+                    <div className="size-info"><b>35mm x 45mm</b><span>Passport</span></div>
+                  </div>
+                  <div className="size-card">
+                    <div className="size-icon"><Scaling size={14} /></div>
+                    <div className="size-info"><b>40mm x 60mm</b><span>Visa</span></div>
+                  </div>
+                </div>
+                <button className="apply-tool-btn" onClick={() => setShowCropper(true)}>Refine Portrait Crop</button>
+              </>
+            )}
+
+            {activeTool === 'bg' && (
+              <>
+                <div className="panel-header">Background Color</div>
+                <p className="panel-desc">Select a background color for your passport photo.</p>
+                <div className="color-swatches-panel">
+                  {[
+                    { name: 'White', hex: '#ffffff' },
+                    { name: 'Sky Blue', hex: '#3b82f6' },
+                    { name: 'Royal Blue', hex: '#1e40af' },
+                    { name: 'Red', hex: '#ef4444' },
+                    { name: 'Grey', hex: '#f1f5f9' },
+                    { name: 'Yellow', hex: '#fbbf24' },
+                    { name: 'Custom', hex: 'linear-gradient(to right, red, blue)' }
+                  ].map(c => (
+                    <div key={c.hex} className="swatch-item-wrapper">
+                      <button 
+                        className={`swatch-circle ${bgColor === c.hex ? 'active' : ''}`}
+                        style={{ background: c.hex }}
+                        onClick={() => setBgColor(c.hex)}
+                      />
+                      <span>{c.name}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="panel-group mt-24">
+                  <label>Custom Hex Code</label>
+                  <div className="hex-input-wrapper">
+                    <input type="text" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="panel-select" />
+                    <div className="color-preview" style={{ background: bgColor }}></div>
+                  </div>
+                </div>
+                <button className="apply-tool-btn" onClick={() => setActiveTool('adjust')}>Continue to Adjustments</button>
+              </>
+            )}
+
+            {activeTool !== 'crop' && activeTool !== 'bg' && (
+              <div className="empty-tool-state">
+                <Info size={32} />
+                <h3>{activeTool.charAt(0).toUpperCase() + activeTool.slice(1)} Tool</h3>
+                <p>This tool panel is currently being optimized for {activeTool} tasks.</p>
+                <button className="apply-tool-btn" onClick={() => setActiveTool('crop')}>Back to Crop</button>
               </div>
-            </div>
+            )}
           </div>
 
           {/* C. CENTER CANVAS */}
@@ -292,13 +328,13 @@ export default function Home() {
                 <button><Redo2 size={18} /></button>
               </div>
               <div className="zoom-controls">
-                <button>−</button>
-                <span className="zoom-val">100%</span>
-                <button>+</button>
+                <button onClick={() => setZoom(z => Math.max(z - 0.1, 1))}>−</button>
+                <span className="zoom-val">{Math.round(zoom * 100)}%</span>
+                <button onClick={() => setZoom(z => Math.min(z + 0.1, 3))}>+</button>
               </div>
               <div className="canvas-actions">
-                <button><Search size={16} /> Fit</button>
-                <button><Maximize2 size={16} /></button>
+                <button onClick={() => {setZoom(1); setCrop({x:0, y:0})}}><Search size={16} /> Fit</button>
+                <button onClick={() => setShowCropper(true)}><Maximize2 size={16} /></button>
                 <button className="canvas-download-btn" onClick={generateSheet}>
                   <Download size={18} /> Download
                 </button>
@@ -308,14 +344,18 @@ export default function Home() {
             <div className="canvas-main">
               {isProcessing && <div className="canvas-loader"><div className="spin"></div> PROCESSING...</div>}
               {image ? (
-                <div className="photo-view">
-                  <img src={image} alt="Target" />
+                <div className="photo-view" style={{ transform: `scale(${zoom}) translate(${crop.x}px, ${crop.y}px)` }}>
+                  <img src={image} alt="Target" style={{ 
+                    filter: `brightness(${100 + adjustments.brightness}%) contrast(${100 + adjustments.contrast}%) saturate(${100 + adjustments.saturation}%)` 
+                  }} />
                   <div className="status-badge"><CheckCircle2 size={12} /> Face detected and perfectly aligned</div>
                 </div>
               ) : (
                 <div className="canvas-placeholder">
-                  <ImageIcon size={64} />
-                  <p>Upload a photo to begin editing</p>
+                  <div className="upload-prompt" onClick={() => fileInputRef.current?.click()}>
+                    <ImageIcon size={64} />
+                    <p>Click to upload a photo</p>
+                  </div>
                 </div>
               )}
             </div>
@@ -338,17 +378,22 @@ export default function Home() {
             <div className="adjust-content">
               <div className="adjust-section">
                 <div className="section-head">Basic Adjustments <ChevronDown size={14} /></div>
-                {['brightness', 'contrast', 'saturation', 'sharpness'].map(key => (
-                  <div key={key} className="slider-box">
+                {[
+                  { id: 'brightness', label: 'Brightness' },
+                  { id: 'contrast', label: 'Contrast' },
+                  { id: 'saturation', label: 'Saturation' },
+                  { id: 'sharpness', label: 'Sharpness' }
+                ].map(item => (
+                  <div key={item.id} className="slider-box">
                     <div className="slider-label">
-                      <span>{key.charAt(0).toUpperCase() + key.slice(1)}</span>
-                      <span>{adjustments[key as keyof typeof adjustments]}</span>
+                      <span>{item.label}</span>
+                      <span>{adjustments[item.id as keyof typeof adjustments]}</span>
                     </div>
                     <input 
                       type="range" 
                       min="-50" max="50" 
-                      value={adjustments[key as keyof typeof adjustments]} 
-                      onChange={(e) => handleSliderChange(key as any, e.target.value)} 
+                      value={adjustments[item.id as keyof typeof adjustments]} 
+                      onChange={(e) => handleSliderChange(item.id as any, e.target.value)} 
                     />
                   </div>
                 ))}
@@ -356,25 +401,42 @@ export default function Home() {
 
               <div className="adjust-section">
                 <div className="section-head">Advanced Adjustments <ChevronDown size={14} /></div>
-                {['highlights', 'shadows', 'whites', 'blacks'].map(key => (
-                  <div key={key} className="slider-box">
+                {[
+                  { id: 'highlights', label: 'Highlights' },
+                  { id: 'shadows', label: 'Shadows' },
+                  { id: 'whites', label: 'Whites' },
+                  { id: 'blacks', label: 'Blacks' }
+                ].map(item => (
+                  <div key={item.id} className="slider-box">
                     <div className="slider-label">
-                      <span>{key.charAt(0).toUpperCase() + key.slice(1)}</span>
-                      <span>{adjustments[key as keyof typeof adjustments]}</span>
+                      <span>{item.label}</span>
+                      <span>{adjustments[item.id as keyof typeof adjustments]}</span>
                     </div>
-                    <input type="range" min="-50" max="50" value={adjustments[key as keyof typeof adjustments]} onChange={(e)=>handleSliderChange(key as any, e.target.value)} />
+                    <input 
+                      type="range" 
+                      min="-50" max="50" 
+                      value={adjustments[item.id as keyof typeof adjustments]} 
+                      onChange={(e) => handleSliderChange(item.id as any, e.target.value)} 
+                    />
                   </div>
                 ))}
               </div>
 
               <div className="adjust-tools">
                 <label>Tools</label>
-                <button className="tool-row"><Wand2 size={16} /> Auto Enhance</button>
-                <button className="tool-row"><Ghost size={16} /> Remove Background</button>
-                <button className="tool-row"><Smile size={16} /> Retouch Face</button>
+                <button className="tool-row" onClick={() => setAdjustments(prev => ({...prev, brightness: 10, contrast: 15, saturation: 5}))}>
+                  <Wand2 size={16} /> Auto Enhance
+                </button>
+                <button className="tool-row" onClick={() => setActiveTool('bg')}>
+                  <Ghost size={16} /> Change Background
+                </button>
+                <button className="tool-row">
+                  <Smile size={16} /> Retouch Face
+                </button>
               </div>
             </div>
           </aside>
+  </aside>
 
         </div>
       </section>
@@ -779,9 +841,27 @@ export default function Home() {
         .panel-header { font-weight: 700; font-size: 18px; margin-bottom: 32px; }
         .panel-group { margin-bottom: 24px; }
         .panel-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 12px; }
-        .panel-select { width: 100%; background: #1e293b; border: 1px solid #334155; color: white; padding: 10px; border-radius: 8px; font-size: 14px; }
+        .panel-select { width: 100%; background: #1e293b; border: 1px solid #334155; color: white; padding: 10px; border-radius: 8px; font-size: 14px; margin-bottom: 8px; }
+        .panel-desc { font-size: 13px; color: var(--text-dim); margin: -20px 0 24px; line-height: 1.4; }
 
-        .align-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .color-swatches-panel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .swatch-item-wrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .swatch-item-wrapper span { font-size: 10px; color: var(--text-dim); font-weight: 600; }
+        .swatch-circle { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #334155; cursor: pointer; transition: 0.2s; position: relative; }
+        .swatch-circle.active { border-color: var(--primary); transform: scale(1.1); box-shadow: 0 0 15px rgba(37, 99, 235, 0.4); }
+        .swatch-circle.active::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+
+        .hex-input-wrapper { display: flex; gap: 12px; align-items: center; }
+        .color-preview { width: 40px; height: 40px; border-radius: 8px; border: 1px solid #334155; flex-shrink: 0; }
+
+        .apply-tool-btn { width: 100%; margin-top: 24px; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .apply-tool-btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+        .empty-tool-state { text-align: center; padding: 40px 0; color: var(--text-dim); }
+        .empty-tool-state h3 { color: white; margin: 16px 0 8px; font-size: 16px; }
+        .empty-tool-state p { font-size: 13px; margin-bottom: 24px; line-height: 1.5; }
+
+        .mt-24 { margin-top: 24px; }
         .align-grid button { aspect-ratio: 1; background: #1e293b; border: 1px solid #334155; color: white; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         .panel-toggle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
