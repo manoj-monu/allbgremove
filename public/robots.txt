@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://allbgremove.com/sitemap.xml
