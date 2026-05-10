@@ -6,7 +6,7 @@ import {
   Search, Bell, Settings, Download, Wand2, Layers3, ImageIcon, 
   Crop as CropIcon, Scaling, RotateCcw, Palette, Brush, Zap, 
   Printer, Sun, Contrast, X, Globe, ChevronDown, CheckCircle2, Upload,
-  Sticker, Frame, Layers, Monitor, ScanLine, AlignCenter,
+  Sticker, Frame, Layers, Monitor, ScanLine, AlignCenter, ArrowRight,
   Undo2, Redo2, Maximize2, MoreVertical, Star, LayoutGrid, Check,
   User, MessageSquare, ShieldCheck, ZapOff, Clock, MousePointer2, 
   Minus, Plus, AlignLeft, AlignRight, Type, Sparkles, Ghost, Smile
