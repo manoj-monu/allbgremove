@@ -9,7 +9,8 @@ import {
   Sticker, Frame, Layers, Monitor, ScanLine, AlignCenter, ArrowRight,
   Undo2, Redo2, Maximize2, MoreVertical, Star, LayoutGrid, Check,
   User, MessageSquare, ShieldCheck, ZapOff, Clock, MousePointer2, 
-  Minus, Plus, AlignLeft, AlignRight, Type, Sparkles, Ghost, Smile
+  Minus, Plus, AlignLeft, AlignRight, Type, Sparkles, Ghost, Smile,
+  Facebook, Twitter, Instagram, Linkedin, Youtube
 } from 'lucide-react';
 import { saveAs } from 'file-saver';
 
