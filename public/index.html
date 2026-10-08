@@ -1243,45 +1243,27 @@
     const bWidth = +document.getElementById('borderWidth').value;
 
     // Calculate Grid
-    const availableW = pW - (2 * pageMargin);
-    const availableH = pH - (2 * pageMargin);
-
-    let imgW, imgH, cols, rows;
-    const gridLayout = document.getElementById('gridLayout').value;
-
-    if (gridLayout === 'actual') {
+      const availableW = pW - (2 * pageMargin);
+      const availableH = pH - (2 * pageMargin);
+  
+      let imgW, imgH, cols, rows;
+      
+      // Always use Actual Physical Size
       imgW = +document.getElementById('cropW').value * MM_TO_PX;
       imgH = +document.getElementById('cropH').value * MM_TO_PX;
       cols = Math.floor((availableW + photoMargin) / (imgW + photoMargin));
       rows = Math.floor((availableH + photoMargin) / (imgH + photoMargin));
-    } else {
-      const parts = gridLayout.split('x').map(Number);
-      const maxGrid = Math.max(parts[0], parts[1]);
-      const minGrid = Math.min(parts[0], parts[1]);
       
-      if (availableW >= availableH) {
-         cols = maxGrid;
-         rows = minGrid;
-      } else {
-         cols = minGrid;
-         rows = maxGrid;
-      }
-      
-      const cellW = (availableW - (cols - 1) * photoMargin) / cols;
-      const cellH = (availableH - (rows - 1) * photoMargin) / rows;
-      
-      const aspect = finalImage.width / finalImage.height;
-      let drawW = cellW;
-      let drawH = drawW / aspect;
-      if (drawH > cellH) {
-          drawH = cellH;
-          drawW = drawH * aspect;
-      }
-      imgW = drawW;
-      imgH = drawH;
-    }
+      if (cols < 1) cols = 1;
+      if (rows < 1) rows = 1;
 
-    let printed = 0;
+      // Perfectly center the grid
+      const totalGridW = (cols * imgW) + ((cols - 1) * photoMargin);
+      const totalGridH = (rows * imgH) + ((rows - 1) * photoMargin);
+      const startX = (pW - totalGridW) / 2;
+      const startY = (pH - totalGridH) / 2;
+      
+      let printed = 0;
     
     // Distribute extra space into the gaps so photos fill the page area perfectly
     let actualHGap = photoMargin;
@@ -1312,8 +1294,8 @@
     for(let r=0; r<rows; r++) {
       for(let col=0; col<cols; col++) {
         if(printed >= count) break;
-        const x = startX + (col * (imgW + actualHGap));
-        const y = startY + (r * (imgH + actualVGap));
+        const x = startX + (col * (imgW + photoMargin));
+        const y = startY + (r * (imgH + photoMargin));
         
         ctx.drawImage(finalImage, x, y, imgW, imgH);
         
