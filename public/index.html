@@ -1201,7 +1201,7 @@
     }
   }
 
-  function updatePrintLayout() {
+  function updatePrintLayout(includeRuler = true) {
     const c = document.getElementById('printCanvas');
     const ctx = c.getContext('2d');
     
@@ -1308,11 +1308,61 @@
         printed++;
       }
     }
+    
+    // Draw Ruler (Scale Pati)
+    if (includeRuler) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.font = '10px Arial';
+      ctx.lineWidth = 1;
+      
+      // Top Ruler (X axis)
+      for (let i = 0; i <= pW / MM_TO_PX; i++) {
+        const x = i * MM_TO_PX;
+        let tickLen = 5;
+        if (i % 5 === 0) tickLen = 10;
+        if (i % 10 === 0) {
+          tickLen = 15;
+          if (i > 0) ctx.fillText(i, x + 2, 10);
+        }
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, tickLen);
+        ctx.stroke();
+      }
+      
+      // Left Ruler (Y axis)
+      for (let i = 0; i <= pH / MM_TO_PX; i++) {
+        const y = i * MM_TO_PX;
+        let tickLen = 5;
+        if (i % 5 === 0) tickLen = 10;
+        if (i % 10 === 0) {
+          tickLen = 15;
+          if (i > 0) {
+            ctx.save();
+            ctx.translate(10, y + 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText(i, 0, 0);
+            ctx.restore();
+          }
+        }
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(tickLen, y);
+        ctx.stroke();
+      }
+    }
   }
 
   function printSheet() {
+    // Re-render WITHOUT ruler for the print dataUrl
+    updatePrintLayout(false);
+    
     const c = document.getElementById('printCanvas');
     const dataUrl = c.toDataURL('image/png');
+    
+    // Restore ruler on the UI preview
+    updatePrintLayout(true);
     
     const paperSize = document.getElementById('paperSize').value;
     let cssPageSize = 'auto';
