@@ -220,6 +220,15 @@
         <p style="color: var(--text-muted); font-size: 14px;">High quality JPG or PNG</p>
       </div>
       <input type="file" id="fileIn" accept="image/*" style="display:none" onchange="handleUpload(event)">
+      
+      <div class="examples-section" style="margin-top: 40px;">
+        <h4 style="text-align: center; color: var(--text-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">Or Try With a Professional Example</h4>
+        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+          <img src="assets/example1.jpg" style="width: 100px; height: 130px; object-fit: cover; border-radius: 12px; cursor: pointer; transition: 0.3s; box-shadow: var(--shadow-sm); border: 2px solid transparent;" onclick="loadExample('assets/example1.jpg')" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='var(--primary)'; this.style.boxShadow='var(--shadow-lg)';" onmouseout="this.style.transform='none'; this.style.borderColor='transparent'; this.style.boxShadow='var(--shadow-sm)';">
+          <img src="assets/example2.jpg" style="width: 100px; height: 130px; object-fit: cover; border-radius: 12px; cursor: pointer; transition: 0.3s; box-shadow: var(--shadow-sm); border: 2px solid transparent;" onclick="loadExample('assets/example2.jpg')" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='var(--primary)'; this.style.boxShadow='var(--shadow-lg)';" onmouseout="this.style.transform='none'; this.style.borderColor='transparent'; this.style.boxShadow='var(--shadow-sm)';">
+          <img src="assets/example3.jpg" style="width: 100px; height: 130px; object-fit: cover; border-radius: 12px; cursor: pointer; transition: 0.3s; box-shadow: var(--shadow-sm); border: 2px solid transparent;" onclick="loadExample('assets/example3.jpg')" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='var(--primary)'; this.style.boxShadow='var(--shadow-lg)';" onmouseout="this.style.transform='none'; this.style.borderColor='transparent'; this.style.boxShadow='var(--shadow-sm)';">
+        </div>
+      </div>
     </div>
   </div>
 
@@ -444,6 +453,15 @@
   }
 
   // 1. Upload
+  function loadExample(url) {
+    originalImage.crossOrigin = "Anonymous";
+    originalImage.src = url;
+    originalImage.onload = () => {
+      setupCrop();
+      goToStep(2);
+    };
+  }
+
   function handleUpload(e) {
     const file = e.target.files[0];
     if(!file) return;
