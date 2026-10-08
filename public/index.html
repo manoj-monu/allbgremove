@@ -1266,17 +1266,37 @@
 
     let printed = 0;
     
-    // Calculate total grid size to center it on the canvas
-    const totalGridW = (cols * imgW) + ((cols - 1) * photoMargin);
-    const totalGridH = (rows * imgH) + ((rows - 1) * photoMargin);
-    const startX = (pW - totalGridW) / 2;
-    const startY = (pH - totalGridH) / 2;
+    // Distribute extra space into the gaps so photos fill the page area perfectly
+    let actualHGap = photoMargin;
+    let actualVGap = photoMargin;
+    let startX = pageMargin;
+    let startY = pageMargin;
+    
+    const minGridW = (cols * imgW) + ((cols - 1) * photoMargin);
+    if (cols > 1 && minGridW < availableW) {
+       actualHGap = (availableW - (cols * imgW)) / (cols - 1);
+    } else if (cols === 1) {
+       startX = pageMargin + (availableW - imgW) / 2;
+    } else {
+       // If it overflows, just center it
+       startX = (pW - minGridW) / 2;
+    }
+    
+    const minGridH = (rows * imgH) + ((rows - 1) * photoMargin);
+    if (rows > 1 && minGridH < availableH) {
+       actualVGap = (availableH - (rows * imgH)) / (rows - 1);
+    } else if (rows === 1) {
+       startY = pageMargin + (availableH - imgH) / 2;
+    } else {
+       // If it overflows, just center it
+       startY = (pH - minGridH) / 2;
+    }
     
     for(let r=0; r<rows; r++) {
       for(let col=0; col<cols; col++) {
         if(printed >= count) break;
-        const x = startX + (col * (imgW + photoMargin));
-        const y = startY + (r * (imgH + photoMargin));
+        const x = startX + (col * (imgW + actualHGap));
+        const y = startY + (r * (imgH + actualVGap));
         
         ctx.drawImage(finalImage, x, y, imgW, imgH);
         
