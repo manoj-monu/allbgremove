@@ -1257,11 +1257,9 @@
       if (cols < 1) cols = 1;
       if (rows < 1) rows = 1;
 
-      // Perfectly center the grid
-      const totalGridW = (cols * imgW) + ((cols - 1) * photoMargin);
-      const totalGridH = (rows * imgH) + ((rows - 1) * photoMargin);
-      const startX = (pW - totalGridW) / 2;
-      const startY = (pH - totalGridH) / 2;
+      // Align grid to Top-Left ("ek line se") to allow studios to cut paper and reuse it
+      const startX = pageMargin;
+      const startY = pageMargin;
       
       let printed = 0;
     
