@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing - PassportSnap Pro</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 40px; line-height: 1.6; max-width: 1000px; margin: 0 auto; color: #111827; background: #f3f4f6; text-align: center; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 40px; }
+    .plan { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    .plan h2 { color: #6366f1; margin-bottom: 10px; }
+    .plan .price { font-size: 36px; font-weight: 800; margin-bottom: 20px; }
+    .btn { display: inline-block; padding: 12px 24px; background: #6366f1; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <a href="index.html" style="color: #6366f1; text-decoration: none; display: block; text-align: left;">&larr; Back to Home</a>
+  
+  <h1 style="margin-top: 20px;">Simple, Transparent Pricing</h1>
+  <p style="color: #6b7280; font-size: 18px;">Choose the plan that fits your needs.</p>
+
+  <div class="pricing-grid">
+    <div class="plan">
+      <h2>Free Tier (Ad Supported)</h2>
+      <div class="price">₹0</div>
+      <p>Perfect for home users needing a quick photo.</p>
+      <ul style="text-align: left; margin: 20px auto; display: inline-block;">
+        <li>Basic AI Background Removal</li>
+        <li>Standard Layouts (A4, 4x6)</li>
+        <li>Watermarked Downloads</li>
+      </ul>
+      <a href="app.html" class="btn">Try For Free</a>
+    </div>
+
+    <div class="plan" style="border: 2px solid #ec4899; position: relative;">
+      <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #ec4899; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold;">POPULAR FOR STUDIOS</div>
+      <h2>Pro Wallet (B2B)</h2>
+      <div class="price">₹2.5 <span style="font-size:16px; color:#6b7280;">/ photo</span></div>
+      <p>For Cyber Cafes and Photo Studios.</p>
+      <ul style="text-align: left; margin: 20px auto; display: inline-block;">
+        <li>AI Face Enhancement (GFPGAN)</li>
+        <li>No Watermarks</li>
+        <li>Custom Paper Layouts</li>
+        <li>Priority Fast Server Processing</li>
+      </ul>
+      <a href="#" class="btn" style="background: #ec4899;" onclick="alert('Payment Gateway (Razorpay/Stripe) integration coming soon!')">Recharge Wallet</a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Passport Photo Pro - Wizard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+  
+  :root {
+    --bg-mesh: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+    --bg-color: #f3f4f6;
+    --bg-alt: #ffffff;
+    --primary: #6366f1; /* Indigo */
+    --primary-hover: #4f46e5;
+    --accent: #ec4899; /* Pink */
+    --text: #111827;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --radius: 16px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+  
+  body { 
+    background-color: var(--bg-color); 
+    background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+                      radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.1) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: var(--text); 
+    display: flex; 
+    flex-direction: column; 
+    min-height: 100vh; 
+  }
+  
+  header { 
+    background: rgba(255, 255, 255, 0.8); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 16px 40px; 
+    border-bottom: 1px solid rgba(255,255,255,0.3); 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    position: sticky; 
+    top: 0; 
+    z-index: 100; 
+    box-shadow: var(--shadow-sm); 
+  }
+  
+  .logo { font-size: 26px; font-weight: 800; display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px; }
+  .logo span { 
+    background: linear-gradient(135deg, var(--primary), var(--accent)); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+  }
+  
+  /* Stepper */
+  .stepper { 
+    display: flex; align-items: center; justify-content: center; padding: 25px; 
+    background: transparent; gap: 15px; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .step { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--text-muted); opacity: 0.6; transition: all 0.4s ease; }
+  .step.active { opacity: 1; color: var(--primary); transform: scale(1.05); }
+  .step.completed { opacity: 1; color: #10b981; }
+  
+  .step-num { 
+    width: 28px; height: 28px; border-radius: 50%; background: var(--border); 
+    display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; transition: 0.4s;
+  }
+  .step.active .step-num { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; box-shadow: var(--shadow-glow); }
+  .step.completed .step-num { background: linear-gradient(135deg, #10b981, #34d399); color: white; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+  .step-line { width: 40px; height: 3px; background: var(--border); border-radius: 3px; transition: 0.4s; }
+  .step.completed + .step-line { background: #10b981; }
+
+  /* Main Layout */
+  .container { display: flex; flex: 1; max-width: 1200px; margin: 0 auto; width: 100%; padding: 20px 30px 50px 30px; gap: 30px; }
+  
+  .view-panel { display: none; width: 100%; flex-direction: column; gap: 20px; animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
+  .view-panel.active { display: flex; }
+  
+  @keyframes slideUpFade { 
+    to { opacity: 1; transform: translateY(0); } 
+  }
+
+  .card { 
+    background: rgba(255, 255, 255, 0.9); 
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius); 
+    border: 1px solid rgba(255,255,255,0.5); 
+    padding: 40px; 
+    box-shadow: var(--shadow-lg); 
+  }
+  
+  h2 { font-size: 26px; font-weight: 800; margin-bottom: 24px; color: var(--text); letter-spacing: -0.5px; }
+  
+  /* Buttons */
+  .btn { 
+    padding: 14px 28px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.5px;
+  }
+  .btn-primary { 
+    background: linear-gradient(135deg, var(--primary), var(--accent)); 
+    color: white; 
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); 
+  }
+  .btn-primary:hover { 
+    transform: translateY(-2px) scale(1.02); 
+    box-shadow: 0 8px 25px rgba(236, 72, 153, 0.5); 
+  }
+  .btn-primary:active { transform: translateY(0) scale(0.98); }
+  
+  .btn-outline { background: white; border: 2px solid var(--border); color: var(--text); font-weight: 700; }
+  .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: #fef2f8; }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+  /* Step 1: Upload */
+  .upload-area { 
+    border: 2px dashed rgba(99, 102, 241, 0.5); 
+    border-radius: 20px; padding: 70px 20px; text-align: center; 
+    background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(99, 102, 241, 0.05) 100%); 
+    cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;
+  }
+  .upload-area:hover { 
+    border-color: var(--accent); 
+    background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(236, 72, 153, 0.08) 100%); 
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+  }
+  .upload-icon { font-size: 54px; margin-bottom: 20px; display: inline-block; animation: float 3s ease-in-out infinite; }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+
+  /* Two column layout for Editor Steps */
+  .editor-layout { display: grid; grid-template-columns: 380px 1fr; gap: 30px; width: 100%; align-items: start; }
+  
+  .sidebar { 
+    background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
+    border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.7); 
+    padding: 30px; box-shadow: var(--shadow-lg); 
+  }
+  
+  .canvas-container { 
+    background: rgba(255,255,255,0.6); backdrop-filter: blur(5px);
+    border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.5); box-shadow: var(--shadow-lg); 
+    display: flex; align-items: center; justify-content: center; padding: 40px; min-height: 550px; 
+    background-image: radial-gradient(rgba(99, 102, 241, 0.15) 1px, transparent 1px); background-size: 24px 24px; overflow: auto; 
+  }
+
+  /* Forms & Inputs */
+  .form-group { margin-bottom: 22px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 800; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1.2px; }
+  
+  select, input[type="number"], input[type="color"] { 
+    width: 100%; padding: 14px 16px; 
+    background: var(--bg-alt);
+    border: 2px solid var(--border); border-radius: 10px; 
+    font-size: 15px; font-weight: 600; color: var(--text); outline: none; transition: all 0.3s ease; 
+  }
+  select:focus, input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); background: white; }
+  
+  input[type="range"] { width: 100%; accent-color: var(--accent); height: 6px; border-radius: 3px; }
+  .slider-val { float: right; color: var(--primary); font-weight: 800; font-size: 14px; }
+
+  /* Navigation Footer */
+  .nav-footer { display: flex; justify-content: space-between; margin-top: 30px; padding-top: 25px; border-top: 1px solid var(--border); }
+  
+  canvas { max-width: 100%; max-height: 65vh; object-fit: contain; box-shadow: 0 15px 35px rgba(0,0,0,0.15); border-radius: 8px; }
+  
+  .loader { display: none; padding: 20px; text-align: center; color: var(--primary); font-weight: bold; }
+  
+  /* Scanner and Progress */
+  .scanner-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; display: none; border-radius: 8px; pointer-events: none; background: rgba(99, 102, 241, 0.1); backdrop-filter: blur(2px); }
+  .scanner-line { position: absolute; width: 100%; height: 3px; background: var(--primary); box-shadow: 0 0 20px var(--primary), 0 0 30px var(--accent); animation: scan 1.5s infinite linear alternate; }
+  @keyframes scan { 0% { top: 0%; opacity: 0.5; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0.5; } }
+  
+  .progress-container { width: 100%; height: 8px; background: var(--border); border-radius: 4px; margin-top: 15px; overflow: hidden; display: none; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary)); background-size: 200% 100%; width: 0%; transition: width 0.3s ease; animation: gradientMove 2s infinite linear; }
+  
+  @keyframes gradientMove { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+  
+  .progress-text { text-align: center; font-size: 14px; font-weight: 800; color: var(--primary); margin-top: 10px; display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">📷 <span>PassportSnap Pro</span></div>
+</header>
+
+<div class="stepper">
+  <div class="step active" id="st-1"><div class="step-num">1</div> Upload</div>
+  <div class="step-line"></div>
+  <div class="step" id="st-2"><div class="step-num">2</div> Crop</div>
+  <div class="step-line"></div>
+  <div class="step" id="st-3"><div class="step-num">3</div> Background</div>
+  <div class="step-line"></div>
+  <div class="step" id="st-4"><div class="step-num">4</div> Adjust</div>
+  <div class="step-line"></div>
+  <div class="step" id="st-5"><div class="step-num">5</div> Print Setup</div>
+</div>
+
+<div class="container">
+  
+  <!-- Step 1: Upload -->
+  <div id="step-1" class="view-panel active">
+    <div class="card" style="max-width: 600px; margin: 50px auto; width: 100%;">
+      <h2 style="text-align: center;">Start with a Photo</h2>
+      <div class="upload-area" onclick="document.getElementById('fileIn').click()">
+        <div class="upload-icon">📁</div>
+        <h3 style="margin-bottom: 10px;">Click or Drag to Upload</h3>
+        <p style="color: var(--text-muted); font-size: 14px;">High quality JPG or PNG</p>
+      </div>
+      <input type="file" id="fileIn" accept="image/*" style="display:none" onchange="handleUpload(event)">
+      
+      <div class="examples-section" style="margin-top: 40px;">
+        <h4 style="text-align: center; color: var(--text-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">Or Try With a Professional Example</h4>
+        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+          <img src="assets/example1.jpg" style="width: 100px; height: 130px; object-fit: cover; border-radius: 12px; cursor: pointer; transition: 0.3s; box-shadow: var(--shadow-sm); border: 2px solid transparent;" onclick="loadExample('assets/example1.jpg')" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='var(--primary)'; this.style.boxShadow='var(--shadow-lg)';" onmouseout="this.style.transform='none'; this.style.borderColor='transparent'; this.style.boxShadow='var(--shadow-sm)';">
+          <img src="assets/example2.jpg" style="width: 100px; height: 130px; object-fit: cover; border-radius: 12px; cursor: pointer; transition: 0.3s; box-shadow: var(--shadow-sm); border: 2px solid transparent;" onclick="loadExample('assets/example2.jpg')" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='var(--primary)'; this.style.boxShadow='var(--shadow-lg)';" onmouseout="this.style.transform='none'; this.style.borderColor='transparent'; this.style.boxShadow='var(--shadow-sm)';">
+          <img src="assets/example3.jpg" style="width: 100px; height: 130px; object-fit: cover; border-radius: 12px; cursor: pointer; transition: 0.3s; box-shadow: var(--shadow-sm); border: 2px solid transparent;" onclick="loadExample('assets/example3.jpg')" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='var(--primary)'; this.style.boxShadow='var(--shadow-lg)';" onmouseout="this.style.transform='none'; this.style.borderColor='transparent'; this.style.boxShadow='var(--shadow-sm)';">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Crop -->
+  <div id="step-2" class="view-panel">
+    <div class="editor-layout">
+      <div class="sidebar">
+        <h2>Crop Image</h2>
+        <p style="font-size:14px; color:var(--text-muted); margin-bottom:20px;">Select your desired passport size and position the photo inside the box.</p>
+        
+        <div class="form-group">
+          <label>Photo Size Requirement</label>
+          <select id="cropSize" onchange="updateCropBox()">
+            <option value="35x45">India Passport (35x45 mm)</option>
+            <option value="30x40">UAE Passport / Stamp Size (30x40 mm)</option>
+            <option value="51x51">US Visa (51x51 mm)</option>
+            <option value="custom">Custom Size</option>
+          </select>
+        </div>
+        
+        <div class="form-group" style="display: flex; gap: 10px;">
+          <div style="flex:1">
+            <label>Width (mm)</label>
+            <input type="number" id="cropW" value="35" onchange="updateCropBox()">
+          </div>
+          <div style="flex:1">
+            <label>Height (mm)</label>
+            <input type="number" id="cropH" value="45" onchange="updateCropBox()">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Photo Zoom Adjust</label>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="zoomImage(0.1)">🔍 +</button>
+            <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="zoomImage(-0.1)">🔍 -</button>
+            <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="resetZoom()">Reset</button>
+          </div>
+        </div>
+
+        <div class="nav-footer">
+          <button class="btn btn-outline" onclick="goToStep(1)">Back</button>
+          <button class="btn btn-primary" onclick="applyCropAndNext()">Crop & Next ➔</button>
+        </div>
+      </div>
+      <div class="canvas-container">
+        <!-- Temporary Simple Crop visualization using a container -->
+        <div id="cropWrapper" style="position:relative; overflow:hidden; border:2px solid var(--primary); box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);">
+          <img id="cropImg" style="cursor:move; transform-origin: top left;" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Background -->
+  <div id="step-3" class="view-panel">
+    <div class="editor-layout">
+      <div class="sidebar">
+        <h2>Background</h2>
+        
+        <div style="margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="doEnhance" checked style="width:18px; height:18px; accent-color:var(--primary); cursor:pointer;">
+          <label for="doEnhance" style="margin:0; font-size:14px; cursor:pointer; color:var(--text); text-transform:none; letter-spacing:0;">Enable AI Face Enhancement (HD)</label>
+        </div>
+        <button class="btn btn-primary" style="width:100%; margin-bottom:10px;" onclick="removeBgApi()">✨ AI Remove Background</button>
+        <div id="progressContainer" class="progress-container"><div id="progressBar" class="progress-bar"></div></div>
+        <div id="progressText" class="progress-text">0% Scanning...</div>
+        <div id="bgLoader" class="loader" style="display:none;"></div>
+        
+        <div class="form-group" style="margin-top:20px;">
+          <label>Pick Background Color</label>
+          <input type="color" id="bgColor" value="#ffffff" oninput="applyBgColor()">
+        </div>
+        
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+          <button class="btn btn-outline" style="flex:1; padding:10px;" onclick="setBg('#ffffff')">White</button>
+          <button class="btn btn-outline" style="flex:1; padding:10px; background:#3B82F6; color:white; border-color:#3B82F6;" onclick="setBg('#3B82F6')">Blue</button>
+          <button class="btn btn-outline" style="flex:1; padding:10px; background:#EF4444; color:white; border-color:#EF4444;" onclick="setBg('#EF4444')">Red</button>
+        </div>
+
+        <div class="nav-footer">
+          <button class="btn btn-outline" onclick="goToStep(2)">Back</button>
+          <button class="btn btn-primary" onclick="goToStep(4); applyAdjustments();">Next ➔</button>
+        </div>
+      </div>
+      <div class="canvas-container">
+        <div style="position:relative; display:flex; max-width:100%; max-height:65vh;">
+          <canvas id="bgCanvas" style="max-height: 65vh; object-fit: contain;"></canvas>
+          <div id="scannerOverlay" class="scanner-overlay"><div class="scanner-line"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Adjustments -->
+  <div id="step-4" class="view-panel">
+    <div class="editor-layout">
+      <div class="sidebar">
+        <h2>Enhance & Adjust</h2>
+        <button class="btn btn-primary" style="width:100%; margin-bottom:20px;" onclick="autoEnhance()">✨ Auto Enhance</button>
+        
+        <div class="form-group">
+          <label>Brightness <span id="vB" class="slider-val">100%</span></label>
+          <input type="range" id="slB" min="0" max="200" value="100" oninput="applyAdjustments()">
+        </div>
+        <div class="form-group">
+          <label>Contrast <span id="vC" class="slider-val">100%</span></label>
+          <input type="range" id="slC" min="0" max="200" value="100" oninput="applyAdjustments()">
+        </div>
+        <div class="form-group">
+          <label>Saturation <span id="vS" class="slider-val">100%</span></label>
+          <input type="range" id="slS" min="0" max="200" value="100" oninput="applyAdjustments()">
+        </div>
+
+        <div class="nav-footer">
+          <button class="btn btn-outline" onclick="goToStep(3)">Back</button>
+          <button class="btn btn-primary" onclick="preparePrintStep()">Layout & Print ➔</button>
+        </div>
+      </div>
+      <div class="canvas-container">
+        <canvas id="adjCanvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5: Print Setup -->
+  <div id="step-5" class="view-panel">
+    <div class="editor-layout">
+      <div class="sidebar" style="max-height: 80vh; overflow-y:auto;">
+        <h2>Print Layout Setup</h2>
+        
+        <div class="form-group">
+          <label>Paper Size</label>
+          <select id="paperSize" onchange="updatePrintLayout()">
+            <option value="A4P">A4 Portrait (210 x 297 mm)</option>
+            <option value="A4L">A4 Landscape (297 x 210 mm)</option>
+            <option value="4x6L" selected>4x6 inch Landscape (152 x 102 mm)</option>
+            <option value="4x6P">4x6 inch Portrait (102 x 152 mm)</option>
+            <option value="5x7L">5x7 inch Landscape (178 x 127 mm)</option>
+            <option value="5x7P">5x7 inch Portrait (127 x 178 mm)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Auto-Fit Grid (Scale to fit)</label>
+          <select id="gridLayout" onchange="updatePrintLayout()">
+            <option value="actual">Actual Size (From Crop Step)</option>
+            <option value="2x2">Fit 4 Photos</option>
+            <option value="3x2">Fit 6 Photos</option>
+            <option value="4x2" selected>Fit 8 Photos</option>
+            <option value="3x3">Fit 9 Photos</option>
+            <option value="4x3">Fit 12 Photos</option>
+            <option value="5x3">Fit 15 Photos</option>
+            <option value="4x4">Fit 16 Photos</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Number of Photos (Manual)</label>
+          <input type="number" id="photoCount" value="8" min="1" max="100" onchange="updatePrintLayout()">
+        </div>
+
+        <div class="form-group" style="display:flex; gap:10px;">
+          <div style="flex:1">
+            <label>Photo Margin (mm)</label>
+            <input type="number" id="photoMargin" value="2" min="0" onchange="updatePrintLayout()">
+          </div>
+          <div style="flex:1">
+            <label>Page Margin (mm)</label>
+            <input type="number" id="pageMargin" value="4" min="0" onchange="updatePrintLayout()">
+          </div>
+        </div>
+
+        <div class="form-group" style="display:flex; gap:10px;">
+          <div style="flex:1">
+            <label>Border Color</label>
+            <input type="color" id="borderColor" value="#000000" oninput="updatePrintLayout()">
+          </div>
+          <div style="flex:1">
+            <label>Border Width (px)</label>
+            <input type="number" id="borderWidth" value="1" min="0" onchange="updatePrintLayout()">
+          </div>
+        </div>
+
+        <div class="nav-footer" style="flex-direction:column; gap:10px;">
+          <button class="btn btn-primary" style="width:100%; font-size:18px; padding:15px;" onclick="printSheet()">🖨️ Print Now</button>
+          <button class="btn btn-outline" style="width:100%;" onclick="goToStep(4)">Back to Adjust</button>
+        </div>
+      </div>
+      <div class="canvas-container" style="background:#e5e7eb;">
+        <!-- The Print Sheet Preview -->
+        <canvas id="printCanvas" style="background:white; box-shadow:0 10px 40px rgba(0,0,0,0.2); max-height:80vh; max-width:100%;"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // State
+  let currentStep = 1;
+  let originalImage = new Image();
+  let croppedImage = new Image();
+  let bgRemovedImage = new Image(); // Stores image with transparent bg
+  let finalImage = new Image(); // Stores final adjusted image
+  
+  // Base scales
+  const MM_TO_PX = 11.811; // 300 DPI roughly
+
+  // Navigate steps
+  function goToStep(step) {
+    document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.step').forEach((el, idx) => {
+      el.classList.remove('active');
+      if(idx < step-1) el.classList.add('completed');
+      else el.classList.remove('completed');
+    });
+    
+    document.getElementById('step-'+step).classList.add('active');
+    document.getElementById('st-'+step).classList.add('active');
+    currentStep = step;
+  }
+
+  // 1. Upload
+  function loadExample(url) {
+    originalImage.crossOrigin = "Anonymous";
+    originalImage.src = url;
+    originalImage.onload = () => {
+      setupCrop();
+      goToStep(2);
+    };
+  }
+
+  function handleUpload(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      originalImage.src = event.target.result;
+      originalImage.onload = () => {
+        setupCrop();
+        goToStep(2);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // 2. Crop logic (Simplified for UI visualization)
+  let drag = false, startX, startY, imgX=0, imgY=0, imgScale=1;
+  function setupCrop() {
+    const img = document.getElementById('cropImg');
+    img.src = originalImage.src;
+    imgX=0; imgY=0; imgScale=1; // reset
+    updateCropBox();
+    
+    // Basic drag logic
+    img.onmousedown = (e) => { drag = true; startX = e.clientX - imgX; startY = e.clientY - imgY; e.preventDefault(); };
+    document.onmousemove = (e) => { if(drag) { imgX = e.clientX - startX; imgY = e.clientY - startY; img.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`; } };
+    document.onmouseup = () => { drag = false; };
+    // Wheel zoom
+    document.getElementById('cropWrapper').onwheel = (e) => {
+      e.preventDefault();
+      imgScale += e.deltaY * -0.001;
+      imgScale = Math.max(0.1, imgScale);
+      img.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+    };
+  }
+
+  function updateCropBox() {
+    const size = document.getElementById('cropSize').value;
+    let w, h;
+    if(size !== 'custom') {
+      [w, h] = size.split('x').map(Number);
+      document.getElementById('cropW').value = w;
+      document.getElementById('cropH').value = h;
+    } else {
+      w = +document.getElementById('cropW').value;
+      h = +document.getElementById('cropH').value;
+    }
+    const wrap = document.getElementById('cropWrapper');
+    // Scale for visualization
+    const visualW = w * 5;
+    const visualH = h * 5;
+    wrap.style.width = visualW + 'px';
+    wrap.style.height = visualH + 'px';
+
+    // Auto-scale to fit nicely initially
+    if (imgScale === 1 && originalImage.width) {
+      const scaleToFitW = visualW / originalImage.width;
+      const scaleToFitH = visualH / originalImage.height;
+      imgScale = Math.max(scaleToFitW, scaleToFitH);
+      imgX = (visualW - (originalImage.width * imgScale)) / 2;
+      imgY = (visualH - (originalImage.height * imgScale)) / 2;
+    }
+
+    document.getElementById('cropImg').style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+  }
+
+  function applyCropAndNext() {
+    // Render crop to a real canvas
+    const w = +document.getElementById('cropW').value * MM_TO_PX;
+    const h = +document.getElementById('cropH').value * MM_TO_PX;
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    const ctx = c.getContext('2d');
+    
+    // Reverse engineer the visual scale to actual scale
+    const visualW = +document.getElementById('cropW').value * 5;
+    const ratio = w / visualW;
+    
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0,0,w,h);
+    ctx.drawImage(originalImage, imgX * ratio, imgY * ratio, originalImage.width * imgScale * ratio, originalImage.height * imgScale * ratio);
+    
+    croppedImage.src = c.toDataURL('image/png');
+    croppedImage.onload = () => {
+      bgRemovedImage.src = croppedImage.src; // Init bg removed as same
+      bgRemovedImage.onload = () => {
+        initBgCanvas();
+        goToStep(3);
+      }
+    }
+  }
+
+  // 3. Background
+  function initBgCanvas() {
+    applyBgColor();
+  }
+
+  function setBg(color) {
+    document.getElementById('bgColor').value = color;
+    applyBgColor();
+  }
+
+  function applyBgColor() {
+    const c = document.getElementById('bgCanvas');
+    c.width = bgRemovedImage.width; c.height = bgRemovedImage.height;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = document.getElementById('bgColor').value;
+    ctx.fillRect(0,0,c.width,c.height);
+    ctx.drawImage(bgRemovedImage, 0, 0);
+  }
+
+  async function removeBgApi() {
+    document.getElementById('scannerOverlay').style.display = 'block';
+    document.getElementById('progressContainer').style.display = 'block';
+    document.getElementById('progressText').style.display = 'block';
+    
+    let pb = document.getElementById('progressBar');
+    let pt = document.getElementById('progressText');
+    let progress = 0;
+    
+    let interval = setInterval(() => {
+       progress += Math.random() * 4;
+       if(progress > 95) progress = 95;
+       pb.style.width = progress + '%';
+       pt.textContent = Math.round(progress) + '% AI Processing...';
+    }, 200);
+
+    try {
+      const tempC = document.createElement('canvas');
+      tempC.width = croppedImage.width; tempC.height = croppedImage.height;
+      tempC.getContext('2d').drawImage(croppedImage, 0, 0);
+      const blob = await new Promise(res => tempC.toBlob(res, 'image/png'));
+      const fd = new FormData(); 
+      fd.append('file', blob, 'photo.png');
+
+      const isEnhance = document.getElementById('doEnhance').checked;
+
+      let res = await fetch('https://ojnsbnq4x2d99y-8888.proxy.runpod.net/api/process-all?enhance=' + isEnhance, {
+        method: 'POST',
+        body: fd,
+        mode: 'cors',
+        headers: { 'Accept': 'image/png, */*' }
+      });
+      
+      if(!res.ok) throw new Error("API Failed: " + res.status);
+      let resBlob = await res.blob();
+      let url = URL.createObjectURL(resBlob);
+      
+      bgRemovedImage.onload = () => {
+        clearInterval(interval);
+        pb.style.width = '100%';
+        pt.textContent = '100% Complete!';
+        setTimeout(() => {
+            document.getElementById('scannerOverlay').style.display = 'none';
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('progressText').style.display = 'none';
+            applyBgColor();
+        }, 500);
+      };
+      
+      bgRemovedImage.onerror = () => {
+        clearInterval(interval);
+        alert('Failed to load processed image from API.');
+        document.getElementById('scannerOverlay').style.display = 'none';
+        document.getElementById('progressContainer').style.display = 'none';
+        document.getElementById('progressText').style.display = 'none';
+      };
+
+      bgRemovedImage.src = url;
+    } catch (e) {
+      clearInterval(interval);
+      console.error(e);
+      alert('Background removal failed. API might be offline.');
+      document.getElementById('scannerOverlay').style.display = 'none';
+      document.getElementById('progressContainer').style.display = 'none';
+      document.getElementById('progressText').style.display = 'none';
+    }
+  }
+
+  // 4. Adjustments
+  function applyAdjustments() {
+    const b = document.getElementById('slB').value;
+    const c = document.getElementById('slC').value;
+    const s = document.getElementById('slS').value;
+    
+    document.getElementById('vB').textContent = b + '%';
+    document.getElementById('vC').textContent = c + '%';
+    document.getElementById('vS').textContent = s + '%';
+
+    const canvas = document.getElementById('adjCanvas');
+    canvas.width = bgRemovedImage.width; canvas.height = bgRemovedImage.height;
+    const ctx = canvas.getContext('2d');
+    
+    // Draw BG
+    ctx.fillStyle = document.getElementById('bgColor').value;
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    
+    // CSS Filters trick for canvas
+    ctx.filter = `brightness(${b}%) contrast(${c}%) saturate(${s}%)`;
+    ctx.drawImage(bgRemovedImage, 0, 0);
+    ctx.filter = 'none'; // reset
+  }
+
+  function autoEnhance() {
+    document.getElementById('slB').value = 110;
+    document.getElementById('slC').value = 115;
+    document.getElementById('slS').value = 105;
+    applyAdjustments();
+  }
+
+  // 5. Print Layout
+  function preparePrintStep() {
+    // Save final adjusted image
+    applyAdjustments();
+    finalImage.src = document.getElementById('adjCanvas').toDataURL('image/png');
+    finalImage.onload = () => {
+      updatePrintLayout();
+      goToStep(5);
+    }
+  }
+
+  function updatePrintLayout() {
+    const c = document.getElementById('printCanvas');
+    const ctx = c.getContext('2d');
+    
+    const paperSize = document.getElementById('paperSize').value;
+    let pW, pH;
+    if(paperSize === 'A4P') { pW = 210 * MM_TO_PX; pH = 297 * MM_TO_PX; }
+    else if(paperSize === 'A4L') { pW = 297 * MM_TO_PX; pH = 210 * MM_TO_PX; }
+    else if(paperSize === '4x6L') { pW = 152 * MM_TO_PX; pH = 102 * MM_TO_PX; }
+    else if(paperSize === '4x6P') { pW = 102 * MM_TO_PX; pH = 152 * MM_TO_PX; }
+    else if(paperSize === '5x7L') { pW = 178 * MM_TO_PX; pH = 127 * MM_TO_PX; }
+    else if(paperSize === '5x7P') { pW = 127 * MM_TO_PX; pH = 178 * MM_TO_PX; }
+
+    c.width = pW; c.height = pH;
+    ctx.fillStyle = "#ffffff"; // Paper color
+    ctx.fillRect(0,0,pW,pH);
+
+    const count = +document.getElementById('photoCount').value;
+    const photoMargin = +document.getElementById('photoMargin').value * MM_TO_PX;
+    const pageMargin = +document.getElementById('pageMargin').value * MM_TO_PX;
+    
+    const bColor = document.getElementById('borderColor').value;
+    const bWidth = +document.getElementById('borderWidth').value;
+
+    // Calculate Grid
+    const availableW = pW - (2 * pageMargin);
+    const availableH = pH - (2 * pageMargin);
+
+    let imgW, imgH, cols, rows;
+    const gridLayout = document.getElementById('gridLayout').value;
+
+    if (gridLayout === 'actual') {
+      imgW = +document.getElementById('cropW').value * MM_TO_PX;
+      imgH = +document.getElementById('cropH').value * MM_TO_PX;
+      cols = Math.floor((availableW + photoMargin) / (imgW + photoMargin));
+      rows = Math.floor((availableH + photoMargin) / (imgH + photoMargin));
+    } else {
+      const parts = gridLayout.split('x').map(Number);
+      const maxGrid = Math.max(parts[0], parts[1]);
+      const minGrid = Math.min(parts[0], parts[1]);
+      
+      if (availableW >= availableH) {
+         cols = maxGrid;
+         rows = minGrid;
+      } else {
+         cols = minGrid;
+         rows = maxGrid;
+      }
+      
+      const cellW = (availableW - (cols - 1) * photoMargin) / cols;
+      const cellH = (availableH - (rows - 1) * photoMargin) / rows;
+      
+      const aspect = finalImage.width / finalImage.height;
+      let drawW = cellW;
+      let drawH = drawW / aspect;
+      if (drawH > cellH) {
+          drawH = cellH;
+          drawW = drawH * aspect;
+      }
+      imgW = drawW;
+      imgH = drawH;
+    }
+
+    let printed = 0;
+    for(let r=0; r<rows; r++) {
+      for(let col=0; col<cols; col++) {
+        if(printed >= count) break;
+        const x = pageMargin + (col * (imgW + photoMargin));
+        const y = pageMargin + (r * (imgH + photoMargin));
+        
+        ctx.drawImage(finalImage, x, y, imgW, imgH);
+        
+        if(bWidth > 0) {
+          ctx.strokeStyle = bColor;
+          ctx.lineWidth = bWidth;
+          ctx.strokeRect(x, y, imgW, imgH);
+        }
+        printed++;
+      }
+    }
+  }
+
+  function printSheet() {
+    const c = document.getElementById('printCanvas');
+    const dataUrl = c.toDataURL('image/png');
+    
+    // Open a new window for pure printing
+    const printWin = window.open('', '_blank');
+    printWin.document.write(`
+      <html>
+        <head>
+          <title>Print Passport Photos</title>
+          <style>
+            @page { size: auto; margin: 0mm; }
+            body { margin: 0; display:flex; justify-content:center; align-items:center; background:#fff; }
+            img { max-width: 100%; height: auto; }
+          </style>
+        </head>
+        <body>
+          <img src="${dataUrl}" onload="window.print(); window.close();" />
+        </body>
+      </html>
+    `);
+    printWin.document.close();
+  }
+
+  function zoomImage(delta) {
+    imgScale += delta;
+    imgScale = Math.max(0.1, imgScale);
+    document.getElementById('cropImg').style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+  }
+
+  function resetZoom() {
+    imgScale = 1;
+    imgX = 0;
+    imgY = 0;
+    updateCropBox(); // Recalculate auto-fit
+  }
+
+</script>
+</body>
+</html>

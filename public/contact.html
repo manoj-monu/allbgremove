@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us - PassportSnap Pro</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 40px; line-height: 1.6; max-width: 600px; margin: 0 auto; color: #111827; background: #f3f4f6; }
+    .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    input, textarea { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #e5e7eb; border-radius: 8px; font-family: inherit; }
+    .btn { display: inline-block; padding: 12px 24px; background: #6366f1; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
+  </style>
+</head>
+<body>
+  <a href="index.html" style="color: #6366f1; text-decoration: none;">&larr; Back to Home</a>
+  
+  <div class="card" style="margin-top: 40px;">
+    <h2>Contact Us</h2>
+    <p style="color: #6b7280; margin-bottom: 30px;">Have questions about our B2B plans or API? Drop us a message.</p>
+    
+    <form onsubmit="event.preventDefault(); alert('Message sent successfully!');">
+      <label>Name</label>
+      <input type="text" placeholder="Your Name" required>
+      
+      <label>Email</label>
+      <input type="email" placeholder="Your Email" required>
+      
+      <label>Message</label>
+      <textarea rows="5" placeholder="How can we help?" required></textarea>
+      
+      <button type="submit" class="btn">Send Message</button>
+    </form>
+  </div>
+</body>
+</html>
