@@ -1265,11 +1265,18 @@
     }
 
     let printed = 0;
+    
+    // Calculate total grid size to center it on the canvas
+    const totalGridW = (cols * imgW) + ((cols - 1) * photoMargin);
+    const totalGridH = (rows * imgH) + ((rows - 1) * photoMargin);
+    const startX = (pW - totalGridW) / 2;
+    const startY = (pH - totalGridH) / 2;
+    
     for(let r=0; r<rows; r++) {
       for(let col=0; col<cols; col++) {
         if(printed >= count) break;
-        const x = pageMargin + (col * (imgW + photoMargin));
-        const y = pageMargin + (r * (imgH + photoMargin));
+        const x = startX + (col * (imgW + photoMargin));
+        const y = startY + (r * (imgH + photoMargin));
         
         ctx.drawImage(finalImage, x, y, imgW, imgH);
         
