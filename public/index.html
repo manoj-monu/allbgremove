@@ -349,8 +349,20 @@
     }
     const wrap = document.getElementById('cropWrapper');
     // Scale for visualization
-    wrap.style.width = (w * 5) + 'px';
-    wrap.style.height = (h * 5) + 'px';
+    const visualW = w * 5;
+    const visualH = h * 5;
+    wrap.style.width = visualW + 'px';
+    wrap.style.height = visualH + 'px';
+
+    // Auto-scale to fit nicely initially
+    if (imgScale === 1 && originalImage.width) {
+      const scaleToFitW = visualW / originalImage.width;
+      const scaleToFitH = visualH / originalImage.height;
+      imgScale = Math.max(scaleToFitW, scaleToFitH);
+      imgX = (visualW - (originalImage.width * imgScale)) / 2;
+      imgY = (visualH - (originalImage.height * imgScale)) / 2;
+    }
+
     document.getElementById('cropImg').style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
   }
 
