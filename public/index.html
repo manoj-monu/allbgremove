@@ -891,7 +891,7 @@
 
         <div class="form-group">
           <label>Auto-Fit Grid (Scale to fit)</label>
-          <select id="gridLayout" onchange="updatePrintLayout()">
+          <select id="gridLayout" onchange="onGridLayoutChange()">
             <option value="actual">Actual Size (From Crop Step)</option>
             <option value="2x2">Fit 4 Photos</option>
             <option value="3x2">Fit 6 Photos</option>
@@ -1218,6 +1218,16 @@
     }
   }
 
+
+  function onGridLayoutChange() {
+    const val = document.getElementById('gridLayout').value;
+    if (val !== 'actual') {
+       const parts = val.split('x').map(Number);
+       document.getElementById('photoCount').value = parts[0] * parts[1];
+    }
+    updatePrintLayout();
+  }
+
   function updatePrintLayout(includeRuler = true) {
     const c = document.getElementById('printCanvas');
     const ctx = c.getContext('2d');
@@ -1247,12 +1257,39 @@
       const availableH = pH - (2 * pageMargin);
   
       let imgW, imgH, cols, rows;
+      const gridLayout = document.getElementById('gridLayout').value;
       
-      // Always use Actual Physical Size
-      imgW = +document.getElementById('cropW').value * MM_TO_PX;
-      imgH = +document.getElementById('cropH').value * MM_TO_PX;
-      cols = Math.floor((availableW + photoMargin) / (imgW + photoMargin));
-      rows = Math.floor((availableH + photoMargin) / (imgH + photoMargin));
+      if (gridLayout === 'actual') {
+        imgW = +document.getElementById('cropW').value * MM_TO_PX;
+        imgH = +document.getElementById('cropH').value * MM_TO_PX;
+        cols = Math.floor((availableW + photoMargin) / (imgW + photoMargin));
+        rows = Math.floor((availableH + photoMargin) / (imgH + photoMargin));
+      } else {
+        const parts = gridLayout.split('x').map(Number);
+        const maxGrid = Math.max(parts[0], parts[1]);
+        const minGrid = Math.min(parts[0], parts[1]);
+        
+        if (availableW >= availableH) {
+           cols = maxGrid;
+           rows = minGrid;
+        } else {
+           cols = minGrid;
+           rows = maxGrid;
+        }
+        
+        const cellW = (availableW - ((cols - 1) * photoMargin)) / cols;
+        const cellH = (availableH - ((rows - 1) * photoMargin)) / rows;
+        
+        const aspect = finalImage.width / finalImage.height;
+        let drawW = cellW;
+        let drawH = drawW / aspect;
+        if (drawH > cellH) {
+            drawH = cellH;
+            drawW = drawH * aspect;
+        }
+        imgW = drawW;
+        imgH = drawH;
+      }
       
       if (cols < 1) cols = 1;
       if (rows < 1) rows = 1;
