@@ -860,7 +860,8 @@
           <input type="range" id="slS" min="0" max="200" value="100" oninput="applyAdjustments()">
         </div>
 
-        <div class="nav-footer">
+        <button class="btn btn-outline" style="width:100%; margin-bottom:20px; border-color:var(--primary); color:var(--primary);" onclick="downloadImage('adjCanvas', 'adjusted_passport.png')">⬇ Download Final Single Photo</button>
+          <div class="nav-footer">
           <button class="btn btn-outline" onclick="goToStep(3)">Back</button>
           <button class="btn btn-primary" onclick="preparePrintStep()">Layout & Print ➔</button>
         </div>
