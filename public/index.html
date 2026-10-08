@@ -152,6 +152,15 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label>Photo Zoom Adjust</label>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="zoomImage(0.1)">🔍 +</button>
+            <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="zoomImage(-0.1)">🔍 -</button>
+            <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="resetZoom()">Reset</button>
+          </div>
+        </div>
+
         <div class="nav-footer">
           <button class="btn btn-outline" onclick="goToStep(1)">Back</button>
           <button class="btn btn-primary" onclick="applyCropAndNext()">Crop & Next ➔</button>
@@ -611,6 +620,19 @@
       </html>
     `);
     printWin.document.close();
+  }
+
+  function zoomImage(delta) {
+    imgScale += delta;
+    imgScale = Math.max(0.1, imgScale);
+    document.getElementById('cropImg').style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+  }
+
+  function resetZoom() {
+    imgScale = 1;
+    imgX = 0;
+    imgY = 0;
+    updateCropBox(); // Recalculate auto-fit
   }
 
 </script>
