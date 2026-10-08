@@ -4,33 +4,123 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact Us - PassportSnap Pro</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 40px; line-height: 1.6; max-width: 600px; margin: 0 auto; color: #111827; background: #f3f4f6; }
-    .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-    input, textarea { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #e5e7eb; border-radius: 8px; font-family: inherit; }
-    .btn { display: inline-block; padding: 12px 24px; background: #6366f1; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
-  </style>
+  <meta name="description" content="Contact Us for PassportSnap Pro. Read about our policies and terms.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: { primary: '#6366f1' }
+        }
+      }
+    }
+  </script>
 </head>
-<body>
-  <a href="index.html" style="color: #6366f1; text-decoration: none;">&larr; Back to Home</a>
-  
-  <div class="card" style="margin-top: 40px;">
-    <h2>Contact Us</h2>
-    <p style="color: #6b7280; margin-bottom: 30px;">Have questions about our B2B plans or API? Drop us a message.</p>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen font-sans">
+  <!-- Navbar -->
+  <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
+          <i class="fa-solid fa-camera-retro text-primary text-3xl"></i>
+          <span class="font-bold text-2xl tracking-tight text-gray-900">PassportSnap <span class="text-primary">Pro</span></span>
+        </div>
+        <nav class="hidden md:flex gap-8 font-medium text-gray-600">
+          <a href="index.html" class="hover:text-primary transition">Home</a>
+          <a href="pricing.html" class="hover:text-primary transition">Pricing</a>
+          <a href="about.html" class="hover:text-primary transition">About</a>
+          <a href="contact.html" class="hover:text-primary transition">Contact</a>
+        </nav>
+        <div class="flex gap-4">
+          <button class="px-5 py-2 text-primary font-medium hover:bg-indigo-50 rounded-full transition hidden sm:block">Login</button>
+          <button class="px-5 py-2 bg-primary text-white font-medium rounded-full shadow-lg hover:shadow-xl hover:bg-indigo-600 transition" onclick="window.location.href='index.html'">Start App</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="flex-grow max-w-4xl mx-auto w-full px-4 py-16 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-12">
+      <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-8 border-b pb-4">Contact Us</h1>
+      <div class="prose prose-indigo max-w-none text-gray-600 space-y-6">
+        
+    <p class="text-lg mb-6">We'd love to hear from you! Whether you have a question about features, pricing, or need technical support, our team is ready to answer all your questions.</p>
     
-    <form onsubmit="event.preventDefault(); alert('Message sent successfully!');">
-      <label>Name</label>
-      <input type="text" placeholder="Your Name" required>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+      <div>
+        <h3 class="text-xl font-bold text-gray-800">Get in Touch</h3>
+        <p class="mt-4"><strong>Email:</strong> support@passportsnappro.com</p>
+        <p class="mt-2"><strong>Phone:</strong> +91 98765 43210</p>
+        <p class="mt-2"><strong>Address:</strong><br>123 Startup Hub, Tech Park<br>New Delhi, India 110001</p>
+      </div>
       
-      <label>Email</label>
-      <input type="email" placeholder="Your Email" required>
-      
-      <label>Message</label>
-      <textarea rows="5" placeholder="How can we help?" required></textarea>
-      
-      <button type="submit" class="btn">Send Message</button>
-    </form>
-  </div>
+      <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
+        <form class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary" placeholder="Your Name">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input type="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary" placeholder="your@email.com">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+            <textarea rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary" placeholder="How can we help you?"></textarea>
+          </div>
+          <button type="button" class="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-600 transition">Send Message</button>
+        </form>
+      </div>
+    </div>
+    
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white pt-20 pb-10 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12 border-b border-gray-800 pb-12">
+        <div class="col-span-1 md:col-span-1">
+          <div class="flex items-center gap-2 mb-6">
+            <i class="fa-solid fa-camera-retro text-primary text-2xl"></i>
+            <span class="font-bold text-xl tracking-tight">PassportSnap <span class="text-primary">Pro</span></span>
+          </div>
+          <p class="text-gray-400 text-sm mb-6">Create passport, visa, ID and more photos with our easy-to-use online tool.</p>
+        </div>
+        <div>
+          <h4 class="font-bold mb-6 text-lg">Quick Links</h4>
+          <ul class="space-y-3 text-sm text-gray-400">
+            <li><a href="index.html" class="hover:text-white transition">Home</a></li>
+            <li><a href="pricing.html" class="hover:text-white transition">Pricing</a></li>
+            <li><a href="about.html" class="hover:text-white transition">About</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold mb-6 text-lg">Tools</h4>
+          <ul class="space-y-3 text-sm text-gray-400">
+            <li><a href="index.html" class="hover:text-white transition">Passport Photo Maker</a></li>
+            <li><a href="index.html" class="hover:text-white transition">Background Remover</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold mb-6 text-lg">Support</h4>
+          <ul class="space-y-3 text-sm text-gray-400">
+            <li><a href="terms.html" class="hover:text-white transition">Terms & Conditions</a></li>
+            <li><a href="privacy.html" class="hover:text-white transition">Privacy Policy</a></li>
+            <li><a href="refund.html" class="hover:text-white transition">Refund Policy</a></li>
+            <li><a href="contact.html" class="hover:text-white transition">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="text-center text-sm text-gray-500">
+        &copy; 2026 PassportSnap Pro. All rights reserved.
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

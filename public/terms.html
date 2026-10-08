@@ -4,26 +4,106 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terms of Service - PassportSnap Pro</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 40px; line-height: 1.6; max-width: 800px; margin: 0 auto; color: #111827; }
-    h1, h2 { color: #6366f1; }
-  </style>
+  <meta name="description" content="Terms of Service for PassportSnap Pro. Read about our policies and terms.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: { primary: '#6366f1' }
+        }
+      }
+    }
+  </script>
 </head>
-<body>
-  <a href="index.html" style="color: #6366f1; text-decoration: none;">&larr; Back to Home</a>
-  <h1 style="margin-top: 20px;">Terms and Conditions</h1>
-  
-  <h2>1. Acceptance of Terms</h2>
-  <p>By using PassportSnap Pro, you agree to these terms. If you do not agree, please do not use our service.</p>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen font-sans">
+  <!-- Navbar -->
+  <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
+          <i class="fa-solid fa-camera-retro text-primary text-3xl"></i>
+          <span class="font-bold text-2xl tracking-tight text-gray-900">PassportSnap <span class="text-primary">Pro</span></span>
+        </div>
+        <nav class="hidden md:flex gap-8 font-medium text-gray-600">
+          <a href="index.html" class="hover:text-primary transition">Home</a>
+          <a href="pricing.html" class="hover:text-primary transition">Pricing</a>
+          <a href="about.html" class="hover:text-primary transition">About</a>
+          <a href="contact.html" class="hover:text-primary transition">Contact</a>
+        </nav>
+        <div class="flex gap-4">
+          <button class="px-5 py-2 text-primary font-medium hover:bg-indigo-50 rounded-full transition hidden sm:block">Login</button>
+          <button class="px-5 py-2 bg-primary text-white font-medium rounded-full shadow-lg hover:shadow-xl hover:bg-indigo-600 transition" onclick="window.location.href='index.html'">Start App</button>
+        </div>
+      </div>
+    </div>
+  </header>
 
-  <h2>2. Use of Service</h2>
-  <p>You agree to use our AI photo generation tool only for lawful purposes. You must not upload explicit, illegal, or unauthorized material.</p>
+  <!-- Content -->
+  <main class="flex-grow max-w-4xl mx-auto w-full px-4 py-16 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-12">
+      <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-8 border-b pb-4">Terms of Service</h1>
+      <div class="prose prose-indigo max-w-none text-gray-600 space-y-6">
+        
+    <p>Last updated: October 2026</p>
+    <h3 class="text-xl font-bold text-gray-800 mt-6">1. Acceptance of Terms</h3>
+    <p>By accessing or using PassportSnap Pro, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any part of these terms, you may not use our service.</p>
+    <h3 class="text-xl font-bold text-gray-800 mt-6">2. Use License</h3>
+    <p>Permission is granted to temporarily use the tools on PassportSnap Pro's website for personal or commercial photo editing. This is the grant of a license, not a transfer of title, and under this license you may not use the materials for any illegal purpose.</p>
+    <h3 class="text-xl font-bold text-gray-800 mt-6">3. Disclaimer</h3>
+    <p>The materials on PassportSnap Pro's website are provided on an 'as is' basis. We make no warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
+    <h3 class="text-xl font-bold text-gray-800 mt-6">4. Limitations</h3>
+    <p>In no event shall PassportSnap Pro or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on our website.</p>
+    <h3 class="text-xl font-bold text-gray-800 mt-6">5. Governing Law</h3>
+    <p>These terms and conditions are governed by and construed in accordance with the laws of India and you irrevocably submit to the exclusive jurisdiction of the courts in that location.</p>
+    
+      </div>
+    </div>
+  </main>
 
-  <h2>3. Disclaimer of Warranties</h2>
-  <p>The service is provided "as is". We make no guarantees that the generated photos will be accepted by specific government or visa authorities. It is your responsibility to verify the physical dimensions and quality before final submission.</p>
-
-  <h2>4. Limitations of Liability</h2>
-  <p>PassportSnap Pro is not liable for any direct or indirect damages arising from the use of our app.</p>
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white pt-20 pb-10 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12 border-b border-gray-800 pb-12">
+        <div class="col-span-1 md:col-span-1">
+          <div class="flex items-center gap-2 mb-6">
+            <i class="fa-solid fa-camera-retro text-primary text-2xl"></i>
+            <span class="font-bold text-xl tracking-tight">PassportSnap <span class="text-primary">Pro</span></span>
+          </div>
+          <p class="text-gray-400 text-sm mb-6">Create passport, visa, ID and more photos with our easy-to-use online tool.</p>
+        </div>
+        <div>
+          <h4 class="font-bold mb-6 text-lg">Quick Links</h4>
+          <ul class="space-y-3 text-sm text-gray-400">
+            <li><a href="index.html" class="hover:text-white transition">Home</a></li>
+            <li><a href="pricing.html" class="hover:text-white transition">Pricing</a></li>
+            <li><a href="about.html" class="hover:text-white transition">About</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold mb-6 text-lg">Tools</h4>
+          <ul class="space-y-3 text-sm text-gray-400">
+            <li><a href="index.html" class="hover:text-white transition">Passport Photo Maker</a></li>
+            <li><a href="index.html" class="hover:text-white transition">Background Remover</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold mb-6 text-lg">Support</h4>
+          <ul class="space-y-3 text-sm text-gray-400">
+            <li><a href="terms.html" class="hover:text-white transition">Terms & Conditions</a></li>
+            <li><a href="privacy.html" class="hover:text-white transition">Privacy Policy</a></li>
+            <li><a href="refund.html" class="hover:text-white transition">Refund Policy</a></li>
+            <li><a href="contact.html" class="hover:text-white transition">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="text-center text-sm text-gray-500">
+        &copy; 2026 PassportSnap Pro. All rights reserved.
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
