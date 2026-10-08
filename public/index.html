@@ -954,6 +954,7 @@
   let croppedImage = new Image();
   let bgRemovedImage = new Image(); // Stores image with transparent bg
   let finalImage = new Image(); // Stores final adjusted image
+    let bgRemovedFullImage = new Image();
   
   // Base scales
   const MM_TO_PX = 11.811; // 300 DPI roughly
@@ -1164,6 +1165,14 @@
       document.getElementById('progressContainer').style.display = 'none';
       document.getElementById('progressText').style.display = 'none';
     }
+  }
+
+  
+  function downloadImage(canvasId, filename) {
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = document.getElementById(canvasId).toDataURL('image/png');
+    link.click();
   }
 
   // 4. Adjustments
