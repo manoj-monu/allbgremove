@@ -442,19 +442,24 @@
     }, 200);
 
     try {
-      let b64 = croppedImage.src;
+      const tempC = document.createElement('canvas');
+      tempC.width = croppedImage.width; tempC.height = croppedImage.height;
+      tempC.getContext('2d').drawImage(croppedImage, 0, 0);
+      const blob = await new Promise(res => tempC.toBlob(res, 'image/png'));
+      const fd = new FormData(); 
+      fd.append('file', blob, 'photo.png');
+
       let res = await fetch('https://manojkumarsh-ai-passport-studio-pro.hf.space/api/process-all', {
         method: 'POST',
-        body: await (await fetch(b64)).formData().catch(async ()=>{
-             let blob = await (await fetch(b64)).blob();
-             let fd = new FormData(); fd.append('file', blob, 'photo.png'); return fd;
-        }),
-        mode:'cors'
+        body: fd,
+        mode: 'cors',
+        headers: { 'Accept': 'image/png, */*' }
       });
-      if(!res.ok) throw new Error("API Failed");
+      
+      if(!res.ok) throw new Error("API Failed: " + res.status);
       let resBlob = await res.blob();
       let url = URL.createObjectURL(resBlob);
-      bgRemovedImage.src = url;
+      
       bgRemovedImage.onload = () => {
         clearInterval(interval);
         pb.style.width = '100%';
@@ -465,9 +470,20 @@
             document.getElementById('progressText').style.display = 'none';
             applyBgColor();
         }, 500);
-      }
+      };
+      
+      bgRemovedImage.onerror = () => {
+        clearInterval(interval);
+        alert('Failed to load processed image from API.');
+        document.getElementById('scannerOverlay').style.display = 'none';
+        document.getElementById('progressContainer').style.display = 'none';
+        document.getElementById('progressText').style.display = 'none';
+      };
+
+      bgRemovedImage.src = url;
     } catch (e) {
       clearInterval(interval);
+      console.error(e);
       alert('Background removal failed. API might be offline.');
       document.getElementById('scannerOverlay').style.display = 'none';
       document.getElementById('progressContainer').style.display = 'none';
