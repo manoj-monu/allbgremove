@@ -1170,11 +1170,29 @@
   }
 
   
+  function dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
+  }
+
   function downloadImage(canvasId, filename) {
+    const c = document.getElementById(canvasId);
+    // Use JPEG for better compatibility and smaller size
+    const dataUrl = c.toDataURL('image/jpeg', 1.0);
+    const blob = dataURLtoBlob(dataUrl);
+    const url = URL.createObjectURL(blob);
+    
     const link = document.createElement('a');
-    link.download = filename;
-    link.href = document.getElementById(canvasId).toDataURL('image/png');
+    link.download = filename.replace('.png', '.jpg');
+    link.href = url;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
   // 4. Adjustments
@@ -1367,13 +1385,18 @@
       // Re-render WITHOUT ruler
       updatePrintLayout(false);
       const c = document.getElementById('printCanvas');
-      const dataUrl = c.toDataURL('image/png');
+      const dataUrl = c.toDataURL('image/jpeg', 1.0);
+      const blob = dataURLtoBlob(dataUrl);
+      const url = URL.createObjectURL(blob);
+      
       const a = document.createElement('a');
-      a.href = dataUrl;
-      a.download = 'passport_sheet_ready.png';
+      a.href = url;
+      a.download = 'passport_sheet_ready.jpg';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
       // Restore ruler
       updatePrintLayout(true);
   }
