@@ -77,7 +77,7 @@
   /* Navigation Footer */
   .nav-footer { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
   
-  canvas { max-width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+  canvas { max-width: 100%; max-height: 65vh; object-fit: contain; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
   
   .loader { display: none; padding: 20px; text-align: center; color: var(--primary); font-weight: bold; }
   
@@ -198,8 +198,8 @@
         </div>
       </div>
       <div class="canvas-container">
-        <div style="position:relative; display:inline-block;">
-          <canvas id="bgCanvas"></canvas>
+        <div style="position:relative; display:flex; max-width:100%; max-height:65vh;">
+          <canvas id="bgCanvas" style="max-height: 65vh; object-fit: contain;"></canvas>
           <div id="scannerOverlay" class="scanner-overlay"><div class="scanner-line"></div></div>
         </div>
       </div>
