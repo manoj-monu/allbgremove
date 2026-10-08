@@ -135,8 +135,8 @@
           <label>Photo Size Requirement</label>
           <select id="cropSize" onchange="updateCropBox()">
             <option value="35x45">India Passport (35x45 mm)</option>
+            <option value="30x40">UAE Passport / Stamp Size (30x40 mm)</option>
             <option value="51x51">US Visa (51x51 mm)</option>
-            <option value="30x40">UAE Passport (30x40 mm)</option>
             <option value="custom">Custom Size</option>
           </select>
         </div>
@@ -255,9 +255,12 @@
         <div class="form-group">
           <label>Paper Size</label>
           <select id="paperSize" onchange="updatePrintLayout()">
-            <option value="A4">A4 (210 x 297 mm)</option>
-            <option value="4x6">4x6 inch (102 x 152 mm)</option>
-            <option value="5x7">5x7 inch (127 x 178 mm)</option>
+            <option value="A4P">A4 Portrait (210 x 297 mm)</option>
+            <option value="A4L">A4 Landscape (297 x 210 mm)</option>
+            <option value="4x6L" selected>4x6 inch Landscape (152 x 102 mm)</option>
+            <option value="4x6P">4x6 inch Portrait (102 x 152 mm)</option>
+            <option value="5x7L">5x7 inch Landscape (178 x 127 mm)</option>
+            <option value="5x7P">5x7 inch Portrait (127 x 178 mm)</option>
           </select>
         </div>
 
@@ -269,11 +272,11 @@
         <div class="form-group" style="display:flex; gap:10px;">
           <div style="flex:1">
             <label>Photo Margin (mm)</label>
-            <input type="number" id="photoMargin" value="3" min="0" onchange="updatePrintLayout()">
+            <input type="number" id="photoMargin" value="2" min="0" onchange="updatePrintLayout()">
           </div>
           <div style="flex:1">
             <label>Page Margin (mm)</label>
-            <input type="number" id="pageMargin" value="10" min="0" onchange="updatePrintLayout()">
+            <input type="number" id="pageMargin" value="4" min="0" onchange="updatePrintLayout()">
           </div>
         </div>
 
@@ -554,9 +557,12 @@
     
     const paperSize = document.getElementById('paperSize').value;
     let pW, pH;
-    if(paperSize === 'A4') { pW = 210 * MM_TO_PX; pH = 297 * MM_TO_PX; }
-    else if(paperSize === '4x6') { pW = 102 * MM_TO_PX; pH = 152 * MM_TO_PX; }
-    else if(paperSize === '5x7') { pW = 127 * MM_TO_PX; pH = 178 * MM_TO_PX; }
+    if(paperSize === 'A4P') { pW = 210 * MM_TO_PX; pH = 297 * MM_TO_PX; }
+    else if(paperSize === 'A4L') { pW = 297 * MM_TO_PX; pH = 210 * MM_TO_PX; }
+    else if(paperSize === '4x6L') { pW = 152 * MM_TO_PX; pH = 102 * MM_TO_PX; }
+    else if(paperSize === '4x6P') { pW = 102 * MM_TO_PX; pH = 152 * MM_TO_PX; }
+    else if(paperSize === '5x7L') { pW = 178 * MM_TO_PX; pH = 127 * MM_TO_PX; }
+    else if(paperSize === '5x7P') { pW = 127 * MM_TO_PX; pH = 178 * MM_TO_PX; }
 
     c.width = pW; c.height = pH;
     ctx.fillStyle = "#ffffff"; // Paper color
