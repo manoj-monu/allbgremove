@@ -1363,6 +1363,21 @@
     }
   }
 
+  function downloadSheet() {
+      // Re-render WITHOUT ruler
+      updatePrintLayout(false);
+      const c = document.getElementById('printCanvas');
+      const dataUrl = c.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'passport_sheet_ready.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      // Restore ruler
+      updatePrintLayout(true);
+  }
+  
   function printSheet() {
     // Re-render WITHOUT ruler for the print dataUrl
     updatePrintLayout(false);
