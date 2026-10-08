@@ -172,6 +172,10 @@
       <div class="sidebar">
         <h2>Background</h2>
         
+        <div style="margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="doEnhance" checked style="width:18px; height:18px; accent-color:var(--primary); cursor:pointer;">
+          <label for="doEnhance" style="margin:0; font-size:14px; cursor:pointer; color:var(--text); text-transform:none; letter-spacing:0;">Enable AI Face Enhancement (HD)</label>
+        </div>
         <button class="btn btn-primary" style="width:100%; margin-bottom:10px;" onclick="removeBgApi()">✨ AI Remove Background</button>
         <div id="progressContainer" class="progress-container"><div id="progressBar" class="progress-bar"></div></div>
         <div id="progressText" class="progress-text">0% Scanning...</div>
@@ -449,7 +453,9 @@
       const fd = new FormData(); 
       fd.append('file', blob, 'photo.png');
 
-      let res = await fetch('https://manojkumarsh-ai-passport-studio-pro.hf.space/api/process-all', {
+      const isEnhance = document.getElementById('doEnhance').checked;
+
+      let res = await fetch('https://manojkumarsh-ai-passport-studio-pro.hf.space/api/process-all?enhance=' + isEnhance, {
         method: 'POST',
         body: fd,
         mode: 'cors',
