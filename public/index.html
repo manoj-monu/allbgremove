@@ -170,8 +170,15 @@
     100% { transform: translateY(0px); }
   }
 
-  /* Two column layout for Editor Steps */
-  .editor-layout { display: grid; grid-template-columns: 380px 1fr; gap: 30px; width: 100%; align-items: start; }
+  /* Two column layout for Editor Steps (Responsive & Swapped) */
+  .editor-layout { display: flex; flex-direction: column-reverse; gap: 30px; width: 100%; align-items: stretch; }
+  .sidebar { width: 100%; flex-shrink: 0; }
+  .canvas-container { flex-grow: 1; min-width: 0; width: 100%; }
+  
+  @media (min-width: 900px) {
+    .editor-layout { flex-direction: row-reverse; align-items: flex-start; }
+    .sidebar { width: 380px; }
+  }
   
   .sidebar { 
     background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
