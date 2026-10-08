@@ -1,710 +1,548 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>PassportSnap Pro - AI Passport Photo Maker</title>
-<meta name="description" content="Create perfect passport photos in seconds. AI background removal, all country sizes, 300 DPI download. Free and private."/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Passport Photo Pro - Wizard</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{font-size:16px;scroll-behavior:smooth;}
-
-:root{
-  --bg:#FFFFFF;
-  --bg2:#F8FAFC;
-  --bg3:#F1F5F9;
-  --bg4:#E2E8F0;
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
   
-  --border:rgba(0,0,0,0.08);
-  --border2:rgba(0,0,0,0.12);
+  :root {
+    --bg: #FFFFFF;
+    --bg-alt: #F8FAFC;
+    --primary: #EC4899;
+    --primary-hover: #DB2777;
+    --accent: #F43F5E;
+    --text: #000000;
+    --text-muted: #475569;
+    --border: #E2E8F0;
+    --radius: 12px;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+  body { background-color: var(--bg-alt); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; }
   
-  --accent:#EC4899;
-  --accent2:#F43F5E;
-  --accentg:linear-gradient(135deg,#EC4899,#F43F5E);
+  header { background: var(--bg); padding: 15px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+  .logo { font-size: 24px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+  .logo span { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   
-  --text:#000000;
-  --text2:#000000;
-  --text3:#000000;
-  --white:#FFFFFF;
+  /* Stepper */
+  .stepper { display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--bg); border-bottom: 1px solid var(--border); gap: 15px; flex-wrap: wrap; }
+  .step { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-muted); opacity: 0.5; transition: 0.3s; }
+  .step.active { opacity: 1; color: var(--primary); }
+  .step.completed { opacity: 1; color: #10B981; }
+  .step-num { width: 24px; height: 24px; border-radius: 50%; background: #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .step.active .step-num { background: var(--primary); color: white; }
+  .step.completed .step-num { background: #10B981; color: white; }
+  .step-line { width: 30px; height: 2px; background: var(--border); }
+
+  /* Main Layout */
+  .container { display: flex; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; padding: 30px; gap: 30px; }
   
-  --r:12px;--r-sm:8px;--r-lg:18px;
-  --glow:0 0 40px rgba(236,72,153,0.15);
-  --shadow:0 20px 60px rgba(0,0,0,0.08);
-}
-body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;line-height:1.5;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
-::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-track{background:var(--bg2);}
-::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:2px;}
+  .view-panel { display: none; width: 100%; flex-direction: column; gap: 20px; animation: fadeIn 0.3s ease; }
+  .view-panel.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-nav{position:sticky;top:0;z-index:900;background:rgba(255,255,255,0.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);height:64px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;}
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.nav-logo-mark{width:36px;height:36px;border-radius:10px;background:var(--accentg);display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(236,72,153,0.3);}
-.nav-logo-mark svg{width:18px;height:18px;fill:white;}
-.nav-logo-name{font-size:17px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
-.nav-logo-name span{background:var(--accentg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.nav-links{display:flex;gap:2px;}
-.nav-link{font-size:14px;font-weight:500;color:var(--text2);text-decoration:none;padding:7px 14px;border-radius:var(--r-sm);transition:all .2s;}
-.nav-link:hover{color:var(--text);background:rgba(0,0,0,0.04);}
-.nav-cta{background:var(--accentg);color:#fff;font-size:14px;font-weight:600;padding:9px 22px;border-radius:var(--r-sm);text-decoration:none;letter-spacing:-0.2px;transition:all .2s;box-shadow:0 0 20px rgba(236,72,153,0.3);}
-.nav-cta:hover{transform:translateY(-1px);box-shadow:0 0 30px rgba(236,72,153,0.5);}
+  .card { background: var(--bg); border-radius: 20px; border: 1px solid var(--border); padding: 30px; box-shadow: var(--shadow); }
+  
+  h2 { font-size: 24px; font-weight: 700; margin-bottom: 20px; color: var(--text); }
+  
+  .btn { padding: 12px 24px; border-radius: var(--radius); font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-primary { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; box-shadow: 0 4px 15px rgba(236,72,153,0.3); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(236,72,153,0.4); }
+  .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
-.hero-outer{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(236,72,153,0.05) 0%,transparent 60%);border-bottom:1px solid var(--border);}
-.hero-outer::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(236,72,153,0.1),transparent);pointer-events:none;}
-.hero{padding:96px 5% 80px;display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;max-width:1200px;margin:0 auto;position:relative;}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(236,72,153,0.1);border:1px solid rgba(236,72,153,0.25);color:var(--accent);font-size:12px;font-weight:600;padding:5px 14px;border-radius:999px;margin-bottom:24px;letter-spacing:0.03em;}
-.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 2s ease-in-out infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
-.hero h1{font-size:clamp(38px,5.5vw,64px);font-weight:900;line-height:1.04;letter-spacing:-2px;color:var(--text);margin-bottom:20px;}
-.hero h1 em{font-style:normal;background:linear-gradient(135deg,#EC4899,#8B5CF6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.hero-sub{font-size:17px;color:var(--text2);line-height:1.7;max-width:440px;margin-bottom:40px;}
-.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:52px;}
-.btn-primary{background:var(--accentg);color:#fff;font-size:15px;font-weight:600;padding:13px 28px;border-radius:var(--r-sm);border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:9px;letter-spacing:-0.2px;font-family:inherit;transition:all .2s;box-shadow:0 0 20px rgba(236,72,153,0.35);}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 36px rgba(236,72,153,0.55);}
-.btn-ghost{background:rgba(0,0,0,0.03);color:var(--text);font-size:15px;font-weight:500;padding:13px 26px;border-radius:var(--r-sm);border:1px solid var(--border2);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:9px;letter-spacing:-0.2px;font-family:inherit;transition:all .2s;}
-.btn-ghost:hover{background:rgba(0,0,0,0.06);border-color:rgba(0,0,0,0.15);}
-.hero-proof{display:flex;gap:28px;flex-wrap:wrap;}
-.proof-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);font-weight:500;}
-.hero-visual{background:var(--white);border-radius:20px;border:1px solid var(--border2);overflow:hidden;position:relative;box-shadow:var(--shadow),0 0 60px rgba(236,72,153,0.1);}
-.hv-topbar{background:var(--bg3);border-bottom:1px solid var(--border);padding:11px 15px;display:flex;align-items:center;gap:7px;}
-.hv-dot{width:11px;height:11px;border-radius:50%;}
-.hv-body{display:flex;height:320px;}
-.hv-sidebar{width:125px;background:var(--bg2);border-right:1px solid var(--border);padding:12px;}
-.hv-sb-block{border-radius:6px;margin-bottom:8px;background:var(--bg4);}
-.hv-center{flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg3);position:relative;}
-.hv-photo-card{width:120px;height:150px;border-radius:10px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,0.15);position:relative;background:#E0E7FF;}
-.hv-photo-head{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:42px;height:48px;background:#C49162;border-radius:50%;}
-.hv-photo-body{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:80px;height:80px;background:#A0784A;border-radius:40px 40px 0 0;}
-.hv-oval{position:absolute;top:18%;left:14%;right:14%;bottom:48%;border:1.5px dashed rgba(236,72,153,0.5);border-radius:50%;pointer-events:none;}
-.hv-panel{width:115px;border-left:1px solid var(--border);background:var(--bg2);padding:10px;}
-.hv-sl{margin-bottom:10px;}
-.hv-sl-lbl{height:7px;border-radius:3px;background:var(--bg4);margin-bottom:6px;width:55%;}
-.hv-sl-track{height:3px;background:var(--bg4);border-radius:2px;}
-.hv-sl-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#EC4899,#F43F5E);}
-.hv-bottom{background:var(--bg2);border-top:1px solid var(--border);padding:9px 15px;display:flex;gap:10px;}
-.hv-bl{height:7px;background:var(--bg4);border-radius:3px;width:60px;}
+  /* Step 1: Upload */
+  .upload-area { border: 2px dashed var(--primary); border-radius: 24px; padding: 60px 20px; text-align: center; background: rgba(236,72,153,0.03); cursor: pointer; transition: 0.3s; }
+  .upload-area:hover { background: rgba(236,72,153,0.08); border-color: var(--accent); }
+  .upload-icon { font-size: 48px; margin-bottom: 20px; color: var(--primary); }
 
-.strip{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg2);display:flex;overflow-x:auto;scrollbar-width:none;}
-.strip::-webkit-scrollbar{display:none;}
-.strip-item{flex:1;min-width:150px;padding:15px 20px;text-align:center;font-size:13px;color:var(--text2);white-space:nowrap;font-weight:500;border-right:1px solid var(--border);transition:all .2s;}
-.strip-item:hover{color:var(--text);background:rgba(236,72,153,0.06);}
-.strip-item:last-child{border-right:none;}
-.strip-item em{display:block;font-style:normal;font-size:18px;margin-bottom:4px;}
+  /* Two column layout for Editor Steps */
+  .editor-layout { display: grid; grid-template-columns: 350px 1fr; gap: 30px; width: 100%; }
+  .sidebar { background: var(--bg); border-radius: 20px; border: 1px solid var(--border); padding: 25px; box-shadow: var(--shadow); height: fit-content; }
+  .canvas-container { background: var(--bg); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; padding: 40px; min-height: 500px; background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 20px 20px; overflow: auto; }
 
-.section{padding:96px 5%;max-width:1200px;margin:0 auto;}
-.s-tag{font-size:12px;font-weight:700;background:var(--accentg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:0.08em;margin-bottom:12px;text-transform:uppercase;}
-.s-title{font-size:clamp(28px,3.5vw,44px);font-weight:800;letter-spacing:-1.5px;line-height:1.08;margin-bottom:14px;color:var(--text);}
-.s-sub{font-size:16px;color:var(--text2);line-height:1.7;max-width:500px;}
+  /* Forms & Inputs */
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  select, input[type="number"], input[type="color"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 15px; font-weight: 600; color: var(--text); outline: none; transition: 0.2s; }
+  select:focus, input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(236,72,153,0.1); }
+  
+  input[type="range"] { width: 100%; accent-color: var(--primary); }
+  .slider-val { float: right; color: var(--primary); }
 
-.tool-outer{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:60px 5%;}
-.tool-head{text-align:center;margin-bottom:40px;}
-.tool-head .s-tag{-webkit-text-fill-color:unset;background:none;color:var(--text2);}
-.tool-head .s-title{color:var(--text);}
-.tool-head .s-sub{color:var(--text2);margin:0 auto;text-align:center;}
-
-.app-shell{background:var(--white);border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border2);box-shadow:var(--shadow),var(--glow);max-width:1100px;margin:0 auto;}
-
-.atb{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.atb-tab{padding:7px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;transition:all .2s;letter-spacing:-0.1px;}
-.atb-tab.on{background:rgba(236,72,153,0.1);color:var(--accent);border:1px solid rgba(236,72,153,0.3);}
-.atb-tab.off{background:transparent;color:var(--text2);}
-.atb-tab.off:hover{color:var(--text);background:rgba(0,0,0,0.05);}
-.atb-r{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;}
-.atb-btn{padding:7px 13px;border-radius:var(--r-sm);font-size:12px;font-weight:600;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap;}
-.atb-btn:hover{color:var(--text);border-color:var(--border2);background:var(--bg4);}
-.atb-btn:disabled{opacity:.4;cursor:not-allowed;}
-.atb-btn.primary{background:var(--accentg);color:#fff;border-color:transparent;box-shadow:0 0 16px rgba(236,72,153,0.3);}
-.atb-btn.primary:hover{box-shadow:0 0 24px rgba(236,72,153,0.5);transform:translateY(-1px);}
-
-.ab{display:flex;height:580px;}
-.al{width:210px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding:16px 13px;}
-.al::-webkit-scrollbar{width:4px;}
-.al::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:2px;}
-.ph{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:9px;margin-top:5px;}
-.upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:20px 10px;text-align:center;cursor:pointer;background:var(--bg);transition:all .2s;margin-bottom:16px;}
-.upload-zone:hover,.upload-zone.over{border-color:var(--accent);background:rgba(236,72,153,0.05);}
-.uz-icon{font-size:26px;margin-bottom:6px;}
-.uz-text{font-size:11px;color:var(--text);font-weight:600;}
-.uz-sub{font-size:10px;color:var(--text3);margin-top:2px;}
-.sz-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:var(--r-sm);cursor:pointer;margin-bottom:2px;font-size:12px;color:var(--text2);border:1px solid transparent;transition:all .15s;font-weight:500;}
-.sz-item:hover{background:rgba(0,0,0,0.04);color:var(--text);}
-.sz-item.on{background:rgba(236,72,153,0.1);border-color:rgba(236,72,153,0.25);color:var(--accent);}
-.sz-dim{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
-.sz-item.on .sz-dim{color:var(--accent);}
-.bg-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;}
-.sw{width:24px;height:24px;border-radius:6px;cursor:pointer;border:2px solid var(--border2);transition:all .2s;}
-.sw.on{border-color:var(--accent);box-shadow:0 0 8px rgba(236,72,153,0.4);}
-.sw.ck{background:repeating-conic-gradient(#E2E8F0 0% 25%,#F8FAFC 0% 50%) 0 0/10px 10px;}
-.clr-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
-.clr-row input[type=color]{width:30px;height:26px;border:1px solid var(--border2);border-radius:6px;background:none;cursor:pointer;padding:2px;}
-.clr-row span{font-size:11px;color:var(--text2);font-weight:500;}
-.ab-btn{width:100%;padding:9px;border-radius:var(--r-sm);border:none;cursor:pointer;font-size:12px;font-weight:600;margin-bottom:5px;font-family:inherit;transition:all .2s;text-align:center;}
-.ab-btn:disabled{opacity:.4;cursor:not-allowed;}
-.ab-btn.b{background:rgba(59,130,246,0.1);color:#2563EB;border:1px solid rgba(59,130,246,0.2);}
-.ab-btn.b:hover:not(:disabled){background:rgba(59,130,246,0.15);}
-.ab-btn.p{background:rgba(236,72,153,0.1);color:var(--accent);border:1px solid rgba(236,72,153,0.2);}
-.ab-btn.p:hover:not(:disabled){background:rgba(236,72,153,0.15);}
-.ab-btn-row{display:flex;gap:5px;}
-.ab-btn-row .ab-btn{margin-bottom:0;font-size:11px;}
-.thr-row{display:flex;align-items:center;gap:6px;margin-top:7px;}
-.thr-row span{font-size:10px;color:var(--text2);font-weight:600;}
-.thr-row input{flex:1;accent-color:var(--accent);}
-.thr-row strong{font-size:10px;color:var(--accent);min-width:22px;}
-.info-block{background:rgba(236,72,153,0.05);border-radius:var(--r-sm);padding:11px;margin-top:14px;border:1px solid rgba(236,72,153,0.15);}
-.info-block .ib-l{font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:600;}
-.info-block .ib-v{font-size:13px;font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace;}
-.info-block .ib-s{font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace;}
-
-.ac{flex:1;display:flex;flex-direction:column;background:var(--bg);overflow:hidden;}
-.ctb{background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 13px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex-shrink:0;}
-.tb{padding:5px 11px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .2s;}
-.tb:hover{color:var(--text);border-color:rgba(0,0,0,0.15);background:var(--bg4);}
-.tb:disabled{opacity:.4;cursor:not-allowed;}
-.tsep{width:1px;height:16px;background:var(--border);margin:0 2px;}
-.zoom-v{font-size:11px;color:var(--accent);width:40px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:600;}
-.cv{flex:1;display:flex;align-items:center;justify-content:center;overflow:auto;padding:32px;position:relative;background:radial-gradient(ellipse at center,rgba(236,72,153,0.04),transparent 70%),var(--bg);}
-.empty{text-align:center;user-select:none;width:100%;display:flex;align-items:center;justify-content:center;}
-.pw{position:relative;display:inline-block;}
-.pw canvas{display:block;max-width:min(420px,100%);max-height:480px;width:auto;height:auto;border-radius:4px;box-shadow:0 8px 40px rgba(0,0,0,0.15);}
-.pw-oval{position:absolute;top:8%;left:18%;right:18%;bottom:52%;border:1.5px dashed rgba(236,72,153,0.5);border-radius:50%;pointer-events:none;}
-.pw-guide{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--text3);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:600;}
-.ldr{position:absolute;inset:0;background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:50;}
-.ldr.show{display:flex;}
-.spin{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite;margin-bottom:12px;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.ldr-txt{font-size:13px;color:var(--text2);font-weight:600;}
-
-.ar{width:210px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--border);overflow-y:auto;padding:16px 13px;}
-.ar::-webkit-scrollbar{width:4px;}
-.ar::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:2px;}
-.sl-row{margin-bottom:12px;}
-.sl-meta{display:flex;justify-content:space-between;margin-bottom:5px;}
-.sl-meta span{font-size:11px;color:var(--text2);font-weight:600;}
-.sl-meta strong{font-size:11px;color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:700;}
-input[type=range]{width:100%;cursor:pointer;accent-color:var(--accent);}
-.fp{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px;}
-.fp-pill{padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;background:var(--bg3);color:var(--text2);border:1px solid var(--border2);transition:all .2s;font-weight:500;}
-.fp-pill.on{background:rgba(236,72,153,0.1);color:var(--accent);border-color:rgba(236,72,153,0.3);font-weight:600;}
-.fp-pill:hover:not(.on){color:var(--text);background:var(--bg4);}
-.qa{display:flex;flex-direction:column;gap:4px;margin-bottom:14px;}
-.comp{background:rgba(20,184,166,0.1);border:1px solid rgba(20,184,166,0.25);border-radius:var(--r-sm);padding:12px;}
-.comp-h{font-size:11px;font-weight:700;color:#0D9488;margin-bottom:8px;}
-.comp-i{font-size:10px;color:var(--text2);margin-bottom:4px;line-height:1.5;font-weight:500;}
-
-.spp{flex:1;display:none;flex-direction:column;background:var(--bg);overflow:hidden;}
-.spp.show{display:flex;}
-.spc{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;flex-shrink:0;}
-.sc-g{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);font-weight:600;}
-.sc-g input[type=number]{width:52px;background:var(--white);border:1px solid var(--border2);border-radius:6px;color:var(--text);padding:5px 6px;font-size:12px;font-family:'JetBrains Mono',monospace;outline:none;}
-.sc-g input[type=color]{width:30px;height:26px;border:1px solid var(--border2);border-radius:6px;background:none;cursor:pointer;padding:2px;}
-.spv{flex:1;overflow:auto;padding:28px;display:flex;justify-content:center;align-items:flex-start;}
-.spe{text-align:center;color:var(--text3);padding-top:60px;}
-.spe-icon{font-size:44px;margin-bottom:10px;opacity:0.3;}
-.sc-wrap{background:var(--white);border-radius:4px;overflow:hidden;box-shadow:var(--shadow);display:inline-block;border:1px solid var(--border2);}
-.stbar{background:var(--bg2);border-top:1px solid var(--border);padding:6px 16px;display:flex;gap:14px;font-size:11px;color:var(--text3);align-items:center;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-weight:500;}
-.stbar .si{color:var(--text2);font-weight:600;}
-.stbar .sp{color:var(--border2);}
-.stbar .sl{color:var(--accent);}
-
-.hiw-outer{border-top:1px solid var(--border);}
-.hiw-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);margin-top:56px;}
-.hiw-cell{padding:40px 32px;border-right:1px solid var(--border);transition:background .2s;}
-.hiw-cell:hover{background:rgba(236,72,153,0.03);}
-.hiw-cell:last-child{border-right:none;}
-.hiw-n{font-size:12px;font-weight:800;color:var(--accent);margin-bottom:16px;font-family:'JetBrains Mono',monospace;letter-spacing:0.05em;}
-.hiw-icon{font-size:28px;margin-bottom:14px;display:block;}
-.hiw-t{font-size:15px;font-weight:800;color:var(--text);margin-bottom:9px;letter-spacing:-0.2px;}
-.hiw-d{font-size:13px;color:var(--text2);line-height:1.7;}
-
-.feat-outer{border-top:1px solid var(--border);}
-.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border2);border:1px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;margin-top:56px;}
-.feat-cell{background:var(--bg);padding:36px 30px;transition:background .2s;}
-.feat-cell:hover{background:rgba(236,72,153,0.02);}
-.fc-icon{font-size:24px;margin-bottom:16px;display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:12px;background:rgba(236,72,153,0.1);}
-.fc-t{font-size:15px;font-weight:800;color:var(--text);margin-bottom:9px;letter-spacing:-0.2px;}
-.fc-d{font-size:13px;color:var(--text2);line-height:1.7;}
-
-.sizes-outer{background:var(--bg2);border-top:1px solid var(--border);}
-.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:10px;margin-top:48px;}
-.sc{background:var(--white);border:1px solid var(--border2);border-radius:var(--r);padding:18px;cursor:pointer;transition:all .2s;}
-.sc:hover{border-color:rgba(236,72,153,0.4);box-shadow:0 0 20px rgba(236,72,153,0.1);background:rgba(236,72,153,0.03);transform:translateY(-2px);}
-.sc-n{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;}
-.sc-d{font-size:13px;color:var(--accent);font-weight:600;font-family:'JetBrains Mono',monospace;}
-.sc-x{font-size:11px;color:var(--text3);margin-top:3px;}
-
-.pricing-outer{border-top:1px solid var(--border);}
-.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:900px;margin:56px auto 0;}
-.pc{background:var(--white);border:1px solid var(--border2);border-radius:var(--r-lg);padding:32px;position:relative;overflow:hidden;transition:all .2s;box-shadow:var(--shadow);}
-.pc:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 24px 60px rgba(0,0,0,0.12);}
-.pc.pop{border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.02);}
-.pb{position:absolute;top:18px;right:-30px;background:var(--accentg);color:#fff;font-size:9px;font-weight:800;letter-spacing:.08em;padding:5px 40px;transform:rotate(45deg);box-shadow:0 0 20px rgba(236,72,153,0.3);}
-.pc-t{font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;}
-.pc-p{font-size:48px;font-weight:900;color:var(--text);line-height:1;margin-bottom:4px;letter-spacing:-2px;}
-.pc-p sup{font-size:20px;vertical-align:super;font-weight:600;}
-.pc-per{font-size:13px;color:var(--text3);margin-bottom:28px;}
-.pc-ul{list-style:none;font-size:13px;color:var(--text2);line-height:2.2;margin-bottom:28px;font-weight:500;}
-.pc-ul li::before{content:'\2713  ';color:#0D9488;font-weight:700;}
-.pc-btn{display:block;width:100%;padding:12px;border-radius:var(--r-sm);font-size:14px;font-weight:700;text-align:center;cursor:pointer;border:none;font-family:inherit;text-decoration:none;transition:all .2s;}
-.pc-btn.o{background:rgba(0,0,0,0.03);border:1px solid var(--border2);color:var(--text);}
-.pc-btn.o:hover{background:rgba(0,0,0,0.06);}
-.pc-btn.s{background:var(--accentg);color:#fff;box-shadow:0 0 20px rgba(236,72,153,0.3);}
-.pc-btn.s:hover{box-shadow:0 0 32px rgba(236,72,153,0.4);transform:translateY(-1px);}
-
-.faq-outer{background:var(--bg2);border-top:1px solid var(--border);}
-.faq-wrap{max-width:700px;margin:56px auto 0;}
-.faq-it{border-bottom:1px solid var(--border);}
-.faq-q{width:100%;padding:20px 0;background:none;border:none;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:700;color:var(--text);text-align:left;gap:16px;letter-spacing:-0.2px;transition:color .2s;}
-.faq-q:hover{color:var(--accent);}
-.faq-ic{font-size:18px;color:var(--text3);transition:transform .3s,color .2s;flex-shrink:0;}
-.faq-a{font-size:14px;color:var(--text2);line-height:1.75;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s;font-weight:500;}
-.faq-it.open .faq-a{max-height:200px;padding-bottom:20px;}
-.faq-it.open .faq-ic{transform:rotate(45deg);color:var(--accent);}
-
-.cta-band{background:linear-gradient(135deg,rgba(236,72,153,0.1),rgba(244,63,94,0.05));border-top:1px solid rgba(236,72,153,0.15);padding:88px 5%;text-align:center;position:relative;overflow:hidden;}
-.cta-band h2{font-size:clamp(28px,4vw,48px);font-weight:900;color:var(--text);letter-spacing:-2px;margin-bottom:14px;}
-.cta-band p{font-size:16px;color:var(--text2);margin-bottom:36px;font-weight:500;}
-
-footer{background:var(--bg2);border-top:1px solid var(--border);padding:60px 5% 32px;}
-.ft{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:52px;}
-.fb p{font-size:13px;color:var(--text3);margin-top:12px;max-width:280px;line-height:1.75;font-weight:500;}
-.fc h4{font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;}
-.fc a{display:block;font-size:13px;color:var(--text2);text-decoration:none;margin-bottom:10px;transition:color .2s;font-weight:500;}
-.fc a:hover{color:var(--text);}
-.fb-bottom{font-size:12px;color:var(--text3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid var(--border);padding-top:28px;}
-
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--white);padding:13px 24px;border-radius:12px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;border:1px solid rgba(255,255,255,0.1);box-shadow:0 12px 30px rgba(0,0,0,0.3);}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.pw{background:repeating-conic-gradient(#E2E8F0 0% 25%,#F8FAFC 0% 50%) 0 0/20px 20px;}
-
-.udz{cursor:pointer;border:2px dashed var(--border2);border-radius:20px;padding:60px 40px;background:rgba(236,72,153,0.02);max-width:420px;width:100%;transition:all .25s;text-align:center;}
-.udz:hover,.udz.over{border-color:rgba(236,72,153,0.4);background:rgba(236,72,153,0.06);}
-.udz-em{font-size:56px;margin-bottom:18px;display:block;}
-.udz-t{font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;}
-.udz-s{font-size:14px;color:var(--text2);margin-bottom:24px;font-weight:500;}
-.udz-btn{display:inline-flex;align-items:center;gap:9px;background:var(--accentg);color:#fff;padding:12px 30px;border-radius:var(--r-sm);font-size:14px;font-weight:600;box-shadow:0 0 20px rgba(236,72,153,0.3);transition:all .2s;}
-.udz-fmt{margin-top:16px;font-size:12px;color:var(--text3);font-weight:500;}
-
-@media(max-width:960px){.hero{grid-template-columns:1fr;gap:48px;}.hero-visual{display:none;}.hiw-grid{grid-template-columns:1fr 1fr;}.feat-grid{grid-template-columns:1fr 1fr;}.pg{grid-template-columns:1fr;max-width:400px;}.ft{grid-template-columns:1fr 1fr;gap:32px;}.ar{display:none;}}
-@media(max-width:600px){nav .nav-links{display:none;}.hiw-grid{grid-template-columns:1fr;}.feat-grid{grid-template-columns:1fr;}.al{width:170px;}.ft{grid-template-columns:1fr;}.strip-item{min-width:130px;}}
-
-@keyframes fadeInUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
-.hero-left>*{animation:fadeInUp .6s ease both;}
-.hero-left>*:nth-child(1){animation-delay:0.05s;}
-.hero-left>*:nth-child(2){animation-delay:0.15s;}
-.hero-left>*:nth-child(3){animation-delay:0.25s;}
-.hero-left>*:nth-child(4){animation-delay:0.35s;}
-.hero-left>*:nth-child(5){animation-delay:0.45s;}
+  /* Navigation Footer */
+  .nav-footer { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+  
+  canvas { max-width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+  
+  .loader { display: none; padding: 20px; text-align: center; color: var(--primary); font-weight: bold; }
 </style>
 </head>
-<body style="display:flex;flex-direction:column;">
+<body>
 
-<nav style="order:0;">
-  <a class="nav-logo" href="#">
-    <div class="nav-logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/><circle cx="12" cy="12" r="3"/></svg></div>
-    <span class="nav-logo-name">Passport<span>Snap</span></span>
-  </a>
-  <div class="nav-links">
-    <a href="#tool" class="nav-link">Editor</a>
-    <a href="#hiw" class="nav-link">How it works</a>
-    <a href="#sizes" class="nav-link">Sizes</a>
-    <a href="#pricing" class="nav-link">Pricing</a>
-  </div>
-  <div style="display:flex;gap:10px;align-items:center;">
-    <a href="#" class="nav-link">Log in</a>
-    <a href="#tool" class="nav-cta">Open editor</a>
-  </div>
-</nav>
+<header>
+  <div class="logo">📷 <span>PassportSnap Pro</span></div>
+</header>
 
-<div class="tool-outer" id="tool" style="order:1;">
-  <div class="tool-head">
-    <div class="s-tag">AI-Powered Editor</div>
-    <div class="s-title">Make your passport photo</div>
-    <div class="s-sub">Everything runs in your browser. Your photos never leave your device.</div>
-  </div>
-  <div class="app-shell">
-    <div class="atb">
-      <button class="atb-tab on" onclick="switchTab('e',this)">Editor</button>
-      <button class="atb-tab off" onclick="switchTab('a',this)">Adjustments</button>
-      <button class="atb-tab off" onclick="switchTab('s',this)">Print Sheet</button>
-      <div class="atb-r">
-        <button class="atb-btn" id="undoBtn" onclick="doUndo()" disabled>&#8617; Undo</button>
-        <button class="atb-btn" id="redoBtn" onclick="doRedo()" disabled>&#8618; Redo</button>
-        <button class="atb-btn" onclick="doReset()">Reset</button>
-        <button class="atb-btn primary" id="dlBtn" onclick="downloadPhoto()" disabled>&#8615; Download</button>
+<div class="stepper">
+  <div class="step active" id="st-1"><div class="step-num">1</div> Upload</div>
+  <div class="step-line"></div>
+  <div class="step" id="st-2"><div class="step-num">2</div> Crop</div>
+  <div class="step-line"></div>
+  <div class="step" id="st-3"><div class="step-num">3</div> Background</div>
+  <div class="step-line"></div>
+  <div class="step" id="st-4"><div class="step-num">4</div> Adjust</div>
+  <div class="step-line"></div>
+  <div class="step" id="st-5"><div class="step-num">5</div> Print Setup</div>
+</div>
+
+<div class="container">
+  
+  <!-- Step 1: Upload -->
+  <div id="step-1" class="view-panel active">
+    <div class="card" style="max-width: 600px; margin: 50px auto; width: 100%;">
+      <h2 style="text-align: center;">Start with a Photo</h2>
+      <div class="upload-area" onclick="document.getElementById('fileIn').click()">
+        <div class="upload-icon">📁</div>
+        <h3 style="margin-bottom: 10px;">Click or Drag to Upload</h3>
+        <p style="color: var(--text-muted); font-size: 14px;">High quality JPG or PNG</p>
       </div>
+      <input type="file" id="fileIn" accept="image/*" style="display:none" onchange="handleUpload(event)">
     </div>
-    <div class="ab">
-      <div class="al">
-        <div class="ph">Upload</div>
-        <div class="upload-zone" id="upz" onclick="document.getElementById('fi').click()" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="onDrop(event)">
-          <div class="uz-icon">&#128194;</div>
-          <div class="uz-text">Click or drag &amp; drop</div>
-          <div class="uz-sub">JPG &middot; PNG &middot; WEBP</div>
+  </div>
+
+  <!-- Step 2: Crop -->
+  <div id="step-2" class="view-panel">
+    <div class="editor-layout">
+      <div class="sidebar">
+        <h2>Crop Image</h2>
+        <p style="font-size:14px; color:var(--text-muted); margin-bottom:20px;">Select your desired passport size and position the photo inside the box.</p>
+        
+        <div class="form-group">
+          <label>Photo Size Requirement</label>
+          <select id="cropSize" onchange="updateCropBox()">
+            <option value="35x45">India Passport (35x45 mm)</option>
+            <option value="51x51">US Visa (51x51 mm)</option>
+            <option value="30x40">UAE Passport (30x40 mm)</option>
+            <option value="custom">Custom Size</option>
+          </select>
         </div>
-        <input type="file" id="fi" accept="image/*" style="display:none" onchange="onFile(event)"/>
-        <div class="ph" style="margin-top:4px;">Size</div>
-        <div id="szList"></div>
-        <div id="cusBlock" style="display:none;margin-top:8px;">
-          <div style="font-size:10px;color:var(--text3);margin-bottom:5px;">Width x Height (mm)</div>
-          <div style="display:flex;gap:5px;">
-            <input type="number" id="cW" value="35" oninput="updSzD()" style="width:100%;background:var(--white);border:1px solid var(--border2);border-radius:6px;color:var(--text);padding:5px 7px;font-size:12px;font-family:'JetBrains Mono',monospace;outline:none;"/>
-            <input type="number" id="cH" value="45" oninput="updSzD()" style="width:100%;background:var(--white);border:1px solid var(--border2);border-radius:6px;color:var(--text);padding:5px 7px;font-size:12px;font-family:'JetBrains Mono',monospace;outline:none;"/>
+        
+        <div class="form-group" style="display: flex; gap: 10px;">
+          <div style="flex:1">
+            <label>Width (mm)</label>
+            <input type="number" id="cropW" value="35" onchange="updateCropBox()">
+          </div>
+          <div style="flex:1">
+            <label>Height (mm)</label>
+            <input type="number" id="cropH" value="45" onchange="updateCropBox()">
           </div>
         </div>
-        <div class="ph" style="margin-top:14px;">Background</div>
-        <div class="bg-row" id="bgsw"></div>
-        <div class="clr-row">
-          <input type="color" id="bgpk" value="#FFFFFF" oninput="curBg=this.value"/>
-          <span>Custom</span>
-        </div>
-        <button class="ab-btn b" id="abgBtn" onclick="applyBgColor()" disabled>Apply background</button>
-        <div class="ab-btn-row" style="margin-bottom:5px;">
-          <button class="ab-btn p" id="rmBtn" onclick="removeBg()" disabled>&#9986; Remove BG</button>
-          <button class="ab-btn p" id="aiBtn" onclick="aiRm()" disabled>&#129680; AI BG</button>
-        </div>
-        <div class="thr-row">
-          <span>Sensitivity</span>
-          <input type="range" min="5" max="80" value="30" id="thr" oninput="document.getElementById('thrV').textContent=this.value"/>
-          <strong id="thrV">30</strong>
-        </div>
-        <div class="info-block">
-          <div class="ib-l">Output size</div>
-          <div class="ib-v" id="szV">35 x 45 mm</div>
-          <div class="ib-s" id="pxV">413 x 531 px</div>
+
+        <div class="nav-footer">
+          <button class="btn btn-outline" onclick="goToStep(1)">Back</button>
+          <button class="btn btn-primary" onclick="applyCropAndNext()">Crop & Next ➔</button>
         </div>
       </div>
-      <div class="ac">
-        <div class="ctb">
-          <button class="tb" id="rtL" onclick="doRot(-90)" disabled>&#8634; -90</button>
-          <button class="tb" id="rtR" onclick="doRot(90)" disabled>&#8635; +90</button>
-          <button class="tb" id="flH" onclick="doFl(true)" disabled>H Flip</button>
-          <button class="tb" id="flV" onclick="doFl(false)" disabled>V Flip</button>
-          <div class="tsep"></div>
-          <button class="tb" id="autoB" onclick="doAuto()" disabled>&#10024; Auto</button>
-          <button class="tb" id="wbB" onclick="doWB()" disabled>WB</button>
-          <div class="tsep"></div>
-          <button class="tb" onclick="chZ(-0.15)">-</button>
-          <span class="zoom-v" id="zL">100%</span>
-          <button class="tb" onclick="chZ(0.15)">+</button>
-          <button class="tb" onclick="fitZ()">Fit</button>
-          <div class="tsep" style="margin-left:auto;"></div>
-          <button class="tb" id="restB" onclick="doRestore()" disabled>Restore</button>
+      <div class="canvas-container">
+        <!-- Temporary Simple Crop visualization using a container -->
+        <div id="cropWrapper" style="position:relative; overflow:hidden; border:2px solid var(--primary); box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);">
+          <img id="cropImg" style="cursor:move; transform-origin: top left;" />
         </div>
-        <div class="cv" id="cv">
-          <div class="udz" id="emp" onclick="document.getElementById('fi').click()" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="this.classList.remove('over');onDrop(event)">
-            <span class="udz-em">&#128247;</span>
-            <div class="udz-t">Upload your photo</div>
-            <div class="udz-s">Drag &amp; drop or click to browse</div>
-            <div class="udz-btn">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-              Choose Photo
-            </div>
-            <div class="udz-fmt">Supports JPG &middot; PNG &middot; WEBP</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Background -->
+  <div id="step-3" class="view-panel">
+    <div class="editor-layout">
+      <div class="sidebar">
+        <h2>Background</h2>
+        
+        <button class="btn btn-primary" style="width:100%; margin-bottom:20px;" onclick="removeBgApi()">✨ AI Remove Background</button>
+        <div id="bgLoader" class="loader">Processing AI Remove...</div>
+        
+        <div class="form-group">
+          <label>Pick Background Color</label>
+          <input type="color" id="bgColor" value="#ffffff" oninput="applyBgColor()">
+        </div>
+        
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+          <button class="btn btn-outline" style="flex:1; padding:10px;" onclick="setBg('#ffffff')">White</button>
+          <button class="btn btn-outline" style="flex:1; padding:10px; background:#3B82F6; color:white; border-color:#3B82F6;" onclick="setBg('#3B82F6')">Blue</button>
+          <button class="btn btn-outline" style="flex:1; padding:10px; background:#EF4444; color:white; border-color:#EF4444;" onclick="setBg('#EF4444')">Red</button>
+        </div>
+
+        <div class="nav-footer">
+          <button class="btn btn-outline" onclick="goToStep(2)">Back</button>
+          <button class="btn btn-primary" onclick="goToStep(4)">Next ➔</button>
+        </div>
+      </div>
+      <div class="canvas-container">
+        <canvas id="bgCanvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Adjustments -->
+  <div id="step-4" class="view-panel">
+    <div class="editor-layout">
+      <div class="sidebar">
+        <h2>Enhance & Adjust</h2>
+        <button class="btn btn-primary" style="width:100%; margin-bottom:20px;" onclick="autoEnhance()">✨ Auto Enhance</button>
+        
+        <div class="form-group">
+          <label>Brightness <span id="vB" class="slider-val">100%</span></label>
+          <input type="range" id="slB" min="0" max="200" value="100" oninput="applyAdjustments()">
+        </div>
+        <div class="form-group">
+          <label>Contrast <span id="vC" class="slider-val">100%</span></label>
+          <input type="range" id="slC" min="0" max="200" value="100" oninput="applyAdjustments()">
+        </div>
+        <div class="form-group">
+          <label>Saturation <span id="vS" class="slider-val">100%</span></label>
+          <input type="range" id="slS" min="0" max="200" value="100" oninput="applyAdjustments()">
+        </div>
+
+        <div class="nav-footer">
+          <button class="btn btn-outline" onclick="goToStep(3)">Back</button>
+          <button class="btn btn-primary" onclick="preparePrintStep()">Layout & Print ➔</button>
+        </div>
+      </div>
+      <div class="canvas-container">
+        <canvas id="adjCanvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5: Print Setup -->
+  <div id="step-5" class="view-panel">
+    <div class="editor-layout">
+      <div class="sidebar" style="max-height: 80vh; overflow-y:auto;">
+        <h2>Print Layout Setup</h2>
+        
+        <div class="form-group">
+          <label>Paper Size</label>
+          <select id="paperSize" onchange="updatePrintLayout()">
+            <option value="A4">A4 (210 x 297 mm)</option>
+            <option value="4x6">4x6 inch (102 x 152 mm)</option>
+            <option value="5x7">5x7 inch (127 x 178 mm)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Number of Photos (Manual)</label>
+          <input type="number" id="photoCount" value="8" min="1" max="100" onchange="updatePrintLayout()">
+        </div>
+
+        <div class="form-group" style="display:flex; gap:10px;">
+          <div style="flex:1">
+            <label>Photo Margin (mm)</label>
+            <input type="number" id="photoMargin" value="3" min="0" onchange="updatePrintLayout()">
           </div>
-          <div class="pw" id="pw" style="display:none;">
-            <canvas id="mc"></canvas>
-            <div class="pw-oval"></div>
-            <div class="pw-guide">face guide</div>
-          </div>
-          <div class="ldr" id="ldr">
-            <div class="spin"></div>
-            <div class="ldr-txt" id="ldrT">Processing...</div>
+          <div style="flex:1">
+            <label>Page Margin (mm)</label>
+            <input type="number" id="pageMargin" value="10" min="0" onchange="updatePrintLayout()">
           </div>
         </div>
-      </div>
-      <div class="ar">
-        <div class="ph">Adjustments</div>
-        <div class="sl-row"><div class="sl-meta"><span>Brightness</span><strong id="vB">100%</strong></div><input type="range" min="0" max="200" value="100" id="slB" oninput="onSl()"/></div>
-        <div class="sl-row"><div class="sl-meta"><span>Contrast</span><strong id="vC">100%</strong></div><input type="range" min="0" max="200" value="100" id="slC" oninput="onSl()"/></div>
-        <div class="sl-row"><div class="sl-meta"><span>Saturation</span><strong id="vS">100%</strong></div><input type="range" min="0" max="200" value="100" id="slS" oninput="onSl()"/></div>
-        <div class="sl-row"><div class="sl-meta"><span>Exposure</span><strong id="vE">0</strong></div><input type="range" min="-50" max="50" value="0" id="slE" oninput="onSl()"/></div>
-        <div class="ph" style="margin-top:14px;">Filters</div>
-        <div class="fp" id="fp"></div>
-        <div class="ph">Quick tools</div>
-        <div class="qa">
-          <button class="ab-btn b" id="qaA" onclick="doAuto()" disabled>&#10024; Auto enhance</button>
-          <button class="ab-btn b" id="qaW" onclick="doWB()" disabled>White balance</button>
-          <button class="ab-btn p" id="qaR" onclick="removeBg()" disabled>&#9986; Remove BG</button>
-          <button class="ab-btn p" id="qaI" onclick="aiRm()" disabled>&#129680; AI Remove BG</button>
+
+        <div class="form-group" style="display:flex; gap:10px;">
+          <div style="flex:1">
+            <label>Border Color</label>
+            <input type="color" id="borderColor" value="#000000" oninput="updatePrintLayout()">
+          </div>
+          <div style="flex:1">
+            <label>Border Width (px)</label>
+            <input type="number" id="borderWidth" value="1" min="0" onchange="updatePrintLayout()">
+          </div>
         </div>
-        <div class="comp">
-          <div class="comp-h">Requirements</div>
-          <div class="comp-i">&#10003; White or blue background</div>
-          <div class="comp-i">&#10003; Face 70-80% of frame</div>
-          <div class="comp-i">&#10003; No glasses or headwear</div>
-          <div class="comp-i">&#10003; Neutral expression</div>
-          <div class="comp-i">&#10003; 300 DPI for printing</div>
+
+        <div class="nav-footer" style="flex-direction:column; gap:10px;">
+          <button class="btn btn-primary" style="width:100%; font-size:18px; padding:15px;" onclick="printSheet()">🖨️ Print Now</button>
+          <button class="btn btn-outline" style="width:100%;" onclick="goToStep(4)">Back to Adjust</button>
         </div>
       </div>
-    </div>
-    <div class="spp" id="spp">
-      <div class="spc">
-        <div class="sc-g">Columns <input type="number" id="sCo" value="4" min="1" max="8"/></div>
-        <div class="sc-g">Rows <input type="number" id="sRo" value="6" min="1" max="10"/></div>
-        <div class="sc-g">Gap mm <input type="number" id="sGa" value="3" min="0" max="15"/></div>
-        <div class="sc-g">Sheet BG <input type="color" id="sBG" value="#FFFFFF"/></div>
-        <button class="atb-btn" onclick="buildSheet()">Refresh</button>
-        <button class="atb-btn primary" id="dlSh" onclick="dlSheet()" disabled>&#8615; Download sheet</button>
-        <span id="shInfo" style="font-size:11px;color:var(--text3);margin-left:auto;font-family:'JetBrains Mono',monospace;"></span>
-      </div>
-      <div class="spv">
-        <div class="spe" id="spe"><div class="spe-icon">&#128424;</div><p>Upload a photo first</p></div>
-        <div class="sc-wrap" id="scw" style="display:none;"><canvas id="shC"></canvas></div>
+      <div class="canvas-container" style="background:#e5e7eb;">
+        <!-- The Print Sheet Preview -->
+        <canvas id="printCanvas" style="background:white; box-shadow:0 10px 40px rgba(0,0,0,0.2); max-height:80vh; max-width:100%;"></canvas>
       </div>
     </div>
-    <div class="stbar">
-      <span class="si" id="sbSz">35x45 mm</span><span class="sp">&middot;</span>
-      <span class="si" id="sbFi">Filter: None</span><span class="sp">&middot;</span>
-      <span class="si" id="sbZo">Zoom: 100%</span><span class="sp">&middot;</span>
-      <span class="si" id="sbHi">0 states</span>
-      <span class="sl" id="sbLd" style="display:none;">&middot; processing</span>
-      <span style="margin-left:auto;color:var(--text3);">PassportSnap Pro</span>
-    </div>
   </div>
-</div>
 
-<div class="hero-outer" style="order:2;">
-<div class="hero">
-  <div class="hero-left">
-    <div class="hero-badge"><span class="hero-badge-dot"></span>Free &middot; No signup &middot; Works instantly</div>
-    <h1>Passport photo,<br><em>done right.</em></h1>
-    <p class="hero-sub">Upload any photo. Remove background, adjust lighting, crop to official specs. Print-ready 300 DPI in under a minute.</p>
-    <div class="hero-btns">
-      <a href="#tool" class="btn-primary">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-        Make my photo
-      </a>
-      <a href="#hiw" class="btn-ghost">See how it works</a>
-    </div>
-    <div class="hero-proof">
-      <div class="proof-item"><span>&#128274;</span> Photos stay on device</div>
-      <div class="proof-item"><span>&#128424;</span> 300 DPI output</div>
-      <div class="proof-item"><span>&#127759;</span> All countries</div>
-    </div>
-  </div>
-  <div class="hero-visual">
-    <div class="hv-topbar">
-      <div class="hv-dot" style="background:#FF5F57;"></div>
-      <div class="hv-dot" style="background:#FFBD2E;"></div>
-      <div class="hv-dot" style="background:#28C840;"></div>
-      <span style="font-size:11px;color:var(--text3);margin-left:8px;font-family:'JetBrains Mono',monospace;">PassportSnap Pro</span>
-    </div>
-    <div class="hv-body">
-      <div class="hv-sidebar">
-        <div class="hv-sb-block" style="height:12px;width:70%;margin-bottom:10px;"></div>
-        <div class="hv-sb-block" style="height:64px;border:1.5px dashed rgba(236,72,153,0.3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;background:rgba(236,72,153,0.05);">&#128194;</div>
-        <div class="hv-sb-block" style="height:9px;width:55%;margin-bottom:7px;"></div>
-        <div class="hv-sb-block" style="height:24px;background:rgba(236,72,153,0.15);border:1px solid rgba(236,72,153,0.3);border-radius:6px;margin-bottom:4px;"></div>
-        <div class="hv-sb-block" style="height:24px;border-radius:6px;margin-bottom:4px;"></div>
-        <div class="hv-sb-block" style="height:24px;border-radius:6px;margin-bottom:4px;"></div>
-        <div style="margin-top:10px;display:flex;gap:4px;flex-wrap:wrap;">
-          <div style="width:20px;height:20px;border-radius:5px;background:#fff;border:2px solid var(--accent);box-shadow:0 0 8px rgba(236,72,153,0.4);"></div>
-          <div style="width:20px;height:20px;border-radius:5px;background:#4A90D9;"></div>
-          <div style="width:20px;height:20px;border-radius:5px;background:#555;"></div>
-          <div style="width:20px;height:20px;border-radius:5px;background:#c00;"></div>
-        </div>
-      </div>
-      <div class="hv-center">
-        <div class="hv-photo-card">
-          <div class="hv-photo-head"></div>
-          <div class="hv-photo-body"></div>
-          <div class="hv-oval"></div>
-        </div>
-      </div>
-      <div class="hv-panel">
-        <div class="hv-sb-block" style="height:9px;width:60%;margin-bottom:12px;"></div>
-        <div class="hv-sl"><div class="hv-sl-lbl"></div><div class="hv-sl-track"><div class="hv-sl-fill" style="width:68%;"></div></div></div>
-        <div class="hv-sl"><div class="hv-sl-lbl" style="width:45%;"></div><div class="hv-sl-track"><div class="hv-sl-fill" style="width:55%;"></div></div></div>
-        <div class="hv-sl"><div class="hv-sl-lbl" style="width:75%;"></div><div class="hv-sl-track"><div class="hv-sl-fill" style="width:72%;"></div></div></div>
-        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:3px;">
-          <div style="padding:3px 6px;background:rgba(236,72,153,0.1);border:1px solid rgba(236,72,153,0.3);border-radius:4px;font-size:8px;color:var(--accent);font-weight:600;">None</div>
-          <div style="padding:3px 6px;background:var(--bg4);border-radius:4px;font-size:8px;color:var(--text3);">Vivid</div>
-          <div style="padding:3px 6px;background:var(--bg4);border-radius:4px;font-size:8px;color:var(--text3);">B&amp;W</div>
-        </div>
-      </div>
-    </div>
-    <div class="hv-bottom">
-      <div class="hv-bl"></div><div class="hv-bl" style="width:45px;"></div><div class="hv-bl" style="width:35px;"></div>
-    </div>
-  </div>
 </div>
-</div>
-
-<div class="strip" style="order:3;">
-  <div class="strip-item"><em>&#129680;</em>AI BG Remove</div>
-  <div class="strip-item"><em>&#128208;</em>All country sizes</div>
-  <div class="strip-item"><em>&#127898;</em>Studio adjustments</div>
-  <div class="strip-item"><em>&#128424;</em>Print sheet</div>
-  <div class="strip-item"><em>&#8615;</em>300 DPI download</div>
-  <div class="strip-item"><em>&#128274;</em>100% private</div>
-</div>
-
-<div class="hiw-outer" id="hiw" style="order:4;">
-  <div class="section" style="padding-bottom:0;">
-    <div class="s-tag">Process</div>
-    <div class="s-title">Three steps to a perfect photo</div>
-  </div>
-  <div class="hiw-grid">
-    <div class="hiw-cell"><div class="hiw-n">01</div><span class="hiw-icon">&#128228;</span><div class="hiw-t">Upload your photo</div><div class="hiw-d">Any selfie or portrait works. Drag and drop or click to upload. JPG, PNG, or WEBP.</div></div>
-    <div class="hiw-cell"><div class="hiw-n">02</div><span class="hiw-icon">&#9986;</span><div class="hiw-t">Remove background</div><div class="hiw-d">One click removes the background. Replace with white, blue, or any colour.</div></div>
-    <div class="hiw-cell"><div class="hiw-n">03</div><span class="hiw-icon">&#128207;</span><div class="hiw-t">Choose your size</div><div class="hiw-d">India passport, US, UK, Schengen, PAN card or enter a custom size.</div></div>
-    <div class="hiw-cell" style="border-right:none;"><div class="hiw-n">04</div><span class="hiw-icon">&#128424;</span><div class="hiw-t">Download or print</div><div class="hiw-d">Get a 300 DPI JPEG instantly or build a multi-photo print sheet.</div></div>
-  </div>
-</div>
-
-<div class="feat-outer" style="order:5;">
-<div class="section">
-  <div class="s-tag">Features</div>
-  <div class="s-title">A full studio, in your browser</div>
-  <div class="feat-grid">
-    <div class="feat-cell"><div class="fc-icon">&#129680;</div><div class="fc-t">AI background removal</div><div class="fc-d">One click removes any background. AI detects edges precisely, then replaces with official white, blue, or any colour you need.</div></div>
-    <div class="feat-cell"><div class="fc-icon">&#127898;</div><div class="fc-t">Studio-grade adjustments</div><div class="fc-d">Brightness, contrast, saturation, and exposure sliders. Seven filters. Auto-enhance and white balance for perfect skin tones.</div></div>
-    <div class="feat-cell"><div class="fc-icon">&#128208;</div><div class="fc-t">Every country standard</div><div class="fc-d">India, US, UK, Schengen, China, Canada, PAN card, Aadhaar all preloaded. Or enter your own size in millimetres.</div></div>
-    <div class="feat-cell"><div class="fc-icon">&#128424;</div><div class="fc-t">Print sheet generator</div><div class="fc-d">Arrange multiple photos on one sheet. Set rows, columns, gap size. Download and print at any studio or at home.</div></div>
-    <div class="feat-cell"><div class="fc-icon">&#128260;</div><div class="fc-t">Rotate, flip and undo</div><div class="fc-d">Straighten tilted photos instantly. Flip horizontal or vertical. Full undo and redo history.</div></div>
-    <div class="feat-cell"><div class="fc-icon">&#128274;</div><div class="fc-t">Completely private</div><div class="fc-d">Everything runs in your browser using Canvas API. Your photos are never sent to any server. 300 DPI JPEG ready to print.</div></div>
-  </div>
-</div>
-</div>
-
-<div class="sizes-outer" id="sizes" style="order:6;">
-<div class="section">
-  <div class="s-tag">Supported formats</div>
-  <div class="s-title">Every photo size standard</div>
-  <div class="s-sub">Click any size to load it instantly in the editor above.</div>
-  <div class="sg" id="szGrid"></div>
-</div>
-</div>
-
-<div class="pricing-outer" style="order:7;">
-<div class="section" id="pricing">
-  <div class="s-tag" style="text-align:center;">Plans</div>
-  <div class="s-title" style="text-align:center;">Start free, upgrade when ready</div>
-  <div class="pg">
-    <div class="pc">
-      <div class="pc-t">Free</div>
-      <div class="pc-p"><sup>&#8377;</sup>0</div>
-      <div class="pc-per">forever free</div>
-      <ul class="pc-ul"><li>5 photos per day</li><li>All size presets</li><li>Basic adjustments</li><li>Print sheet (watermarked)</li></ul>
-      <a href="#tool" class="pc-btn o">Get started</a>
-    </div>
-    <div class="pc pop">
-      <div class="pb">POPULAR</div>
-      <div class="pc-t">Pro</div>
-      <div class="pc-p"><sup>&#8377;</sup>99</div>
-      <div class="pc-per">per month</div>
-      <ul class="pc-ul"><li>Unlimited photos</li><li>AI background removal</li><li>All filters &amp; adjustments</li><li>Print sheet no watermark</li><li>300 DPI download</li><li>Priority support</li></ul>
-      <button class="pc-btn s">Start Pro - &#8377;99/mo</button>
-    </div>
-    <div class="pc">
-      <div class="pc-t">Studio</div>
-      <div class="pc-p"><sup>&#8377;</sup>499</div>
-      <div class="pc-per">per month</div>
-      <ul class="pc-ul"><li>Everything in Pro</li><li>Bulk processing</li><li>White-label output</li><li>API access</li><li>Dedicated support</li></ul>
-      <button class="pc-btn o">Contact sales</button>
-    </div>
-  </div>
-</div>
-</div>
-
-<div class="faq-outer" style="order:8;">
-<div class="section">
-  <div class="s-tag" style="text-align:center;">FAQ</div>
-  <div class="s-title" style="text-align:center;">Common questions</div>
-  <div class="faq-wrap" id="faqW"></div>
-</div>
-</div>
-
-<div class="cta-band" style="order:9;">
-  <h2>Make your passport photo now</h2>
-  <p>Free, instant, no signup. Works on any device.</p>
-  <a href="#tool" class="btn-primary" style="display:inline-flex;text-decoration:none;">Open editor free</a>
-</div>
-
-<footer style="order:10;">
-  <div class="ft">
-    <div>
-      <a class="nav-logo" href="#" style="text-decoration:none;">
-        <div class="nav-logo-mark"><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:white;"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="10" r="3" fill="#0C0D10"/><path d="M7 18c0-2.76 2.24-4 5-4s5 1.24 5 4" fill="#0C0D10"/></svg></div>
-        <span class="nav-logo-name">Passport<span>Snap</span></span>
-      </a>
-      <p>Professional passport photos, free, fast, completely private. Nothing leaves your browser.</p>
-    </div>
-    <div class="fc"><h4>Tool</h4><a href="#tool">Photo editor</a><a href="#tool">Print sheet</a><a href="#sizes">Size guide</a></div>
-    <div class="fc"><h4>Sizes</h4><a href="#sizes">India passport</a><a href="#sizes">US passport</a><a href="#sizes">UK passport</a><a href="#sizes">Schengen visa</a></div>
-    <div class="fc"><h4>Company</h4><a href="#">Privacy policy</a><a href="#">Terms</a><a href="#">Contact</a></div>
-  </div>
-  <div class="fb-bottom"><span>2025 PassportSnap Pro. All rights reserved.</span><span>Made in India &#127470;&#127475;</span></div>
-</footer>
-
-<div class="toast" id="toast" style="order:11;"></div>
 
 <script>
-let toastTimer;
-function showToast(msg,duration){
-  duration=duration||3500;
-  var t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(function(){t.classList.remove('show');},duration);
-}
-var SIZES={"India Passport":{w:35,h:45,d:"Govt. of India"},"India Visa":{w:51,h:51,d:"Embassy standard"},"US Passport":{w:51,h:51,d:"2x2 inch USPS"},"UK Passport":{w:35,h:45,d:"HMPO specification"},"Schengen Visa":{w:35,h:45,d:"EU visa standard"},"China Visa":{w:33,h:48,d:"Chinese embassy"},"Canada Passport":{w:50,h:70,d:"IRCC specification"},"Australia":{w:35,h:45,d:"DFAT standard"},"PAN Card":{w:25,h:35,d:"Income Tax India"},"Aadhaar":{w:35,h:45,d:"UIDAI standard"},"Driving Licence":{w:35,h:45,d:"RTO India"},"Custom":{w:35,h:45,d:"Your own size"}};
-var BGS=["#FFFFFF","#4A90D9","#B0C8E8","#CCCCCC","#CC0000","#228B22","#000000"];
-var FILTERS=[{n:"None"},{n:"Vivid",b:1,c:1.12,s:1.4},{n:"Soft",b:1.05,c:.95,s:.85},{n:"B&W"},{n:"Warm"},{n:"Cool"},{n:"Sharp",b:1,c:1.25,s:1.08}];
-var FAQS=[{q:"Is this really free?",a:"Yes, the basic editor is completely free with no signup needed. Pro features like unlimited photos and AI background removal are available with a paid plan."},{q:"Are my photos uploaded to a server?",a:"No. PassportSnap runs entirely in your browser using the HTML5 Canvas API. Your photos never leave your device."},{q:"What size for Indian passport?",a:"Select India Passport (35x45 mm, white background). The tool outputs the exact dimensions at 300 DPI."},{q:"How do I print the sheet?",a:"Go to Print Sheet tab, set columns and rows, click Download Sheet. Take the JPG to any photo studio or print at home on A4 or 4R paper."},{q:"Background not fully removed?",a:"Adjust the Sensitivity slider in the left panel. Higher removes more. Works best on solid, evenly lit backgrounds. Try AI mode for better results."},{q:"Does it work on mobile?",a:"Yes. PassportSnap works on any modern mobile browser. Chrome and Safari on iOS and Android are best."}];
-var imgSrc=null,origSrc=null,hist=[],histIdx=-1,curSz="India Passport",curBg="#FFFFFF",zoom=1,fi=0;
-function getSz(){if(curSz==="Custom")return{w:+document.getElementById('cW').value,h:+document.getElementById('cH').value};return SIZES[curSz];}
-(function(){
-  var sl=document.getElementById('szList');
-  Object.entries(SIZES).forEach(function(e){var n=e[0],s=e[1];var d=document.createElement('div');d.className='sz-item'+(n==="India Passport"?" on":"");d.id='si_'+n.replace(/\W/g,'_');d.innerHTML='<span>'+n+'</span><span class="sz-dim">'+s.w+'x'+s.h+'</span>';d.onclick=function(){pickSz(n);};sl.appendChild(d);});
-  var bw=document.getElementById('bgsw');
-  BGS.forEach(function(c){var d=document.createElement('div');d.className='sw'+(c==="#FFFFFF"?" on":"");d.style.background=c;d.title=c;d.onclick=function(){curBg=c;document.getElementById('bgpk').value=c;document.querySelectorAll('.sw').forEach(function(s){s.classList.remove('on');});d.classList.add('on');};bw.appendChild(d);});
-  var fw=document.getElementById('fp');
-  FILTERS.forEach(function(f,i){var d=document.createElement('div');d.className='fp-pill'+(i===0?" on":"");d.textContent=f.n;d.onclick=function(){fi=i;document.querySelectorAll('.fp-pill').forEach(function(p){p.classList.remove('on');});d.classList.add('on');redraw();document.getElementById('sbFi').textContent='Filter: '+f.n;};fw.appendChild(d);});
-  var sg=document.getElementById('szGrid');
-  Object.entries(SIZES).forEach(function(e){var n=e[0],s=e[1];if(n==="Custom")return;var d=document.createElement('div');d.className='sc';d.innerHTML='<div class="sc-n">'+n+'</div><div class="sc-d">'+s.w+'x'+s.h+' mm</div><div class="sc-x">'+s.d+'</div>';d.onclick=function(){pickSz(n);document.getElementById('tool').scrollIntoView({behavior:'smooth'});};sg.appendChild(d);});
-  var fw2=document.getElementById('faqW');
-  FAQS.forEach(function(f){var d=document.createElement('div');d.className='faq-it';d.innerHTML='<button class="faq-q">'+f.q+'<span class="faq-ic">+</span></button><div class="faq-a">'+f.a+'</div>';d.querySelector('.faq-q').onclick=function(){var o=d.classList.contains('open');document.querySelectorAll('.faq-it').forEach(function(i){i.classList.remove('open');});if(!o)d.classList.add('open');};fw2.appendChild(d);});
-  updSzD();
-})();
-function pickSz(n){curSz=n;document.querySelectorAll('.sz-item').forEach(function(d){d.classList.remove('on');});var el=document.getElementById('si_'+n.replace(/\W/g,'_'));if(el)el.classList.add('on');document.getElementById('cusBlock').style.display=n==="Custom"?"block":"none";updSzD();}
-function updSzD(){var s=getSz();document.getElementById('szV').textContent=s.w+' x '+s.h+' mm';document.getElementById('pxV').textContent=Math.round(s.w*11.81)+' x '+Math.round(s.h*11.81)+' px';document.getElementById('sbSz').textContent=s.w+'x'+s.h+' mm';}
-function onFile(e){loadF(e.target.files[0]);}
-function onDrop(e){e.preventDefault();document.getElementById('upz').classList.remove('over');loadF(e.dataTransfer.files[0]);}
-function loadF(f){if(!f||!f.type.startsWith('image/'))return;var r=new FileReader();r.onload=function(ev){setImg(ev.target.result);};r.readAsDataURL(f);}
-function setImg(url){origSrc=url;imgSrc=url;hist=[url];histIdx=0;zoom=1;renderC(url);enTools(true);updH();updSB();document.getElementById('emp').style.display='none';document.getElementById('pw').style.display='inline-block';}
-function renderC(src){var canvas=document.getElementById('mc');var img=new Image();img.onload=function(){canvas.width=img.width;canvas.height=img.height;var ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0);var d=ctx.getImageData(0,0,canvas.width,canvas.height);d=apAdj(d);if(fi>0)d=apFilt(d,fi);ctx.putImageData(d,0,0);apZoom();};img.src=src;}
-function redraw(){if(imgSrc)renderC(imgSrc);}
-function cl(v){return Math.min(255,Math.max(0,Math.round(v)));}
-function apAdj(id){var b=(+document.getElementById('slB').value + +document.getElementById('slE').value)/100;var c=+document.getElementById('slC').value/100;var s=+document.getElementById('slS').value/100;var d=new Uint8ClampedArray(id.data);for(var i=0;i<d.length;i+=4){var r=d[i]*b,g=d[i+1]*b,bv=d[i+2]*b;r=(r-128)*c+128;g=(g-128)*c+128;bv=(bv-128)*c+128;var gr=.2126*r+.7152*g+.0722*bv;r=gr+(r-gr)*s;g=gr+(g-gr)*s;bv=gr+(bv-gr)*s;d[i]=cl(r);d[i+1]=cl(g);d[i+2]=cl(bv);}return new ImageData(d,id.width,id.height);}
-function apFilt(id,idx){var f=FILTERS[idx];var d=new Uint8ClampedArray(id.data);if(f.n==="B&W"){for(var i=0;i<d.length;i+=4){var g=.2126*d[i]+.7152*d[i+1]+.0722*d[i+2];d[i]=d[i+1]=d[i+2]=g;}}else if(f.n==="Warm"){for(var i=0;i<d.length;i+=4){d[i]=cl(d[i]*1.15);d[i+2]=cl(d[i+2]*.85);}}else if(f.n==="Cool"){for(var i=0;i<d.length;i+=4){d[i]=cl(d[i]*.88);d[i+2]=cl(d[i+2]*1.12);}}else if(f.b||f.c||f.s){for(var i=0;i<d.length;i+=4){var r=d[i]*(f.b||1),g=d[i+1]*(f.b||1),bv=d[i+2]*(f.b||1);var cc=f.c||1;r=(r-128)*cc+128;g=(g-128)*cc+128;bv=(bv-128)*cc+128;var ss=f.s||1;var gr=.2126*r+.7152*g+.0722*bv;r=gr+(r-gr)*ss;g=gr+(g-gr)*ss;bv=gr+(bv-gr)*ss;d[i]=cl(r);d[i+1]=cl(g);d[i+2]=cl(bv);}}return new ImageData(d,id.width,id.height);}
-function cOp(fn){if(!imgSrc)return;var img=new Image();img.onload=function(){var c=document.createElement('canvas');fn(c,img);pushS(c.toDataURL('image/png'));};img.src=imgSrc;}
-function pushS(url){imgSrc=url;hist=hist.slice(0,histIdx+1);hist.push(url);histIdx++;renderC(url);updH();updSB();}
-function doRot(deg){cOp(function(c,img){var rad=deg*Math.PI/180;var w=Math.abs(Math.cos(rad))*img.width+Math.abs(Math.sin(rad))*img.height;var h=Math.abs(Math.sin(rad))*img.width+Math.abs(Math.cos(rad))*img.height;c.width=w;c.height=h;var ctx=c.getContext('2d');ctx.translate(w/2,h/2);ctx.rotate(rad);ctx.drawImage(img,-img.width/2,-img.height/2);});}
-function doFl(h){cOp(function(c,img){c.width=img.width;c.height=img.height;var ctx=c.getContext('2d');if(h){ctx.translate(img.width,0);ctx.scale(-1,1);}else{ctx.translate(0,img.height);ctx.scale(1,-1);}ctx.drawImage(img,0,0);});}
-function doWB(){cOp(function(c,img){c.width=img.width;c.height=img.height;var ctx=c.getContext('2d');ctx.drawImage(img,0,0);var d=ctx.getImageData(0,0,c.width,c.height);var px=d.data;var rS=0,gS=0,bS=0,n=px.length/4;for(var i=0;i<px.length;i+=4){rS+=px[i];gS+=px[i+1];bS+=px[i+2];}var avg=(rS+gS+bS)/(3*n);for(var i=0;i<px.length;i+=4){px[i]=cl(px[i]*(avg/(rS/n)));px[i+1]=cl(px[i+1]*(avg/(gS/n)));px[i+2]=cl(px[i+2]*(avg/(bS/n)));}ctx.putImageData(d,0,0);});}
-function doAuto(){document.getElementById('slB').value=108;document.getElementById('slC').value=112;document.getElementById('slS').value=108;document.getElementById('slE').value=5;onSl();}
-function removeBg(){cOp(function(c,img){c.width=img.width;c.height=img.height;var ctx=c.getContext('2d');ctx.drawImage(img,0,0);var d=ctx.getImageData(0,0,c.width,c.height);var px=d.data;var thr=+document.getElementById('thr').value;var corners=[[0,0],[0,c.width-1],[c.height-1,0],[c.height-1,c.width-1]];var aR=0,aG=0,aB=0;corners.forEach(function(e){var y=e[0],x=e[1];var i=(y*c.width+x)*4;aR+=px[i];aG+=px[i+1];aB+=px[i+2];});aR=Math.round(aR/4);aG=Math.round(aG/4);aB=Math.round(aB/4);for(var i=0;i<px.length;i+=4){if(Math.abs(px[i]-aR)<thr&&Math.abs(px[i+1]-aG)<thr&&Math.abs(px[i+2]-aB)<thr){if(curBg==="transparent"){px[i+3]=0;}else{var rgb=h2r(curBg);px[i]=rgb.r;px[i+1]=rgb.g;px[i+2]=rgb.b;}}}ctx.putImageData(d,0,0);});}
-function applyBgColor(){cOp(function(c,img){c.width=img.width;c.height=img.height;var ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);if(curBg&&curBg!=='transparent'){ctx.fillStyle=curBg;ctx.fillRect(0,0,c.width,c.height);}ctx.drawImage(img,0,0);});showToast('Background color applied!');}
-async function aiRm(){if(!imgSrc)return;showL("AI removing background...");try{var canvas=document.getElementById('mc');var blob=await new Promise(function(res){canvas.toBlob(res,'image/png');});var fd=new FormData();fd.append('file',blob,'photo.png');var res=await fetch('https://manojkumarsh-ai-passport-studio-pro.hf.space/api/process-all',{method:'POST',body:fd,mode:'cors',headers:{'Accept':'image/png, */*'}});if(!res.ok)throw new Error('API error: '+res.status);var respBlob=await res.blob();var pngUrl=URL.createObjectURL(respBlob);var img=new Image();img.onload=function(){var c=document.createElement('canvas');c.width=img.width;c.height=img.height;var ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(img,0,0);URL.revokeObjectURL(pngUrl);var result=c.toDataURL('image/png');pushS(result);hideL();showToast('Background removed! Choose color and Apply BG Color.');};img.onerror=function(){URL.revokeObjectURL(pngUrl);hideL();alert('BG remove failed. Try again.');};img.src=pngUrl;}catch(e){console.error('AI error:',e);hideL();showL("Fallback BG remove...");setTimeout(function(){removeBg();hideL();},500);}}
-function onSl(){document.getElementById('vB').textContent=document.getElementById('slB').value+'%';document.getElementById('vC').textContent=document.getElementById('slC').value+'%';document.getElementById('vS').textContent=document.getElementById('slS').value+'%';document.getElementById('vE').textContent=document.getElementById('slE').value;redraw();}
-function chZ(d){zoom=Math.min(3,Math.max(.25,zoom+d));apZoom();}
-function fitZ(){zoom=1;apZoom();}
-function apZoom(){var pw=document.getElementById('pw');if(pw){pw.style.transform='scale('+zoom+')';pw.style.transformOrigin='center';}var l=Math.round(zoom*100)+'%';document.getElementById('zL').textContent=l;document.getElementById('sbZo').textContent='Zoom: '+l;}
-function doUndo(){if(histIdx>0){histIdx--;imgSrc=hist[histIdx];renderC(imgSrc);updH();}}
-function doRedo(){if(histIdx<hist.length-1){histIdx++;imgSrc=hist[histIdx];renderC(imgSrc);updH();}}
-function updH(){document.getElementById('undoBtn').disabled=histIdx<=0;document.getElementById('redoBtn').disabled=histIdx>=hist.length-1;}
-function doRestore(){if(!origSrc)return;imgSrc=origSrc;hist=[origSrc];histIdx=0;doReset();renderC(origSrc);updH();}
-function doReset(){['slB','slC','slS'].forEach(function(id){document.getElementById(id).value=100;});document.getElementById('slE').value=0;fi=0;document.querySelectorAll('.fp-pill').forEach(function(p,i){p.classList.toggle('on',i===0);});onSl();}
-function switchTab(t,el){document.querySelectorAll('.atb-tab').forEach(function(b){b.className='atb-tab '+(b===el?'on':'off');});var ab=document.querySelector('.ab');var sp=document.getElementById('spp');if(t==='s'){ab.style.display='none';sp.classList.add('show');buildSheet();}else{ab.style.display='flex';sp.classList.remove('show');}}
-function buildSheet(){if(!imgSrc){document.getElementById('spe').style.display='block';document.getElementById('scw').style.display='none';return;}document.getElementById('spe').style.display='none';document.getElementById('scw').style.display='inline-block';var sz=getSz(),PPI=96,MM=PPI/25.4;var co=+document.getElementById('sCo').value,ro=+document.getElementById('sRo').value;var ga=+document.getElementById('sGa').value*MM;var pw=Math.round(sz.w*MM),ph=Math.round(sz.h*MM);var tw=co*pw+(co+1)*ga,th=ro*ph+(ro+1)*ga;var c=document.getElementById('shC');c.width=tw;c.height=th;var ctx=c.getContext('2d');ctx.fillStyle=document.getElementById('sBG').value;ctx.fillRect(0,0,tw,th);var src=document.getElementById('mc').toDataURL('image/png');var img=new Image();img.onload=function(){for(var r=0;r<ro;r++)for(var cc=0;cc<co;cc++){var x=ga+cc*(pw+ga),y=ga+r*(ph+ga);ctx.drawImage(img,x,y,pw,ph);ctx.strokeStyle='rgba(0,0,0,0.1)';ctx.lineWidth=.5;ctx.strokeRect(x,y,pw,ph);}document.getElementById('shInfo').textContent=co+'x'+ro+' - '+sz.w+'x'+sz.h+' mm';document.getElementById('dlSh').disabled=false;};img.src=src;}
-function dlSheet(){var c=document.getElementById('shC');if(!c.width)return;var a=document.createElement('a');a.href=c.toDataURL('image/jpeg',.95);a.download='passport_sheet.jpg';a.click();}
-function downloadPhoto(){if(!imgSrc)return;var sz=getSz(),PPI=300,MM=PPI/25.4;var w=Math.round(sz.w*MM),h=Math.round(sz.h*MM);var c=document.createElement('canvas');c.width=w;c.height=h;var ctx=c.getContext('2d');var src=document.getElementById('mc').toDataURL('image/png');var img=new Image();img.onload=function(){ctx.drawImage(img,0,0,w,h);var a=document.createElement('a');a.href=c.toDataURL('image/jpeg',.95);a.download='passport_'+sz.w+'x'+sz.h+'mm.jpg';a.click();};img.src=src;}
-function h2r(hex){return{r:parseInt(hex.slice(1,3),16),g:parseInt(hex.slice(3,5),16),b:parseInt(hex.slice(5,7),16)};}
-function showL(m){document.getElementById('ldr').classList.add('show');document.getElementById('ldrT').textContent=m;document.getElementById('sbLd').style.display='inline';}
-function hideL(){document.getElementById('ldr').classList.remove('show');document.getElementById('sbLd').style.display='none';}
-function enTools(on){['undoBtn','redoBtn','dlBtn','abgBtn','rmBtn','aiBtn','qaA','qaW','qaR','qaI','rtL','rtR','flH','flV','autoB','wbB','restB'].forEach(function(id){var el=document.getElementById(id);if(el)el.disabled=!on;});}
-function updSB(){document.getElementById('sbHi').textContent=hist.length+' states';}
+  // State
+  let currentStep = 1;
+  let originalImage = new Image();
+  let croppedImage = new Image();
+  let bgRemovedImage = new Image(); // Stores image with transparent bg
+  let finalImage = new Image(); // Stores final adjusted image
+  
+  // Base scales
+  const MM_TO_PX = 11.811; // 300 DPI roughly
+
+  // Navigate steps
+  function goToStep(step) {
+    document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.step').forEach((el, idx) => {
+      el.classList.remove('active');
+      if(idx < step-1) el.classList.add('completed');
+      else el.classList.remove('completed');
+    });
+    
+    document.getElementById('step-'+step).classList.add('active');
+    document.getElementById('st-'+step).classList.add('active');
+    currentStep = step;
+  }
+
+  // 1. Upload
+  function handleUpload(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      originalImage.src = event.target.result;
+      originalImage.onload = () => {
+        setupCrop();
+        goToStep(2);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // 2. Crop logic (Simplified for UI visualization)
+  let drag = false, startX, startY, imgX=0, imgY=0, imgScale=1;
+  function setupCrop() {
+    const img = document.getElementById('cropImg');
+    img.src = originalImage.src;
+    imgX=0; imgY=0; imgScale=1; // reset
+    updateCropBox();
+    
+    // Basic drag logic
+    img.onmousedown = (e) => { drag = true; startX = e.clientX - imgX; startY = e.clientY - imgY; e.preventDefault(); };
+    document.onmousemove = (e) => { if(drag) { imgX = e.clientX - startX; imgY = e.clientY - startY; img.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`; } };
+    document.onmouseup = () => { drag = false; };
+    // Wheel zoom
+    document.getElementById('cropWrapper').onwheel = (e) => {
+      e.preventDefault();
+      imgScale += e.deltaY * -0.001;
+      imgScale = Math.max(0.1, imgScale);
+      img.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+    };
+  }
+
+  function updateCropBox() {
+    const size = document.getElementById('cropSize').value;
+    let w, h;
+    if(size !== 'custom') {
+      [w, h] = size.split('x').map(Number);
+      document.getElementById('cropW').value = w;
+      document.getElementById('cropH').value = h;
+    } else {
+      w = +document.getElementById('cropW').value;
+      h = +document.getElementById('cropH').value;
+    }
+    const wrap = document.getElementById('cropWrapper');
+    // Scale for visualization
+    wrap.style.width = (w * 5) + 'px';
+    wrap.style.height = (h * 5) + 'px';
+    document.getElementById('cropImg').style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+  }
+
+  function applyCropAndNext() {
+    // Render crop to a real canvas
+    const w = +document.getElementById('cropW').value * MM_TO_PX;
+    const h = +document.getElementById('cropH').value * MM_TO_PX;
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    const ctx = c.getContext('2d');
+    
+    // Reverse engineer the visual scale to actual scale
+    const visualW = +document.getElementById('cropW').value * 5;
+    const ratio = w / visualW;
+    
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0,0,w,h);
+    ctx.drawImage(originalImage, imgX * ratio, imgY * ratio, originalImage.width * imgScale * ratio, originalImage.height * imgScale * ratio);
+    
+    croppedImage.src = c.toDataURL('image/png');
+    croppedImage.onload = () => {
+      bgRemovedImage.src = croppedImage.src; // Init bg removed as same
+      bgRemovedImage.onload = () => {
+        initBgCanvas();
+        goToStep(3);
+      }
+    }
+  }
+
+  // 3. Background
+  function initBgCanvas() {
+    applyBgColor();
+  }
+
+  function setBg(color) {
+    document.getElementById('bgColor').value = color;
+    applyBgColor();
+  }
+
+  function applyBgColor() {
+    const c = document.getElementById('bgCanvas');
+    c.width = bgRemovedImage.width; c.height = bgRemovedImage.height;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = document.getElementById('bgColor').value;
+    ctx.fillRect(0,0,c.width,c.height);
+    ctx.drawImage(bgRemovedImage, 0, 0);
+  }
+
+  async function removeBgApi() {
+    document.getElementById('bgLoader').style.display = 'block';
+    try {
+      // Create base64 of cropped image
+      let b64 = croppedImage.src;
+      let res = await fetch('https://manojkumarsh-ai-passport-studio-pro.hf.space/api/process-all', {
+        method: 'POST',
+        // Creating Blob from b64
+        body: await (await fetch(b64)).formData().catch(async ()=>{
+             let blob = await (await fetch(b64)).blob();
+             let fd = new FormData(); fd.append('file', blob, 'photo.png'); return fd;
+        }),
+        mode:'cors'
+      });
+      if(!res.ok) throw new Error("API Failed");
+      let resBlob = await res.blob();
+      let url = URL.createObjectURL(resBlob);
+      bgRemovedImage.src = url;
+      bgRemovedImage.onload = () => {
+        applyBgColor();
+        document.getElementById('bgLoader').style.display = 'none';
+      }
+    } catch (e) {
+      alert('Background removal failed. API might be offline.');
+      document.getElementById('bgLoader').style.display = 'none';
+    }
+  }
+
+  // 4. Adjustments
+  function applyAdjustments() {
+    const b = document.getElementById('slB').value;
+    const c = document.getElementById('slC').value;
+    const s = document.getElementById('slS').value;
+    
+    document.getElementById('vB').textContent = b + '%';
+    document.getElementById('vC').textContent = c + '%';
+    document.getElementById('vS').textContent = s + '%';
+
+    const canvas = document.getElementById('adjCanvas');
+    canvas.width = bgRemovedImage.width; canvas.height = bgRemovedImage.height;
+    const ctx = canvas.getContext('2d');
+    
+    // Draw BG
+    ctx.fillStyle = document.getElementById('bgColor').value;
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    
+    // CSS Filters trick for canvas
+    ctx.filter = `brightness(${b}%) contrast(${c}%) saturate(${s}%)`;
+    ctx.drawImage(bgRemovedImage, 0, 0);
+    ctx.filter = 'none'; // reset
+  }
+
+  function autoEnhance() {
+    document.getElementById('slB').value = 110;
+    document.getElementById('slC').value = 115;
+    document.getElementById('slS').value = 105;
+    applyAdjustments();
+  }
+
+  // 5. Print Layout
+  function preparePrintStep() {
+    // Save final adjusted image
+    applyAdjustments();
+    finalImage.src = document.getElementById('adjCanvas').toDataURL('image/png');
+    finalImage.onload = () => {
+      updatePrintLayout();
+      goToStep(5);
+    }
+  }
+
+  function updatePrintLayout() {
+    const c = document.getElementById('printCanvas');
+    const ctx = c.getContext('2d');
+    
+    const paperSize = document.getElementById('paperSize').value;
+    let pW, pH;
+    if(paperSize === 'A4') { pW = 210 * MM_TO_PX; pH = 297 * MM_TO_PX; }
+    else if(paperSize === '4x6') { pW = 102 * MM_TO_PX; pH = 152 * MM_TO_PX; }
+    else if(paperSize === '5x7') { pW = 127 * MM_TO_PX; pH = 178 * MM_TO_PX; }
+
+    c.width = pW; c.height = pH;
+    ctx.fillStyle = "#ffffff"; // Paper color
+    ctx.fillRect(0,0,pW,pH);
+
+    const count = +document.getElementById('photoCount').value;
+    const photoMargin = +document.getElementById('photoMargin').value * MM_TO_PX;
+    const pageMargin = +document.getElementById('pageMargin').value * MM_TO_PX;
+    
+    const bColor = document.getElementById('borderColor').value;
+    const bWidth = +document.getElementById('borderWidth').value;
+
+    const imgW = +document.getElementById('cropW').value * MM_TO_PX;
+    const imgH = +document.getElementById('cropH').value * MM_TO_PX;
+
+    // Calculate Grid
+    const availableW = pW - (2 * pageMargin);
+    const availableH = pH - (2 * pageMargin);
+    
+    const cols = Math.floor((availableW + photoMargin) / (imgW + photoMargin));
+    const rows = Math.floor((availableH + photoMargin) / (imgH + photoMargin));
+
+    let printed = 0;
+    for(let r=0; r<rows; r++) {
+      for(let col=0; col<cols; col++) {
+        if(printed >= count) break;
+        const x = pageMargin + (col * (imgW + photoMargin));
+        const y = pageMargin + (r * (imgH + photoMargin));
+        
+        ctx.drawImage(finalImage, x, y, imgW, imgH);
+        
+        if(bWidth > 0) {
+          ctx.strokeStyle = bColor;
+          ctx.lineWidth = bWidth;
+          ctx.strokeRect(x, y, imgW, imgH);
+        }
+        printed++;
+      }
+    }
+  }
+
+  function printSheet() {
+    const c = document.getElementById('printCanvas');
+    const dataUrl = c.toDataURL('image/png');
+    
+    // Open a new window for pure printing
+    const printWin = window.open('', '_blank');
+    printWin.document.write(`
+      <html>
+        <head>
+          <title>Print Passport Photos</title>
+          <style>
+            @page { size: auto; margin: 0mm; }
+            body { margin: 0; display:flex; justify-content:center; align-items:center; background:#fff; }
+            img { max-width: 100%; height: auto; }
+          </style>
+        </head>
+        <body>
+          <img src="${dataUrl}" onload="window.print(); window.close();" />
+        </body>
+      </html>
+    `);
+    printWin.document.close();
+  }
+
 </script>
 </body>
 </html>
