@@ -1,102 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Passport Photo Pro - Wizard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PassportSnap Pro - Create Perfect Passport Photos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4f46e5',
+            secondary: '#ec4899',
+            light: '#f3f4f6',
+            dark: '#111827',
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f9fafb; color: #1f2937; }
+    .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
+    .gradient-text { background: linear-gradient(135deg, #4f46e5, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-bg { background: radial-gradient(circle at top right, rgba(79, 70, 229, 0.1), transparent 40%), radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.05), transparent 40%); }
+    .step-line { position: relative; }
+    .step-line::after { content: ''; position: absolute; top: 20px; left: 50px; width: 100px; height: 2px; background: repeating-linear-gradient(90deg, #d1d5db 0, #d1d5db 5px, transparent 5px, transparent 10px); z-index: -1; }
+    .step-line:last-child::after { display: none; }
+  </style>
 <style>
+/* APP CSS */
+
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
   
   :root {
-    --bg: #FFFFFF;
-    --bg-alt: #F8FAFC;
-    --primary: #EC4899;
-    --primary-hover: #DB2777;
-    --accent: #F43F5E;
-    --text: #000000;
-    --text-muted: #475569;
-    --border: #E2E8F0;
-    --radius: 12px;
+    --bg-mesh: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+    --bg-color: #f3f4f6;
+    --bg-alt: #ffffff;
+    --primary: #6366f1; /* Indigo */
+    --primary-hover: #4f46e5;
+    --accent: #ec4899; /* Pink */
+    --text: #111827;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --radius: 16px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-  body { background-color: var(--bg-alt); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; }
   
-  header { background: var(--bg); padding: 15px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-  .logo { font-size: 24px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; }
-  .logo span { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  body { 
+    background-color: var(--bg-color); 
+    background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+                      radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.1) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: var(--text); 
+    display: flex; 
+    flex-direction: column; 
+    min-height: 100vh; 
+  }
+  
+  header { 
+    background: rgba(255, 255, 255, 0.8); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 16px 40px; 
+    border-bottom: 1px solid rgba(255,255,255,0.3); 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    position: sticky; 
+    top: 0; 
+    z-index: 100; 
+    box-shadow: var(--shadow-sm); 
+  }
+  
+  .logo { font-size: 26px; font-weight: 800; display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px; }
+  .logo span { 
+    background: linear-gradient(135deg, var(--primary), var(--accent)); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+  }
   
   /* Stepper */
-  .stepper { display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--bg); border-bottom: 1px solid var(--border); gap: 15px; flex-wrap: wrap; }
-  .step { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-muted); opacity: 0.5; transition: 0.3s; }
-  .step.active { opacity: 1; color: var(--primary); }
-  .step.completed { opacity: 1; color: #10B981; }
-  .step-num { width: 24px; height: 24px; border-radius: 50%; background: #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-  .step.active .step-num { background: var(--primary); color: white; }
-  .step.completed .step-num { background: #10B981; color: white; }
-  .step-line { width: 30px; height: 2px; background: var(--border); }
+  .stepper { 
+    display: flex; align-items: center; justify-content: center; padding: 25px; 
+    background: transparent; gap: 15px; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .step { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--text-muted); opacity: 0.6; transition: all 0.4s ease; }
+  .step.active { opacity: 1; color: var(--primary); transform: scale(1.05); }
+  .step.completed { opacity: 1; color: #10b981; }
+  
+  .step-num { 
+    width: 28px; height: 28px; border-radius: 50%; background: var(--border); 
+    display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; transition: 0.4s;
+  }
+  .step.active .step-num { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; box-shadow: var(--shadow-glow); }
+  .step.completed .step-num { background: linear-gradient(135deg, #10b981, #34d399); color: white; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+  .step-line { width: 40px; height: 3px; background: var(--border); border-radius: 3px; transition: 0.4s; }
+  .step.completed + .step-line { background: #10b981; }
 
   /* Main Layout */
-  .container { display: flex; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; padding: 30px; gap: 30px; }
+  .container { display: flex; flex: 1; max-width: 1200px; margin: 0 auto; width: 100%; padding: 20px 30px 50px 30px; gap: 30px; }
   
-  .view-panel { display: none; width: 100%; flex-direction: column; gap: 20px; animation: fadeIn 0.3s ease; }
+  .view-panel { display: none; width: 100%; flex-direction: column; gap: 20px; animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
   .view-panel.active { display: flex; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  @keyframes slideUpFade { 
+    to { opacity: 1; transform: translateY(0); } 
+  }
 
-  .card { background: var(--bg); border-radius: 20px; border: 1px solid var(--border); padding: 30px; box-shadow: var(--shadow); }
+  .card { 
+    background: rgba(255, 255, 255, 0.9); 
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius); 
+    border: 1px solid rgba(255,255,255,0.5); 
+    padding: 40px; 
+    box-shadow: var(--shadow-lg); 
+  }
   
-  h2 { font-size: 24px; font-weight: 700; margin-bottom: 20px; color: var(--text); }
+  h2 { font-size: 26px; font-weight: 800; margin-bottom: 24px; color: var(--text); letter-spacing: -0.5px; }
   
-  .btn { padding: 12px 24px; border-radius: var(--radius); font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-  .btn-primary { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; box-shadow: 0 4px 15px rgba(236,72,153,0.3); }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(236,72,153,0.4); }
-  .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
-  .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+  /* Buttons */
+  .btn { 
+    padding: 14px 28px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.5px;
+  }
+  .btn-primary { 
+    background: linear-gradient(135deg, var(--primary), var(--accent)); 
+    color: white; 
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); 
+  }
+  .btn-primary:hover { 
+    transform: translateY(-2px) scale(1.02); 
+    box-shadow: 0 8px 25px rgba(236, 72, 153, 0.5); 
+  }
+  .btn-primary:active { transform: translateY(0) scale(0.98); }
+  
+  .btn-outline { background: white; border: 2px solid var(--border); color: var(--text); font-weight: 700; }
+  .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: #fef2f8; }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
 
   /* Step 1: Upload */
-  .upload-area { border: 2px dashed var(--primary); border-radius: 24px; padding: 60px 20px; text-align: center; background: rgba(236,72,153,0.03); cursor: pointer; transition: 0.3s; }
-  .upload-area:hover { background: rgba(236,72,153,0.08); border-color: var(--accent); }
-  .upload-icon { font-size: 48px; margin-bottom: 20px; color: var(--primary); }
+  .upload-area { 
+    border: 2px dashed rgba(99, 102, 241, 0.5); 
+    border-radius: 20px; padding: 70px 20px; text-align: center; 
+    background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(99, 102, 241, 0.05) 100%); 
+    cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;
+  }
+  .upload-area:hover { 
+    border-color: var(--accent); 
+    background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(236, 72, 153, 0.08) 100%); 
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+  }
+  .upload-icon { font-size: 54px; margin-bottom: 20px; display: inline-block; animation: float 3s ease-in-out infinite; }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
 
-  /* Two column layout for Editor Steps */
-  .editor-layout { display: grid; grid-template-columns: 350px 1fr; gap: 30px; width: 100%; }
-  .sidebar { background: var(--bg); border-radius: 20px; border: 1px solid var(--border); padding: 25px; box-shadow: var(--shadow); height: fit-content; }
-  .canvas-container { background: var(--bg); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; padding: 40px; min-height: 500px; background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 20px 20px; overflow: auto; }
+  /* Two column layout for Editor Steps (Responsive & Swapped) */
+  .editor-layout { display: flex; flex-direction: column-reverse; gap: 30px; width: 100%; align-items: stretch; }
+  .sidebar { width: 100%; flex-shrink: 0; }
+  .canvas-container { flex-grow: 1; min-width: 0; width: 100%; }
+  
+  @media (min-width: 900px) {
+    .editor-layout { flex-direction: row-reverse; align-items: flex-start; }
+    .sidebar { width: 380px; }
+  }
+  
+  .sidebar { 
+    background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
+    border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.7); 
+    padding: 30px; box-shadow: var(--shadow-lg); 
+  }
+  
+  .canvas-container { 
+    background: rgba(255,255,255,0.6); backdrop-filter: blur(5px);
+    border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.5); box-shadow: var(--shadow-lg); 
+    display: flex; align-items: center; justify-content: center; padding: 40px; min-height: 550px; 
+    background-image: radial-gradient(rgba(99, 102, 241, 0.15) 1px, transparent 1px); background-size: 24px 24px; overflow: auto; 
+  }
 
   /* Forms & Inputs */
-  .form-group { margin-bottom: 20px; }
-  .form-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-  select, input[type="number"], input[type="color"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 15px; font-weight: 600; color: var(--text); outline: none; transition: 0.2s; }
-  select:focus, input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(236,72,153,0.1); }
+  .form-group { margin-bottom: 22px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 800; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1.2px; }
   
-  input[type="range"] { width: 100%; accent-color: var(--primary); }
-  .slider-val { float: right; color: var(--primary); }
+  select, input[type="number"], input[type="color"] { 
+    width: 100%; padding: 14px 16px; 
+    background: var(--bg-alt);
+    border: 2px solid var(--border); border-radius: 10px; 
+    font-size: 15px; font-weight: 600; color: var(--text); outline: none; transition: all 0.3s ease; 
+  }
+  select:focus, input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); background: white; }
+  
+  input[type="range"] { width: 100%; accent-color: var(--accent); height: 6px; border-radius: 3px; }
+  .slider-val { float: right; color: var(--primary); font-weight: 800; font-size: 14px; }
 
   /* Navigation Footer */
-  .nav-footer { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .nav-footer { display: flex; justify-content: space-between; margin-top: 30px; padding-top: 25px; border-top: 1px solid var(--border); }
   
-  canvas { max-width: 100%; max-height: 65vh; object-fit: contain; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+  canvas { max-width: 100%; max-height: 65vh; object-fit: contain; box-shadow: 0 15px 35px rgba(0,0,0,0.15); border-radius: 8px; }
   
   .loader { display: none; padding: 20px; text-align: center; color: var(--primary); font-weight: bold; }
   
   /* Scanner and Progress */
-  .scanner-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; display: none; border-radius: 12px; pointer-events: none; background: rgba(236,72,153,0.1); }
-  .scanner-line { position: absolute; width: 100%; height: 4px; background: var(--primary); box-shadow: 0 0 15px var(--primary), 0 0 20px var(--primary); animation: scan 2s infinite linear alternate; }
-  @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+  .scanner-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; display: none; border-radius: 8px; pointer-events: none; background: rgba(99, 102, 241, 0.1); backdrop-filter: blur(2px); }
+  .scanner-line { position: absolute; width: 100%; height: 3px; background: var(--primary); box-shadow: 0 0 20px var(--primary), 0 0 30px var(--accent); animation: scan 1.5s infinite linear alternate; }
+  @keyframes scan { 0% { top: 0%; opacity: 0.5; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0.5; } }
   
-  .progress-container { width: 100%; height: 10px; background: var(--border); border-radius: 5px; margin-top: 10px; overflow: hidden; display: none; }
-  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); width: 0%; transition: width 0.2s ease; }
-  .progress-text { text-align: center; font-size: 14px; font-weight: 800; color: var(--primary); margin-top: 8px; display: none; }
+  .progress-container { width: 100%; height: 8px; background: var(--border); border-radius: 4px; margin-top: 15px; overflow: hidden; display: none; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary)); background-size: 200% 100%; width: 0%; transition: width 0.3s ease; animation: gradientMove 2s infinite linear; }
+  
+  @keyframes gradientMove { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+  
+  .progress-text { text-align: center; font-size: 14px; font-weight: 800; color: var(--primary); margin-top: 10px; display: none; }
+
 </style>
 </head>
 <body>
-
-<header>
-  <div class="logo">📷 <span>PassportSnap Pro</span></div>
-</header>
-
+<div id="app-container" style="display:block; padding-top: 20px;">
 <div class="stepper">
   <div class="step active" id="st-1"><div class="step-num">1</div> Upload</div>
   <div class="step-line"></div>
@@ -135,8 +269,8 @@
           <label>Photo Size Requirement</label>
           <select id="cropSize" onchange="updateCropBox()">
             <option value="35x45">India Passport (35x45 mm)</option>
+            <option value="30x40">UAE Passport / Stamp Size (30x40 mm)</option>
             <option value="51x51">US Visa (51x51 mm)</option>
-            <option value="30x40">UAE Passport (30x40 mm)</option>
             <option value="custom">Custom Size</option>
           </select>
         </div>
@@ -152,6 +286,15 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label>Photo Zoom Adjust</label>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="zoomImage(0.1)">🔍 +</button>
+            <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="zoomImage(-0.1)">🔍 -</button>
+            <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="resetZoom()">Reset</button>
+          </div>
+        </div>
+
         <div class="nav-footer">
           <button class="btn btn-outline" onclick="goToStep(1)">Back</button>
           <button class="btn btn-primary" onclick="applyCropAndNext()">Crop & Next ➔</button>
@@ -160,7 +303,7 @@
       <div class="canvas-container">
         <!-- Temporary Simple Crop visualization using a container -->
         <div id="cropWrapper" style="position:relative; overflow:hidden; border:2px solid var(--primary); box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);">
-          <img id="cropImg" style="cursor:move; transform-origin: top left;" />
+          <img id="cropImg" style="cursor:move; transform-origin: top left; max-width: none !important;" />
         </div>
       </div>
     </div>
@@ -171,7 +314,18 @@
     <div class="editor-layout">
       <div class="sidebar">
         <h2>Background</h2>
+        <div class="form-group" style="margin-top:20px; display:flex; flex-direction:column; align-items:center;">
+          <label style="align-self:flex-start; margin-bottom:15px;">Pick Background Color</label>
+          <input type="hidden" id="bgColor" value="#ffffff">
+          <div id="colorPickerContainer"></div>
+        </div>
         
+        <div style="display:flex; gap:10px; margin-bottom:30px;">
+          <button class="btn btn-outline" style="flex:1; padding:10px;" onclick="setBg('#ffffff')">White</button>
+          <button class="btn btn-outline" style="flex:1; padding:10px; background:#3B82F6; color:white; border-color:#3B82F6;" onclick="setBg('#3B82F6')">Blue</button>
+          <button class="btn btn-outline" style="flex:1; padding:10px; background:#EF4444; color:white; border-color:#EF4444;" onclick="setBg('#EF4444')">Red</button>
+        </div>
+
         <div style="margin-bottom:15px; display:flex; align-items:center; gap:8px;">
           <input type="checkbox" id="doEnhance" checked style="width:18px; height:18px; accent-color:var(--primary); cursor:pointer;">
           <label for="doEnhance" style="margin:0; font-size:14px; cursor:pointer; color:var(--text); text-transform:none; letter-spacing:0;">Enable AI Face Enhancement (HD)</label>
@@ -180,17 +334,6 @@
         <div id="progressContainer" class="progress-container"><div id="progressBar" class="progress-bar"></div></div>
         <div id="progressText" class="progress-text">0% Scanning...</div>
         <div id="bgLoader" class="loader" style="display:none;"></div>
-        
-        <div class="form-group" style="margin-top:20px;">
-          <label>Pick Background Color</label>
-          <input type="color" id="bgColor" value="#ffffff" oninput="applyBgColor()">
-        </div>
-        
-        <div style="display:flex; gap:10px; margin-bottom:20px;">
-          <button class="btn btn-outline" style="flex:1; padding:10px;" onclick="setBg('#ffffff')">White</button>
-          <button class="btn btn-outline" style="flex:1; padding:10px; background:#3B82F6; color:white; border-color:#3B82F6;" onclick="setBg('#3B82F6')">Blue</button>
-          <button class="btn btn-outline" style="flex:1; padding:10px; background:#EF4444; color:white; border-color:#EF4444;" onclick="setBg('#EF4444')">Red</button>
-        </div>
 
         <div class="nav-footer">
           <button class="btn btn-outline" onclick="goToStep(2)">Back</button>
@@ -211,8 +354,6 @@
     <div class="editor-layout">
       <div class="sidebar">
         <h2>Enhance & Adjust</h2>
-        <button class="btn btn-primary" style="width:100%; margin-bottom:20px;" onclick="autoEnhance()">✨ Auto Enhance</button>
-        
         <div class="form-group">
           <label>Brightness <span id="vB" class="slider-val">100%</span></label>
           <input type="range" id="slB" min="0" max="200" value="100" oninput="applyAdjustments()">
@@ -226,7 +367,10 @@
           <input type="range" id="slS" min="0" max="200" value="100" oninput="applyAdjustments()">
         </div>
 
-        <div class="nav-footer">
+        <button class="btn btn-primary" style="width:100%; margin-bottom:20px;" onclick="autoEnhance()">✨ Auto Enhance</button>
+
+        <button class="btn" style="width:100%; margin-bottom:20px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); text-transform: uppercase; font-weight: 800; font-size: 15px; letter-spacing: 0.5px; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 25px rgba(16, 185, 129, 0.6)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 15px rgba(16, 185, 129, 0.4)';" onclick="downloadImage('adjCanvas', 'adjusted_passport.png')">⬇ Download Final Single Photo</button>
+          <div class="nav-footer">
           <button class="btn btn-outline" onclick="goToStep(3)">Back</button>
           <button class="btn btn-primary" onclick="preparePrintStep()">Layout & Print ➔</button>
         </div>
@@ -246,9 +390,26 @@
         <div class="form-group">
           <label>Paper Size</label>
           <select id="paperSize" onchange="updatePrintLayout()">
-            <option value="A4">A4 (210 x 297 mm)</option>
-            <option value="4x6">4x6 inch (102 x 152 mm)</option>
-            <option value="5x7">5x7 inch (127 x 178 mm)</option>
+            <option value="A4P">A4 Portrait (210 x 297 mm)</option>
+            <option value="A4L">A4 Landscape (297 x 210 mm)</option>
+            <option value="4x6L" selected>4x6 inch Landscape (152 x 102 mm)</option>
+            <option value="4x6P">4x6 inch Portrait (102 x 152 mm)</option>
+            <option value="5x7L">5x7 inch Landscape (178 x 127 mm)</option>
+            <option value="5x7P">5x7 inch Portrait (127 x 178 mm)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Auto-Fit Grid (Scale to fit)</label>
+          <select id="gridLayout" onchange="onGridLayoutChange()">
+            <option value="actual">Actual Size (From Crop Step)</option>
+            <option value="2x2">Fit 4 Photos</option>
+            <option value="3x2">Fit 6 Photos</option>
+            <option value="4x2" selected>Fit 8 Photos</option>
+            <option value="3x3">Fit 9 Photos</option>
+            <option value="4x3">Fit 12 Photos</option>
+            <option value="5x3">Fit 15 Photos</option>
+            <option value="4x4">Fit 16 Photos</option>
           </select>
         </div>
 
@@ -260,11 +421,11 @@
         <div class="form-group" style="display:flex; gap:10px;">
           <div style="flex:1">
             <label>Photo Margin (mm)</label>
-            <input type="number" id="photoMargin" value="3" min="0" onchange="updatePrintLayout()">
+            <input type="number" id="photoMargin" value="2" min="0" onchange="updatePrintLayout()">
           </div>
           <div style="flex:1">
             <label>Page Margin (mm)</label>
-            <input type="number" id="pageMargin" value="10" min="0" onchange="updatePrintLayout()">
+            <input type="number" id="pageMargin" value="4" min="0" onchange="updatePrintLayout()">
           </div>
         </div>
 
@@ -280,26 +441,121 @@
         </div>
 
         <div class="nav-footer" style="flex-direction:column; gap:10px;">
-          <button class="btn btn-primary" style="width:100%; font-size:18px; padding:15px;" onclick="printSheet()">🖨️ Print Now</button>
+          <button class="btn btn-primary" style="width:100%; font-size:18px; padding:15px;" onclick="downloadSheet()">⬇ Download Print Sheet</button>
+            <button class="btn btn-outline" style="width:100%;" onclick="printSheet()">🖨️ Direct Print</button>
           <button class="btn btn-outline" style="width:100%;" onclick="goToStep(4)">Back to Adjust</button>
         </div>
       </div>
       <div class="canvas-container" style="background:#e5e7eb;">
         <!-- The Print Sheet Preview -->
-        <canvas id="printCanvas" style="background:white; box-shadow:0 10px 40px rgba(0,0,0,0.2); max-height:80vh; max-width:100%;"></canvas>
+        <canvas id="printCanvas" style="background:white; box-shadow:0 10px 40px rgba(0,0,0,0.2); max-height:80vh; max-width:100%; width:auto; height:auto; object-fit:contain;"></canvas>
       </div>
     </div>
   </div>
 
 </div>
 
+
+</div>
+
+<!-- Ad Placeholder 1 -->
+<div style="max-w-4xl mx-auto px-4 py-8 text-center mt-10">
+  <div style="width:100%; height:120px; background:#e5e7eb; border:2px dashed #cbd5e1; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#94a3b8;">
+    <div>
+      <p style="font-weight:bold; font-size:18px; margin:0;">Google AdSense Banner</p>
+      <p style="font-size:14px; margin:0;">Responsive Ad Unit</p>
+    </div>
+  </div>
+</div>
+
+<!-- Content Section: Features & Guide -->
+<div style="max-w-6xl mx-auto px-4 py-12">
+  <div style="text-align:center; margin-bottom:40px;">
+    <h2 style="font-size:2rem; font-weight:800; color:var(--text); margin-bottom:10px;">Create Professional Passport Photos in Seconds</h2>
+    <p style="font-size:1.1rem; color:var(--text-muted); max-width:800px; margin:0 auto;">Our AI-powered tool automatically removes backgrounds, enhances facial details, and formats your photo to exact government specifications.</p>
+  </div>
+
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:30px; margin-bottom:50px;">
+    <div style="background:white; padding:30px; border-radius:20px; box-shadow:var(--shadow-sm); border:1px solid var(--border); text-align:center;">
+      <div style="width:60px; height:60px; background:#e0e7ff; color:#4f46e5; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; margin:0 auto 20px;">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+      </div>
+      <h3 style="font-size:1.25rem; font-weight:bold; margin-bottom:10px;">AI Background Removal</h3>
+      <p style="color:var(--text-muted); font-size:14px; line-height:1.6;">Instantly replace any messy background with a clean, solid color required for official documents.</p>
+    </div>
+    
+    <div style="background:white; padding:30px; border-radius:20px; box-shadow:var(--shadow-sm); border:1px solid var(--border); text-align:center;">
+      <div style="width:60px; height:60px; background:#fce7f3; color:#ec4899; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; margin:0 auto 20px;">
+        <i class="fa-solid fa-face-smile"></i>
+      </div>
+      <h3 style="font-size:1.25rem; font-weight:bold; margin-bottom:10px;">HD Face Enhancement</h3>
+      <p style="color:var(--text-muted); font-size:14px; line-height:1.6;">Advanced AI sharpens facial features, fixes lighting, and ensures your photo looks crystal clear.</p>
+    </div>
+
+    <div style="background:white; padding:30px; border-radius:20px; box-shadow:var(--shadow-sm); border:1px solid var(--border); text-align:center;">
+      <div style="width:60px; height:60px; background:#dcfce7; color:#16a34a; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; margin:0 auto 20px;">
+        <i class="fa-solid fa-print"></i>
+      </div>
+      <h3 style="font-size:1.25rem; font-weight:bold; margin-bottom:10px;">Ready to Print Layouts</h3>
+      <p style="color:var(--text-muted); font-size:14px; line-height:1.6;">Generate A4 or 4x6 inch print sheets automatically. Save money by printing at your local shop.</p>
+    </div>
+  </div>
+
+  <!-- Ad Placeholder 2 -->
+  <div style="text-align:center; margin-bottom:50px;">
+    <div style="display:inline-flex; width:100%; max-width:728px; height:250px; background:#e5e7eb; border:2px dashed #cbd5e1; border-radius:12px; align-items:center; justify-content:center; color:#94a3b8;">
+      <div>
+        <p style="font-weight:bold; font-size:18px; margin:0;">Display Ad Unit</p>
+        <p style="font-size:14px; margin:0;">Responsive Rectangle</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Requirements Section -->
+  <div style="background:#eef2ff; border-radius:24px; padding:40px; border:1px solid #e0e7ff; margin-bottom:50px;">
+    <h2 style="font-size:1.75rem; font-weight:bold; color:var(--text); margin-bottom:30px; text-align:center;">Standard Photo Requirements</h2>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:30px;">
+      <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:15px;">
+        <li style="display:flex; align-items:flex-start; gap:12px;">
+          <i class="fa-solid fa-check" style="color:#10b981; margin-top:4px;"></i>
+          <span style="color:#374151; font-size:15px; line-height:1.5;"><strong>White or light blue background</strong> without shadows or patterns.</span>
+        </li>
+        <li style="display:flex; align-items:flex-start; gap:12px;">
+          <i class="fa-solid fa-check" style="color:#10b981; margin-top:4px;"></i>
+          <span style="color:#374151; font-size:15px; line-height:1.5;"><strong>Neutral facial expression</strong> with both eyes open and mouth closed.</span>
+        </li>
+        <li style="display:flex; align-items:flex-start; gap:12px;">
+          <i class="fa-solid fa-check" style="color:#10b981; margin-top:4px;"></i>
+          <span style="color:#374151; font-size:15px; line-height:1.5;"><strong>Directly facing the camera</strong>, showing full face and ears if possible.</span>
+        </li>
+      </ul>
+      <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:15px;">
+        <li style="display:flex; align-items:flex-start; gap:12px;">
+          <i class="fa-solid fa-check" style="color:#10b981; margin-top:4px;"></i>
+          <span style="color:#374151; font-size:15px; line-height:1.5;"><strong>No glasses</strong> (especially with glare) or tinted contact lenses.</span>
+        </li>
+        <li style="display:flex; align-items:flex-start; gap:12px;">
+          <i class="fa-solid fa-check" style="color:#10b981; margin-top:4px;"></i>
+          <span style="color:#374151; font-size:15px; line-height:1.5;"><strong>Good lighting</strong> on the face, with no shadows on the neck or background.</span>
+        </li>
+        <li style="display:flex; align-items:flex-start; gap:12px;">
+          <i class="fa-solid fa-check" style="color:#10b981; margin-top:4px;"></i>
+          <span style="color:#374151; font-size:15px; line-height:1.5;"><strong>Recent photo</strong> taken within the last 6 months.</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
 <script>
+
   // State
   let currentStep = 1;
   let originalImage = new Image();
   let croppedImage = new Image();
   let bgRemovedImage = new Image(); // Stores image with transparent bg
   let finalImage = new Image(); // Stores final adjusted image
+    let bgRemovedFullImage = new Image();
   
   // Base scales
   const MM_TO_PX = 11.811; // 300 DPI roughly
@@ -319,7 +575,18 @@
   }
 
   // 1. Upload
+  function loadExample(url) {
+    window.scrollTo(0,0);
+    originalImage.crossOrigin = "Anonymous";
+    originalImage.src = url;
+    originalImage.onload = () => {
+      setupCrop();
+      goToStep(2);
+    };
+  }
+
   function handleUpload(e) {
+    window.scrollTo(0,0);
     const file = e.target.files[0];
     if(!file) return;
     const reader = new FileReader();
@@ -429,6 +696,16 @@
     ctx.drawImage(bgRemovedImage, 0, 0);
   }
 
+  function setBg(color) {
+    document.getElementById('bgColor').value = color;
+    if (typeof colorPicker !== 'undefined' && colorPicker) {
+      colorPicker.color.hexString = color;
+    }
+    if (bgRemovedImage.src) {
+      applyBgColor();
+    }
+  }
+
   async function removeBgApi() {
     document.getElementById('scannerOverlay').style.display = 'block';
     document.getElementById('progressContainer').style.display = 'block';
@@ -455,11 +732,11 @@
 
       const isEnhance = document.getElementById('doEnhance').checked;
 
-      let res = await fetch('https://8k1w665qats4j8-8000.proxy.runpod.net/api/process-all?enhance=' + isEnhance, {
+      let res = await fetch('https://manojkumarsh-allbgremove-api.hf.space/api/process-all?enhance=' + isEnhance, {
         method: 'POST',
         body: fd,
         mode: 'cors',
-        headers: { 'Accept': 'image/png, */*' }
+        headers: { 'Accept': 'image/png, */*', 'x-api-key': 'SUPER_SECRET_KEY_998877' }
       });
       
       if(!res.ok) throw new Error("API Failed: " + res.status);
@@ -495,6 +772,32 @@
       document.getElementById('progressContainer').style.display = 'none';
       document.getElementById('progressText').style.display = 'none';
     }
+  }
+
+  
+  function dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
+  }
+
+  function downloadImage(canvasId, filename) {
+    const c = document.getElementById(canvasId);
+    // Use JPEG for better compatibility and smaller size
+    const dataUrl = c.toDataURL('image/jpeg', 1.0);
+    const blob = dataURLtoBlob(dataUrl);
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.download = filename.replace('.png', '.jpg');
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
   // 4. Adjustments
@@ -539,15 +842,28 @@
     }
   }
 
-  function updatePrintLayout() {
+
+  function onGridLayoutChange() {
+    const val = document.getElementById('gridLayout').value;
+    if (val !== 'actual') {
+       const parts = val.split('x').map(Number);
+       document.getElementById('photoCount').value = parts[0] * parts[1];
+    }
+    updatePrintLayout();
+  }
+
+  function updatePrintLayout(includeRuler = true) {
     const c = document.getElementById('printCanvas');
     const ctx = c.getContext('2d');
     
     const paperSize = document.getElementById('paperSize').value;
     let pW, pH;
-    if(paperSize === 'A4') { pW = 210 * MM_TO_PX; pH = 297 * MM_TO_PX; }
-    else if(paperSize === '4x6') { pW = 102 * MM_TO_PX; pH = 152 * MM_TO_PX; }
-    else if(paperSize === '5x7') { pW = 127 * MM_TO_PX; pH = 178 * MM_TO_PX; }
+    if(paperSize === 'A4P') { pW = 210 * MM_TO_PX; pH = 297 * MM_TO_PX; }
+    else if(paperSize === 'A4L') { pW = 297 * MM_TO_PX; pH = 210 * MM_TO_PX; }
+    else if(paperSize === '4x6L') { pW = 152 * MM_TO_PX; pH = 102 * MM_TO_PX; }
+    else if(paperSize === '4x6P') { pW = 102 * MM_TO_PX; pH = 152 * MM_TO_PX; }
+    else if(paperSize === '5x7L') { pW = 178 * MM_TO_PX; pH = 127 * MM_TO_PX; }
+    else if(paperSize === '5x7P') { pW = 127 * MM_TO_PX; pH = 178 * MM_TO_PX; }
 
     c.width = pW; c.height = pH;
     ctx.fillStyle = "#ffffff"; // Paper color
@@ -560,22 +876,59 @@
     const bColor = document.getElementById('borderColor').value;
     const bWidth = +document.getElementById('borderWidth').value;
 
-    const imgW = +document.getElementById('cropW').value * MM_TO_PX;
-    const imgH = +document.getElementById('cropH').value * MM_TO_PX;
-
     // Calculate Grid
-    const availableW = pW - (2 * pageMargin);
-    const availableH = pH - (2 * pageMargin);
-    
-    const cols = Math.floor((availableW + photoMargin) / (imgW + photoMargin));
-    const rows = Math.floor((availableH + photoMargin) / (imgH + photoMargin));
+      const availableW = pW - (2 * pageMargin);
+      const availableH = pH - (2 * pageMargin);
+  
+      let imgW, imgH, cols, rows;
+      const gridLayout = document.getElementById('gridLayout').value;
+      
+      if (gridLayout === 'actual') {
+        imgW = +document.getElementById('cropW').value * MM_TO_PX;
+        imgH = +document.getElementById('cropH').value * MM_TO_PX;
+        cols = Math.floor((availableW + photoMargin) / (imgW + photoMargin));
+        rows = Math.floor((availableH + photoMargin) / (imgH + photoMargin));
+      } else {
+        const parts = gridLayout.split('x').map(Number);
+        const maxGrid = Math.max(parts[0], parts[1]);
+        const minGrid = Math.min(parts[0], parts[1]);
+        
+        if (availableW >= availableH) {
+           cols = maxGrid;
+           rows = minGrid;
+        } else {
+           cols = minGrid;
+           rows = maxGrid;
+        }
+        
+        const cellW = (availableW - ((cols - 1) * photoMargin)) / cols;
+        const cellH = (availableH - ((rows - 1) * photoMargin)) / rows;
+        
+        const aspect = finalImage.width / finalImage.height;
+        let drawW = cellW;
+        let drawH = drawW / aspect;
+        if (drawH > cellH) {
+            drawH = cellH;
+            drawW = drawH * aspect;
+        }
+        imgW = drawW;
+        imgH = drawH;
+      }
+      
+      if (cols < 1) cols = 1;
+      if (rows < 1) rows = 1;
 
-    let printed = 0;
-    for(let r=0; r<rows; r++) {
+      // Align grid to Top-Left ("ek line se") to allow studios to cut paper and reuse it
+      const startX = pageMargin;
+      const startY = pageMargin;
+      
+      let printed = 0;
+      
+      for(let r=0; r<rows; r++) {
       for(let col=0; col<cols; col++) {
         if(printed >= count) break;
-        const x = pageMargin + (col * (imgW + photoMargin));
-        const y = pageMargin + (r * (imgH + photoMargin));
+        const x = startX + (col * (imgW + photoMargin));
+        const y = startY + (r * (imgH + photoMargin));
         
         ctx.drawImage(finalImage, x, y, imgW, imgH);
         
@@ -587,11 +940,90 @@
         printed++;
       }
     }
+    
+    // Draw Ruler (Scale Pati)
+    if (includeRuler) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.font = '35px Arial';
+      ctx.lineWidth = 2;
+      
+      // Top Ruler (X axis)
+      for (let i = 0; i <= pW / MM_TO_PX; i++) {
+        const x = i * MM_TO_PX;
+        let tickLen = 10;
+        if (i % 5 === 0) tickLen = 20;
+        if (i % 10 === 0) {
+          tickLen = 30;
+          if (i > 0) ctx.fillText(i, x + 6, 30);
+        }
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, tickLen);
+        ctx.stroke();
+      }
+      
+      // Left Ruler (Y axis)
+      for (let i = 0; i <= pH / MM_TO_PX; i++) {
+        const y = i * MM_TO_PX;
+        let tickLen = 10;
+        if (i % 5 === 0) tickLen = 20;
+        if (i % 10 === 0) {
+          tickLen = 30;
+          if (i > 0) {
+            ctx.save();
+            ctx.translate(30, y + 8);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText(i, 0, 0);
+            ctx.restore();
+          }
+        }
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(tickLen, y);
+        ctx.stroke();
+      }
+    }
   }
 
+  function downloadSheet() {
+      // Re-render WITHOUT ruler
+      updatePrintLayout(false);
+      const c = document.getElementById('printCanvas');
+      const dataUrl = c.toDataURL('image/jpeg', 1.0);
+      const blob = dataURLtoBlob(dataUrl);
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'passport_sheet_ready.jpg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      // Restore ruler
+      updatePrintLayout(true);
+  }
+  
   function printSheet() {
+    // Re-render WITHOUT ruler for the print dataUrl
+    updatePrintLayout(false);
+    
     const c = document.getElementById('printCanvas');
     const dataUrl = c.toDataURL('image/png');
+    
+    // Restore ruler on the UI preview
+    updatePrintLayout(true);
+    
+    const paperSize = document.getElementById('paperSize').value;
+    let cssPageSize = 'auto';
+    if(paperSize === 'A4P') cssPageSize = 'A4 portrait';
+    if(paperSize === 'A4L') cssPageSize = 'A4 landscape';
+    if(paperSize === '4x6P') cssPageSize = '4in 6in';
+    if(paperSize === '4x6L') cssPageSize = '6in 4in';
+    if(paperSize === '5x7P') cssPageSize = '5in 7in';
+    if(paperSize === '5x7L') cssPageSize = '7in 5in';
     
     // Open a new window for pure printing
     const printWin = window.open('', '_blank');
@@ -600,9 +1032,9 @@
         <head>
           <title>Print Passport Photos</title>
           <style>
-            @page { size: auto; margin: 0mm; }
+            @page { size: ${cssPageSize}; margin: 0mm; }
             body { margin: 0; display:flex; justify-content:center; align-items:center; background:#fff; }
-            img { max-width: 100%; height: auto; }
+            img { width: 100%; height: 100%; object-fit: contain; }
           </style>
         </head>
         <body>
@@ -613,6 +1045,50 @@
     printWin.document.close();
   }
 
+  function zoomImage(delta) {
+    imgScale += delta;
+    imgScale = Math.max(0.1, imgScale);
+    document.getElementById('cropImg').style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+  }
+
+  function resetZoom() {
+    imgScale = 1;
+    imgX = 0;
+    imgY = 0;
+    updateCropBox(); // Recalculate auto-fit
+  }
+
+
 </script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+<script>
+  let colorPicker;
+  document.addEventListener("DOMContentLoaded", () => {
+    colorPicker = new iro.ColorPicker("#colorPickerContainer", {
+      width: 220,
+      color: "#ffffff",
+      borderWidth: 1,
+      borderColor: "#e5e7eb",
+      layout: [
+        { 
+          component: iro.ui.Wheel,
+        },
+        { 
+          component: iro.ui.Slider,
+          options: { sliderType: 'value' }
+        }
+      ]
+    });
+    colorPicker.on('color:change', function(color) {
+      document.getElementById('bgColor').value = color.hexString;
+      if (bgRemovedImage && bgRemovedImage.src) {
+        applyBgColor();
+      }
+    });
+  });
+</script>
+
 </body>
 </html>
