@@ -1128,7 +1128,7 @@
 
       const isEnhance = document.getElementById('doEnhance').checked;
 
-      let res = await fetch('https://uj3a6i6h8nq4up-19123.proxy.runpod.net/api/process-all?enhance=' + isEnhance, {
+      let res = await fetch('/api/remove-bg?enhance=' + isEnhance, {
         method: 'POST',
         body: fd,
         mode: 'cors',
