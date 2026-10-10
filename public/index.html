@@ -1590,7 +1590,26 @@
     }
   }
 
+  function deductCredit() {
+    let user = getStoredUser();
+    if (!user) {
+      alert('🔒 फोटो डाउनलोड करने के लिए कृपया पहले Login या Sign Up करें।\n\nPlease Sign In to download your photo sheet.');
+      openAuthModal('login', 'डाउनलोड करने के लिए पहले लॉगिन करें');
+      return false;
+    }
+    if (user.credits <= 0) {
+      alert('⚠️ आपके वॉलेट में 0 क्रेडिट्स बचे हैं!\n\nHD प्रिंट शीट डाउनलोड करने के लिए कृपया अपना वॉलेट रिचार्ज करें।\n\nPlease recharge your wallet to continue downloading.');
+      openRechargeModal('Studio Pack');
+      return false;
+    }
+    user.credits -= 1;
+    setStoredUser(user);
+    return true;
+  }
+
   function downloadSheet() {
+      if (!deductCredit()) return;
+
       // Re-render WITHOUT ruler
       updatePrintLayout(false);
       const c = document.getElementById('printCanvas');
@@ -1611,6 +1630,8 @@
   }
   
   function printSheet() {
+    if (!deductCredit()) return;
+
     // Re-render WITHOUT ruler for the print dataUrl
     updatePrintLayout(false);
     
