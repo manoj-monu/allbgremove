@@ -50,7 +50,9 @@
             <div id="userWalletBadge" class="flex items-center gap-2 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-full text-sm font-bold text-primary">
               <i class="fa-solid fa-coins text-amber-500"></i> <span id="creditCount">0</span> Credits
             </div>
-            <button onclick="handleLogout()" class="text-xs text-red-500 hover:text-red-700 font-bold px-2 py-1">Logout</button>
+            <button onclick="handleLogout(event)" class="px-3 py-1.5 text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-sm">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </button>
           </div>
 
           <button class="px-4 py-2 bg-primary text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:bg-indigo-600 transition text-sm hidden sm:block" onclick="window.location.href='index.html'">Open App</button>
@@ -340,11 +342,14 @@
       updateNavWallet();
     }
 
-    function handleLogout() {
-      if (confirm('क्या आप सचमुच लॉग-आउट करना चाहते हैं? / Are you sure you want to sign out?')) {
-        setStoredUser(null);
-        window.location.reload();
+    function handleLogout(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
       }
+      localStorage.removeItem('passportsnap_user');
+      updateNavWallet();
+      window.location.reload();
     }
   // ================= GOOGLE AUTHENTICATION SYSTEM =================
   function loginWithGoogle() {
