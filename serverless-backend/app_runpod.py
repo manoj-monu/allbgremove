@@ -24,24 +24,36 @@ app.add_middleware(
 )
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-print(f"Loading BiRefNet on {device}...")
-model = AutoModelForImageSegmentation.from_pretrained(
-    "ZhengPeng7/BiRefNet_lite", 
-    trust_remote_code=True
-)
-model.to(device)
-model.eval()
+model = None
+gfpgan = None
 
-print("Loading GFPGAN...")
-gfpgan = GFPGANer(
-    model_path='https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.4.pth',
-    upscale=2,
-    arch='clean',
-    channel_multiplier=2,
-    bg_upsampler=None
-)
+def get_model():
+    global model
+    if model is None:
+        print(f"Loading BiRefNet on {device}...")
+        model = AutoModelForImageSegmentation.from_pretrained(
+            "ZhengPeng7/BiRefNet_lite", 
+            trust_remote_code=True
+        ).to(device)
+        model.eval()
+    return model
+
+def get_gfpgan():
+    global gfpgan
+    if gfpgan is None:
+        print("Loading GFPGAN...")
+        from gfpgan import GFPGANer
+        gfpgan = GFPGANer(
+            model_path='https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.4.pth',
+            upscale=2,
+            arch='clean',
+            channel_multiplier=2,
+            bg_upsampler=None
+        )
+    return gfpgan
 
 def process_bg(image):
+    m = get_model()
     input_size = (1024, 1024)
     original_size = image.size
     
@@ -54,7 +66,7 @@ def process_bg(image):
     input_tensor = transform(image).unsqueeze(0).to(device)
     
     with torch.no_grad():
-        preds = model(input_tensor)[-1].sigmoid().cpu()
+        preds = m(input_tensor)[-1].sigmoid().cpu()
     
     pred = preds[0].squeeze()
     mask = transforms.ToPILImage()(pred)
@@ -76,8 +88,9 @@ async def process_all(file: UploadFile = File(...), enhance: str = "false", x_ap
         
         # Optionally Enhance Face
         if is_enhance:
+            enhancer = get_gfpgan()
             img_cv = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
-            _, _, enhanced_img = gfpgan.enhance(img_cv, has_aligned=False, only_center_face=False, paste_back=True)
+            _, _, enhanced_img = enhancer.enhance(img_cv, has_aligned=False, only_center_face=False, paste_back=True)
             if enhanced_img is not None:
                 img_pil = Image.fromarray(cv2.cvtColor(enhanced_img, cv2.COLOR_BGR2RGB))
             
