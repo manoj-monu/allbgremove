@@ -219,7 +219,11 @@
   /* Navigation Footer */
   .nav-footer { display: flex; justify-content: space-between; margin-top: 30px; padding-top: 25px; border-top: 1px solid var(--border); }
   
-  canvas { max-width: 100%; max-height: 65vh; object-fit: contain; box-shadow: 0 15px 35px rgba(0,0,0,0.15); border-radius: 8px; }
+  canvas { max-width: 100%; max-height: 65vh; object-fit: contain; box-shadow: 0 15px 35px rgba(0,0,0,0.15); border-radius: 8px; -webkit-touch-callout: none !important; -webkit-user-select: none !important; user-select: none !important; -webkit-user-drag: none !important; }
+  
+  /* Photo Shield & Anti-Copy Protection */
+  .canvas-container { position: relative; user-select: none !important; -webkit-user-select: none !important; }
+  .photo-shield-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 15; background: transparent; cursor: default; -webkit-touch-callout: none !important; -webkit-user-select: none !important; user-select: none !important; -webkit-user-drag: none !important; }
   
   .loader { display: none; padding: 20px; text-align: center; color: var(--primary); font-weight: bold; }
   
@@ -900,6 +904,7 @@
         <div style="position:relative; display:flex; max-width:100%; max-height:65vh;">
           <canvas id="bgCanvas" style="max-height: 65vh; object-fit: contain;"></canvas>
           <div id="scannerOverlay" class="scanner-overlay"><div class="scanner-line"></div></div>
+          <div class="photo-shield-overlay" id="bgShield" title="Protected photo preview" oncontextmenu="return false;" ondragstart="return false;"></div>
         </div>
       </div>
     </div>
@@ -931,8 +936,12 @@
           <button class="btn btn-primary" onclick="preparePrintStep()">Layout & Print ➔</button>
         </div>
       </div>
-      <div class="canvas-container">
+      <div class="canvas-container" style="position:relative; display:inline-flex; align-items:center; justify-content:center; max-height:65vh;">
         <canvas id="adjCanvas"></canvas>
+        <div class="photo-shield-overlay" id="adjShield" title="Protected photo preview" oncontextmenu="return false;" ondragstart="return false;"></div>
+        <div id="watermarkWarningBadge" class="hidden" style="position:absolute; bottom:14px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); color:white; padding:7px 18px; border-radius:30px; font-size:12px; font-weight:700; backdrop-filter:blur(8px); box-shadow:0 8px 25px rgba(0,0,0,0.4); pointer-events:auto; cursor:pointer; border:1px solid rgba(255,255,255,0.2); z-index:25; white-space:nowrap; transition:all 0.2s;" onclick="openAuthModal('login', 'Watermark hatane ke liye Login karein')">
+          <i class="fa-solid fa-lock text-amber-400 mr-2"></i> Watermarked Preview • Click to Sign In & Unlock Clean HD
+        </div>
       </div>
     </div>
   </div>
@@ -1032,6 +1041,7 @@
           <!-- Paper Canvas -->
           <div style="position:relative; display:inline-block;">
             <canvas id="printCanvas" style="background:white; box-shadow:0 10px 40px rgba(0,0,0,0.2); max-height:72vh; max-width:82vw; display:block; border-radius:4px;"></canvas>
+            <div class="photo-shield-overlay" id="printShield" title="Protected print sheet preview" oncontextmenu="return false;" ondragstart="return false;"></div>
           </div>
 
           <!-- Right Side Vertical Slider (Up-Down Shift) -->
@@ -1220,6 +1230,7 @@
     ctx.fillStyle = document.getElementById('bgColor').value;
     ctx.fillRect(0,0,c.width,c.height);
     ctx.drawImage(bgRemovedImage, 0, 0);
+    drawWatermark(ctx, c.width, c.height);
   }
 
   async function removeBgApi() {
@@ -1313,6 +1324,12 @@
   }
 
   function downloadImage(canvasId, filename) {
+    const user = getStoredUser();
+    if (!user) {
+      alert('🔒 Watermark-free HD photo download karne ke liye kripya pehle Login ya Sign Up karein.\n\nPlease Login to download your clean official passport photo.');
+      openAuthModal('login', 'Watermark-free photo download karne ke liye Login karein');
+      return;
+    }
     if (!deductCredit()) return;
     const c = document.getElementById(canvasId);
     // Use JPEG for better compatibility and smaller size
@@ -1327,6 +1344,77 @@
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  }
+
+  // ================= WATERMARK ENGINE (bina login ke 4-5 jagah watermark) =================
+  function drawWatermark(ctx, w, h) {
+    const user = getStoredUser();
+    const warnBadge = document.getElementById('watermarkWarningBadge');
+    
+    if (user) {
+      if (warnBadge) warnBadge.classList.add('hidden');
+      return; // Login hone par photo 100% clean bina kisi watermark ke rahegi!
+    }
+
+    if (warnBadge) warnBadge.classList.remove('hidden');
+
+    ctx.save();
+    
+    // Resolution-aware proportional font size
+    const fontSize = Math.max(14, Math.min(32, Math.round(w * 0.072)));
+    ctx.font = `800 ${fontSize}px 'Plus Jakarta Sans', Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    // 5 Strategic distributed positions across the portrait photo
+    const spots = [
+      { x: w * 0.28, y: h * 0.20, rot: -0.35 },  // 1. Top-Left (Head / Hair)
+      { x: w * 0.74, y: h * 0.32, rot: -0.35 },  // 2. Top-Right (Right side / Ear)
+      { x: w * 0.50, y: h * 0.52, rot: -0.35 },  // 3. Center (Neck / Lower face)
+      { x: w * 0.28, y: h * 0.74, rot: -0.35 },  // 4. Bottom-Left (Chest / Left shoulder)
+      { x: w * 0.74, y: h * 0.84, rot: -0.35 }   // 5. Bottom-Right (Right shoulder / Bottom)
+    ];
+
+    spots.forEach(spot => {
+      ctx.save();
+      ctx.translate(spot.x, spot.y);
+      ctx.rotate(spot.rot);
+
+      const text = 'allbgremove.com';
+      const metrics = ctx.measureText(text);
+      const tw = metrics.width;
+      const padX = Math.round(fontSize * 0.45);
+      const padY = Math.round(fontSize * 0.25);
+      const boxW = tw + (padX * 2);
+      const boxH = fontSize + (padY * 2);
+
+      // Semi-transparent dark pill background for guaranteed contrast on any background
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.60)';
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(-boxW / 2, -boxH / 2, boxW, boxH, 8);
+      } else {
+        ctx.rect(-boxW / 2, -boxH / 2, boxW, boxH);
+      }
+      ctx.fill();
+
+      // Border on pill
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // High-contrast bright white text with drop shadow
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+      ctx.shadowBlur = 6;
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 1;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(text, 0, 0);
+
+      ctx.restore();
+    });
+
+    ctx.restore();
   }
 
   // 4. Adjustments
@@ -1351,6 +1439,9 @@
     ctx.filter = `brightness(${b}%) contrast(${c}%) saturate(${s}%)`;
     ctx.drawImage(bgRemovedImage, 0, 0);
     ctx.filter = 'none'; // reset
+
+    // Draw watermark if not logged in
+    drawWatermark(ctx, canvas.width, canvas.height);
   }
 
   function autoEnhance() {
@@ -1608,6 +1699,21 @@
         ctx.stroke();
       }
     }
+
+    // If not logged in, draw security preview watermark across print sheet
+    if (!getStoredUser()) {
+      ctx.save();
+      ctx.font = 'bold 36px Arial';
+      ctx.fillStyle = 'rgba(79, 70, 229, 0.20)';
+      ctx.textAlign = 'center';
+      ctx.rotate(-Math.PI / 6);
+      for (let x = -pW; x < pW * 2; x += 320) {
+        for (let y = -pH; y < pH * 2; y += 190) {
+          ctx.fillText('allbgremove.com • PREVIEW', x, y);
+        }
+      }
+      ctx.restore();
+    }
   }
 
   function deductCredit() {
@@ -1810,6 +1916,24 @@
         navLoggedIn.classList.remove('flex');
       }
     }
+
+    // Re-render active canvases to show or remove watermark according to login state
+    try {
+      if (typeof bgRemovedImage !== 'undefined' && bgRemovedImage && bgRemovedImage.src) {
+        if (typeof applyBgColor === 'function') applyBgColor();
+        if (typeof applyAdjustments === 'function') applyAdjustments();
+        if (typeof updatePrintLayout === 'function') {
+          if (typeof finalImage !== 'undefined' && document.getElementById('adjCanvas')) {
+            finalImage.src = document.getElementById('adjCanvas').toDataURL('image/png');
+            finalImage.onload = () => {
+              try { updatePrintLayout(); } catch(e){}
+            };
+          } else {
+            updatePrintLayout();
+          }
+        }
+      }
+    } catch(e) {}
   }
 
   
@@ -2492,6 +2616,78 @@
     updateUserUI();
   });
 
+  // ================= DESKTOP COPY & RIGHT-CLICK PROTECTION =================
+  (function initCopyProtection() {
+    // 1. Disable context menu on all canvases, photo containers, and editor
+    document.addEventListener('contextmenu', function(e) {
+      if (e.target.closest('canvas') || e.target.closest('.canvas-container') || e.target.closest('.photo-shield-overlay') || e.target.closest('.editor-layout')) {
+        e.preventDefault();
+        e.stopPropagation();
+        showProtectedToast('🔒 Right-Click & Save Disabled! Please Login to download official photo.');
+        return false;
+      }
+    }, true);
+
+    // 2. Disable dragging canvases / photos to desktop or other tabs
+    document.addEventListener('dragstart', function(e) {
+      if (e.target.closest('canvas') || e.target.closest('.canvas-container') || e.target.closest('.photo-shield-overlay') || e.target.tagName === 'CANVAS' || e.target.tagName === 'IMG') {
+        e.preventDefault();
+        return false;
+      }
+    }, true);
+
+    // 3. Disable text/image selection highlighting on canvases
+    document.addEventListener('selectstart', function(e) {
+      if (e.target.closest('canvas') || e.target.closest('.canvas-container') || e.target.closest('.photo-shield-overlay')) {
+        e.preventDefault();
+        return false;
+      }
+    }, true);
+
+    // 4. Click feedback on protected photo shield
+    document.addEventListener('click', function(e) {
+      const shield = e.target.closest('.photo-shield-overlay');
+      if (shield) {
+        const user = getStoredUser();
+        if (!user) {
+          showProtectedToast('🔒 Watermarked Preview. Login to remove watermark and download.');
+        }
+      }
+    }, false);
+
+    // 5. Prevent keyboard save & copy shortcuts on canvas area
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+        e.preventDefault();
+        showProtectedToast('🔒 Direct saving disabled. Use the Download button after login.');
+        return false;
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C')) {
+        const sel = window.getSelection ? window.getSelection().toString() : '';
+        if (!sel && (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA')) {
+          e.preventDefault();
+          showProtectedToast('🔒 Copying disabled for protected canvas images.');
+          return false;
+        }
+      }
+    });
+  })();
+
+  let toastTimer = null;
+  function showProtectedToast(msg) {
+    const toast = document.getElementById('protectToast');
+    const txt = document.getElementById('protectToastText');
+    if (!toast || !txt) return;
+    txt.textContent = msg || '🔒 Right-click & Copying disabled. Please login to download clean photo.';
+    toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+    toast.classList.add('opacity-100', 'translate-y-0');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.remove('opacity-100', 'translate-y-0');
+      toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+    }, 2800);
+  }
+
 </script>
 
   <!-- ================= AUTH MODAL (Login & Sign Up) ================= -->
@@ -2777,6 +2973,14 @@
         </button>
       </form>
     </div>
+  </div>
+
+  <!-- Floating Copy & Save Protection Toast -->
+  <div id="protectToast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-2xl border border-gray-700/60 flex items-center gap-3 text-sm font-semibold transition-all duration-300 opacity-0 pointer-events-none translate-y-4 z-[9999]">
+    <div class="w-8 h-8 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center shrink-0">
+      <i class="fa-solid fa-shield-halved text-sm"></i>
+    </div>
+    <span id="protectToastText">🔒 Right-click & Copying disabled. Please login to download clean photo.</span>
   </div>
 
 </body>
