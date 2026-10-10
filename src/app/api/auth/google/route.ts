@@ -3,26 +3,28 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { credential, email, name, picture, googleId } = body;
+    const { credential, email, name, picture } = body;
 
     let userEmail = email;
     let userName = name;
     let userPicture = picture;
-    let userGoogleId = googleId;
+    let userGoogleId = '';
 
-    // If Google ID token credential was provided, decode JWT payload
+    // Verify Google ID token cryptographically via Google's tokeninfo API
     if (credential) {
       try {
-        const parts = credential.split('.');
-        if (parts.length === 3) {
-          const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf-8'));
-          userEmail = payload.email || userEmail;
-          userName = payload.name || userName;
-          userPicture = payload.picture || userPicture;
-          userGoogleId = payload.sub || userGoogleId;
+        const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+        if (!verifyRes.ok) {
+          return NextResponse.json({ error: 'Invalid Google credential token' }, { status: 401 });
         }
-      } catch (e) {
-        console.error('Failed to decode Google JWT:', e);
+        const verifiedData = await verifyRes.json();
+        userEmail = verifiedData.email;
+        userName = verifiedData.name || verifiedData.given_name;
+        userPicture = verifiedData.picture;
+        userGoogleId = verifiedData.sub;
+      } catch (verErr) {
+        console.error('Google token verification failed:', verErr);
+        return NextResponse.json({ error: 'Unable to verify Google credential' }, { status: 401 });
       }
     }
 
@@ -47,12 +49,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Google Sign-In successful',
+      message: 'Google Sign-In verified and successful',
       user: user,
-      token: 'jwt_google_' + Buffer.from(cleanEmail).toString('base64') + '_' + Date.now()
     });
 
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 });
+    console.error('Auth route error:', err);
+    return NextResponse.json({ error: 'Authentication service error' }, { status: 500 });
   }
 }

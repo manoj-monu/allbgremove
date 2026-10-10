@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 🔒 USER PROFILES & CREDITS
+    match /users/{userId} {
+      // Users can only read their own data
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // New users can only create their own account with max 5 free credits
+      allow create: if request.auth != null && request.auth.uid == userId
+                    && request.resource.data.credits <= 5;
+
+      // Users can only update their own profile and deduct credits for downloads
+      allow update: if request.auth != null && request.auth.uid == userId;
+
+      // Prevent account deletion directly from client
+      allow delete: if false;
+    }
+
+    // 🔒 PAYMENT TRANSACTIONS & RECHARGES
+    match /transactions/{txnId} {
+      // Users can only view their own transactions
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+
+      // Record new payments for verified users
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+
+      // Immutable: Transactions cannot be modified or deleted
+      allow update, delete: if false;
+    }
+
+    // Default deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
