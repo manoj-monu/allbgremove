@@ -42,14 +42,31 @@ def get_gfpgan():
     if gfpgan is None:
         print("Loading GFPGAN...")
         from gfpgan import GFPGANer
+        import os
+        model_path = '/app/GFPGANv1.4.pth' if os.path.exists('/app/GFPGANv1.4.pth') else 'https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.4.pth'
         gfpgan = GFPGANer(
-            model_path='https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.4.pth',
+            model_path=model_path,
             upscale=2,
             arch='clean',
             channel_multiplier=2,
             bg_upsampler=None
         )
     return gfpgan
+
+def warm_up():
+    print(f"Pre-warming BiRefNet and GFPGAN on {device}...")
+    try:
+        get_model()
+        print("BiRefNet ready in VRAM!")
+        get_gfpgan()
+        print("GFPGAN ready in VRAM!")
+    except Exception as e:
+        print("Warmup notice:", e)
+
+@app.on_event("startup")
+async def startup_event():
+    import threading
+    threading.Thread(target=warm_up, daemon=True).start()
 
 def process_bg(image):
     m = get_model()
