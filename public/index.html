@@ -1326,8 +1326,7 @@
   function downloadImage(canvasId, filename) {
     const user = getStoredUser();
     if (!user) {
-      alert('🔒 Watermark-free HD photo download karne ke liye kripya pehle Login ya Sign Up karein.\n\nPlease Login to download your clean official passport photo.');
-      openAuthModal('login', 'Watermark-free photo download karne ke liye Login karein');
+      showLoginRequiredModal('Please Sign In or Create an Account to download clean, watermark-free passport photos.');
       return;
     }
     if (!deductCredit()) return;
@@ -1719,13 +1718,11 @@
   function deductCredit() {
     let user = getStoredUser();
     if (!user) {
-      alert('🔒 फोटो डाउनलोड करने के लिए कृपया पहले Login या Sign Up करें।\n\nPlease Sign In to download your photo sheet.');
-      openAuthModal('login', 'डाउनलोड करने के लिए पहले लॉगिन करें');
+      showLoginRequiredModal('Please Sign In or Create an Account to download your official passport photo print sheet.');
       return false;
     }
     if (user.credits <= 0) {
-      alert('⚠️ आपके वॉलेट में 0 क्रेडिट्स बचे हैं!\n\nHD प्रिंट शीट डाउनलोड करने के लिए कृपया अपना वॉलेट रिचार्ज करें।\n\nPlease recharge your wallet to continue downloading.');
-      openRechargeModal('Studio Pack');
+      showZeroCreditsModal();
       return false;
     }
     user.credits -= 1;
@@ -2072,6 +2069,66 @@
   function closeLoginSuccessModal() {
     const modal = document.getElementById('loginSuccessModal');
     const card = document.getElementById('loginSuccessCard');
+    if (!modal) return;
+    if (card) {
+      card.classList.remove('scale-100', 'opacity-100');
+      card.classList.add('scale-95', 'opacity-0');
+    }
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }, 200);
+  }
+
+  // ================= CENTERED 0 CREDITS MODAL CONTROLLER (ENGLISH ONLY, LARGE TEXT) =================
+  function showZeroCreditsModal() {
+    const modal = document.getElementById('zeroCreditsModal');
+    const card = document.getElementById('zeroCreditsCard');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => {
+      if (card) {
+        card.classList.remove('scale-95', 'opacity-0');
+        card.classList.add('scale-100', 'opacity-100');
+      }
+    }, 20);
+  }
+
+  function closeZeroCreditsModal() {
+    const modal = document.getElementById('zeroCreditsModal');
+    const card = document.getElementById('zeroCreditsCard');
+    if (!modal) return;
+    if (card) {
+      card.classList.remove('scale-100', 'opacity-100');
+      card.classList.add('scale-95', 'opacity-0');
+    }
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }, 200);
+  }
+
+  // ================= CENTERED LOGIN REQUIRED MODAL CONTROLLER =================
+  function showLoginRequiredModal(msg) {
+    const modal = document.getElementById('loginRequiredModal');
+    const card = document.getElementById('loginRequiredCard');
+    const msgEl = document.getElementById('loginRequiredMsg');
+    if (!modal) return;
+    if (msgEl && msg) msgEl.textContent = msg;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => {
+      if (card) {
+        card.classList.remove('scale-95', 'opacity-0');
+        card.classList.add('scale-100', 'opacity-100');
+      }
+    }, 20);
+  }
+
+  function closeLoginRequiredModal() {
+    const modal = document.getElementById('loginRequiredModal');
+    const card = document.getElementById('loginRequiredCard');
     if (!modal) return;
     if (card) {
       card.classList.remove('scale-100', 'opacity-100');
@@ -2466,8 +2523,7 @@
     const user = getStoredUser();
     if (!user) {
       pendingPackForAuth = packName;
-      alert('🔒 पेमेंट करने के लिए पहले Login या Create Account करना अनिवार्य है!\n\nPlease Sign In or Create an Account first to recharge your wallet.');
-      openAuthModal('login', 'वॉलेट रिचार्ज करने के लिए कृपया पहले Login करें');
+      showLoginRequiredModal('Please Sign In or Create an Account first to recharge your studio wallet.');
       return;
     }
 
@@ -2505,9 +2561,8 @@
     // 🔒 STRICT LOGIN CHECK AGAIN
     const user = getStoredUser();
     if (!user) {
-      alert('🔒 आपका सेशन समाप्त हो गया है। कृपया पहले लॉगिन करें।');
       closeRechargeModal();
-      openAuthModal('login', 'पेमेंट करने के लिए कृपया लॉगिन करें');
+      showLoginRequiredModal('Your session has expired. Please sign in to complete your recharge payment.');
       return;
     }
 
@@ -2903,6 +2958,74 @@
       <button onclick="closeLoginSuccessModal()" class="w-full py-4 sm:py-5 px-8 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-700 hover:to-indigo-700 text-white font-black text-lg sm:text-xl rounded-2xl shadow-xl shadow-emerald-500/30 hover:shadow-2xl transition transform active:scale-95 flex items-center justify-center gap-3">
         <span>Continue to Photo Maker</span>
         <i class="fa-solid fa-arrow-right text-xl"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= ZERO CREDITS WARNING MODAL (100% ENGLISH, CENTERED, LARGE FONT) ================= -->
+  <div id="zeroCreditsModal" class="fixed inset-0 z-[100000] bg-black/75 backdrop-blur-md hidden items-center justify-center p-4 sm:p-6" onclick="if(event.target === this) closeZeroCreditsModal()">
+    <div id="zeroCreditsCard" class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-10 shadow-2xl relative border-2 border-amber-200 text-center transform transition-all duration-300 scale-95 opacity-0">
+      <!-- Close button -->
+      <button onclick="closeZeroCreditsModal()" aria-label="Close" class="absolute top-5 right-5 text-gray-400 hover:text-gray-700 text-3xl font-bold leading-none transition cursor-pointer">&times;</button>
+      
+      <!-- Big Amber Alert Badge -->
+      <div class="w-24 h-24 rounded-full bg-amber-100 border-4 border-amber-200 flex items-center justify-center mx-auto mb-5 shadow-inner">
+        <i class="fa-solid fa-coins text-5xl text-amber-500"></i>
+      </div>
+
+      <!-- Main Heading (Large) -->
+      <h2 class="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight mb-2">0 Credits Remaining!</h2>
+      
+      <!-- Subtitle -->
+      <p class="text-xl sm:text-2xl font-bold text-amber-600 mb-6">Your Studio Wallet is Empty</p>
+      
+      <!-- Wallet Credits Box (Extra Large Numbers) -->
+      <div class="bg-gradient-to-br from-amber-50 via-orange-50 to-amber-50 border-2 border-amber-200 rounded-2xl p-5 sm:p-6 mb-6 text-center shadow-sm">
+        <div class="text-xs sm:text-sm uppercase font-extrabold tracking-wider text-amber-800">Available Wallet Balance</div>
+        <div class="text-4xl sm:text-5xl font-black text-gray-900 mt-2 tracking-tight">0 Credits</div>
+      </div>
+
+      <!-- Informative Note (Large & Crisp) -->
+      <p class="text-base sm:text-lg font-medium text-gray-600 leading-relaxed mb-8">
+        Please recharge your studio wallet to download high-resolution, watermark-free passport photos and printable multi-photo sheets.
+      </p>
+
+      <!-- Buttons -->
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button onclick="closeZeroCreditsModal(); openRechargeModal('Studio Pack');" class="flex-1 py-4 sm:py-5 px-6 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-lg sm:text-xl rounded-2xl shadow-xl shadow-amber-500/30 hover:shadow-2xl transition transform active:scale-95 flex items-center justify-center gap-3 cursor-pointer">
+          <i class="fa-solid fa-bolt text-xl"></i>
+          <span>Recharge Wallet Now</span>
+        </button>
+        <button onclick="closeZeroCreditsModal()" class="py-4 px-6 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-base sm:text-lg rounded-2xl transition cursor-pointer">
+          Maybe Later
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SIGN IN REQUIRED MODAL (100% ENGLISH, CENTERED, LARGE FONT) ================= -->
+  <div id="loginRequiredModal" class="fixed inset-0 z-[100000] bg-black/75 backdrop-blur-md hidden items-center justify-center p-4 sm:p-6" onclick="if(event.target === this) closeLoginRequiredModal()">
+    <div id="loginRequiredCard" class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-10 shadow-2xl relative border-2 border-indigo-200 text-center transform transition-all duration-300 scale-95 opacity-0">
+      <!-- Close button -->
+      <button onclick="closeLoginRequiredModal()" aria-label="Close" class="absolute top-5 right-5 text-gray-400 hover:text-gray-700 text-3xl font-bold leading-none transition cursor-pointer">&times;</button>
+      
+      <!-- Big Lock Icon Badge -->
+      <div class="w-24 h-24 rounded-full bg-indigo-100 border-4 border-indigo-200 flex items-center justify-center mx-auto mb-5 shadow-inner">
+        <i class="fa-solid fa-lock text-5xl text-primary"></i>
+      </div>
+
+      <!-- Main Heading (Large) -->
+      <h2 class="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight mb-2">Sign In Required!</h2>
+      
+      <!-- Message -->
+      <p id="loginRequiredMsg" class="text-base sm:text-lg font-medium text-gray-600 leading-relaxed mb-8">
+        Please sign in or create a free studio account to download clean, watermark-free passport photos.
+      </p>
+
+      <!-- Primary Action Button -->
+      <button onclick="closeLoginRequiredModal(); openAuthModal('login');" class="w-full py-4 sm:py-5 px-8 bg-gradient-to-r from-primary to-secondary text-white font-black text-lg sm:text-xl rounded-2xl shadow-xl shadow-indigo-300 hover:shadow-2xl transition transform active:scale-95 flex items-center justify-center gap-3 cursor-pointer">
+        <i class="fa-solid fa-arrow-right-to-bracket text-xl"></i>
+        <span>Sign In to Continue</span>
       </button>
     </div>
   </div>
