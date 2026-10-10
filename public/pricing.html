@@ -814,39 +814,42 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing Secure Payment...';
 
-      const rzpKey = window.RAZORPAY_KEY_ID || '';
+      const rzpKey = window.RAZORPAY_KEY_ID || localStorage.getItem('allbgremove_rzp_key') || '';
       
-      if (rzpKey && typeof Razorpay !== 'undefined') {
-        const options = {
-          key: rzpKey,
-          amount: selectedPack.amount * 100, // in paise
-          currency: "INR",
-          name: "allbgremove.com",
-          description: selectedPack.name + " (" + selectedPack.credits + " Credits)",
-          handler: function (response) {
-            onPaymentSuccess(response.razorpay_payment_id || 'PAY_' + Date.now());
-          },
-          prefill: {
-            name: user.name,
-            email: user.email,
-            contact: document.getElementById('payMobile').value || user.phone || "9999999999"
-          },
-          notes: {
-            userId: user.id
-          },
-          theme: { color: "#6366f1" }
-        };
-        const rzp = new Razorpay(options);
-        rzp.open();
+      if (!rzpKey || typeof Razorpay === 'undefined') {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Pay Securely via UPI / Cards';
+        alert('🔒 Payment Gateway Security Notice:\n\nPayment Gateway अभी Verification मोड में है। बिना वास्तविक Razorpay पेमेंट के वॉलेट में कोई भी क्रेडिट्स ऐड नहीं किए जाएँगे।\n\nकृपया वास्तविक पेमेंट के लिए Razorpay Merchant Key ID (rzp_live_... या rzp_test_...) कॉन्फ़िगर करें।');
         return;
       }
 
-      // Demo/Instant Simulation for Immediate Testing & Local Wallet Update
-      setTimeout(() => {
-        onPaymentSuccess('TXN_' + Math.floor(100000 + Math.random() * 900000));
-      }, 1200);
+      const options = {
+        key: rzpKey,
+        amount: selectedPack.amount * 100, // in paise
+        currency: "INR",
+        name: "allbgremove.com",
+        description: selectedPack.name + " (" + selectedPack.credits + " Credits)",
+        handler: function (response) {
+          if (!response || !response.razorpay_payment_id) {
+            alert('⚠️ Payment failed or was not verified by Razorpay. No credits were added.');
+            return;
+          }
+          onPaymentSuccess(response.razorpay_payment_id);
+        },
+        prefill: {
+          name: user.name,
+          email: user.email,
+          contact: document.getElementById('payMobile').value || user.phone || ""
+        },
+        notes: {
+          userId: user.id
+        },
+        theme: { color: "#6366f1" }
+      };
+      const rzp = new Razorpay(options);
+      rzp.open();
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Pay Securely via UPI / Cards';
     }
 
     function onPaymentSuccess(txnId) {

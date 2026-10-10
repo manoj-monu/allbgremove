@@ -2346,46 +2346,47 @@
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting to Secure Gateway...';
 
-    const rzpKey = window.RAZORPAY_KEY_ID || '';
+    const rzpKey = window.RAZORPAY_KEY_ID || localStorage.getItem('allbgremove_rzp_key') || '';
 
-    if (rzpKey && typeof Razorpay !== 'undefined') {
-      const options = {
-        key: rzpKey,
-        amount: activeRechargePack.amount * 100, // in Paise
-        currency: "INR",
-        name: "allbgremove.com",
-        description: activeRechargePack.name + " (" + activeRechargePack.credits + " Credits)",
-        handler: function(response) {
-          onRechargeSuccess(response.razorpay_payment_id || 'PAY_' + Date.now());
-        },
-        prefill: {
-          name: user.name,
-          email: user.email,
-          contact: user.phone || "9999999999"
-        },
-        notes: {
-          userId: user.id,
-          studio: user.studio || ''
-        },
-        theme: { color: "#6366f1" },
-        modal: {
-          ondismiss: function() {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely via Razorpay (UPI / Cards)';
-          }
-        }
-      };
-      const rzp = new Razorpay(options);
-      rzp.open();
+    if (!rzpKey || typeof Razorpay === 'undefined') {
       btn.disabled = false;
       btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely via Razorpay (UPI / Cards)';
+      alert('🔒 Payment Gateway Security Notice:\n\nPayment Gateway अभी Verification मोड में है। बिना वास्तविक Razorpay पेमेंट के वॉलेट में कोई भी क्रेडिट्स ऐड नहीं किए जाएँगे।\n\nकृपया वास्तविक पेमेंट के लिए Razorpay Merchant Key ID (rzp_live_... या rzp_test_...) कॉन्फ़िगर करें।');
       return;
     }
 
-    // Instant Simulation / Demo Checkout when live key not plugged in
-    setTimeout(() => {
-      onRechargeSuccess('TXN_RZP_' + Math.floor(100000 + Math.random() * 900000));
-    }, 1500);
+    const options = {
+      key: rzpKey,
+      amount: activeRechargePack.amount * 100, // in Paise
+      currency: "INR",
+      name: "allbgremove.com",
+      description: activeRechargePack.name + " (" + activeRechargePack.credits + " Credits)",
+      handler: function(response) {
+        if (!response || !response.razorpay_payment_id) {
+          alert('⚠️ Payment failed or was not verified by Razorpay. No credits were added.');
+          return;
+        }
+        onRechargeSuccess(response.razorpay_payment_id);
+      },
+      prefill: {
+        name: user.name,
+        email: user.email,
+        contact: user.phone || ""
+      },
+      notes: {
+        userId: user.id,
+        studio: user.studio || ''
+      },
+      theme: { color: "#6366f1" },
+      modal: {
+        ondismiss: function() {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely via Razorpay (UPI / Cards)';
+        }
+      }
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
   }
 
   function onRechargeSuccess(txnId) {
