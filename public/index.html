@@ -1659,17 +1659,59 @@
     updateCropBox(); // Recalculate auto-fit
   }
 
-  // ================= AUTHENTICATION & WALLET SYSTEM =================
+  // ================= REAL AUTHENTICATION & WALLET SYSTEM =================
   let currentAuthTab = 'login';
   let activeRechargePack = { name: 'Studio Pack', amount: 199, credits: 100 };
+  let pendingPackForAuth = null;
+
+  function getRegisteredUsers() {
+    const raw = localStorage.getItem('passportsnap_registered_users');
+    let users = [];
+    try {
+      users = raw ? JSON.parse(raw) : [];
+    } catch(e) { users = []; }
+    
+    if (!users.some(u => u.email === 'studio@allbgremove.com')) {
+      users.push({
+        id: 'usr_studio_default',
+        name: 'Sharma Studio',
+        studio: 'Sharma Photo Studio',
+        phone: '9876543210',
+        email: 'studio@allbgremove.com',
+        password: 'password123',
+        credits: 15,
+        createdAt: '2026-10-01T00:00:00Z'
+      });
+      localStorage.setItem('passportsnap_registered_users', JSON.stringify(users));
+    }
+    return users;
+  }
+
+  function saveRegisteredUsers(users) {
+    localStorage.setItem('passportsnap_registered_users', JSON.stringify(users));
+  }
 
   function getStoredUser() {
-    return JSON.parse(localStorage.getItem('passportsnap_user') || 'null');
+    try {
+      const u = JSON.parse(localStorage.getItem('passportsnap_user') || 'null');
+      if (!u || !u.email) return null;
+      return u;
+    } catch(e) {
+      return null;
+    }
   }
 
   function setStoredUser(user) {
     if (user) {
       localStorage.setItem('passportsnap_user', JSON.stringify(user));
+      const users = getRegisteredUsers();
+      const idx = users.findIndex(u => u.email.toLowerCase() === user.email.toLowerCase());
+      if (idx !== -1) {
+        users[idx].credits = user.credits;
+        users[idx].name = user.name;
+        users[idx].studio = user.studio || users[idx].studio;
+        saveRegisteredUsers(users);
+      }
     } else {
       localStorage.removeItem('passportsnap_user');
     }
@@ -1688,13 +1730,13 @@
         navLoggedIn.classList.add('flex');
       }
       const creditsCount = document.getElementById('navCreditsCount');
-      if (creditsCount) creditsCount.textContent = user.credits !== undefined ? user.credits : 5;
+      if (creditsCount) creditsCount.textContent = user.credits !== undefined ? user.credits : 0;
       
       const userName = document.getElementById('navUserName');
-      if (userName) userName.textContent = user.name || 'Studio User';
+      if (userName) userName.textContent = user.studio ? user.studio : (user.name || 'Studio User');
       
       const userEmail = document.getElementById('navUserEmail');
-      if (userEmail) userEmail.textContent = user.email || 'user@example.com';
+      if (userEmail) userEmail.textContent = user.email || '';
       
       const userAvatar = document.getElementById('navUserAvatar');
       if (userAvatar && user.name) {
@@ -1709,8 +1751,22 @@
     }
   }
 
-  function openAuthModal(tab = 'login') {
+  function openAuthModal(tab = 'login', noticeText = '') {
     switchAuthTab(tab);
+    const noticeEl = document.getElementById('authNoticeBox');
+    if (noticeEl) {
+      if (noticeText) {
+        noticeEl.innerHTML = '<i class="fa-solid fa-lock text-amber-500 mr-1.5"></i> ' + noticeText;
+        noticeEl.classList.remove('hidden');
+      } else {
+        noticeEl.classList.add('hidden');
+      }
+    }
+    const errLogin = document.getElementById('loginErrorMsg');
+    if (errLogin) errLogin.classList.add('hidden');
+    const errSignup = document.getElementById('signupErrorMsg');
+    if (errSignup) errSignup.classList.add('hidden');
+
     const modal = document.getElementById('authModal');
     if (modal) {
       modal.classList.remove('hidden');
@@ -1737,76 +1793,169 @@
     const sub = document.getElementById('authModalSubtitle');
 
     if (isLogin) {
-      formLogin.classList.remove('hidden');
-      formSignup.classList.add('hidden');
-      btnLogin.className = 'flex-1 py-2 text-sm font-bold rounded-lg transition bg-white text-primary shadow-sm';
-      btnSignup.className = 'flex-1 py-2 text-sm font-bold rounded-lg transition text-gray-500 hover:text-gray-900';
-      title.textContent = 'Welcome Back';
-      sub.textContent = 'Sign in to access your wallet, print sheets & downloads';
+      if (formLogin) formLogin.classList.remove('hidden');
+      if (formSignup) formSignup.classList.add('hidden');
+      if (btnLogin) btnLogin.className = 'flex-1 py-2 text-sm font-bold rounded-lg transition bg-white text-primary shadow-sm';
+      if (btnSignup) btnSignup.className = 'flex-1 py-2 text-sm font-bold rounded-lg transition text-gray-500 hover:text-gray-900';
+      if (title) title.textContent = 'Account Sign In';
+      if (sub) sub.textContent = 'Enter your email & password to access your studio wallet';
     } else {
-      formLogin.classList.add('hidden');
-      formSignup.classList.remove('hidden');
-      btnSignup.className = 'flex-1 py-2 text-sm font-bold rounded-lg transition bg-white text-primary shadow-sm';
-      btnLogin.className = 'flex-1 py-2 text-sm font-bold rounded-lg transition text-gray-500 hover:text-gray-900';
-      title.textContent = 'Create Studio Account';
-      sub.textContent = 'Get 5 Free Credits instantly upon creating your account';
+      if (formLogin) formLogin.classList.add('hidden');
+      if (formSignup) formSignup.classList.remove('hidden');
+      if (btnSignup) btnSignup.className = 'flex-1 py-2 text-sm font-bold rounded-lg transition bg-white text-primary shadow-sm';
+      if (btnLogin) btnLogin.className = 'flex-1 py-2 text-sm font-bold rounded-lg transition text-gray-500 hover:text-gray-900';
+      if (title) title.textContent = 'Create Studio Account';
+      if (sub) sub.textContent = 'Register to get 5 Free Welcome Credits instantly';
     }
   }
 
+  // REAL LOGIN HANDLER
   function handleLogin(e) {
     e.preventDefault();
-    const email = document.getElementById('loginEmail').value.trim();
-    const name = email.split('@')[0].replace(/[._]/g, ' ') || 'Studio User';
-    
-    let user = getStoredUser();
-    if (!user || user.email !== email) {
-      user = { name: name.charAt(0).toUpperCase() + name.slice(1), email: email, credits: 10 };
+    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginErrorMsg');
+
+    if (!email || !password) {
+      if (errorEl) {
+        errorEl.textContent = 'कृपया ईमेल और पासवर्ड दोनों दर्ज करें।';
+        errorEl.classList.remove('hidden');
+      }
+      return;
     }
-    setStoredUser(user);
+
+    const users = getRegisteredUsers();
+    const foundUser = users.find(u => u.email.toLowerCase() === email);
+
+    if (!foundUser) {
+      if (errorEl) {
+        errorEl.innerHTML = '❌ यह ईमेल रजिस्टर्ड नहीं है! कृपया <b>Create Account</b> टैब से नया अकाउंट बनाएं।';
+        errorEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    if (foundUser.password !== password) {
+      if (errorEl) {
+        errorEl.innerHTML = '❌ गलत पासवर्ड! कृपया सही पासवर्ड दर्ज करें।';
+        errorEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    if (errorEl) errorEl.classList.add('hidden');
+    
+    const sessionUser = {
+      id: foundUser.id,
+      name: foundUser.name,
+      studio: foundUser.studio || foundUser.name + ' Studio',
+      phone: foundUser.phone || '',
+      email: foundUser.email,
+      credits: foundUser.credits !== undefined ? foundUser.credits : 5,
+      lastLogin: new Date().toISOString()
+    };
+    setStoredUser(sessionUser);
     closeAuthModal();
-    alert('✅ Welcome back, ' + user.name + '! You are now signed in with ' + user.credits + ' credits.');
+
+    alert('✅ स्वागत है, ' + sessionUser.name + '!\nआप सफलतापूर्वक Sign In हो चुके हैं।\nआपके वॉलेट में ' + sessionUser.credits + ' Credits उपलब्ध हैं।');
+
+    if (pendingPackForAuth) {
+      const p = pendingPackForAuth;
+      pendingPackForAuth = null;
+      openRechargeModal(p);
+    }
   }
 
+  // REAL SIGN UP HANDLER
   function handleSignUp(e) {
     e.preventDefault();
     const name = document.getElementById('signupName').value.trim();
     const studio = document.getElementById('signupStudio').value.trim();
-    const email = document.getElementById('signupEmail').value.trim();
+    const phone = document.getElementById('signupPhone').value.trim();
+    const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+    const password = document.getElementById('signupPassword').value;
+    const errorEl = document.getElementById('signupErrorMsg');
 
-    const user = {
+    if (!name || !email || !password) {
+      if (errorEl) {
+        errorEl.textContent = 'नाम, ईमेल और पासवर्ड अनिवार्य हैं।';
+        errorEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    if (password.length < 6) {
+      if (errorEl) {
+        errorEl.textContent = 'पासवर्ड कम से कम 6 अक्षरों का होना चाहिए।';
+        errorEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    const users = getRegisteredUsers();
+    if (users.some(u => u.email.toLowerCase() === email)) {
+      if (errorEl) {
+        errorEl.innerHTML = '⚠️ यह ईमेल पहले से रजिस्टर्ड है! कृपया <b>Sign In</b> टैब पर जाकर लॉगिन करें।';
+        errorEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    const newUser = {
+      id: 'usr_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
       name: name,
-      studio: studio || name + ' Studio',
+      studio: studio || name + ' Photo Studio',
+      phone: phone || '',
       email: email,
-      credits: 5, // 5 Free Welcome Credits!
+      password: password,
+      credits: 5,
       createdAt: new Date().toISOString()
     };
-    setStoredUser(user);
-    closeAuthModal();
-    alert('🎉 Account created successfully!\nWelcome ' + name + '!\n🎁 You have received 5 Free Credits to start editing right away!');
-  }
 
-  function demoLogin() {
-    const demoUser = {
-      name: 'Studio Pro',
-      studio: 'Super Photo Studio',
-      email: 'demo@photostudio.com',
-      credits: 25,
-      createdAt: new Date().toISOString()
+    users.push(newUser);
+    saveRegisteredUsers(users);
+
+    if (errorEl) errorEl.classList.add('hidden');
+
+    const sessionUser = {
+      id: newUser.id,
+      name: newUser.name,
+      studio: newUser.studio,
+      phone: newUser.phone,
+      email: newUser.email,
+      credits: newUser.credits,
+      createdAt: newUser.createdAt
     };
-    setStoredUser(demoUser);
+    setStoredUser(sessionUser);
     closeAuthModal();
-    alert('⚡ Demo Account Activated!\nLogged in as Studio Pro with 25 Credits.');
-  }
 
-  function handleLogout() {
-    if (confirm('Are you sure you want to sign out?')) {
-      setStoredUser(null);
-      alert('Signed out successfully.');
+    alert('🎉 बधाई हो ' + name + '!\nआपका अकाउंट सफलतापूर्वक बन गया है।\n🎁 आपको 5 Free Welcome Credits तुरंत दे दिए गए हैं!');
+
+    if (pendingPackForAuth) {
+      const p = pendingPackForAuth;
+      pendingPackForAuth = null;
+      openRechargeModal(p);
     }
   }
 
-  // ================= RECHARGE & PAYMENT GATEWAY (RAZORPAY) =================
+  function handleLogout() {
+    if (confirm('क्या आप सचमुच लॉग-आउट करना चाहते हैं? / Are you sure you want to sign out?')) {
+      setStoredUser(null);
+      alert('आप सफलतापूर्वक लॉग-आउट हो चुके हैं।');
+    }
+  }
+
+  // ================= PROTECTED RECHARGE & PAYMENT GATEWAY =================
   function openRechargeModal(packName = 'Studio Pack') {
+    // 🔒 STRICT LOGIN CHECK: No payment without login!
+    const user = getStoredUser();
+    if (!user) {
+      pendingPackForAuth = packName;
+      alert('🔒 पेमेंट करने के लिए पहले Login या Create Account करना अनिवार्य है!\n\nPlease Sign In or Create an Account first to recharge your wallet.');
+      openAuthModal('login', 'वॉलेट रिचार्ज करने के लिए कृपया पहले Login करें');
+      return;
+    }
+
     const modal = document.getElementById('rechargeModal');
     if (modal) {
       modal.classList.remove('hidden');
@@ -1838,12 +1987,20 @@
   }
 
   function processRechargePayment() {
+    // 🔒 STRICT LOGIN CHECK AGAIN
+    const user = getStoredUser();
+    if (!user) {
+      alert('🔒 आपका सेशन समाप्त हो गया है। कृपया पहले लॉगिन करें।');
+      closeRechargeModal();
+      openAuthModal('login', 'पेमेंट करने के लिए कृपया लॉगिन करें');
+      return;
+    }
+
     const btn = document.getElementById('btnProcessPayment');
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting to Secure Gateway...';
 
     const rzpKey = window.RAZORPAY_KEY_ID || '';
-    const user = getStoredUser() || { name: 'Studio User', email: 'studio@user.com' };
 
     if (rzpKey && typeof Razorpay !== 'undefined') {
       const options = {
@@ -1858,7 +2015,11 @@
         prefill: {
           name: user.name,
           email: user.email,
-          contact: "9999999999"
+          contact: user.phone || "9999999999"
+        },
+        notes: {
+          userId: user.id,
+          studio: user.studio || ''
         },
         theme: { color: "#6366f1" },
         modal: {
@@ -1884,7 +2045,8 @@
   function onRechargeSuccess(txnId) {
     let user = getStoredUser();
     if (!user) {
-      user = { name: 'Studio User', email: 'studio@user.com', credits: 5 };
+      alert('Error: user not found');
+      return;
     }
     user.credits = (user.credits || 0) + activeRechargePack.credits;
     setStoredUser(user);
@@ -1893,6 +2055,8 @@
     let txns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
     txns.unshift({
       id: txnId,
+      userId: user.id,
+      userEmail: user.email,
       pack: activeRechargePack.name,
       amount: activeRechargePack.amount,
       credits: activeRechargePack.credits,
@@ -1902,8 +2066,10 @@
 
     closeRechargeModal();
     const btn = document.getElementById('btnProcessPayment');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely via Razorpay (UPI / Cards)';
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely via Razorpay (UPI / Cards)';
+    }
 
     alert('🎉 Payment Successful via Razorpay!\n\nTransaction ID: ' + txnId + '\nPack: ' + activeRechargePack.name + '\nAmount: ₹' + activeRechargePack.amount + '\nAdded ' + activeRechargePack.credits + ' Credits to your account!\n\nNew Wallet Balance: ' + user.credits + ' Credits.');
   }
@@ -1964,16 +2130,20 @@
 
   <!-- ================= AUTH MODAL (Login & Sign Up) ================= -->
   <div id="authModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative border border-gray-100">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative border border-gray-100 max-h-[90vh] overflow-y-auto">
       <button onclick="closeAuthModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">&times;</button>
       
+      <!-- Notice Box (e.g. redirected from payment) -->
+      <div id="authNoticeBox" class="hidden mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold rounded-xl text-center">
+      </div>
+
       <!-- Logo & Welcome -->
       <div class="text-center mb-6">
         <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-50 text-primary text-2xl mb-3 shadow-inner">
-          <i class="fa-solid fa-camera-retro"></i>
+          <i class="fa-solid fa-user-lock"></i>
         </div>
-        <h3 class="text-2xl font-extrabold text-gray-900" id="authModalTitle">Welcome Back</h3>
-        <p class="text-xs text-gray-500 mt-1" id="authModalSubtitle">Sign in to access your wallet, print sheets & downloads</p>
+        <h3 class="text-2xl font-extrabold text-gray-900" id="authModalTitle">Account Sign In</h3>
+        <p class="text-xs text-gray-500 mt-1" id="authModalSubtitle">Enter your email & password to access your studio wallet</p>
       </div>
 
       <!-- Tab Switcher -->
@@ -1988,6 +2158,8 @@
 
       <!-- LOGIN FORM -->
       <form id="formLogin" onsubmit="handleLogin(event)" class="space-y-4">
+        <div id="loginErrorMsg" class="hidden p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-xl"></div>
+
         <div>
           <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Email Address</label>
           <div class="relative">
@@ -1999,7 +2171,7 @@
         <div>
           <div class="flex justify-between items-center mb-1">
             <label class="block text-xs font-bold text-gray-700 uppercase">Password</label>
-            <a href="#" onclick="alert('Password reset link has been sent to your email.'); return false;" class="text-xs text-primary font-semibold hover:underline">Forgot?</a>
+            <a href="#" onclick="alert('Password reset link will be sent to your registered email.'); return false;" class="text-xs text-primary font-semibold hover:underline">Forgot?</a>
           </div>
           <div class="relative">
             <i class="fa-solid fa-lock absolute left-4 top-3.5 text-gray-400 text-sm"></i>
@@ -2007,27 +2179,19 @@
           </div>
         </div>
 
-        <div class="flex items-center">
-          <input type="checkbox" id="rememberMe" checked class="w-4 h-4 accent-primary rounded cursor-pointer">
-          <label for="rememberMe" class="ml-2 text-xs text-gray-600 cursor-pointer">Remember this device</label>
-        </div>
-
         <button type="submit" class="w-full py-3.5 bg-primary hover:bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Account
         </button>
 
-        <div class="relative my-4 text-center">
-          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div>
-          <span class="relative bg-white px-3 text-xs text-gray-400 uppercase font-semibold">Or Quick Demo</span>
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 text-center">
+          <p class="text-[11px] text-gray-500">Demo Studio Account: <span class="font-mono text-gray-800 font-bold">studio@allbgremove.com</span> | Pass: <span class="font-mono text-gray-800 font-bold">password123</span></p>
         </div>
-
-        <button type="button" onclick="demoLogin()" class="w-full py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold rounded-xl transition text-xs flex items-center justify-center gap-2">
-          ⚡ 1-Click Studio Demo Login (+10 Credits)
-        </button>
       </form>
 
       <!-- SIGN UP FORM -->
       <form id="formSignup" onsubmit="handleSignUp(event)" class="space-y-4 hidden">
+        <div id="signupErrorMsg" class="hidden p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-xl"></div>
+
         <div>
           <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Full Name</label>
           <div class="relative">
@@ -2045,7 +2209,15 @@
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Email Address</label>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Mobile Number (For WhatsApp Receipts)</label>
+          <div class="relative">
+            <i class="fa-solid fa-phone absolute left-4 top-3.5 text-gray-400 text-sm"></i>
+            <input type="tel" id="signupPhone" placeholder="9876543210" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm bg-gray-50/50">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Email Address (Login ID)</label>
           <div class="relative">
             <i class="fa-solid fa-envelope absolute left-4 top-3.5 text-gray-400 text-sm"></i>
             <input type="email" id="signupEmail" required placeholder="studio@gmail.com" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm bg-gray-50/50">
@@ -2053,7 +2225,7 @@
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Password</label>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Create Password (Min 6 chars)</label>
           <div class="relative">
             <i class="fa-solid fa-lock absolute left-4 top-3.5 text-gray-400 text-sm"></i>
             <input type="password" id="signupPassword" required minlength="6" placeholder="Create strong password" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm bg-gray-50/50">
@@ -2062,16 +2234,15 @@
 
         <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3 flex items-center gap-3">
           <i class="fa-solid fa-gift text-2xl text-primary"></i>
-          <span class="text-xs text-indigo-900 font-semibold">🎉 Special Offer: You will get <strong>5 Free Credits</strong> instantly upon creating your account!</span>
+          <span class="text-xs text-indigo-900 font-semibold">🎉 Special Bonus: You will receive <strong>5 Free Credits</strong> instantly upon creating your account!</span>
         </div>
 
         <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-user-plus"></i> Create Free Account
+          <i class="fa-solid fa-user-plus"></i> Create Free Account & Get 5 Credits
         </button>
       </form>
     </div>
   </div>
-
 
   <!-- ================= RECHARGE / PAYMENT MODAL ================= -->
   <div id="rechargeModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
