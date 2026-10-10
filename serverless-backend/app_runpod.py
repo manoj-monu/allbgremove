@@ -1,4 +1,20 @@
 import sys
+import torch
+
+# Polyfill torch.accelerator for PyTorch 2.5 compatibility
+if not hasattr(torch, 'accelerator'):
+    class _DummyAccelerator:
+        @staticmethod
+        def is_available():
+            return torch.cuda.is_available()
+        @staticmethod
+        def device_count():
+            return torch.cuda.device_count()
+        @staticmethod
+        def current_accelerator():
+            return torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    torch.accelerator = _DummyAccelerator()
+
 try:
     import torchvision.transforms.functional as TF
     sys.modules['torchvision.transforms.functional_tensor'] = TF
@@ -11,7 +27,6 @@ from fastapi import FastAPI, UploadFile, File, Header, HTTPException
 from fastapi.responses import Response
 from PIL import Image
 import io
-import torch
 from transformers import AutoModelForImageSegmentation
 from torchvision import transforms
 from fastapi.middleware.cors import CORSMiddleware
