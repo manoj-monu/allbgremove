@@ -826,22 +826,42 @@
         
         <div class="form-group">
           <label>Photo Size Requirement</label>
-          <select id="cropSize" onchange="updateCropBox()">
-            <option value="38.5x45" selected>India Passport (38.5×45 mm)</option>
-            <option value="35x45">India Passport Standard (35×45 mm)</option>
-            <option value="30x40">UAE Passport / Stamp Size (30×40 mm)</option>
-            <option value="51x51">US Visa (51×51 mm)</option>
-            <option value="custom">Custom Size</option>
+          <select id="cropSize" onchange="onCropSizePresetChange()">
+            <option value="38.5x45" selected>India Passport (38.5×45 mm • 3.85×4.5 cm)</option>
+            <option value="35x45">India Standard / UK (35×45 mm • 3.5×4.5 cm)</option>
+            <option value="51x51">US Visa / OCI / Square (51×51 mm • 2×2 inch)</option>
+            <option value="30x40">UAE Passport / Stamp Size (30×40 mm • 3×4 cm)</option>
+            <option value="50.8x50.8">2×2 Inch Photo (50.8×50.8 mm • 2×2 in)</option>
+            <option value="custom">Custom Size (Custom mm / cm / inch)</option>
           </select>
+        </div>
+
+        <!-- Unit Selector (mm, cm, inch) -->
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-weight:700; color:var(--text);"><i class="fa-solid fa-ruler-combined text-primary mr-1"></i> Size Unit (इकाई)</span>
+            <span id="unitIndicatorBadge" style="font-size:11px; font-weight:800; color:var(--primary); background:#eef2ff; padding:2px 8px; border-radius:10px; border:1px solid #c7d2fe;">Millimeters (mm)</span>
+          </label>
+          <div style="display: flex; gap: 6px; background: #f1f5f9; padding: 4px; border-radius: 12px; border: 1px solid #e2e8f0;">
+            <button type="button" id="unitBtn_mm" onclick="setCropUnit('mm')" style="flex:1; padding: 8px 6px; border-radius: 8px; border: none; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; background: var(--primary); color: white; box-shadow: 0 2px 6px rgba(99,102,241,0.3);">
+              mm
+            </button>
+            <button type="button" id="unitBtn_cm" onclick="setCropUnit('cm')" style="flex:1; padding: 8px 6px; border-radius: 8px; border: none; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; background: transparent; color: #64748b;">
+              cm
+            </button>
+            <button type="button" id="unitBtn_inch" onclick="setCropUnit('inch')" style="flex:1; padding: 8px 6px; border-radius: 8px; border: none; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; background: transparent; color: #64748b;">
+              inch
+            </button>
+          </div>
         </div>
         
         <div class="form-group" style="display: flex; gap: 10px;">
           <div style="flex:1">
-            <label>Width (mm)</label>
+            <label id="cropWLabel" style="font-weight:700;">Width (mm)</label>
             <input type="number" step="0.1" id="cropW" value="38.5" oninput="updateCropBox(true)">
           </div>
           <div style="flex:1">
-            <label>Height (mm)</label>
+            <label id="cropHLabel" style="font-weight:700;">Height (mm)</label>
             <input type="number" step="0.1" id="cropH" value="45" oninput="updateCropBox(true)">
           </div>
         </div>
@@ -930,6 +950,24 @@
           <input type="range" id="slS" min="0" max="200" value="100" oninput="applyAdjustments()">
         </div>
 
+        <!-- 2 Export Quality Options -->
+        <div class="form-group" style="margin-top:16px; margin-bottom:16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:12px;">
+          <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-weight:700; color:var(--text);"><i class="fa-solid fa-sliders text-primary mr-1"></i> Output Quality (क्वालिटी):</span>
+            <span id="qualityBadgeSingle" style="font-size:11px; font-weight:800; background:#ecfdf5; color:#059669; padding:2px 8px; border-radius:12px; border:1px solid #a7f3d0;">Ultra HD (600 DPI)</span>
+          </label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <button type="button" id="qualityBtnSingle_ultra" onclick="setExportQuality('ultra')" style="padding:10px 8px; border-radius:10px; border:2px solid var(--primary); background:white; cursor:pointer; text-align:center; transition:0.2s; box-shadow:0 2px 8px rgba(99,102,241,0.2);">
+              <div style="font-size:12px; font-weight:800; color:var(--primary);"><i class="fa-solid fa-crown mr-1 text-amber-500"></i> Ultra HD 600 DPI</div>
+              <div style="font-size:10px; color:#64748b; margin-top:2px;">Studio Lab Print</div>
+            </button>
+            <button type="button" id="qualityBtnSingle_standard" onclick="setExportQuality('standard')" style="padding:10px 8px; border-radius:10px; border:1px solid #cbd5e1; background:#f8fafc; cursor:pointer; text-align:center; transition:0.2s;">
+              <div style="font-size:12px; font-weight:800; color:#334155;"><i class="fa-solid fa-cloud-arrow-up mr-1 text-indigo-500"></i> Standard 300 DPI</div>
+              <div style="font-size:10px; color:#64748b; margin-top:2px;">Govt Forms / Online</div>
+            </button>
+          </div>
+        </div>
+
         <button class="btn btn-outline" style="width:100%; margin-bottom:20px; border-color:var(--primary); color:var(--primary);" onclick="downloadImage('adjCanvas', 'adjusted_passport.png')">⬇ Download Final Single Photo</button>
           <div class="nav-footer">
           <button class="btn btn-outline" onclick="goToStep(3)">Back</button>
@@ -1014,6 +1052,24 @@
           <button class="btn btn-outline" style="flex:1; padding:6px 8px; font-size:12px;" onclick="centerPhotosOnSheet()">🎯 Center</button>
           <button class="btn btn-outline" style="flex:1; padding:6px 8px; font-size:12px;" onclick="topLeftPhotosOnSheet()">📐 Top-Left</button>
           <button class="btn btn-outline" style="flex:1; padding:6px 8px; font-size:12px;" onclick="distributeEvenlyOnSheet()">✨ Fill Page</button>
+        </div>
+
+        <!-- 2 Sheet Export Quality Options -->
+        <div class="form-group" style="margin-top:16px; margin-bottom:16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:12px;">
+          <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-weight:700; color:var(--text);"><i class="fa-solid fa-sliders text-primary mr-1"></i> Print Quality (क्वालिटी):</span>
+            <span id="qualityBadgeSheet" style="font-size:11px; font-weight:800; background:#ecfdf5; color:#059669; padding:2px 8px; border-radius:12px; border:1px solid #a7f3d0;">Ultra HD (600 DPI)</span>
+          </label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <button type="button" id="qualityBtnSheet_ultra" onclick="setExportQuality('ultra')" style="padding:10px 8px; border-radius:10px; border:2px solid var(--primary); background:white; cursor:pointer; text-align:center; transition:0.2s; box-shadow:0 2px 8px rgba(99,102,241,0.2);">
+              <div style="font-size:12px; font-weight:800; color:var(--primary);"><i class="fa-solid fa-crown mr-1 text-amber-500"></i> Ultra HD 600 DPI</div>
+              <div style="font-size:10px; color:#64748b; margin-top:2px;">Studio Lab Print</div>
+            </button>
+            <button type="button" id="qualityBtnSheet_standard" onclick="setExportQuality('standard')" style="padding:10px 8px; border-radius:10px; border:1px solid #cbd5e1; background:#f8fafc; cursor:pointer; text-align:center; transition:0.2s;">
+              <div style="font-size:12px; font-weight:800; color:#334155;"><i class="fa-solid fa-cloud-arrow-up mr-1 text-indigo-500"></i> Standard 300 DPI</div>
+              <div style="font-size:10px; color:#64748b; margin-top:2px;">Normal / Fast Print</div>
+            </button>
+          </div>
         </div>
 
         <div class="nav-footer" style="flex-direction:column; gap:10px;">
@@ -1153,25 +1209,111 @@
     };
   }
 
+  // ================= UNIT & SIZE CONTROLLER (MM / CM / INCHES) =================
+  let currentCropUnit = 'mm'; // 'mm', 'cm', 'inch'
+
+  function getCropWidthMM() {
+    const val = parseFloat(document.getElementById('cropW').value) || 38.5;
+    if (currentCropUnit === 'cm') return val * 10;
+    if (currentCropUnit === 'inch') return val * 25.4;
+    return val;
+  }
+
+  function getCropHeightMM() {
+    const val = parseFloat(document.getElementById('cropH').value) || 45;
+    if (currentCropUnit === 'cm') return val * 10;
+    if (currentCropUnit === 'inch') return val * 25.4;
+    return val;
+  }
+
+  function setCropUnit(newUnit) {
+    if (currentCropUnit === newUnit) return;
+    
+    // 1. Get current dimensions in mm before switching
+    const currentW_mm = getCropWidthMM();
+    const currentH_mm = getCropHeightMM();
+    
+    currentCropUnit = newUnit;
+
+    // 2. Update unit button highlights
+    ['mm', 'cm', 'inch'].forEach(u => {
+      const btn = document.getElementById('unitBtn_' + u);
+      if (!btn) return;
+      if (u === newUnit) {
+        btn.style.background = 'var(--primary)';
+        btn.style.color = 'white';
+        btn.style.boxShadow = '0 2px 6px rgba(99,102,241,0.3)';
+      } else {
+        btn.style.background = 'transparent';
+        btn.style.color = '#64748b';
+        btn.style.boxShadow = 'none';
+      }
+    });
+
+    const badge = document.getElementById('unitIndicatorBadge');
+    const wLabel = document.getElementById('cropWLabel');
+    const hLabel = document.getElementById('cropHLabel');
+    const wInput = document.getElementById('cropW');
+    const hInput = document.getElementById('cropH');
+
+    // 3. Convert input values and steps
+    if (newUnit === 'mm') {
+      if (badge) badge.textContent = 'Active: Millimeters (mm)';
+      if (wLabel) wLabel.textContent = 'Width (mm)';
+      if (hLabel) hLabel.textContent = 'Height (mm)';
+      if (wInput) { wInput.step = '0.1'; wInput.value = Math.round(currentW_mm * 10) / 10; }
+      if (hInput) { hInput.step = '0.1'; hInput.value = Math.round(currentH_mm * 10) / 10; }
+    } else if (newUnit === 'cm') {
+      if (badge) badge.textContent = 'Active: Centimeters (cm)';
+      if (wLabel) wLabel.textContent = 'Width (cm)';
+      if (hLabel) hLabel.textContent = 'Height (cm)';
+      if (wInput) { wInput.step = '0.01'; wInput.value = (currentW_mm / 10).toFixed(2); }
+      if (hInput) { hInput.step = '0.01'; hInput.value = (currentH_mm / 10).toFixed(2); }
+    } else if (newUnit === 'inch') {
+      if (badge) badge.textContent = 'Active: Inches (inch)';
+      if (wLabel) wLabel.textContent = 'Width (inch)';
+      if (hLabel) hLabel.textContent = 'Height (inch)';
+      if (wInput) { wInput.step = '0.01'; wInput.value = (currentW_mm / 25.4).toFixed(2); }
+      if (hInput) { hInput.step = '0.01'; hInput.value = (currentH_mm / 25.4).toFixed(2); }
+    }
+
+    updateCropBox();
+  }
+
+  function onCropSizePresetChange() {
+    const size = document.getElementById('cropSize').value;
+    if (size === 'custom') {
+      updateCropBox(true);
+      return;
+    }
+    const [w_mm, h_mm] = size.split('x').map(Number);
+    const wInput = document.getElementById('cropW');
+    const hInput = document.getElementById('cropH');
+
+    if (currentCropUnit === 'mm') {
+      if (wInput) wInput.value = w_mm;
+      if (hInput) hInput.value = h_mm;
+    } else if (currentCropUnit === 'cm') {
+      if (wInput) wInput.value = (w_mm / 10).toFixed(2);
+      if (hInput) hInput.value = (h_mm / 10).toFixed(2);
+    } else if (currentCropUnit === 'inch') {
+      if (wInput) wInput.value = (w_mm / 25.4).toFixed(2);
+      if (hInput) hInput.value = (h_mm / 25.4).toFixed(2);
+    }
+    updateCropBox();
+  }
+
   function updateCropBox(isManual) {
-    let size = document.getElementById('cropSize').value;
-    let w, h;
     if (isManual) {
       document.getElementById('cropSize').value = 'custom';
-      w = parseFloat(document.getElementById('cropW').value) || 38.5;
-      h = parseFloat(document.getElementById('cropH').value) || 45;
-    } else if (size !== 'custom') {
-      [w, h] = size.split('x').map(Number);
-      document.getElementById('cropW').value = w;
-      document.getElementById('cropH').value = h;
-    } else {
-      w = parseFloat(document.getElementById('cropW').value) || 38.5;
-      h = parseFloat(document.getElementById('cropH').value) || 45;
     }
+    const w_mm = getCropWidthMM();
+    const h_mm = getCropHeightMM();
+
     const wrap = document.getElementById('cropWrapper');
-    // Scale for visualization
-    const visualW = w * 5;
-    const visualH = h * 5;
+    // Scale for visual preview box
+    const visualW = w_mm * 5;
+    const visualH = h_mm * 5;
     wrap.style.width = visualW + 'px';
     wrap.style.height = visualH + 'px';
 
@@ -1188,15 +1330,17 @@
   }
 
   function applyCropAndNext() {
-    // Render crop to a real canvas
-    const w = +document.getElementById('cropW').value * MM_TO_PX;
-    const h = +document.getElementById('cropH').value * MM_TO_PX;
+    // Render crop to a real canvas using precise mm dimensions
+    const w_mm = getCropWidthMM();
+    const h_mm = getCropHeightMM();
+    const w = w_mm * MM_TO_PX;
+    const h = h_mm * MM_TO_PX;
     const c = document.createElement('canvas');
     c.width = w; c.height = h;
     const ctx = c.getContext('2d');
     
     // Reverse engineer the visual scale to actual scale
-    const visualW = +document.getElementById('cropW').value * 5;
+    const visualW = w_mm * 5;
     const ratio = w / visualW;
     
     ctx.fillStyle = "#ffffff";
@@ -1323,6 +1467,60 @@
     return new Blob([u8arr], {type:mime});
   }
 
+  // ================= 2 OUTPUT QUALITY MODES (ULTRA HD 600 DPI / STANDARD 300 DPI) =================
+  let currentExportQuality = 'ultra'; // 'ultra' (600 DPI Studio Lab) or 'standard' (300 DPI Web/Forms)
+
+  function setExportQuality(q) {
+    currentExportQuality = q;
+    
+    // Step 4 badges & buttons
+    const badgeSingle = document.getElementById('qualityBadgeSingle');
+    const btnSingleUltra = document.getElementById('qualityBtnSingle_ultra');
+    const btnSingleStd = document.getElementById('qualityBtnSingle_standard');
+
+    // Step 5 badges & buttons
+    const badgeSheet = document.getElementById('qualityBadgeSheet');
+    const btnSheetUltra = document.getElementById('qualityBtnSheet_ultra');
+    const btnSheetStd = document.getElementById('qualityBtnSheet_standard');
+
+    const isUltra = (q === 'ultra');
+
+    if (badgeSingle) {
+      badgeSingle.textContent = isUltra ? 'Ultra HD (600 DPI)' : 'Standard (300 DPI)';
+      badgeSingle.style.background = isUltra ? '#ecfdf5' : '#eff6ff';
+      badgeSingle.style.color = isUltra ? '#059669' : '#2563eb';
+      badgeSingle.style.borderColor = isUltra ? '#a7f3d0' : '#bfdbfe';
+    }
+    if (badgeSheet) {
+      badgeSheet.textContent = isUltra ? 'Ultra HD (600 DPI)' : 'Standard (300 DPI)';
+      badgeSheet.style.background = isUltra ? '#ecfdf5' : '#eff6ff';
+      badgeSheet.style.color = isUltra ? '#059669' : '#2563eb';
+      badgeSheet.style.borderColor = isUltra ? '#a7f3d0' : '#bfdbfe';
+    }
+
+    if (btnSingleUltra) {
+      btnSingleUltra.style.borderColor = isUltra ? 'var(--primary)' : '#cbd5e1';
+      btnSingleUltra.style.background = isUltra ? 'white' : '#f8fafc';
+      btnSingleUltra.style.boxShadow = isUltra ? '0 2px 8px rgba(99,102,241,0.2)' : 'none';
+    }
+    if (btnSingleStd) {
+      btnSingleStd.style.borderColor = !isUltra ? 'var(--primary)' : '#cbd5e1';
+      btnSingleStd.style.background = !isUltra ? 'white' : '#f8fafc';
+      btnSingleStd.style.boxShadow = !isUltra ? '0 2px 8px rgba(99,102,241,0.2)' : 'none';
+    }
+
+    if (btnSheetUltra) {
+      btnSheetUltra.style.borderColor = isUltra ? 'var(--primary)' : '#cbd5e1';
+      btnSheetUltra.style.background = isUltra ? 'white' : '#f8fafc';
+      btnSheetUltra.style.boxShadow = isUltra ? '0 2px 8px rgba(99,102,241,0.2)' : 'none';
+    }
+    if (btnSheetStd) {
+      btnSheetStd.style.borderColor = !isUltra ? 'var(--primary)' : '#cbd5e1';
+      btnSheetStd.style.background = !isUltra ? 'white' : '#f8fafc';
+      btnSheetStd.style.boxShadow = !isUltra ? '0 2px 8px rgba(99,102,241,0.2)' : 'none';
+    }
+  }
+
   function downloadImage(canvasId, filename) {
     const user = getStoredUser();
     if (!user) {
@@ -1331,13 +1529,18 @@
     }
     if (!deductCredit()) return;
     const c = document.getElementById(canvasId);
-    // Use JPEG for better compatibility and smaller size
-    const dataUrl = c.toDataURL('image/jpeg', 1.0);
+    
+    const isUltra = (currentExportQuality === 'ultra');
+    const jpegQuality = isUltra ? 1.0 : 0.85;
+    const dataUrl = c.toDataURL('image/jpeg', jpegQuality);
     const blob = dataURLtoBlob(dataUrl);
     const url = URL.createObjectURL(blob);
     
+    let baseName = filename.replace('.png', '').replace('.jpg', '');
+    const qualitySuffix = isUltra ? '_UltraHD_600dpi.jpg' : '_Standard_300dpi.jpg';
+    
     const link = document.createElement('a');
-    link.download = filename.replace('.png', '.jpg');
+    link.download = baseName + qualitySuffix;
     link.href = url;
     document.body.appendChild(link);
     link.click();
@@ -1501,8 +1704,10 @@
     const gridLayout = document.getElementById('gridLayout').value;
     
     if (gridLayout === 'actual') {
-      imgW = +document.getElementById('cropW').value * MM_TO_PX;
-      imgH = +document.getElementById('cropH').value * MM_TO_PX;
+      const w_mm = getCropWidthMM();
+      const h_mm = getCropHeightMM();
+      imgW = w_mm * MM_TO_PX;
+      imgH = h_mm * MM_TO_PX;
       cols = Math.floor((availableW + photoMargin) / (imgW + photoMargin));
       rows = Math.floor((availableH + photoMargin) / (imgH + photoMargin));
     } else {
@@ -1521,7 +1726,7 @@
       const cellW = (availableW - ((cols - 1) * photoMargin)) / cols;
       const cellH = (availableH - ((rows - 1) * photoMargin)) / rows;
       
-      const aspect = (finalImage && finalImage.width) ? (finalImage.width / finalImage.height) : (38.5 / 45);
+      const aspect = (finalImage && finalImage.width) ? (finalImage.width / finalImage.height) : (getCropWidthMM() / getCropHeightMM());
       let drawW = cellW;
       let drawH = drawW / aspect;
       if (drawH > cellH) {
@@ -1591,15 +1796,20 @@
     updatePrintLayout();
   }
 
-  function updatePrintLayout(includeRuler = true) {
+  function updatePrintLayout(includeRuler = true, scaleMultiplier = 1) {
     const c = document.getElementById('printCanvas');
     const ctx = c.getContext('2d');
     
     const m = getSheetMetrics();
     if (!m) return;
-    const pW = m.pW, pH = m.pH;
+    const pW = m.pW * scaleMultiplier;
+    const pH = m.pH * scaleMultiplier;
 
     c.width = pW; c.height = pH;
+    ctx.save();
+    if (scaleMultiplier !== 1) {
+      ctx.scale(scaleMultiplier, scaleMultiplier);
+    }
     ctx.fillStyle = "#ffffff"; // Paper color
     ctx.fillRect(0,0,m.pW,m.pH);
 
@@ -1663,7 +1873,7 @@
       ctx.lineWidth = 2;
       
       // Top Ruler (X axis)
-      for (let i = 0; i <= pW / MM_TO_PX; i++) {
+      for (let i = 0; i <= m.pW / MM_TO_PX; i++) {
         const x = i * MM_TO_PX;
         let tickLen = 10;
         if (i % 5 === 0) tickLen = 20;
@@ -1678,7 +1888,7 @@
       }
       
       // Left Ruler (Y axis)
-      for (let i = 0; i <= pH / MM_TO_PX; i++) {
+      for (let i = 0; i <= m.pH / MM_TO_PX; i++) {
         const y = i * MM_TO_PX;
         let tickLen = 10;
         if (i % 5 === 0) tickLen = 20;
@@ -1706,13 +1916,14 @@
       ctx.fillStyle = 'rgba(79, 70, 229, 0.20)';
       ctx.textAlign = 'center';
       ctx.rotate(-Math.PI / 6);
-      for (let x = -pW; x < pW * 2; x += 320) {
-        for (let y = -pH; y < pH * 2; y += 190) {
+      for (let x = -m.pW; x < m.pW * 2; x += 320) {
+        for (let y = -m.pH; y < m.pH * 2; y += 190) {
           ctx.fillText('allbgremove.com • PREVIEW', x, y);
         }
       }
       ctx.restore();
     }
+    ctx.restore();
   }
 
   function deductCredit() {
@@ -1740,23 +1951,27 @@
   function downloadSheet() {
       if (!deductCredit()) return;
 
-      // Re-render WITHOUT ruler
-      updatePrintLayout(false);
+      const isUltra = (currentExportQuality === 'ultra');
+      const scaleMultiplier = isUltra ? 2 : 1; // 2x resolution = 600 DPI Studio Lab Quality!
+
+      // Re-render WITHOUT ruler at target DPI scale
+      updatePrintLayout(false, scaleMultiplier);
       const c = document.getElementById('printCanvas');
-      const dataUrl = c.toDataURL('image/jpeg', 1.0);
+      const jpegQuality = isUltra ? 1.0 : 0.88;
+      const dataUrl = c.toDataURL('image/jpeg', jpegQuality);
       const blob = dataURLtoBlob(dataUrl);
       const url = URL.createObjectURL(blob);
       
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'passport_sheet_ready.jpg';
+      a.download = isUltra ? 'passport_sheet_UltraHD_600dpi.jpg' : 'passport_sheet_Standard_300dpi.jpg';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      // Restore ruler
-      updatePrintLayout(true);
+      // Restore ruler on preview canvas at 1x
+      updatePrintLayout(true, 1);
   }
   
   function printSheet() {
