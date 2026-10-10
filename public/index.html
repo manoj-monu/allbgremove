@@ -384,6 +384,20 @@
     transform: rotate(-90deg);
   }
 
+  /* Anti-Screenshot Print & Screen Capture Guard */
+  @media print {
+    body { background: #000 !important; }
+    body > *:not(#antiScreenshotShield) { display: none !important; }
+    #antiScreenshotShield {
+      display: flex !important;
+      position: fixed !important;
+      inset: 0 !important;
+      background: #000 !important;
+      color: #fff !important;
+      z-index: 9999999 !important;
+    }
+  }
+
 </style>
 </head>
 <body class="overflow-x-hidden">
@@ -3289,6 +3303,85 @@
         }
       }
     });
+
+    // 6. Anti-Screenshot Blanking Shield (PrintScreen, Snipping Tool, & Window Blur)
+    const blankShield = document.getElementById('antiScreenshotShield');
+    let isFilePicking = false;
+    let blankTimer = null;
+
+    const triggerBlankShield = (duration = 1600) => {
+      if (!blankShield) return;
+      blankShield.style.display = 'flex';
+      
+      // Wipe clipboard so screenshot bitmap is emptied
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText('').catch(() => {});
+      }
+      
+      showProtectedToast('🔒 Screenshots Disabled! Screen protected by allbgremove.com');
+
+      if (blankTimer) clearTimeout(blankTimer);
+      if (duration > 0) {
+        blankTimer = setTimeout(() => {
+          blankShield.style.display = 'none';
+        }, duration);
+      }
+    };
+
+    const hideBlankShield = () => {
+      if (blankTimer) clearTimeout(blankTimer);
+      if (blankShield) blankShield.style.display = 'none';
+    };
+
+    // Detect PrintScreen keydown
+    window.addEventListener('keydown', function(e) {
+      if (e.key === 'PrintScreen' || e.keyCode === 44) {
+        triggerBlankShield(1800);
+      }
+      // Detect Snipping Tool shortcut Ctrl+Shift+S or Meta+Shift+S
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 's' || e.key === 'S')) {
+        e.preventDefault();
+        triggerBlankShield(2000);
+      }
+      // Detect Ctrl+P (Print to PDF)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
+        e.preventDefault();
+        triggerBlankShield(1500);
+      }
+    }, true);
+
+    // Detect PrintScreen keyup (when Windows finishes screen grab)
+    window.addEventListener('keyup', function(e) {
+      if (e.key === 'PrintScreen' || e.keyCode === 44) {
+        triggerBlankShield(1800);
+      }
+    }, true);
+
+    // File picker tracking
+    const fileIn = document.getElementById('fileIn');
+    if (fileIn) {
+      fileIn.addEventListener('click', () => { isFilePicking = true; });
+      fileIn.addEventListener('change', () => { setTimeout(() => { isFilePicking = false; }, 800); });
+    }
+
+    // Window blur: triggers when Snipping Tool (Win+Shift+S) or screen capture overlay takes focus
+    window.addEventListener('blur', function() {
+      if (isFilePicking) return;
+      const appContainer = document.getElementById('app-container');
+      if (appContainer && appContainer.style.display !== 'none') {
+        if (!blankShield) return;
+        blankShield.style.display = 'flex';
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText('').catch(() => {});
+        }
+      }
+    });
+
+    // Window focus: restore view
+    window.addEventListener('focus', function() {
+      isFilePicking = false;
+      hideBlankShield();
+    });
   })();
 
   let toastTimer = null;
@@ -3307,6 +3400,22 @@
   }
 
 </script>
+
+  <!-- ================= ANTI-SCREENSHOT BLANK SHIELD ================= -->
+  <div id="antiScreenshotShield" style="position:fixed; inset:0; z-index:9999999; background:#000000; display:none; flex-direction:column; align-items:center; justify-content:center; color:white; text-align:center; padding:20px; font-family:'Plus Jakarta Sans', sans-serif;">
+    <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:24px; padding:36px 32px; max-width:440px; box-shadow:0 20px 50px rgba(0,0,0,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);">
+      <div style="width:68px; height:68px; border-radius:50%; background:rgba(99,102,241,0.25); border:2px solid #6366f1; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; color:#818cf8; font-size:28px;">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h2 style="font-size:22px; font-weight:800; color:#ffffff; margin-bottom:8px; letter-spacing:-0.3px;">Protected Content</h2>
+      <p style="font-size:14px; color:#94a3b8; line-height:1.5; margin-bottom:18px;">
+        Screenshots and screen capture are disabled to protect image rights. Please return to the window to continue.
+      </p>
+      <div style="display:inline-block; font-size:12px; font-weight:700; color:#a5b4fc; background:rgba(99,102,241,0.25); border:1px solid rgba(99,102,241,0.4); padding:6px 14px; border-radius:20px;">
+        🔒 allbgremove.com Anti-Screenshot Shield
+      </div>
+    </div>
+  </div>
 
   <!-- ================= AUTH MODAL (Login & Sign Up) ================= -->
   <div id="authModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
