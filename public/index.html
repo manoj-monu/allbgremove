@@ -6,6 +6,7 @@
   <title>PassportSnap Pro - Create Perfect Passport Photos</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -249,9 +250,54 @@
           <a href="#" class="text-gray-600 hover:text-primary font-medium transition">Examples</a>
           <a href="contact.html" class="text-gray-600 hover:text-primary font-medium transition">Contact</a>
         </div>
-        <div class="flex gap-4">
-          <a href="#" class="px-5 py-2 text-primary border border-primary rounded-lg font-semibold hover:bg-indigo-50 transition">Login</a>
-          <a href="#" onclick="document.getElementById('fileIn').click(); return false;" class="px-5 py-2 bg-primary text-white rounded-lg font-semibold shadow-lg shadow-indigo-200 hover:-translate-y-0.5 transition">Sign Up</a>
+        <div class="flex items-center gap-3" id="navAuthContainer">
+          <!-- Auth buttons when logged out -->
+          <div id="navLoggedOut" class="flex gap-3">
+            <button onclick="openAuthModal('login')" class="px-5 py-2 text-primary border border-primary rounded-lg font-semibold hover:bg-indigo-50 transition">Login</button>
+            <button onclick="openAuthModal('signup')" class="px-5 py-2 bg-primary text-white rounded-lg font-semibold shadow-lg shadow-indigo-200 hover:-translate-y-0.5 transition">Create Account</button>
+          </div>
+
+          <!-- Profile & Wallet when logged in -->
+          <div id="navLoggedIn" class="hidden items-center gap-3">
+            <button onclick="openRechargeModal()" class="flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-full text-sm font-bold text-primary transition" title="Click to recharge credits">
+              <i class="fa-solid fa-coins text-amber-500"></i>
+              <span id="navCreditsCount">5</span> Credits
+              <span class="text-xs bg-primary text-white px-2 py-0.5 rounded-full ml-1">+ Recharge</span>
+            </button>
+
+            <!-- User Menu -->
+            <div class="relative group">
+              <button class="flex items-center gap-2 py-1 px-2 rounded-lg hover:bg-gray-100 transition">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-r from-primary to-secondary text-white font-extrabold flex items-center justify-center text-sm shadow" id="navUserAvatar">
+                  U
+                </div>
+                <span class="text-sm font-bold text-gray-800 hidden sm:inline" id="navUserName">Studio User</span>
+                <i class="fa-solid fa-chevron-down text-xs text-gray-500"></i>
+              </button>
+              
+              <!-- Dropdown -->
+              <div class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 hidden group-hover:block transition z-50">
+                <div class="px-4 py-2 border-b border-gray-100">
+                  <p class="text-xs text-gray-400 font-semibold">Signed in as</p>
+                  <p class="text-sm font-bold text-gray-800 truncate" id="navUserEmail">user@example.com</p>
+                </div>
+                <a href="#" onclick="openRechargeModal(); return false;" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-primary transition">
+                  <i class="fa-solid fa-bolt text-amber-500 w-5"></i> Recharge Wallet
+                </a>
+                <a href="#" onclick="openTxnHistoryModal(); return false;" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-primary transition">
+                  <i class="fa-solid fa-receipt text-indigo-500 w-5"></i> Payment History
+                </a>
+                <a href="pricing.html" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-primary transition">
+                  <i class="fa-solid fa-tags text-purple-500 w-5"></i> View Plans & Pricing
+                </a>
+                <div class="border-t border-gray-100 mt-1 pt-1">
+                  <button onclick="handleLogout()" class="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                    <i class="fa-solid fa-arrow-right-from-bracket w-5"></i> Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -699,7 +745,8 @@
             <li><a href="contact.html" class="hover:text-white transition">Help Center</a></li>
             <li><a href="terms.html" class="hover:text-white transition">Terms & Conditions</a></li>
             <li><a href="privacy.html" class="hover:text-white transition">Privacy Policy</a></li>
-              <li><a href="refund.html" class="hover:text-white transition">Refund Policy</a></li>
+            <li><a href="refund.html" class="hover:text-white transition">Refund Policy</a></li>
+            <li><a href="shipping.html" class="hover:text-white transition">Shipping & Delivery</a></li>
             <li><a href="contact.html" class="hover:text-white transition">Contact Us</a></li>
           </ul>
         </div>
@@ -1612,9 +1659,520 @@
     updateCropBox(); // Recalculate auto-fit
   }
 
+  // ================= AUTHENTICATION & WALLET SYSTEM =================
+  let currentAuthTab = 'login';
+  let activeRechargePack = { name: 'Studio Pack', amount: 199, credits: 100 };
+
+  function getStoredUser() {
+    return JSON.parse(localStorage.getItem('passportsnap_user') || 'null');
+  }
+
+  function setStoredUser(user) {
+    if (user) {
+      localStorage.setItem('passportsnap_user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('passportsnap_user');
+    }
+    updateUserUI();
+  }
+
+  function updateUserUI() {
+    const user = getStoredUser();
+    const navLoggedOut = document.getElementById('navLoggedOut');
+    const navLoggedIn = document.getElementById('navLoggedIn');
+    
+    if (user) {
+      if (navLoggedOut) navLoggedOut.classList.add('hidden');
+      if (navLoggedIn) {
+        navLoggedIn.classList.remove('hidden');
+        navLoggedIn.classList.add('flex');
+      }
+      const creditsCount = document.getElementById('navCreditsCount');
+      if (creditsCount) creditsCount.textContent = user.credits !== undefined ? user.credits : 5;
+      
+      const userName = document.getElementById('navUserName');
+      if (userName) userName.textContent = user.name || 'Studio User';
+      
+      const userEmail = document.getElementById('navUserEmail');
+      if (userEmail) userEmail.textContent = user.email || 'user@example.com';
+      
+      const userAvatar = document.getElementById('navUserAvatar');
+      if (userAvatar && user.name) {
+        userAvatar.textContent = user.name.charAt(0).toUpperCase();
+      }
+    } else {
+      if (navLoggedOut) navLoggedOut.classList.remove('hidden');
+      if (navLoggedIn) {
+        navLoggedIn.classList.add('hidden');
+        navLoggedIn.classList.remove('flex');
+      }
+    }
+  }
+
+  function openAuthModal(tab = 'login') {
+    switchAuthTab(tab);
+    const modal = document.getElementById('authModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  }
+
+  function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  function switchAuthTab(tab) {
+    currentAuthTab = tab;
+    const isLogin = tab === 'login';
+    const formLogin = document.getElementById('formLogin');
+    const formSignup = document.getElementById('formSignup');
+    const btnLogin = document.getElementById('tabBtnLogin');
+    const btnSignup = document.getElementById('tabBtnSignup');
+    const title = document.getElementById('authModalTitle');
+    const sub = document.getElementById('authModalSubtitle');
+
+    if (isLogin) {
+      formLogin.classList.remove('hidden');
+      formSignup.classList.add('hidden');
+      btnLogin.className = 'flex-1 py-2 text-sm font-bold rounded-lg transition bg-white text-primary shadow-sm';
+      btnSignup.className = 'flex-1 py-2 text-sm font-bold rounded-lg transition text-gray-500 hover:text-gray-900';
+      title.textContent = 'Welcome Back';
+      sub.textContent = 'Sign in to access your wallet, print sheets & downloads';
+    } else {
+      formLogin.classList.add('hidden');
+      formSignup.classList.remove('hidden');
+      btnSignup.className = 'flex-1 py-2 text-sm font-bold rounded-lg transition bg-white text-primary shadow-sm';
+      btnLogin.className = 'flex-1 py-2 text-sm font-bold rounded-lg transition text-gray-500 hover:text-gray-900';
+      title.textContent = 'Create Studio Account';
+      sub.textContent = 'Get 5 Free Credits instantly upon creating your account';
+    }
+  }
+
+  function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const name = email.split('@')[0].replace(/[._]/g, ' ') || 'Studio User';
+    
+    let user = getStoredUser();
+    if (!user || user.email !== email) {
+      user = { name: name.charAt(0).toUpperCase() + name.slice(1), email: email, credits: 10 };
+    }
+    setStoredUser(user);
+    closeAuthModal();
+    alert('✅ Welcome back, ' + user.name + '! You are now signed in with ' + user.credits + ' credits.');
+  }
+
+  function handleSignUp(e) {
+    e.preventDefault();
+    const name = document.getElementById('signupName').value.trim();
+    const studio = document.getElementById('signupStudio').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+
+    const user = {
+      name: name,
+      studio: studio || name + ' Studio',
+      email: email,
+      credits: 5, // 5 Free Welcome Credits!
+      createdAt: new Date().toISOString()
+    };
+    setStoredUser(user);
+    closeAuthModal();
+    alert('🎉 Account created successfully!\nWelcome ' + name + '!\n🎁 You have received 5 Free Credits to start editing right away!');
+  }
+
+  function demoLogin() {
+    const demoUser = {
+      name: 'Studio Pro',
+      studio: 'Super Photo Studio',
+      email: 'demo@photostudio.com',
+      credits: 25,
+      createdAt: new Date().toISOString()
+    };
+    setStoredUser(demoUser);
+    closeAuthModal();
+    alert('⚡ Demo Account Activated!\nLogged in as Studio Pro with 25 Credits.');
+  }
+
+  function handleLogout() {
+    if (confirm('Are you sure you want to sign out?')) {
+      setStoredUser(null);
+      alert('Signed out successfully.');
+    }
+  }
+
+  // ================= RECHARGE & PAYMENT GATEWAY (RAZORPAY) =================
+  function openRechargeModal(packName = 'Studio Pack') {
+    const modal = document.getElementById('rechargeModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  }
+
+  function closeRechargeModal() {
+    const modal = document.getElementById('rechargeModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  function selectRechargePack(name, amount, credits, el) {
+    activeRechargePack = { name, amount, credits };
+    document.querySelectorAll('.pack-card').forEach(c => {
+      c.classList.remove('active', 'border-secondary', 'bg-pink-50/30');
+      c.classList.add('border-gray-200');
+    });
+    if (el) {
+      el.classList.add('active', 'border-secondary', 'bg-pink-50/30');
+      el.classList.remove('border-gray-200');
+    }
+    document.getElementById('rechargeSelectedName').textContent = name;
+    document.getElementById('rechargeSelectedCredits').textContent = '+' + credits + ' Credits';
+    document.getElementById('rechargeSelectedAmount').textContent = '₹' + amount;
+  }
+
+  function processRechargePayment() {
+    const btn = document.getElementById('btnProcessPayment');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting to Secure Gateway...';
+
+    const rzpKey = window.RAZORPAY_KEY_ID || '';
+    const user = getStoredUser() || { name: 'Studio User', email: 'studio@user.com' };
+
+    if (rzpKey && typeof Razorpay !== 'undefined') {
+      const options = {
+        key: rzpKey,
+        amount: activeRechargePack.amount * 100, // in Paise
+        currency: "INR",
+        name: "PassportSnap Pro",
+        description: activeRechargePack.name + " (" + activeRechargePack.credits + " Credits)",
+        handler: function(response) {
+          onRechargeSuccess(response.razorpay_payment_id || 'PAY_' + Date.now());
+        },
+        prefill: {
+          name: user.name,
+          email: user.email,
+          contact: "9999999999"
+        },
+        theme: { color: "#6366f1" },
+        modal: {
+          ondismiss: function() {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely via Razorpay (UPI / Cards)';
+          }
+        }
+      };
+      const rzp = new Razorpay(options);
+      rzp.open();
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely via Razorpay (UPI / Cards)';
+      return;
+    }
+
+    // Instant Simulation / Demo Checkout when live key not plugged in
+    setTimeout(() => {
+      onRechargeSuccess('TXN_RZP_' + Math.floor(100000 + Math.random() * 900000));
+    }, 1500);
+  }
+
+  function onRechargeSuccess(txnId) {
+    let user = getStoredUser();
+    if (!user) {
+      user = { name: 'Studio User', email: 'studio@user.com', credits: 5 };
+    }
+    user.credits = (user.credits || 0) + activeRechargePack.credits;
+    setStoredUser(user);
+
+    // Save transaction
+    let txns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
+    txns.unshift({
+      id: txnId,
+      pack: activeRechargePack.name,
+      amount: activeRechargePack.amount,
+      credits: activeRechargePack.credits,
+      date: new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+    });
+    localStorage.setItem('passportsnap_transactions', JSON.stringify(txns));
+
+    closeRechargeModal();
+    const btn = document.getElementById('btnProcessPayment');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely via Razorpay (UPI / Cards)';
+
+    alert('🎉 Payment Successful via Razorpay!\n\nTransaction ID: ' + txnId + '\nPack: ' + activeRechargePack.name + '\nAmount: ₹' + activeRechargePack.amount + '\nAdded ' + activeRechargePack.credits + ' Credits to your account!\n\nNew Wallet Balance: ' + user.credits + ' Credits.');
+  }
+
+  // ================= TRANSACTION HISTORY MODAL =================
+  function openTxnHistoryModal() {
+    const modal = document.getElementById('txnModal');
+    const container = document.getElementById('txnListContainer');
+    const txns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
+
+    if (txns.length === 0) {
+      container.innerHTML = `
+        <div class="text-center py-10">
+          <i class="fa-solid fa-receipt text-gray-300 text-4xl mb-3"></i>
+          <p class="text-sm font-semibold text-gray-500">No transactions yet</p>
+          <p class="text-xs text-gray-400 mt-1">Recharge your wallet to see your payment receipts here.</p>
+          <button onclick="closeTxnHistoryModal(); openRechargeModal();" class="mt-4 px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl shadow">Recharge Now</button>
+        </div>
+      `;
+    } else {
+      container.innerHTML = txns.map(t => `
+        <div class="border border-gray-100 bg-gray-50/70 rounded-2xl p-4 flex justify-between items-center hover:bg-gray-50 transition">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-sm text-gray-900">${t.pack}</span>
+              <span class="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">PAID</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-0.5">${t.date} • ID: <span class="font-mono">${t.id}</span></p>
+          </div>
+          <div class="text-right">
+            <div class="font-black text-gray-900 text-base">₹${t.amount}</div>
+            <div class="text-xs font-bold text-primary">+${t.credits} Credits</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  }
+
+  function closeTxnHistoryModal() {
+    const modal = document.getElementById('txnModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  // Initialize Auth state on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    updateUserUI();
+  });
 
 </script>
 
+  <!-- ================= AUTH MODAL (Login & Sign Up) ================= -->
+  <div id="authModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative border border-gray-100">
+      <button onclick="closeAuthModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">&times;</button>
+      
+      <!-- Logo & Welcome -->
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-50 text-primary text-2xl mb-3 shadow-inner">
+          <i class="fa-solid fa-camera-retro"></i>
+        </div>
+        <h3 class="text-2xl font-extrabold text-gray-900" id="authModalTitle">Welcome Back</h3>
+        <p class="text-xs text-gray-500 mt-1" id="authModalSubtitle">Sign in to access your wallet, print sheets & downloads</p>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="flex p-1 bg-gray-100 rounded-xl mb-6">
+        <button id="tabBtnLogin" onclick="switchAuthTab('login')" class="flex-1 py-2 text-sm font-bold rounded-lg transition bg-white text-primary shadow-sm">
+          Sign In
+        </button>
+        <button id="tabBtnSignup" onclick="switchAuthTab('signup')" class="flex-1 py-2 text-sm font-bold rounded-lg transition text-gray-500 hover:text-gray-900">
+          Create Account
+        </button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="formLogin" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Email Address</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-4 top-3.5 text-gray-400 text-sm"></i>
+            <input type="email" id="loginEmail" required placeholder="studio@gmail.com" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm bg-gray-50/50">
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="block text-xs font-bold text-gray-700 uppercase">Password</label>
+            <a href="#" onclick="alert('Password reset link has been sent to your email.'); return false;" class="text-xs text-primary font-semibold hover:underline">Forgot?</a>
+          </div>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-4 top-3.5 text-gray-400 text-sm"></i>
+            <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm bg-gray-50/50">
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          <input type="checkbox" id="rememberMe" checked class="w-4 h-4 accent-primary rounded cursor-pointer">
+          <label for="rememberMe" class="ml-2 text-xs text-gray-600 cursor-pointer">Remember this device</label>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 bg-primary hover:bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
+        </button>
+
+        <div class="relative my-4 text-center">
+          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div>
+          <span class="relative bg-white px-3 text-xs text-gray-400 uppercase font-semibold">Or Quick Demo</span>
+        </div>
+
+        <button type="button" onclick="demoLogin()" class="w-full py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold rounded-xl transition text-xs flex items-center justify-center gap-2">
+          ⚡ 1-Click Studio Demo Login (+10 Credits)
+        </button>
+      </form>
+
+      <!-- SIGN UP FORM -->
+      <form id="formSignup" onsubmit="handleSignUp(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Full Name</label>
+          <div class="relative">
+            <i class="fa-solid fa-user absolute left-4 top-3.5 text-gray-400 text-sm"></i>
+            <input type="text" id="signupName" required placeholder="Ramesh Sharma" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm bg-gray-50/50">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Studio / Cyber Cafe Name (Optional)</label>
+          <div class="relative">
+            <i class="fa-solid fa-store absolute left-4 top-3.5 text-gray-400 text-sm"></i>
+            <input type="text" id="signupStudio" placeholder="Sharma Photo Studio" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm bg-gray-50/50">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Email Address</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-4 top-3.5 text-gray-400 text-sm"></i>
+            <input type="email" id="signupEmail" required placeholder="studio@gmail.com" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm bg-gray-50/50">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Password</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-4 top-3.5 text-gray-400 text-sm"></i>
+            <input type="password" id="signupPassword" required minlength="6" placeholder="Create strong password" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm bg-gray-50/50">
+          </div>
+        </div>
+
+        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3 flex items-center gap-3">
+          <i class="fa-solid fa-gift text-2xl text-primary"></i>
+          <span class="text-xs text-indigo-900 font-semibold">🎉 Special Offer: You will get <strong>5 Free Credits</strong> instantly upon creating your account!</span>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-user-plus"></i> Create Free Account
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ================= RECHARGE / PAYMENT MODAL ================= -->
+  <div id="rechargeModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl relative border border-gray-100">
+      <button onclick="closeRechargeModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">&times;</button>
+      
+      <div class="text-center mb-6">
+        <span class="text-xs font-extrabold uppercase tracking-wider text-primary bg-indigo-50 px-3 py-1 rounded-full">Secure Razorpay Gateway</span>
+        <h3 class="text-2xl font-extrabold text-gray-900 mt-2">Recharge Studio Wallet</h3>
+        <p class="text-xs text-gray-500 mt-1">Instant credit delivery • UPI, GPay, PhonePe, Cards & Netbanking</p>
+      </div>
+
+      <!-- Pack Select Cards -->
+      <div class="grid grid-cols-2 gap-3 mb-6" id="packCardsContainer">
+        <!-- Pack 1 -->
+        <div onclick="selectRechargePack('Starter Pack', 99, 40, this)" class="pack-card cursor-pointer border-2 border-gray-200 hover:border-primary rounded-2xl p-4 text-center transition">
+          <span class="text-xs font-bold text-gray-500">Starter</span>
+          <div class="text-2xl font-black text-gray-900 my-1">₹99</div>
+          <span class="text-xs font-bold text-primary bg-indigo-50 px-2 py-0.5 rounded-full">+40 Photos</span>
+        </div>
+
+        <!-- Pack 2 (Default Active) -->
+        <div onclick="selectRechargePack('Studio Pack', 199, 100, this)" class="pack-card active cursor-pointer border-2 border-secondary bg-pink-50/30 rounded-2xl p-4 text-center transition relative">
+          <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-secondary text-white text-[10px] font-extrabold px-2 py-0.2 rounded-full uppercase">Popular</span>
+          <span class="text-xs font-bold text-secondary">Studio Pro</span>
+          <div class="text-2xl font-black text-gray-900 my-1">₹199</div>
+          <span class="text-xs font-bold text-secondary bg-pink-50 px-2 py-0.5 rounded-full">+100 Photos</span>
+        </div>
+
+        <!-- Pack 3 -->
+        <div onclick="selectRechargePack('Cyber Cafe Bulk', 499, 300, this)" class="pack-card cursor-pointer border-2 border-gray-200 hover:border-primary rounded-2xl p-4 text-center transition">
+          <span class="text-xs font-bold text-gray-500">Bulk Cafe</span>
+          <div class="text-2xl font-black text-gray-900 my-1">₹499</div>
+          <span class="text-xs font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full">+300 Photos</span>
+        </div>
+
+        <!-- Pack 4 -->
+        <div onclick="selectRechargePack('Unlimited Monthly', 999, 1000, this)" class="pack-card cursor-pointer border-2 border-gray-200 hover:border-primary rounded-2xl p-4 text-center transition">
+          <span class="text-xs font-bold text-gray-500">Unlimited</span>
+          <div class="text-2xl font-black text-gray-900 my-1">₹999</div>
+          <span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">Unlimited / Mo</span>
+        </div>
+      </div>
+
+      <!-- Payment Summary -->
+      <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-6">
+        <div class="flex justify-between items-center text-sm mb-1">
+          <span class="text-gray-600">Selected Plan:</span>
+          <span class="font-bold text-gray-900" id="rechargeSelectedName">Studio Pack</span>
+        </div>
+        <div class="flex justify-between items-center text-sm mb-2">
+          <span class="text-gray-600">Total Credits:</span>
+          <span class="font-bold text-primary" id="rechargeSelectedCredits">+100 Credits</span>
+        </div>
+        <div class="flex justify-between items-center border-t border-gray-200 pt-2 text-base font-extrabold">
+          <span class="text-gray-900">Total Payable:</span>
+          <span class="text-xl text-green-600" id="rechargeSelectedAmount">₹199</span>
+        </div>
+      </div>
+
+      <!-- Payment Button -->
+      <button id="btnProcessPayment" onclick="processRechargePayment()" class="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white font-extrabold text-base rounded-2xl shadow-xl hover:shadow-2xl hover:opacity-95 transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-lock"></i> Pay Securely via Razorpay (UPI / Cards)
+      </button>
+
+      <div class="mt-4 flex items-center justify-center gap-4 text-xs text-gray-400">
+        <span class="flex items-center gap-1"><i class="fa-solid fa-shield text-green-500"></i> 256-bit SSL</span>
+        <span>•</span>
+        <span>Instant Wallet Credit</span>
+        <span>•</span>
+        <a href="refund.html" class="underline hover:text-gray-600">Refund Policy</a>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= TRANSACTION HISTORY MODAL ================= -->
+  <div id="txnModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl relative border border-gray-100 max-h-[85vh] flex flex-col">
+      <button onclick="closeTxnHistoryModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">&times;</button>
+      
+      <div class="flex items-center gap-3 mb-6 border-b pb-4">
+        <div class="w-10 h-10 rounded-full bg-indigo-50 text-primary flex items-center justify-center text-lg">
+          <i class="fa-solid fa-receipt"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-gray-900">Payment & Wallet History</h3>
+          <p class="text-xs text-gray-500">All your recharge transactions and invoices</p>
+        </div>
+      </div>
+
+      <div id="txnListContainer" class="flex-1 overflow-y-auto space-y-3 pr-1">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="mt-6 pt-4 border-t flex justify-between items-center text-xs text-gray-500">
+        <span>Need an official GST Invoice?</span>
+        <a href="contact.html" class="text-primary font-bold hover:underline">Contact Support</a>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>

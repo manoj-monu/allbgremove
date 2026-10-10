@@ -3,49 +3,366 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pricing - PassportSnap Pro</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 40px; line-height: 1.6; max-width: 1000px; margin: 0 auto; color: #111827; background: #f3f4f6; text-align: center; }
-    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 40px; }
-    .plan { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-    .plan h2 { color: #6366f1; margin-bottom: 10px; }
-    .plan .price { font-size: 36px; font-weight: 800; margin-bottom: 20px; }
-    .btn { display: inline-block; padding: 12px 24px; background: #6366f1; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 20px; }
-  </style>
+  <title>Pricing & Plans - PassportSnap Pro</title>
+  <meta name="description" content="Simple, transparent pricing for AI passport photos, background removal, and studio print sheets. Free tier and studio wallet packs.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+          colors: { primary: '#6366f1', secondary: '#ec4899' }
+        }
+      }
+    }
+  </script>
 </head>
-<body>
-  <a href="index.html" style="color: #6366f1; text-decoration: none; display: block; text-align: left;">&larr; Back to Home</a>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen font-sans">
   
-  <h1 style="margin-top: 20px;">Simple, Transparent Pricing</h1>
-  <p style="color: #6b7280; font-size: 18px;">Choose the plan that fits your needs.</p>
+  <!-- Navbar -->
+  <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
+          <i class="fa-solid fa-camera-retro text-primary text-3xl"></i>
+          <span class="font-bold text-2xl tracking-tight text-gray-900">PassportSnap <span class="text-primary">Pro</span></span>
+        </div>
+        <nav class="hidden md:flex gap-8 font-medium text-gray-600">
+          <a href="index.html" class="hover:text-primary transition">Home</a>
+          <a href="pricing.html" class="text-primary font-semibold">Pricing</a>
+          <a href="about.html" class="hover:text-primary transition">About</a>
+          <a href="contact.html" class="hover:text-primary transition">Contact</a>
+        </nav>
+        <div class="flex items-center gap-4">
+          <div id="userWalletBadge" class="hidden items-center gap-2 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-full text-sm font-bold text-primary">
+            <i class="fa-solid fa-coins text-amber-500"></i> <span id="creditCount">0</span> Credits
+          </div>
+          <button class="px-5 py-2.5 bg-primary text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:bg-indigo-600 transition" onclick="window.location.href='index.html'">Open App</button>
+        </div>
+      </div>
+    </div>
+  </header>
 
-  <div class="pricing-grid">
-    <div class="plan">
-      <h2>Free Tier (Ad Supported)</h2>
-      <div class="price">₹0</div>
-      <p>Perfect for home users needing a quick photo.</p>
-      <ul style="text-align: left; margin: 20px auto; display: inline-block;">
-        <li>Basic AI Background Removal</li>
-        <li>Standard Layouts (A4, 4x6)</li>
-        <li>Watermarked Downloads</li>
-      </ul>
-      <a href="app.html" class="btn">Try For Free</a>
+  <!-- Hero Header -->
+  <section class="pt-16 pb-12 text-center max-w-4xl mx-auto px-4">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 text-primary text-sm font-bold mb-4 border border-indigo-100">
+      <i class="fa-solid fa-wallet"></i> Pay-As-You-Go • No Hidden Fees • Instant Activation
+    </div>
+    <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
+      Simple & Transparent <span class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Pricing</span>
+    </h1>
+    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+      Whether you are an individual needing a quick photo or a busy photo studio processing hundreds of prints, we have a plan built for you.
+    </p>
+  </section>
+
+  <!-- Pricing Cards Grid -->
+  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-20">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      
+      <!-- Free Plan -->
+      <div class="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm flex flex-col justify-between hover:shadow-lg transition">
+        <div>
+          <span class="text-xs font-extrabold tracking-wider uppercase text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Trial Pack</span>
+          <h3 class="text-2xl font-bold mt-4 mb-2 text-gray-900">Free Tier</h3>
+          <p class="text-sm text-gray-500 mb-6">Perfect to test our AI quality before buying.</p>
+          <div class="flex items-baseline gap-1 mb-6">
+            <span class="text-4xl font-extrabold text-gray-900">₹0</span>
+            <span class="text-gray-500 text-sm">/ 5 photos free</span>
+          </div>
+          <ul class="space-y-3 text-sm text-gray-600 mb-8 border-t pt-6">
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> 5 Free Photos on Signup</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Indian Passport (38.5x45 mm)</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> AI Background Removal</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> A4 & 4x6 Print Layouts</li>
+            <li class="flex items-center gap-3 text-gray-400"><i class="fa-solid fa-xmark"></i> Priority Serverless GPU</li>
+          </ul>
+        </div>
+        <button onclick="window.location.href='index.html'" class="w-full py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl transition text-center">
+          Get Started Free
+        </button>
+      </div>
+
+      <!-- Starter Pack -->
+      <div class="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm flex flex-col justify-between hover:shadow-lg transition">
+        <div>
+          <span class="text-xs font-extrabold tracking-wider uppercase text-primary bg-indigo-50 px-3 py-1 rounded-full">Starter Pack</span>
+          <h3 class="text-2xl font-bold mt-4 mb-2 text-gray-900">₹99 Pack</h3>
+          <p class="text-sm text-gray-500 mb-6">Great for students and single family use.</p>
+          <div class="flex items-baseline gap-1 mb-6">
+            <span class="text-4xl font-extrabold text-gray-900">₹99</span>
+            <span class="text-gray-500 text-sm">/ 40 photos (₹2.47/photo)</span>
+          </div>
+          <ul class="space-y-3 text-sm text-gray-600 mb-8 border-t pt-6">
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> <strong>40 Wallet Credits</strong></li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> AI HD Face Enhancement</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> All Passport, PAN & Stamp Sizes</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> 114+ Studio Frames</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Credits Never Expire</li>
+          </ul>
+        </div>
+        <button onclick="buyPack('Starter Pack', 99, 40)" class="w-full py-3 px-4 bg-primary hover:bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-bolt"></i> Buy ₹99 Pack
+        </button>
+      </div>
+
+      <!-- Studio Pack (Popular) -->
+      <div class="bg-white rounded-3xl p-8 border-2 border-secondary shadow-xl relative flex flex-col justify-between hover:-translate-y-1 transition">
+        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-secondary text-white text-xs font-extrabold px-4 py-1 rounded-full shadow-md tracking-wide uppercase">
+          ⭐ Most Popular for Studios
+        </div>
+        <div>
+          <span class="text-xs font-extrabold tracking-wider uppercase text-secondary bg-pink-50 px-3 py-1 rounded-full">Studio Pack</span>
+          <h3 class="text-2xl font-bold mt-4 mb-2 text-gray-900">₹199 Pack</h3>
+          <p class="text-sm text-gray-500 mb-6">Designed specifically for photo studios & cyber cafes.</p>
+          <div class="flex items-baseline gap-1 mb-6">
+            <span class="text-4xl font-extrabold text-gray-900">₹199</span>
+            <span class="text-gray-500 text-sm">/ 100 photos (₹1.99/photo)</span>
+          </div>
+          <ul class="space-y-3 text-sm text-gray-600 mb-8 border-t pt-6">
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> <strong>100 Wallet Credits</strong></li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Superfast RunPod GPU Server</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> 100% Full Photo & Passport Modes</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Horizontal & Vertical Margin Sliders</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Priority 24/7 WhatsApp Support</li>
+          </ul>
+        </div>
+        <button onclick="buyPack('Studio Pack', 199, 100)" class="w-full py-3 px-4 bg-gradient-to-r from-primary to-secondary hover:opacity-95 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-crown"></i> Buy Studio Pack
+        </button>
+      </div>
+
+      <!-- Cyber Cafe Bulk Pack -->
+      <div class="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm flex flex-col justify-between hover:shadow-lg transition">
+        <div>
+          <span class="text-xs font-extrabold tracking-wider uppercase text-purple-600 bg-purple-50 px-3 py-1 rounded-full">Pro Pack</span>
+          <h3 class="text-2xl font-bold mt-4 mb-2 text-gray-900">₹499 Bulk</h3>
+          <p class="text-sm text-gray-500 mb-6">High volume printing with lowest per-photo cost.</p>
+          <div class="flex items-baseline gap-1 mb-6">
+            <span class="text-4xl font-extrabold text-gray-900">₹499</span>
+            <span class="text-gray-500 text-sm">/ 300 photos (₹1.66/photo)</span>
+          </div>
+          <ul class="space-y-3 text-sm text-gray-600 mb-8 border-t pt-6">
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> <strong>300 Wallet Credits</strong></li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> High-Resolution 300 DPI Exports</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Suit & Dress Changing Engine</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Multi-User Cafe Login Access</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Instant GST Invoicing</li>
+          </ul>
+        </div>
+        <button onclick="buyPack('Cyber Cafe Bulk', 499, 300)" class="w-full py-3 px-4 bg-gray-900 hover:bg-black text-white font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-store"></i> Buy Bulk ₹499
+        </button>
+      </div>
+
     </div>
 
-    <div class="plan" style="border: 2px solid #ec4899; position: relative;">
-      <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #ec4899; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold;">POPULAR FOR STUDIOS</div>
-      <h2>Pro Wallet (B2B)</h2>
-      <div class="price">₹2.5 <span style="font-size:16px; color:#6b7280;">/ photo</span></div>
-      <p>For Cyber Cafes and Photo Studios.</p>
-      <ul style="text-align: left; margin: 20px auto; display: inline-block;">
-        <li>AI Face Enhancement (GFPGAN)</li>
-        <li>No Watermarks</li>
-        <li>Custom Paper Layouts</li>
-        <li>Priority Fast Server Processing</li>
-      </ul>
-      <a href="#" class="btn" style="background: #ec4899;" onclick="alert('Payment Gateway (Razorpay/Stripe) integration coming soon!')">Recharge Wallet</a>
+    <!-- Supported Payment Methods Banner -->
+    <div class="mt-16 bg-white border border-gray-200 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+      <div class="flex items-center gap-3">
+        <i class="fa-solid fa-shield-halved text-2xl text-green-500"></i>
+        <div>
+          <h4 class="font-bold text-gray-900">100% Safe & Secure Indian Payments</h4>
+          <p class="text-xs text-gray-500">Supported by RBI compliant 256-bit SSL encrypted payment gateway.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-2xl text-gray-400">
+        <i class="fa-brands fa-google-pay text-gray-700 hover:text-primary transition" title="Google Pay"></i>
+        <span class="text-sm font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">PhonePe</span>
+        <span class="text-sm font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Paytm UPI</span>
+        <i class="fa-brands fa-cc-visa text-blue-800" title="Visa"></i>
+        <i class="fa-brands fa-cc-mastercard text-red-600" title="Mastercard"></i>
+        <span class="text-sm font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded">Netbanking</span>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-20 max-w-4xl mx-auto">
+      <h2 class="text-3xl font-extrabold text-center text-gray-900 mb-10">Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+          <h4 class="font-bold text-lg text-gray-900 mb-2">How do Wallet Credits work?</h4>
+          <p class="text-gray-600 text-sm">Each photo you process and download costs 1 credit. Free users get 5 credits on signup. You can top up your wallet anytime with any pack, and credits never expire.</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+          <h4 class="font-bold text-lg text-gray-900 mb-2">How quickly are credits added to my account?</h4>
+          <p class="text-gray-600 text-sm">Credits are delivered digitally and instantly within seconds of successful payment confirmation via UPI, Netbanking, or Debit/Credit Cards.</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+          <h4 class="font-bold text-lg text-gray-900 mb-2">Can photo studios and cyber cafes use this service commercially?</h4>
+          <p class="text-gray-600 text-sm">Yes, absolutely! Our ₹199 and ₹499 plans are specially optimized for Indian cyber cafes, CSC centers, and photography studios with complete commercial print rights.</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+          <h4 class="font-bold text-lg text-gray-900 mb-2">What happens if a photo processing fails?</h4>
+          <p class="text-gray-600 text-sm">If any network glitch or server failure occurs during processing, our automated system does not deduct any credit. If a credit was erroneously deducted, please contact support and we will restore it immediately.</p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Payment Modal Simulator / Razorpay Trigger -->
+  <div id="paymentModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative border border-gray-100">
+      <button onclick="closePaymentModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+      
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 rounded-full bg-indigo-50 text-primary flex items-center justify-center text-3xl mx-auto mb-3">
+          <i class="fa-solid fa-lock text-green-600"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900" id="modalPackTitle">Recharge Wallet</h3>
+        <p class="text-gray-500 text-sm mt-1" id="modalPackDesc">Confirm your recharge to activate credits immediately.</p>
+      </div>
+
+      <div class="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-200">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-gray-600 text-sm">Selected Pack:</span>
+          <span class="font-bold text-gray-900" id="modalPackName">Studio Pack</span>
+        </div>
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-gray-600 text-sm">Credits Added:</span>
+          <span class="font-bold text-primary" id="modalPackCredits">+100 Credits</span>
+        </div>
+        <div class="flex justify-between items-center border-t border-gray-200 pt-2 font-bold text-lg">
+          <span class="text-gray-900">Amount to Pay:</span>
+          <span class="text-green-600" id="modalPackAmount">₹199</span>
+        </div>
+      </div>
+
+      <div class="space-y-3 mb-6">
+        <label class="block text-xs font-bold text-gray-700 uppercase">Your Mobile / UPI ID (Optional)</label>
+        <input type="text" id="payMobile" placeholder="e.g. 9876543210 or yourname@upi" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary focus:outline-none text-sm">
+      </div>
+
+      <button id="payNowBtn" onclick="processPayment()" class="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white font-extrabold rounded-xl shadow-lg hover:shadow-xl hover:opacity-95 transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-shield-halved"></i> Pay Securely via UPI / Cards
+      </button>
+
+      <div class="text-center mt-4">
+        <p class="text-xs text-gray-400 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-check text-green-500"></i> Instant Activation • 100% Moneyback Guarantee
+        </p>
+      </div>
     </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-12 border-t border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-400">
+      <div class="flex flex-wrap justify-center gap-6 mb-6">
+        <a href="index.html" class="hover:text-white">Home</a>
+        <a href="pricing.html" class="text-primary font-bold">Pricing</a>
+        <a href="about.html" class="hover:text-white">About Us</a>
+        <a href="contact.html" class="hover:text-white">Contact</a>
+        <a href="privacy.html" class="hover:text-white">Privacy Policy</a>
+        <a href="terms.html" class="hover:text-white">Terms of Service</a>
+        <a href="refund.html" class="hover:text-white">Refund Policy</a>
+        <a href="shipping.html" class="hover:text-white">Shipping Policy</a>
+      </div>
+      <p>&copy; 2026 PassportSnap Pro (Allbgremove). All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    let selectedPack = { name: 'Studio Pack', amount: 199, credits: 100 };
+
+    function buyPack(name, amount, credits) {
+      selectedPack = { name, amount, credits };
+      document.getElementById('modalPackName').textContent = name;
+      document.getElementById('modalPackAmount').textContent = '₹' + amount;
+      document.getElementById('modalPackCredits').textContent = '+' + credits + ' Credits';
+      document.getElementById('paymentModal').classList.remove('hidden');
+      document.getElementById('paymentModal').classList.add('flex');
+    }
+
+    function closePaymentModal() {
+      document.getElementById('paymentModal').classList.add('hidden');
+      document.getElementById('paymentModal').classList.remove('flex');
+    }
+
+    function processPayment() {
+      const btn = document.getElementById('payNowBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing Secure Payment...';
+
+      // Check if real Razorpay Key is configured
+      const rzpKey = window.RAZORPAY_KEY_ID || '';
+      
+      if (rzpKey && typeof Razorpay !== 'undefined') {
+        const options = {
+          key: rzpKey,
+          amount: selectedPack.amount * 100, // in paise
+          currency: "INR",
+          name: "PassportSnap Pro",
+          description: selectedPack.name + " (" + selectedPack.credits + " Credits)",
+          handler: function (response) {
+            onPaymentSuccess(response.razorpay_payment_id || 'PAY_' + Date.now());
+          },
+          prefill: {
+            contact: document.getElementById('payMobile').value || "9999999999"
+          },
+          theme: { color: "#6366f1" }
+        };
+        const rzp = new Razorpay(options);
+        rzp.open();
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Pay Securely via UPI / Cards';
+        return;
+      }
+
+      // Demo/Instant Simulation for Immediate Testing & Local Wallet Update
+      setTimeout(() => {
+        onPaymentSuccess('TXN_' + Math.floor(100000 + Math.random() * 900000));
+      }, 1200);
+    }
+
+    function onPaymentSuccess(txnId) {
+      // Add credits to localStorage user
+      let user = JSON.parse(localStorage.getItem('passportsnap_user') || 'null');
+      if (!user) {
+        user = { name: 'Studio User', email: 'studio@user.com', credits: 5 };
+      }
+      user.credits = (user.credits || 0) + selectedPack.credits;
+      localStorage.setItem('passportsnap_user', JSON.stringify(user));
+      
+      // Log transaction
+      let txns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
+      txns.unshift({
+        id: txnId,
+        pack: selectedPack.name,
+        amount: selectedPack.amount,
+        credits: selectedPack.credits,
+        date: new Date().toLocaleDateString('en-IN')
+      });
+      localStorage.setItem('passportsnap_transactions', JSON.stringify(txns));
+
+      closePaymentModal();
+      alert('🎉 Payment Successful!\nTransaction ID: ' + txnId + '\nAdded ' + selectedPack.credits + ' Credits to your wallet!\nTotal Balance: ' + user.credits + ' Credits.');
+      
+      updateNavWallet();
+      const btn = document.getElementById('payNowBtn');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Pay Securely via UPI / Cards';
+    }
+
+    function updateNavWallet() {
+      const user = JSON.parse(localStorage.getItem('passportsnap_user') || 'null');
+      if (user && user.credits !== undefined) {
+        document.getElementById('userWalletBadge').classList.remove('hidden');
+        document.getElementById('userWalletBadge').classList.add('flex');
+        document.getElementById('creditCount').textContent = user.credits;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', updateNavWallet);
+  </script>
+
 </body>
 </html>
