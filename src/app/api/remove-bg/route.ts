@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const enhance = searchParams.get('enhance') || 'false';
 
     const response = await fetch(
-      `https://uj3a6i6h8nq4up-19123.proxy.runpod.net/api/process-all?enhance=${enhance}`,
+      `https://manojkumarsh-ai-passport-studio-pro.hf.space/api/process-all?enhance=${enhance}`,
       {
         method: 'POST',
         body: formData,
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     );
 
     if (!response.ok) {
-      return new NextResponse('RunPod API Error: ' + response.status, { status: response.status });
+      return new NextResponse('HuggingFace API Error: ' + response.status, { status: response.status });
     }
 
     const imageBuffer = await response.arrayBuffer();

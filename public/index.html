@@ -1128,12 +1128,24 @@
 
       const isEnhance = document.getElementById('doEnhance').checked;
 
-      let res = await fetch('/api/remove-bg?enhance=' + isEnhance, {
-        method: 'POST',
-        body: fd,
-        mode: 'cors',
-        headers: { 'Accept': 'image/png, */*' }
-      });
+      let res;
+      try {
+        res = await fetch('/api/remove-bg?enhance=' + isEnhance, {
+          method: 'POST',
+          body: fd,
+          mode: 'cors',
+          headers: { 'Accept': 'image/png, */*', 'x-api-key': 'SUPER_SECRET_KEY_998877' }
+        });
+        if (!res.ok) throw new Error("API Route status: " + res.status);
+      } catch (err) {
+        console.warn("Proxy failed, falling back to direct Hugging Face Space:", err);
+        res = await fetch('https://manojkumarsh-ai-passport-studio-pro.hf.space/api/process-all?enhance=' + isEnhance, {
+          method: 'POST',
+          body: fd,
+          mode: 'cors',
+          headers: { 'Accept': 'image/png, */*', 'x-api-key': 'SUPER_SECRET_KEY_998877' }
+        });
+      }
       
       if(!res.ok) throw new Error("API Failed: " + res.status);
       let resBlob = await res.blob();
