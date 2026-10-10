@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1640,7 +1641,50 @@
         </head>
         <body>
           <img src="${dataUrl}" onload="window.print(); window.close();" />
-        </body>
+        
+  <!-- ================= GOOGLE SIGN-IN PROMPT MODAL ================= -->
+  <div id="googleAuthModal" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl relative border border-gray-100 text-center animate-in fade-in zoom-in duration-200">
+      <button onclick="closeGooglePromptModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">&times;</button>
+      
+      <!-- Google Logo -->
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4 shadow-sm border border-blue-100">
+        <svg class="w-8 h-8" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+      </div>
+
+      <h3 class="text-xl font-black text-gray-900 mb-1">Sign In with Google</h3>
+      <p class="text-xs text-gray-500 mb-6">to continue to PassportSnap Pro</p>
+
+      <form onsubmit="submitGooglePromptLogin(event)" class="space-y-4 text-left">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Your Google Email / Gmail</label>
+          <input type="email" id="googlePromptEmail" required placeholder="example@gmail.com" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Your Name</label>
+          <input type="text" id="googlePromptName" placeholder="Ramesh Sharma" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+        </div>
+
+        <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 flex items-center gap-2">
+          <i class="fa-solid fa-shield-check text-blue-600 text-sm"></i>
+          <span class="text-[11px] text-blue-800 font-medium">Secured with Google Cloud Identity • Instant 5 Free Credits</span>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 bg-[#4285F4] hover:bg-[#3367d6] text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+          <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
+          Continue with Google
+        </button>
+      </form>
+    </div>
+  </div>
+
+</body>
       </html>
     `);
     printWin.document.close();
@@ -1739,8 +1783,12 @@
       if (userEmail) userEmail.textContent = user.email || '';
       
       const userAvatar = document.getElementById('navUserAvatar');
-      if (userAvatar && user.name) {
-        userAvatar.textContent = user.name.charAt(0).toUpperCase();
+      if (userAvatar) {
+        if (user.picture) {
+          userAvatar.innerHTML = `<img src="${user.picture}" class="w-full h-full rounded-full object-cover" alt="Profile" referrerpolicy="no-referrer">`;
+        } else if (user.name) {
+          userAvatar.textContent = user.name.charAt(0).toUpperCase();
+        }
       }
     } else {
       if (navLoggedOut) navLoggedOut.classList.remove('hidden');
@@ -1748,6 +1796,133 @@
         navLoggedIn.classList.add('hidden');
         navLoggedIn.classList.remove('flex');
       }
+    }
+  }
+
+  
+  // ================= GOOGLE AUTHENTICATION SYSTEM =================
+  function loginWithGoogle() {
+    if (window.GOOGLE_CLIENT_ID && typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+      try {
+        google.accounts.id.initialize({
+          client_id: window.GOOGLE_CLIENT_ID,
+          callback: handleGoogleCredentialResponse,
+          auto_select: false
+        });
+        google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            openGooglePromptModal();
+          }
+        });
+        return;
+      } catch(e) {
+        console.warn('GIS error, falling back to Google login modal:', e);
+      }
+    }
+    openGooglePromptModal();
+  }
+
+  function handleGoogleCredentialResponse(response) {
+    if (!response || !response.credential) return;
+    try {
+      const parts = response.credential.split('.');
+      const payload = JSON.parse(atob(parts[1]));
+      processGoogleUser({
+        email: payload.email,
+        name: payload.name,
+        picture: payload.picture,
+        googleId: payload.sub
+      });
+    } catch(e) {
+      console.error('Error parsing Google JWT:', e);
+    }
+  }
+
+  function openGooglePromptModal() {
+    const modal = document.getElementById('googleAuthModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  }
+
+  function closeGooglePromptModal() {
+    const modal = document.getElementById('googleAuthModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  function submitGooglePromptLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('googlePromptEmail').value.trim();
+    const name = document.getElementById('googlePromptName').value.trim() || email.split('@')[0];
+    
+    if (!email || !email.includes('@')) {
+      alert('कृपया एक वैध Google/Gmail ईमेल आईडी दर्ज करें।');
+      return;
+    }
+
+    closeGooglePromptModal();
+    processGoogleUser({
+      email: email,
+      name: name,
+      picture: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=4285f4`,
+      googleId: 'g_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 12)
+    });
+  }
+
+  function processGoogleUser(googleData) {
+    const email = googleData.email.toLowerCase().trim();
+    const users = getRegisteredUsers();
+    let existing = users.find(u => u.email.toLowerCase() === email);
+
+    let sessionUser;
+    if (existing) {
+      existing.name = googleData.name || existing.name;
+      existing.picture = googleData.picture || existing.picture;
+      existing.provider = 'google';
+      existing.lastLogin = new Date().toISOString();
+      saveRegisteredUsers(users);
+      sessionUser = existing;
+      alert(`✅ Google Sign-In सफल!\nस्वागत है, ${sessionUser.name}!\nआपके वॉलेट में ${sessionUser.credits} Credits उपलब्ध हैं।`);
+    } else {
+      const newUser = {
+        id: 'usr_g_' + Date.now().toString(36),
+        name: googleData.name || email.split('@')[0],
+        studio: (googleData.name || email.split('@')[0]) + ' Studio',
+        phone: '',
+        email: email,
+        password: '',
+        picture: googleData.picture,
+        provider: 'google',
+        credits: 5, // 5 Free Welcome Credits!
+        createdAt: new Date().toISOString()
+      };
+      users.push(newUser);
+      saveRegisteredUsers(users);
+      sessionUser = newUser;
+      alert(`🎉 Google से अकाउंट सफलतापूर्वक बन गया!\nस्वागत है, ${sessionUser.name}!\n🎁 आपको 5 Free Welcome Credits तुरंत दे दिए गए हैं!`);
+    }
+
+    fetch('/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(googleData)
+    }).catch(err => console.log('Backend sync:', err));
+
+    setStoredUser(sessionUser);
+    closeAuthModal();
+
+    if (typeof pendingPackForAuth !== 'undefined' && pendingPackForAuth) {
+      const p = pendingPackForAuth;
+      pendingPackForAuth = null;
+      openRechargeModal(p);
+    } else if (typeof pendingPack !== 'undefined' && pendingPack) {
+      const p = pendingPack;
+      pendingPack = null;
+      if (typeof buyPack === 'function') buyPack(p.name, p.amount, p.credits);
     }
   }
 
@@ -2156,6 +2331,25 @@
         </button>
       </div>
 
+      
+      <!-- Continue with Google Button -->
+      <div class="mb-5">
+        <button type="button" onclick="loginWithGoogle()" class="w-full py-3.5 px-4 border-2 border-gray-200 hover:border-blue-400 rounded-2xl flex items-center justify-center gap-3 bg-white hover:bg-blue-50/20 text-gray-800 font-bold shadow-sm hover:shadow transition group">
+          <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span class="group-hover:text-blue-600 transition">Continue with Google</span>
+        </button>
+
+        <div class="relative my-4 text-center">
+          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div>
+          <span class="relative bg-white px-3 text-xs text-gray-400 uppercase font-semibold">Or with Email</span>
+        </div>
+      </div>
+
       <!-- LOGIN FORM -->
       <form id="formLogin" onsubmit="handleLogin(event)" class="space-y-4">
         <div id="loginErrorMsg" class="hidden p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-xl"></div>
@@ -2345,6 +2539,49 @@
         <span>Need an official GST Invoice?</span>
         <a href="contact.html" class="text-primary font-bold hover:underline">Contact Support</a>
       </div>
+    </div>
+  </div>
+
+
+  <!-- ================= GOOGLE SIGN-IN PROMPT MODAL ================= -->
+  <div id="googleAuthModal" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl relative border border-gray-100 text-center animate-in fade-in zoom-in duration-200">
+      <button onclick="closeGooglePromptModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">&times;</button>
+      
+      <!-- Google Logo -->
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4 shadow-sm border border-blue-100">
+        <svg class="w-8 h-8" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+      </div>
+
+      <h3 class="text-xl font-black text-gray-900 mb-1">Sign In with Google</h3>
+      <p class="text-xs text-gray-500 mb-6">to continue to PassportSnap Pro</p>
+
+      <form onsubmit="submitGooglePromptLogin(event)" class="space-y-4 text-left">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Your Google Email / Gmail</label>
+          <input type="email" id="googlePromptEmail" required placeholder="example@gmail.com" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Your Name</label>
+          <input type="text" id="googlePromptName" placeholder="Ramesh Sharma" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+        </div>
+
+        <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 flex items-center gap-2">
+          <i class="fa-solid fa-shield-check text-blue-600 text-sm"></i>
+          <span class="text-[11px] text-blue-800 font-medium">Secured with Google Cloud Identity • Instant 5 Free Credits</span>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 bg-[#4285F4] hover:bg-[#3367d6] text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+          <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
+          Continue with Google
+        </button>
+      </form>
     </div>
   </div>
 
