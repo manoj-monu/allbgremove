@@ -3224,6 +3224,10 @@
   window.addEventListener('DOMContentLoaded', () => {
     updateUserUI();
     initVerticalZoomSlider();
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('test') === 'crop') {
+      setTimeout(() => loadExample('assets/example1.jpg'), 250);
+    }
   });
 
   // ================= DESKTOP COPY & RIGHT-CLICK PROTECTION =================
