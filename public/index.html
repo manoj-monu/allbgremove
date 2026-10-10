@@ -759,9 +759,10 @@
         <div class="form-group">
           <label>Photo Size Requirement</label>
           <select id="cropSize" onchange="updateCropBox()">
-            <option value="35x45">India Passport (35x45 mm)</option>
-            <option value="30x40">UAE Passport / Stamp Size (30x40 mm)</option>
-            <option value="51x51">US Visa (51x51 mm)</option>
+            <option value="38.5x45" selected>India Passport (38.5×45 mm)</option>
+            <option value="35x45">India Passport Standard (35×45 mm)</option>
+            <option value="30x40">UAE Passport / Stamp Size (30×40 mm)</option>
+            <option value="51x51">US Visa (51×51 mm)</option>
             <option value="custom">Custom Size</option>
           </select>
         </div>
@@ -769,11 +770,11 @@
         <div class="form-group" style="display: flex; gap: 10px;">
           <div style="flex:1">
             <label>Width (mm)</label>
-            <input type="number" id="cropW" value="35" onchange="updateCropBox()">
+            <input type="number" step="0.1" id="cropW" value="38.5" oninput="updateCropBox(true)">
           </div>
           <div style="flex:1">
             <label>Height (mm)</label>
-            <input type="number" id="cropH" value="45" onchange="updateCropBox()">
+            <input type="number" step="0.1" id="cropH" value="45" oninput="updateCropBox(true)">
           </div>
         </div>
 
@@ -1027,16 +1028,20 @@
     };
   }
 
-  function updateCropBox() {
-    const size = document.getElementById('cropSize').value;
+  function updateCropBox(isManual) {
+    let size = document.getElementById('cropSize').value;
     let w, h;
-    if(size !== 'custom') {
+    if (isManual) {
+      document.getElementById('cropSize').value = 'custom';
+      w = parseFloat(document.getElementById('cropW').value) || 38.5;
+      h = parseFloat(document.getElementById('cropH').value) || 45;
+    } else if (size !== 'custom') {
       [w, h] = size.split('x').map(Number);
       document.getElementById('cropW').value = w;
       document.getElementById('cropH').value = h;
     } else {
-      w = +document.getElementById('cropW').value;
-      h = +document.getElementById('cropH').value;
+      w = parseFloat(document.getElementById('cropW').value) || 38.5;
+      h = parseFloat(document.getElementById('cropH').value) || 45;
     }
     const wrap = document.getElementById('cropWrapper');
     // Scale for visualization
