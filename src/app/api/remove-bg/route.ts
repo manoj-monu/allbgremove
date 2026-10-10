@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const enhance = searchParams.get('enhance') || 'false';
 
     const response = await fetch(
-      `https://manojkumarsh-ai-passport-studio-pro.hf.space/api/process-all?enhance=${enhance}`,
+      `https://manojkumarsh-allbgremove-api.hf.space/api/process-all?enhance=${enhance}`,
       {
         method: 'POST',
         body: formData,

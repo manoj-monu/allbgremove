@@ -1139,7 +1139,7 @@
         if (!res.ok) throw new Error("API Route status: " + res.status);
       } catch (err) {
         console.warn("Proxy failed, falling back to direct Hugging Face Space:", err);
-        res = await fetch('https://manojkumarsh-ai-passport-studio-pro.hf.space/api/process-all?enhance=' + isEnhance, {
+        res = await fetch('https://manojkumarsh-allbgremove-api.hf.space/api/process-all?enhance=' + isEnhance, {
           method: 'POST',
           body: fd,
           mode: 'cors',
