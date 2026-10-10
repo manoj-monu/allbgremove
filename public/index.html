@@ -2040,6 +2040,49 @@
     return sessionUser;
   }
 
+  // ================= CENTERED SUCCESS MODAL CONTROLLER (ENGLISH ONLY, LARGE TEXT) =================
+  function showLoginSuccessModal(name, credits, customTitle, customNote) {
+    const modal = document.getElementById('loginSuccessModal');
+    const card = document.getElementById('loginSuccessCard');
+    const titleEl = document.getElementById('loginSuccessTitle');
+    const userEl = document.getElementById('loginSuccessUser');
+    const creditsEl = document.getElementById('loginSuccessCredits');
+    const noteEl = document.getElementById('loginSuccessNote');
+
+    if (!modal) return;
+
+    if (titleEl) titleEl.textContent = customTitle || 'Login Successful!';
+    if (userEl) userEl.textContent = 'Welcome, ' + (name || 'User') + '!';
+    if (creditsEl) creditsEl.textContent = (credits !== undefined ? credits : 5) + ' Credits';
+    if (noteEl) {
+      noteEl.textContent = customNote || 'Watermark is now removed! You can edit, enhance, and download clean, watermark-free biometric photos.';
+    }
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    setTimeout(() => {
+      if (card) {
+        card.classList.remove('scale-95', 'opacity-0');
+        card.classList.add('scale-100', 'opacity-100');
+      }
+    }, 20);
+  }
+
+  function closeLoginSuccessModal() {
+    const modal = document.getElementById('loginSuccessModal');
+    const card = document.getElementById('loginSuccessCard');
+    if (!modal) return;
+    if (card) {
+      card.classList.remove('scale-100', 'opacity-100');
+      card.classList.add('scale-95', 'opacity-0');
+    }
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }, 200);
+  }
+
   // REAL GOOGLE SIGN-IN POPUP WITH VISUAL FEEDBACK & FALLBACK
   async function loginWithGoogle() {
     const btn = document.getElementById('btnGoogleLogin');
@@ -2051,7 +2094,7 @@
 
     if (!fbAuth || !fbGoogleProvider) {
       if (btn) { btn.disabled = false; btn.innerHTML = origHtml; }
-      alert('Firebase Auth लोड हो रहा है, कृपया 1-2 सेकंड बाद पुनः प्रयास करें।');
+      alert('Firebase Auth is initializing. Please retry in 1-2 seconds.');
       return;
     }
 
@@ -2060,7 +2103,7 @@
       const user = result.user;
       const sessionUser = await syncFirebaseUser(user);
       closeAuthModal();
-      alert('✅ Google से Sign In सफल!\nस्वागत है, ' + sessionUser.name + '!\nउपलब्ध क्रेडिट्स: ' + sessionUser.credits);
+      showLoginSuccessModal(sessionUser.name, sessionUser.credits, 'Google Sign-In Successful!');
     } catch (err) {
       console.error("Firebase Google Auth Error:", err);
       if (err.code === 'auth/popup-closed-by-user') {
@@ -2168,7 +2211,7 @@
     };
     setStoredUser(demoUser);
     closeAuthModal();
-    alert('🎉 स्वागत है, Sharma Studio!\nडेमो अकाउंट सफलतापूर्वक लॉगिन हो गया है।\n🎁 आपके पास 15 Credits उपलब्ध हैं!');
+    showLoginSuccessModal('Sharma Studio', 15, 'Demo Account Activated!', 'Demo studio wallet loaded with 15 test credits.');
   }
 
   // REAL EMAIL & PASSWORD SIGN UP WITH GRACEFUL FALLBACK
@@ -2212,7 +2255,7 @@
           await user.updateProfile({ displayName: name });
           const sessionUser = await syncFirebaseUser(user, { name, studio, phone, isNew: true });
           closeAuthModal();
-          alert('🎉 बधाई हो! आपका खाता सफलतापूर्वक बन गया है!\nस्वागत है, ' + sessionUser.name + '!\n🎁 आपको 5 Free Welcome Credits मिल गए हैं!');
+          showLoginSuccessModal(sessionUser.name, sessionUser.credits, 'Account Created Successfully!', 'Welcome bonus of 5 Free Credits has been credited to your wallet.');
           return;
         } catch(fbErr) {
           if (fbErr.code === 'auth/operation-not-allowed') {
@@ -2257,7 +2300,7 @@
       };
       setStoredUser(sessionUser);
       closeAuthModal();
-      alert('🎉 बधाई हो ' + name + '!\nआपका अकाउंट सफलतापूर्वक बन गया है।\n🎁 आपको 5 Free Welcome Credits तुरंत दे दिए गए हैं!');
+      showLoginSuccessModal(name, 5, 'Account Created Successfully!', 'Welcome bonus of 5 Free Credits has been credited to your wallet.');
 
     } catch (err) {
       console.error("SignUp Error:", err);
@@ -2315,7 +2358,7 @@
         const user = userCred.user;
         const sessionUser = await syncFirebaseUser(user);
         closeAuthModal();
-        alert('✅ स्वागत है, ' + sessionUser.name + '!\nआप सफलतापूर्वक Sign In हो चुके हैं।\nउपलब्ध क्रेडिट्स: ' + sessionUser.credits);
+        showLoginSuccessModal(sessionUser.name, sessionUser.credits, 'Sign-In Successful!');
         return;
       }
     } catch (err) {
@@ -2335,7 +2378,7 @@
         };
         setStoredUser(sessionUser);
         closeAuthModal();
-        alert('✅ स्वागत है, ' + sessionUser.name + '!\nआप सफलतापूर्वक Sign In हो चुके हैं।\nउपलब्ध क्रेडिट्स: ' + sessionUser.credits);
+        showLoginSuccessModal(sessionUser.name, sessionUser.credits, 'Sign-In Successful!');
         return;
       }
 
@@ -2825,6 +2868,42 @@
           <i class="fa-solid fa-user-plus"></i> Create Free Account & Get 5 Credits
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- ================= CENTERED LOGIN SUCCESS POPUP MODAL (100% ENGLISH, LARGE FONT) ================= -->
+  <div id="loginSuccessModal" class="fixed inset-0 z-[100000] bg-black/75 backdrop-blur-md hidden items-center justify-center p-4 sm:p-6" onclick="if(event.target === this) closeLoginSuccessModal()">
+    <div id="loginSuccessCard" class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-10 shadow-2xl relative border-2 border-emerald-200 text-center transform transition-all duration-300 scale-95 opacity-0">
+      <!-- Close button -->
+      <button onclick="closeLoginSuccessModal()" aria-label="Close" class="absolute top-5 right-5 text-gray-400 hover:text-gray-700 text-3xl font-bold leading-none transition">&times;</button>
+      
+      <!-- Big Success Icon Badge -->
+      <div class="w-24 h-24 rounded-full bg-emerald-100 border-4 border-emerald-200 flex items-center justify-center mx-auto mb-5 shadow-inner">
+        <i class="fa-solid fa-check text-5xl text-emerald-600"></i>
+      </div>
+
+      <!-- Main Heading (Large) -->
+      <h2 id="loginSuccessTitle" class="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight mb-2">Login Successful!</h2>
+      
+      <!-- User Greeting (Large) -->
+      <p id="loginSuccessUser" class="text-xl sm:text-2xl font-bold text-emerald-600 mb-6">Welcome, User!</p>
+      
+      <!-- Wallet Credits Box (Extra Large Numbers) -->
+      <div class="bg-gradient-to-br from-emerald-50 via-teal-50 to-indigo-50 border-2 border-emerald-200 rounded-2xl p-5 sm:p-6 mb-6 text-center shadow-sm">
+        <div class="text-xs sm:text-sm uppercase font-extrabold tracking-wider text-emerald-800">Available Wallet Balance</div>
+        <div id="loginSuccessCredits" class="text-4xl sm:text-5xl font-black text-gray-900 mt-2 tracking-tight">5 Credits</div>
+      </div>
+
+      <!-- Informative Note (Large & Crisp) -->
+      <p id="loginSuccessNote" class="text-base sm:text-lg font-medium text-gray-600 leading-relaxed mb-8">
+        Watermark is now removed! You can create, enhance, and download clean, watermark-free biometric photos.
+      </p>
+
+      <!-- Primary Action Button (Extra Large) -->
+      <button onclick="closeLoginSuccessModal()" class="w-full py-4 sm:py-5 px-8 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-700 hover:to-indigo-700 text-white font-black text-lg sm:text-xl rounded-2xl shadow-xl shadow-emerald-500/30 hover:shadow-2xl transition transform active:scale-95 flex items-center justify-center gap-3">
+        <span>Continue to Photo Maker</span>
+        <i class="fa-solid fa-arrow-right text-xl"></i>
+      </button>
     </div>
   </div>
 
