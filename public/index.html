@@ -239,6 +239,151 @@
   
   .progress-text { text-align: center; font-size: 14px; font-weight: 800; color: var(--primary); margin-top: 10px; display: none; }
 
+  /* Step 2: Vertical Zoom Slider Widget beside Photo */
+  .crop-stage-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    z-index: 20;
+  }
+
+  .crop-vertical-zoom-panel {
+    position: relative;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 12px 8px;
+    border-radius: 32px;
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.28), 0 2px 10px rgba(99, 102, 241, 0.22);
+    width: 50px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+
+  .vzoom-step-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .vzoom-step-btn:hover {
+    background: var(--primary, #6366f1);
+    color: white;
+    border-color: var(--primary, #6366f1);
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+  }
+  .vzoom-step-btn:active {
+    transform: scale(0.92);
+  }
+
+  .vzoom-badge {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--primary, #6366f1);
+    background: #eef2ff;
+    padding: 2px 6px;
+    border-radius: 8px;
+    border: 1px solid #c7d2fe;
+    margin: 8px 0;
+    letter-spacing: -0.3px;
+    text-align: center;
+    white-space: nowrap;
+    min-width: 36px;
+  }
+
+  .vzoom-track-container {
+    position: relative;
+    width: 10px;
+    height: 150px;
+    background: #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 8px 0;
+    touch-action: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .vzoom-track-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 20%;
+    background: linear-gradient(to top, var(--primary, #6366f1), #a855f7);
+    border-radius: 6px;
+    pointer-events: none;
+    transition: height 0.05s linear;
+  }
+
+  .vzoom-thumb {
+    position: absolute;
+    left: 50%;
+    bottom: 20%;
+    transform: translate(-50%, 50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2.5px solid var(--primary, #6366f1);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5), 0 1px 3px rgba(0, 0, 0, 0.2);
+    cursor: ns-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+    touch-action: none;
+    outline: none;
+    z-index: 5;
+  }
+  .vzoom-thumb:hover, .vzoom-thumb:focus {
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25), 0 4px 14px rgba(99, 102, 241, 0.6);
+  }
+  .vzoom-thumb:active, .vzoom-thumb.dragging {
+    transform: translate(-50%, 50%) scale(1.18);
+    box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.35), 0 6px 18px rgba(99, 102, 241, 0.7);
+    cursor: grabbing;
+  }
+
+  .vzoom-reset-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 6px;
+  }
+  .vzoom-reset-btn:hover {
+    color: var(--primary, #6366f1);
+    background: #eef2ff;
+    transform: rotate(-90deg);
+  }
+
 </style>
 </head>
 <body class="overflow-x-hidden">
@@ -866,12 +1011,16 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Photo Zoom Adjust</label>
+        <div class="form-group" style="margin-bottom: 22px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <label style="margin:0; font-weight:700; color:var(--text);"><i class="fa-solid fa-magnifying-glass text-primary mr-1"></i> Photo Zoom Adjust</label>
+            <span id="sidebarZoomPercent" style="font-size:11px; font-weight:800; color:var(--primary); background:#eef2ff; padding:2px 8px; border-radius:10px; border:1px solid #c7d2fe;">100%</span>
+          </div>
+          <input type="range" id="sidebarZoomRange" min="50" max="300" value="100" step="1" oninput="setZoomPercent(this.value)" style="margin-bottom:10px; width:100%; accent-color:var(--primary); cursor:pointer;">
           <div style="display: flex; gap: 8px;">
-            <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="zoomImage(0.1)">🔍 +</button>
-            <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="zoomImage(-0.1)">🔍 -</button>
-            <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="resetZoom()">Reset</button>
+            <button type="button" class="btn btn-outline" style="flex:1; padding:8px;" onclick="stepZoom(10)">🔍 +</button>
+            <button type="button" class="btn btn-outline" style="flex:1; padding:8px;" onclick="stepZoom(-10)">🔍 -</button>
+            <button type="button" class="btn btn-outline" style="flex:1; padding:8px;" onclick="resetZoom()">Reset</button>
           </div>
         </div>
 
@@ -881,9 +1030,31 @@
         </div>
       </div>
       <div class="canvas-container">
-        <!-- Temporary Simple Crop visualization using a container -->
-        <div id="cropWrapper" style="position:relative; overflow:hidden; border:2px solid var(--primary); box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);">
-          <img id="cropImg" style="cursor:move; transform-origin: top left; max-width: none !important;" />
+        <!-- Photo Stage with Crop Box & Vertical Zoom Slider on Right -->
+        <div class="crop-stage-container">
+          <div id="cropWrapper" style="position:relative; overflow:hidden; border:2px solid var(--primary); box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); border-radius:4px;">
+            <img id="cropImg" style="cursor:move; transform-origin: top left; max-width: none !important;" />
+          </div>
+
+          <!-- Vertical Zoom Slider widget directly on the right side of the photo -->
+          <div id="cropVZoomBar" class="crop-vertical-zoom-panel" title="Slide up to zoom in, slide down to zoom out">
+            <button type="button" class="vzoom-step-btn" onclick="stepZoom(10)" title="Zoom In (+10%)">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+            <span id="vzoomPercentDisplay" class="vzoom-badge">100%</span>
+            <div id="vzoomTrack" class="vzoom-track-container" title="Drag knob up to zoom in, down to zoom out">
+              <div id="vzoomProgress" class="vzoom-track-fill"></div>
+              <div id="vzoomThumb" class="vzoom-thumb" tabindex="0" title="Slide Up/Down to Zoom">
+                <i class="fa-solid fa-up-down" style="font-size:10px; color:var(--primary);"></i>
+              </div>
+            </div>
+            <button type="button" class="vzoom-step-btn" onclick="stepZoom(-10)" title="Zoom Out (-10%)">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <button type="button" class="vzoom-reset-btn" onclick="resetZoom()" title="Reset to Fit">
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1190,11 +1361,137 @@
 
   // 2. Crop logic (Simplified for UI visualization)
   let drag = false, startX, startY, imgX=0, imgY=0, imgScale=1;
+  let currentZoomPercent = 100;
+  let baseFitScale = 1;
+  let isResettingCrop = false;
+
+  function updateZoomUI() {
+    const sideBadge = document.getElementById('sidebarZoomPercent');
+    if (sideBadge) sideBadge.textContent = Math.round(currentZoomPercent) + '%';
+    
+    const sideRange = document.getElementById('sidebarZoomRange');
+    if (sideRange) sideRange.value = Math.round(currentZoomPercent);
+
+    const vBadge = document.getElementById('vzoomPercentDisplay');
+    if (vBadge) vBadge.textContent = Math.round(currentZoomPercent) + '%';
+
+    const vProgress = document.getElementById('vzoomProgress');
+    const vThumb = document.getElementById('vzoomThumb');
+    if (vProgress && vThumb) {
+      const fraction = (currentZoomPercent - 50) / (300 - 50);
+      const pct = Math.max(0, Math.min(100, fraction * 100));
+      vProgress.style.height = pct + '%';
+      vThumb.style.bottom = pct + '%';
+    }
+  }
+
+  function setZoomPercent(newPercent, preserveCenter = true) {
+    newPercent = Math.max(50, Math.min(300, parseFloat(newPercent) || 100));
+    const oldScale = imgScale;
+    currentZoomPercent = newPercent;
+    
+    if (baseFitScale <= 0) baseFitScale = 1;
+    const newScale = baseFitScale * (currentZoomPercent / 100);
+
+    if (preserveCenter && oldScale > 0) {
+      const w_mm = getCropWidthMM();
+      const h_mm = getCropHeightMM();
+      const visualW = w_mm * 5;
+      const visualH = h_mm * 5;
+      const cx = visualW / 2;
+      const cy = visualH / 2;
+      imgX = cx - (cx - imgX) * (newScale / oldScale);
+      imgY = cy - (cy - imgY) * (newScale / oldScale);
+    }
+
+    imgScale = newScale;
+    const cropImg = document.getElementById('cropImg');
+    if (cropImg) {
+      cropImg.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+    }
+    updateZoomUI();
+  }
+
+  function stepZoom(delta) {
+    setZoomPercent(currentZoomPercent + delta);
+  }
+
+  function zoomImage(delta) {
+    stepZoom(delta > 0 ? 10 : -10);
+  }
+
+  function resetZoom() {
+    currentZoomPercent = 100;
+    imgX = 0;
+    imgY = 0;
+    isResettingCrop = true;
+    updateCropBox();
+    updateZoomUI();
+  }
+
+  let vSliderInitialized = false;
+  function initVerticalZoomSlider() {
+    if (vSliderInitialized) return;
+    const track = document.getElementById('vzoomTrack');
+    const thumb = document.getElementById('vzoomThumb');
+    if (!track || !thumb) return;
+    vSliderInitialized = true;
+
+    let isDragging = false;
+
+    function handlePointer(e) {
+      const rect = track.getBoundingClientRect();
+      // Upward drag increases zoom, downward drag decreases zoom
+      const yFromBottom = rect.bottom - e.clientY;
+      let fraction = yFromBottom / rect.height;
+      fraction = Math.max(0, Math.min(1, fraction));
+      const newZoom = 50 + fraction * (300 - 50);
+      setZoomPercent(newZoom);
+    }
+
+    track.addEventListener('pointerdown', (e) => {
+      isDragging = true;
+      try { track.setPointerCapture(e.pointerId); } catch(err){}
+      thumb.classList.add('dragging');
+      handlePointer(e);
+      e.preventDefault();
+    });
+
+    track.addEventListener('pointermove', (e) => {
+      if (isDragging) {
+        handlePointer(e);
+        e.preventDefault();
+      }
+    });
+
+    const endDrag = (e) => {
+      if (isDragging) {
+        isDragging = false;
+        try { track.releasePointerCapture(e.pointerId); } catch(err){}
+        thumb.classList.remove('dragging');
+      }
+    };
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+
+    thumb.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
+        stepZoom(5);
+        e.preventDefault();
+      } else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') {
+        stepZoom(-5);
+        e.preventDefault();
+      }
+    });
+  }
+
   function setupCrop() {
     const img = document.getElementById('cropImg');
     img.src = originalImage.src;
-    imgX=0; imgY=0; imgScale=1; // reset
+    currentZoomPercent = 100;
+    imgX = 0; imgY = 0; imgScale = 1; isResettingCrop = true;
     updateCropBox();
+    initVerticalZoomSlider();
     
     // Basic drag logic
     img.onmousedown = (e) => { drag = true; startX = e.clientX - imgX; startY = e.clientY - imgY; e.preventDefault(); };
@@ -1203,9 +1500,8 @@
     // Wheel zoom
     document.getElementById('cropWrapper').onwheel = (e) => {
       e.preventDefault();
-      imgScale += e.deltaY * -0.001;
-      imgScale = Math.max(0.1, imgScale);
-      img.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+      const delta = e.deltaY < 0 ? 10 : -10;
+      setZoomPercent(currentZoomPercent + delta);
     };
   }
 
@@ -1305,12 +1601,14 @@
 
   function updateCropBox(isManual) {
     if (isManual) {
-      document.getElementById('cropSize').value = 'custom';
+      const cropSizeSel = document.getElementById('cropSize');
+      if (cropSizeSel) cropSizeSel.value = 'custom';
     }
     const w_mm = getCropWidthMM();
     const h_mm = getCropHeightMM();
 
     const wrap = document.getElementById('cropWrapper');
+    if (!wrap) return;
     // Scale for visual preview box
     const visualW = w_mm * 5;
     const visualH = h_mm * 5;
@@ -1318,15 +1616,24 @@
     wrap.style.height = visualH + 'px';
 
     // Auto-scale to fit nicely initially
-    if (imgScale === 1 && originalImage.width) {
+    if (originalImage.width && originalImage.height) {
       const scaleToFitW = visualW / originalImage.width;
       const scaleToFitH = visualH / originalImage.height;
-      imgScale = Math.max(scaleToFitW, scaleToFitH);
-      imgX = (visualW - (originalImage.width * imgScale)) / 2;
-      imgY = (visualH - (originalImage.height * imgScale)) / 2;
+      baseFitScale = Math.max(scaleToFitW, scaleToFitH);
+
+      if (isResettingCrop || imgScale === 1 || !imgScale) {
+        imgScale = baseFitScale * (currentZoomPercent / 100);
+        imgX = (visualW - (originalImage.width * imgScale)) / 2;
+        imgY = (visualH - (originalImage.height * imgScale)) / 2;
+        isResettingCrop = false;
+      }
     }
 
-    document.getElementById('cropImg').style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+    const cropImg = document.getElementById('cropImg');
+    if (cropImg) {
+      cropImg.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+    }
+    updateZoomUI();
   }
 
   function applyCropAndNext() {
@@ -2015,18 +2322,7 @@
     printWin.document.close();
   }
 
-  function zoomImage(delta) {
-    imgScale += delta;
-    imgScale = Math.max(0.1, imgScale);
-    document.getElementById('cropImg').style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
-  }
-
-  function resetZoom() {
-    imgScale = 1;
-    imgX = 0;
-    imgY = 0;
-    updateCropBox(); // Recalculate auto-fit
-  }
+  // zoomImage and resetZoom are already defined above and synced with setZoomPercent
 
   // ================= REAL AUTHENTICATION & WALLET SYSTEM =================
   let currentAuthTab = 'login';
@@ -2927,6 +3223,7 @@
   // Initialize Auth state on page load
   window.addEventListener('DOMContentLoaded', () => {
     updateUserUI();
+    initVerticalZoomSlider();
   });
 
   // ================= DESKTOP COPY & RIGHT-CLICK PROTECTION =================
