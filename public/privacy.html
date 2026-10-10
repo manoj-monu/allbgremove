@@ -4,17 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Privacy Policy - allbgremove.com</title>
-  <meta name="description" content="Privacy Policy for allbgremove.com. Read about our policies and terms.">
+  <meta name="description" content="Privacy Policy for allbgremove.com. Transparent disclosures on data protection, cookies, Google AdSense compliance, and GDPR/CCPA privacy rights.">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="canonical" href="https://allbgremove.com/privacy.html">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: { primary: '#6366f1' }
+          fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+          colors: { primary: '#4f46e5' }
         }
       }
     }
@@ -25,18 +26,20 @@
   <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-20">
-        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
-          <i class="fa-solid fa-camera-retro text-primary text-3xl"></i>
+        <a href="index.html" class="flex items-center gap-2">
+          <i class="fa-solid fa-camera-retro text-primary text-2xl"></i>
           <span class="font-bold text-2xl tracking-tight text-gray-900">allbgremove<span class="text-primary">.com</span></span>
-        </div>
+        </a>
         <nav class="hidden md:flex gap-8 font-medium text-gray-600">
           <a href="index.html" class="hover:text-primary transition">Home</a>
           <a href="pricing.html" class="hover:text-primary transition">Pricing</a>
+          <a href="requirements.html" class="hover:text-primary transition">Photo Guide</a>
+          <a href="blog.html" class="hover:text-primary transition">Blog</a>
           <a href="about.html" class="hover:text-primary transition">About</a>
           <a href="contact.html" class="hover:text-primary transition">Contact</a>
         </nav>
         <div class="flex gap-4">
-          <button class="px-5 py-2 text-primary font-medium hover:bg-indigo-50 rounded-full transition hidden sm:block">Login</button>
+          <button class="px-5 py-2 text-primary font-medium hover:bg-indigo-50 rounded-full transition hidden sm:block" onclick="window.location.href='pricing.html'">Pricing</button>
           <button class="px-5 py-2 bg-primary text-white font-medium rounded-full shadow-lg hover:shadow-xl hover:bg-indigo-600 transition" onclick="window.location.href='index.html'">Start App</button>
         </div>
       </div>
@@ -45,60 +48,114 @@
 
   <!-- Content -->
   <main class="flex-grow max-w-4xl mx-auto w-full px-4 py-16 sm:px-6 lg:px-8">
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-12">
-      <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-8 border-b pb-4">Privacy Policy</h1>
-      <div class="prose prose-indigo max-w-none text-gray-600 space-y-6">
-        
-    <p>Last updated: October 2026</p>
-    <h3 class="text-xl font-bold text-gray-800 mt-6">1. Introduction</h3>
-    <p>Welcome to allbgremove.com ("we", "our", "us"). We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you as to how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you.</p>
-    <h3 class="text-xl font-bold text-gray-800 mt-6">2. Data Collection and Usage</h3>
-    <p>When you use our background removal and photo editing tools, your photos are processed securely. We do not permanently store, share, or use your uploaded photos for any purpose other than providing the requested service. All uploaded images are automatically deleted from our servers shortly after processing.</p>
-    <h3 class="text-xl font-bold text-gray-800 mt-6">3. Cookies and Tracking Technologies</h3>
-    <p>We use cookies and similar tracking technologies to track the activity on our Service and hold certain information. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent.</p>
-    <h3 class="text-xl font-bold text-gray-800 mt-6">4. Third-Party Services</h3>
-    <p>We use third-party services (like Google AdSense and payment gateways) which may collect information used to identify you. These third-party service providers have their own privacy policies addressing how they use such information.</p>
-    <h3 class="text-xl font-bold text-gray-800 mt-6">5. Contact Us</h3>
-    <p>If you have any questions about this Privacy Policy, please contact us through our Contact page.</p>
-    
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-200 p-8 sm:p-12">
+      <span class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 text-primary text-xs font-bold rounded-full mb-4">
+        <i class="fa-solid fa-shield-halved"></i> Data Protection & Transparency
+      </span>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4 border-b pb-4">Privacy Policy</h1>
+      <p class="text-xs text-gray-400 mb-8">Last Updated: October 10, 2026 | Effective Immediately</p>
+
+      <div class="prose max-w-none text-gray-600 space-y-6 text-sm sm:text-base leading-relaxed">
+        <p>
+          At <strong>allbgremove.com</strong>, accessible from <a href="https://allbgremove.com" class="text-primary underline">https://allbgremove.com</a>, one of our main priorities is the privacy of our visitors. This Privacy Policy document details the types of information that is collected and recorded by allbgremove.com and how we use it.
+        </p>
+
+        <h3 class="text-xl font-bold text-gray-800 mt-6">1. Zero Long-Term Image Storage (Ephemeral Processing)</h3>
+        <p>
+          When you upload an image for biometric background removal, head alignment, or enhancement, your image is processed temporarily in volatile system memory (RAM). <strong>We do not permanently store, sell, share, or catalog your personal portrait photos.</strong> Images are automatically cleared immediately following the render session or deleted permanently from cache within 15 minutes.
+        </p>
+
+        <h3 class="text-xl font-bold text-gray-800 mt-6">2. Log Files & Analytics</h3>
+        <p>
+          allbgremove.com follows a standard procedure of using log files. These files log visitors when they visit websites. The information collected by log files includes internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any information that is personally identifiable. The purpose of the information is for analyzing trends, administering the site, tracking users' movement on the website, and gathering demographic information.
+        </p>
+
+        <h3 class="text-xl font-bold text-gray-800 mt-6">3. Cookies and Web Beacons</h3>
+        <p>
+          Like any other website, allbgremove.com uses "cookies". These cookies are used to store information including visitors' preferences, authentication tokens for wallet balances, and the pages on the website that the visitor accessed or visited. The information is used to optimize the users' experience by customizing our web page content based on visitors' browser type and/or other information.
+        </p>
+
+        <div class="p-5 bg-indigo-50/70 border-l-4 border-primary rounded-r-2xl my-6">
+          <h4 class="font-bold text-gray-900 mb-2">4. Google DoubleClick DART Cookie & Google AdSense Policy</h4>
+          <p class="text-sm text-gray-700 leading-relaxed mb-3">
+            Google is one of our third-party advertising vendors. It also uses cookies, known as DART cookies, to serve ads to our site visitors based upon their visit to www.allbgremove.com and other sites on the internet.
+          </p>
+          <p class="text-sm text-gray-700 leading-relaxed">
+            Visitors may choose to decline the use of DART cookies by visiting the Google Ad and Content Network Privacy Policy at the following URL: <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer" class="text-primary font-bold underline">https://policies.google.com/technologies/ads</a> or through the Network Advertising Initiative opt-out page at <a href="https://optout.networkadvertising.org" target="_blank" rel="noopener noreferrer" class="text-primary font-bold underline">https://optout.networkadvertising.org</a>.
+          </p>
+        </div>
+
+        <h3 class="text-xl font-bold text-gray-800 mt-6">5. Third-Party Advertising Partners</h3>
+        <p>
+          Third-party ad servers or ad networks use technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on allbgremove.com. They automatically receive your IP address when this occurs. These technologies are used to measure the effectiveness of their advertising campaigns and/or to personalize the advertising content that you see on websites that you visit. Note that allbgremove.com has no access to or control over these cookies that are used by third-party advertisers.
+        </p>
+
+        <h3 class="text-xl font-bold text-gray-800 mt-6">6. CCPA Privacy Rights (Do Not Sell My Personal Information)</h3>
+        <p>Under the California Consumer Privacy Act (CCPA), California consumers have the right to:</p>
+        <ul class="list-disc pl-6 space-y-1">
+          <li>Request that a business disclose the categories and specific pieces of personal data collected.</li>
+          <li>Request that a business delete any personal data collected about the consumer.</li>
+          <li>Request that a business that sells a consumer's personal data, not sell the consumer's personal data. (Note: allbgremove.com does not sell personal data).</li>
+        </ul>
+
+        <h3 class="text-xl font-bold text-gray-800 mt-6">7. GDPR Data Protection Rights</h3>
+        <p>We would like to make sure you are fully aware of all of your data protection rights under the General Data Protection Regulation (GDPR):</p>
+        <ul class="list-disc pl-6 space-y-1">
+          <li><strong>The right to access:</strong> You have the right to request copies of your personal data.</li>
+          <li><strong>The right to rectification:</strong> You have the right to request correction of any information you believe is inaccurate.</li>
+          <li><strong>The right to erasure:</strong> You have the right to request that we erase your personal data under certain conditions.</li>
+          <li><strong>The right to restrict processing:</strong> You have the right to request restriction of processing of your data.</li>
+        </ul>
+
+        <h3 class="text-xl font-bold text-gray-800 mt-6">8. Children's Information</h3>
+        <p>
+          Another part of our priority is adding protection for children while using the internet. We encourage parents and guardians to observe, participate in, and/or monitor and guide their online activity. allbgremove.com does not knowingly collect any Personal Identifiable Information from children under the age of 13.
+        </p>
+
+        <h3 class="text-xl font-bold text-gray-800 mt-6">9. Contacting Our Privacy Officer</h3>
+        <p>
+          If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us at <strong>support@allbgremove.com</strong> or via our <a href="contact.html" class="text-primary underline">Contact page</a>.
+        </p>
       </div>
     </div>
   </main>
 
   <!-- Footer -->
-  <footer class="bg-gray-900 text-white pt-20 pb-10 mt-auto">
+  <footer class="bg-gray-900 text-white pt-16 pb-10 mt-auto">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12 border-b border-gray-800 pb-12">
-        <div class="col-span-1 md:col-span-1">
+        <div>
           <div class="flex items-center gap-2 mb-6">
             <i class="fa-solid fa-camera-retro text-primary text-2xl"></i>
             <span class="font-bold text-xl tracking-tight">allbgremove<span class="text-primary">.com</span></span>
           </div>
-          <p class="text-gray-400 text-sm mb-6">Create passport, visa, ID and more photos with our easy-to-use online tool.</p>
+          <p class="text-gray-400 text-sm mb-6">AI-powered biometric passport photo generator and background removal suite.</p>
         </div>
         <div>
-          <h4 class="font-bold mb-6 text-lg">Quick Links</h4>
+          <h4 class="font-bold mb-6 text-lg">Product & Guides</h4>
           <ul class="space-y-3 text-sm text-gray-400">
-            <li><a href="index.html" class="hover:text-white transition">Home</a></li>
-            <li><a href="pricing.html" class="hover:text-white transition">Pricing</a></li>
-            <li><a href="about.html" class="hover:text-white transition">About</a></li>
+            <li><a href="index.html" class="hover:text-white transition">Photo Maker</a></li>
+            <li><a href="pricing.html" class="hover:text-white transition">Pricing & Credits</a></li>
+            <li><a href="requirements.html" class="hover:text-white transition">Size Requirements</a></li>
+            <li><a href="blog.html" class="hover:text-white transition">Blog & Tutorials</a></li>
           </ul>
         </div>
         <div>
-          <h4 class="font-bold mb-6 text-lg">Tools</h4>
+          <h4 class="font-bold mb-6 text-lg">Legal & Compliance</h4>
           <ul class="space-y-3 text-sm text-gray-400">
-            <li><a href="index.html" class="hover:text-white transition">Passport Photo Maker</a></li>
-            <li><a href="index.html" class="hover:text-white transition">Background Remover</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="font-bold mb-6 text-lg">Support</h4>
-          <ul class="space-y-3 text-sm text-gray-400">
-            <li><a href="terms.html" class="hover:text-white transition">Terms & Conditions</a></li>
+            <li><a href="terms.html" class="hover:text-white transition">Terms of Service</a></li>
             <li><a href="privacy.html" class="hover:text-white transition">Privacy Policy</a></li>
             <li><a href="refund.html" class="hover:text-white transition">Refund Policy</a></li>
-            <li><a href="shipping.html" class="hover:text-white transition">Shipping & Delivery</a></li>
+            <li><a href="shipping.html" class="hover:text-white transition">Shipping Policy</a></li>
+            <li><a href="disclaimer.html" class="hover:text-white transition">Disclaimer Notice</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold mb-6 text-lg">Customer Support</h4>
+          <ul class="space-y-3 text-sm text-gray-400">
+            <li><a href="about.html" class="hover:text-white transition">About Us</a></li>
             <li><a href="contact.html" class="hover:text-white transition">Contact Us</a></li>
+            <li><span class="text-gray-500">Email: support@allbgremove.com</span></li>
           </ul>
         </div>
       </div>
