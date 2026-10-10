@@ -3252,37 +3252,45 @@
   (function initCopyProtection() {
     // 1. Disable context menu on all canvases, photo containers, and editor
     document.addEventListener('contextmenu', function(e) {
-      if (e.target.closest('canvas') || e.target.closest('.canvas-container') || e.target.closest('.photo-shield-overlay') || e.target.closest('.editor-layout')) {
-        e.preventDefault();
-        e.stopPropagation();
-        showProtectedToast('🔒 Right-Click & Save Disabled! Please Login to download official photo.');
-        return false;
+      if (e.target && typeof e.target.closest === 'function') {
+        if (e.target.closest('canvas') || e.target.closest('.canvas-container') || e.target.closest('.photo-shield-overlay') || e.target.closest('.editor-layout')) {
+          e.preventDefault();
+          e.stopPropagation();
+          showProtectedToast('🔒 Right-Click & Save Disabled! Please Login to download official photo.');
+          return false;
+        }
       }
     }, true);
 
     // 2. Disable dragging canvases / photos to desktop or other tabs
     document.addEventListener('dragstart', function(e) {
-      if (e.target.closest('canvas') || e.target.closest('.canvas-container') || e.target.closest('.photo-shield-overlay') || e.target.tagName === 'CANVAS' || e.target.tagName === 'IMG') {
-        e.preventDefault();
-        return false;
+      if (e.target && typeof e.target.closest === 'function') {
+        if (e.target.closest('canvas') || e.target.closest('.canvas-container') || e.target.closest('.photo-shield-overlay') || e.target.tagName === 'CANVAS' || e.target.tagName === 'IMG') {
+          e.preventDefault();
+          return false;
+        }
       }
     }, true);
 
     // 3. Disable text/image selection highlighting on canvases
     document.addEventListener('selectstart', function(e) {
-      if (e.target.closest('canvas') || e.target.closest('.canvas-container') || e.target.closest('.photo-shield-overlay')) {
-        e.preventDefault();
-        return false;
+      if (e.target && typeof e.target.closest === 'function') {
+        if (e.target.closest('canvas') || e.target.closest('.canvas-container') || e.target.closest('.photo-shield-overlay')) {
+          e.preventDefault();
+          return false;
+        }
       }
     }, true);
 
     // 4. Click feedback on protected photo shield
     document.addEventListener('click', function(e) {
-      const shield = e.target.closest('.photo-shield-overlay');
-      if (shield) {
-        const user = getStoredUser();
-        if (!user) {
-          showProtectedToast('🔒 Watermarked Preview. Login to remove watermark and download.');
+      if (e.target && typeof e.target.closest === 'function') {
+        const shield = e.target.closest('.photo-shield-overlay');
+        if (shield) {
+          const user = getStoredUser();
+          if (!user) {
+            showProtectedToast('🔒 Watermarked Preview. Login to remove watermark and download.');
+          }
         }
       }
     }, false);
