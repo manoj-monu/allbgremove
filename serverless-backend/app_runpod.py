@@ -11,7 +11,6 @@ import io
 import torch
 from transformers import AutoModelForImageSegmentation
 from torchvision import transforms
-from gfpgan import GFPGANer
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
