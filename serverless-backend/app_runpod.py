@@ -1,6 +1,9 @@
 import sys
-import torchvision.transforms.functional as TF
-sys.modules['torchvision.transforms.functional_tensor'] = TF
+try:
+    import torchvision.transforms.functional as TF
+    sys.modules['torchvision.transforms.functional_tensor'] = TF
+except Exception as e:
+    print("Notice: torchvision setup:", e)
 
 import cv2
 import numpy as np
@@ -41,6 +44,11 @@ def get_gfpgan():
     global gfpgan
     if gfpgan is None:
         print("Loading GFPGAN...")
+        try:
+            import torchvision.transforms.functional as TF
+            sys.modules['torchvision.transforms.functional_tensor'] = TF
+        except Exception:
+            pass
         from gfpgan import GFPGANer
         import os
         model_path = '/app/GFPGANv1.4.pth' if os.path.exists('/app/GFPGANv1.4.pth') else 'https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.4.pth'
@@ -49,7 +57,8 @@ def get_gfpgan():
             upscale=2,
             arch='clean',
             channel_multiplier=2,
-            bg_upsampler=None
+            bg_upsampler=None,
+            device=device
         )
     return gfpgan
 
@@ -122,5 +131,6 @@ async def process_all(file: UploadFile = File(...), enhance: str = "false", x_ap
 
 @app.get("/")
 @app.get("/ping")
+@app.post("/ping")
 def root():
     return {"status": "Active"}
