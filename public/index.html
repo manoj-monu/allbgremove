@@ -3305,13 +3305,14 @@
     });
 
     // 6. Anti-Screenshot Blanking Shield (PrintScreen, Snipping Tool, & Window Blur)
-    const blankShield = document.getElementById('antiScreenshotShield');
+    const getBlankShield = () => document.getElementById('antiScreenshotShield');
     let isFilePicking = false;
     let blankTimer = null;
 
-    const triggerBlankShield = (duration = 1600) => {
-      if (!blankShield) return;
-      blankShield.style.display = 'flex';
+    const triggerBlankShield = (duration = 1800) => {
+      const shield = getBlankShield();
+      if (!shield) return;
+      shield.style.display = 'flex';
       
       // Wipe clipboard so screenshot bitmap is emptied
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -3323,37 +3324,38 @@
       if (blankTimer) clearTimeout(blankTimer);
       if (duration > 0) {
         blankTimer = setTimeout(() => {
-          blankShield.style.display = 'none';
+          shield.style.display = 'none';
         }, duration);
       }
     };
 
     const hideBlankShield = () => {
       if (blankTimer) clearTimeout(blankTimer);
-      if (blankShield) blankShield.style.display = 'none';
+      const shield = getBlankShield();
+      if (shield) shield.style.display = 'none';
     };
 
     // Detect PrintScreen keydown
     window.addEventListener('keydown', function(e) {
-      if (e.key === 'PrintScreen' || e.keyCode === 44) {
-        triggerBlankShield(1800);
+      if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44 || e.which === 44) {
+        triggerBlankShield(2000);
       }
       // Detect Snipping Tool shortcut Ctrl+Shift+S or Meta+Shift+S
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 's' || e.key === 'S')) {
         e.preventDefault();
-        triggerBlankShield(2000);
+        triggerBlankShield(2200);
       }
       // Detect Ctrl+P (Print to PDF)
       if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
         e.preventDefault();
-        triggerBlankShield(1500);
+        triggerBlankShield(1800);
       }
     }, true);
 
     // Detect PrintScreen keyup (when Windows finishes screen grab)
     window.addEventListener('keyup', function(e) {
-      if (e.key === 'PrintScreen' || e.keyCode === 44) {
-        triggerBlankShield(1800);
+      if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44 || e.which === 44) {
+        triggerBlankShield(2000);
       }
     }, true);
 
@@ -3369,8 +3371,9 @@
       if (isFilePicking) return;
       const appContainer = document.getElementById('app-container');
       if (appContainer && appContainer.style.display !== 'none') {
-        if (!blankShield) return;
-        blankShield.style.display = 'flex';
+        const shield = getBlankShield();
+        if (!shield) return;
+        shield.style.display = 'flex';
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText('').catch(() => {});
         }
