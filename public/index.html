@@ -932,15 +932,61 @@
           </div>
         </div>
 
+        <div style="display:flex; gap:8px; margin-bottom:15px;">
+          <button class="btn btn-outline" style="flex:1; padding:6px 8px; font-size:12px;" onclick="centerPhotosOnSheet()">🎯 Center</button>
+          <button class="btn btn-outline" style="flex:1; padding:6px 8px; font-size:12px;" onclick="topLeftPhotosOnSheet()">📐 Top-Left</button>
+          <button class="btn btn-outline" style="flex:1; padding:6px 8px; font-size:12px;" onclick="distributeEvenlyOnSheet()">✨ Fill Page</button>
+        </div>
+
         <div class="nav-footer" style="flex-direction:column; gap:10px;">
           <button class="btn btn-primary" style="width:100%; font-size:18px; padding:15px;" onclick="downloadSheet()">⬇ Download Print Sheet</button>
             <button class="btn btn-outline" style="width:100%;" onclick="printSheet()">🖨️ Direct Print</button>
           <button class="btn btn-outline" style="width:100%;" onclick="goToStep(4)">Back to Adjust</button>
         </div>
       </div>
-      <div class="canvas-container" style="background:#e5e7eb;">
-        <!-- The Print Sheet Preview -->
-        <canvas id="printCanvas" style="background:white; box-shadow:0 10px 40px rgba(0,0,0,0.2); max-height:80vh; max-width:100%;"></canvas>
+      <div class="canvas-container" style="background:#e5e7eb; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:15px; position:relative; overflow:auto;">
+        
+        <!-- Quick Alignment Toolbar -->
+        <div style="display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap; justify-content:center; align-items:center; background:rgba(255,255,255,0.92); backdrop-filter:blur(10px); padding:6px 16px; border-radius:30px; box-shadow:0 2px 10px rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.05);">
+          <span style="font-size:12px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:5px;">
+            <i class="fa-solid fa-arrows-up-down-left-right text-indigo-600"></i> Paper Margin & Align:
+          </span>
+          <button class="btn btn-outline" style="padding:4px 12px; font-size:11px; border-radius:20px;" onclick="centerPhotosOnSheet()">🎯 Center (बीच में)</button>
+          <button class="btn btn-outline" style="padding:4px 12px; font-size:11px; border-radius:20px;" onclick="topLeftPhotosOnSheet()">📐 Top-Left (कोने में)</button>
+          <button class="btn btn-outline" style="padding:4px 12px; font-size:11px; border-radius:20px;" onclick="distributeEvenlyOnSheet()">✨ Fill Page (बराबर फैलाएं)</button>
+          <button class="btn btn-outline" style="padding:4px 12px; font-size:11px; border-radius:20px;" onclick="resetSheetOffsets()">🔄 Reset</button>
+        </div>
+
+        <!-- Canvas + Right Vertical Slider Wrapper -->
+        <div style="display:flex; align-items:center; justify-content:center; gap:14px; position:relative; max-width:100%;">
+          
+          <!-- Paper Canvas -->
+          <div style="position:relative; display:inline-block;">
+            <canvas id="printCanvas" style="background:white; box-shadow:0 10px 40px rgba(0,0,0,0.2); max-height:72vh; max-width:82vw; display:block; border-radius:4px;"></canvas>
+          </div>
+
+          <!-- Right Side Vertical Slider (Up-Down Shift) -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; background:white; padding:14px 10px; border-radius:14px; box-shadow:0 4px 15px rgba(0,0,0,0.08); border:1px solid #e5e7eb;">
+            <span style="font-size:10px; font-weight:800; color:var(--primary); letter-spacing:0.5px; text-transform:uppercase;">↕️ Y-Shift</span>
+            <input type="range" id="sheetOffsetYSlider" orient="vertical" min="0" max="60" step="0.5" value="4" 
+                   style="writing-mode: vertical-lr; direction: rtl; appearance: slider-vertical; -webkit-appearance: slider-vertical; width: 18px; height: 160px; cursor: pointer; accent-color: var(--primary);" 
+                   oninput="onOffsetYSliderInput(this.value)" title="Slide photos vertically (ऊपर-नीचे सरकाएं)">
+            <span id="offsetYValBadge" style="font-size:11px; font-weight:700; color:var(--primary); background:#eef2ff; padding:2px 6px; border-radius:6px; min-width:44px; text-align:center;">4.0mm</span>
+          </div>
+
+        </div>
+
+        <!-- Bottom Horizontal Slider (Left-Right Shift) -->
+        <div style="display:flex; align-items:center; justify-content:center; gap:15px; margin-top:14px; background:white; padding:10px 20px; border-radius:14px; box-shadow:0 4px 15px rgba(0,0,0,0.08); border:1px solid #e5e7eb; width:min(550px, 92%);">
+          <span style="font-size:12px; font-weight:800; color:var(--primary); white-space:nowrap; display:flex; align-items:center; gap:6px;">
+            ↔️ X-Shift (Side Margin):
+          </span>
+          <input type="range" id="sheetOffsetXSlider" min="0" max="60" step="0.5" value="4" 
+                 style="flex:1; height:8px; cursor:pointer; accent-color:var(--primary);" 
+                 oninput="onOffsetXSliderInput(this.value)" title="Slide photos horizontally (बाएं-दाएं सरकाएं)">
+          <span id="offsetXValBadge" style="font-size:12px; font-weight:700; color:var(--primary); background:#eef2ff; padding:2px 8px; border-radius:6px; min-width:50px; text-align:center;">4.0mm</span>
+        </div>
+
       </div>
     </div>
   </div>
@@ -1256,19 +1302,27 @@
   }
 
 
-  function onGridLayoutChange() {
-    const val = document.getElementById('gridLayout').value;
-    if (val !== 'actual') {
-       const parts = val.split('x').map(Number);
-       document.getElementById('photoCount').value = parts[0] * parts[1];
-    }
-    updatePrintLayout();
+  let currentOffsetX_mm = 4;
+  let currentOffsetY_mm = 4;
+  let isCustomOffset = false;
+
+  function onOffsetXSliderInput(val) {
+    currentOffsetX_mm = parseFloat(val) || 0;
+    isCustomOffset = true;
+    const badge = document.getElementById('offsetXValBadge');
+    if (badge) badge.textContent = currentOffsetX_mm.toFixed(1) + 'mm';
+    updatePrintLayout(true);
   }
 
-  function updatePrintLayout(includeRuler = true) {
-    const c = document.getElementById('printCanvas');
-    const ctx = c.getContext('2d');
-    
+  function onOffsetYSliderInput(val) {
+    currentOffsetY_mm = parseFloat(val) || 0;
+    isCustomOffset = true;
+    const badge = document.getElementById('offsetYValBadge');
+    if (badge) badge.textContent = currentOffsetY_mm.toFixed(1) + 'mm';
+    updatePrintLayout(true);
+  }
+
+  function getSheetMetrics() {
     const paperSize = document.getElementById('paperSize').value;
     let pW, pH;
     if(paperSize === 'A4P') { pW = 210 * MM_TO_PX; pH = 297 * MM_TO_PX; }
@@ -1278,77 +1332,164 @@
     else if(paperSize === '5x7L') { pW = 178 * MM_TO_PX; pH = 127 * MM_TO_PX; }
     else if(paperSize === '5x7P') { pW = 127 * MM_TO_PX; pH = 178 * MM_TO_PX; }
 
-    c.width = pW; c.height = pH;
-    ctx.fillStyle = "#ffffff"; // Paper color
-    ctx.fillRect(0,0,pW,pH);
-
-    const count = +document.getElementById('photoCount').value;
     const photoMargin = +document.getElementById('photoMargin').value * MM_TO_PX;
     const pageMargin = +document.getElementById('pageMargin').value * MM_TO_PX;
+    const availableW = pW - (2 * pageMargin);
+    const availableH = pH - (2 * pageMargin);
+
+    let imgW, imgH, cols, rows;
+    const gridLayout = document.getElementById('gridLayout').value;
     
+    if (gridLayout === 'actual') {
+      imgW = +document.getElementById('cropW').value * MM_TO_PX;
+      imgH = +document.getElementById('cropH').value * MM_TO_PX;
+      cols = Math.floor((availableW + photoMargin) / (imgW + photoMargin));
+      rows = Math.floor((availableH + photoMargin) / (imgH + photoMargin));
+    } else {
+      const parts = gridLayout.split('x').map(Number);
+      const maxGrid = Math.max(parts[0], parts[1]);
+      const minGrid = Math.min(parts[0], parts[1]);
+      
+      if (availableW >= availableH) {
+         cols = maxGrid;
+         rows = minGrid;
+      } else {
+         cols = minGrid;
+         rows = maxGrid;
+      }
+      
+      const cellW = (availableW - ((cols - 1) * photoMargin)) / cols;
+      const cellH = (availableH - ((rows - 1) * photoMargin)) / rows;
+      
+      const aspect = (finalImage && finalImage.width) ? (finalImage.width / finalImage.height) : (38.5 / 45);
+      let drawW = cellW;
+      let drawH = drawW / aspect;
+      if (drawH > cellH) {
+          drawH = cellH;
+          drawW = drawH * aspect;
+      }
+      imgW = drawW;
+      imgH = drawH;
+    }
+    
+    if (cols < 1) cols = 1;
+    if (rows < 1) rows = 1;
+
+    const totalGridW = cols * imgW + (cols - 1) * photoMargin;
+    const totalGridH = rows * imgH + (rows - 1) * photoMargin;
+    const maxSpareW = Math.max(0, pW - totalGridW);
+    const maxSpareH = Math.max(0, pH - totalGridH);
+
+    return { pW, pH, imgW, imgH, cols, rows, totalGridW, totalGridH, maxSpareW, maxSpareH, photoMargin, pageMargin };
+  }
+
+  function centerPhotosOnSheet() {
+    const m = getSheetMetrics();
+    if (!m) return;
+    currentOffsetX_mm = Math.max(0, Math.round((m.maxSpareW / 2 / MM_TO_PX) * 10) / 10);
+    currentOffsetY_mm = Math.max(0, Math.round((m.maxSpareH / 2 / MM_TO_PX) * 10) / 10);
+    isCustomOffset = true;
+    updatePrintLayout(true);
+  }
+
+  function topLeftPhotosOnSheet() {
+    const pageMargin = +document.getElementById('pageMargin').value || 4;
+    currentOffsetX_mm = pageMargin;
+    currentOffsetY_mm = pageMargin;
+    isCustomOffset = false;
+    updatePrintLayout(true);
+  }
+
+  function resetSheetOffsets() {
+    topLeftPhotosOnSheet();
+  }
+
+  function distributeEvenlyOnSheet() {
+    const m = getSheetMetrics();
+    if (!m) return;
+    const pageMargin = +document.getElementById('pageMargin').value || 4;
+    const availableW = m.pW - (2 * pageMargin * MM_TO_PX);
+    const totalPhotosW = m.cols * m.imgW;
+    if (m.cols > 1) {
+      const newMarginX_px = (availableW - totalPhotosW) / (m.cols - 1);
+      const newMarginX_mm = Math.max(0, Math.round((newMarginX_px / MM_TO_PX) * 10) / 10);
+      document.getElementById('photoMargin').value = newMarginX_mm;
+    }
+    currentOffsetX_mm = pageMargin;
+    currentOffsetY_mm = pageMargin;
+    isCustomOffset = false;
+    updatePrintLayout(true);
+  }
+
+  function onGridLayoutChange() {
+    const val = document.getElementById('gridLayout').value;
+    if (val !== 'actual') {
+       const parts = val.split('x').map(Number);
+       document.getElementById('photoCount').value = parts[0] * parts[1];
+    }
+    isCustomOffset = false;
+    updatePrintLayout();
+  }
+
+  function updatePrintLayout(includeRuler = true) {
+    const c = document.getElementById('printCanvas');
+    const ctx = c.getContext('2d');
+    
+    const m = getSheetMetrics();
+    if (!m) return;
+    const pW = m.pW, pH = m.pH;
+
+    c.width = pW; c.height = pH;
+    ctx.fillStyle = "#ffffff"; // Paper color
+    ctx.fillRect(0,0,m.pW,m.pH);
+
+    const count = +document.getElementById('photoCount').value;
     const bColor = document.getElementById('borderColor').value;
     const bWidth = +document.getElementById('borderWidth').value;
 
-    // Calculate Grid
-      const availableW = pW - (2 * pageMargin);
-      const availableH = pH - (2 * pageMargin);
-  
-      let imgW, imgH, cols, rows;
-      const gridLayout = document.getElementById('gridLayout').value;
-      
-      if (gridLayout === 'actual') {
-        imgW = +document.getElementById('cropW').value * MM_TO_PX;
-        imgH = +document.getElementById('cropH').value * MM_TO_PX;
-        cols = Math.floor((availableW + photoMargin) / (imgW + photoMargin));
-        rows = Math.floor((availableH + photoMargin) / (imgH + photoMargin));
-      } else {
-        const parts = gridLayout.split('x').map(Number);
-        const maxGrid = Math.max(parts[0], parts[1]);
-        const minGrid = Math.min(parts[0], parts[1]);
-        
-        if (availableW >= availableH) {
-           cols = maxGrid;
-           rows = minGrid;
-        } else {
-           cols = minGrid;
-           rows = maxGrid;
-        }
-        
-        const cellW = (availableW - ((cols - 1) * photoMargin)) / cols;
-        const cellH = (availableH - ((rows - 1) * photoMargin)) / rows;
-        
-        const aspect = finalImage.width / finalImage.height;
-        let drawW = cellW;
-        let drawH = drawW / aspect;
-        if (drawH > cellH) {
-            drawH = cellH;
-            drawW = drawH * aspect;
-        }
-        imgW = drawW;
-        imgH = drawH;
-      }
-      
-      if (cols < 1) cols = 1;
-      if (rows < 1) rows = 1;
+    const maxSpareW_mm = Math.round((m.maxSpareW / MM_TO_PX) * 10) / 10;
+    const maxSpareH_mm = Math.round((m.maxSpareH / MM_TO_PX) * 10) / 10;
 
-      // Align grid to Top-Left ("ek line se") to allow studios to cut paper and reuse it
-      const startX = pageMargin;
-      const startY = pageMargin;
+    const xSlider = document.getElementById('sheetOffsetXSlider');
+    const ySlider = document.getElementById('sheetOffsetYSlider');
+    if (xSlider) {
+      xSlider.max = Math.max(maxSpareW_mm, 1).toString();
+      if (!isCustomOffset) {
+        currentOffsetX_mm = Math.min(m.pageMargin / MM_TO_PX, maxSpareW_mm);
+      }
+      if (currentOffsetX_mm > maxSpareW_mm) currentOffsetX_mm = maxSpareW_mm;
+      xSlider.value = currentOffsetX_mm;
+      const xBadge = document.getElementById('offsetXValBadge');
+      if (xBadge) xBadge.textContent = currentOffsetX_mm.toFixed(1) + 'mm';
+    }
+    if (ySlider) {
+      ySlider.max = Math.max(maxSpareH_mm, 1).toString();
+      if (!isCustomOffset) {
+        currentOffsetY_mm = Math.min(m.pageMargin / MM_TO_PX, maxSpareH_mm);
+      }
+      if (currentOffsetY_mm > maxSpareH_mm) currentOffsetY_mm = maxSpareH_mm;
+      ySlider.value = currentOffsetY_mm;
+      const yBadge = document.getElementById('offsetYValBadge');
+      if (yBadge) yBadge.textContent = currentOffsetY_mm.toFixed(1) + 'mm';
+    }
+
+    const startX = currentOffsetX_mm * MM_TO_PX;
+    const startY = currentOffsetY_mm * MM_TO_PX;
       
-      let printed = 0;
+    let printed = 0;
       
-      for(let r=0; r<rows; r++) {
-      for(let col=0; col<cols; col++) {
+    for(let r=0; r<m.rows; r++) {
+      for(let col=0; col<m.cols; col++) {
         if(printed >= count) break;
-        const x = startX + (col * (imgW + photoMargin));
-        const y = startY + (r * (imgH + photoMargin));
+        const x = startX + (col * (m.imgW + m.photoMargin));
+        const y = startY + (r * (m.imgH + m.photoMargin));
         
-        ctx.drawImage(finalImage, x, y, imgW, imgH);
+        ctx.drawImage(finalImage, x, y, m.imgW, m.imgH);
         
         if(bWidth > 0) {
           ctx.strokeStyle = bColor;
           ctx.lineWidth = bWidth;
-          ctx.strokeRect(x, y, imgW, imgH);
+          ctx.strokeRect(x, y, m.imgW, m.imgH);
         }
         printed++;
       }
