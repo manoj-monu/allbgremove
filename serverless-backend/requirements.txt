@@ -9,7 +9,7 @@ transformers>=4.44.0,<4.48.0
 timm
 einops
 kornia
+basicsr-fixed
 gfpgan
-basicsr
 facexlib
 realesrgan
