@@ -92,5 +92,6 @@ async def process_all(file: UploadFile = File(...), enhance: str = "false", x_ap
         return Response(content=str(e), status_code=500)
 
 @app.get("/")
+@app.get("/ping")
 def root():
     return {"status": "Active"}
