@@ -340,7 +340,12 @@
       updateNavWallet();
     }
 
-    
+    function handleLogout() {
+      if (confirm('क्या आप सचमुच लॉग-आउट करना चाहते हैं? / Are you sure you want to sign out?')) {
+        setStoredUser(null);
+        window.location.reload();
+      }
+    }
   // ================= GOOGLE AUTHENTICATION SYSTEM =================
   function loginWithGoogle() {
     if (window.GOOGLE_CLIENT_ID && typeof google !== 'undefined' && google.accounts && google.accounts.id) {
