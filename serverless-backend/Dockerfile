@@ -21,4 +21,4 @@ COPY runpod_handler.py .
 EXPOSE 8000
 
 # FastAPI via Uvicorn — Load Balancer Serverless
-CMD ["uvicorn", "app_runpod:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python3", "-m", "uvicorn", "app_runpod:app", "--host", "0.0.0.0", "--port", "8000"]
