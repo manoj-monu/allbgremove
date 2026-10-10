@@ -10,7 +10,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Firebase SDKs for Real Authentication & Cloud Database -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1614,6 +1617,13 @@
     }
     user.credits -= 1;
     setStoredUser(user);
+    if (fbDb && fbAuth && fbAuth.currentUser) {
+      try {
+        fbDb.collection('users').doc(fbAuth.currentUser.uid).update({
+          credits: firebase.firestore.FieldValue.increment(-1)
+        }).catch(e => console.warn("Credit sync:", e));
+      } catch(e) {}
+    }
     return true;
   }
 
@@ -1790,129 +1800,131 @@
   }
 
   
-  // ================= GOOGLE AUTHENTICATION SYSTEM =================
-  function loginWithGoogle() {
-    if (window.GOOGLE_CLIENT_ID && typeof google !== 'undefined' && google.accounts && google.accounts.id) {
-      try {
-        google.accounts.id.initialize({
-          client_id: window.GOOGLE_CLIENT_ID,
-          callback: handleGoogleCredentialResponse,
-          auto_select: false
-        });
-        google.accounts.id.prompt((notification) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            openGooglePromptModal();
-          }
-        });
-        return;
-      } catch(e) {
-        console.warn('GIS error, falling back to Google login modal:', e);
+  // ================= FIREBASE REAL AUTHENTICATION & CLOUD FIRESTORE =================
+  const firebaseConfig = {
+    apiKey: "AIzaSyB4uuBJNDlHHjLRjL9B7LfszMkQg7u4gmc",
+    authDomain: "allbgremove.firebaseapp.com",
+    projectId: "allbgremove",
+    storageBucket: "allbgremove.firebasestorage.app",
+    messagingSenderId: "260461105477",
+    appId: "1:260461105477:web:3f835a9882d0d74ae02e2c",
+    measurementId: "G-2EK8VGL82C"
+  };
+
+  let fbApp = null, fbAuth = null, fbDb = null, fbGoogleProvider = null;
+  try {
+    if (typeof firebase !== 'undefined') {
+      if (!firebase.apps.length) {
+        fbApp = firebase.initializeApp(firebaseConfig);
+      } else {
+        fbApp = firebase.app();
       }
+      fbAuth = firebase.auth();
+      fbDb = firebase.firestore();
+      fbGoogleProvider = new firebase.auth.GoogleAuthProvider();
+      fbGoogleProvider.setCustomParameters({ prompt: 'select_account' });
     }
-    openGooglePromptModal();
+  } catch(e) {
+    console.warn("Firebase initialization warning:", e);
   }
 
-  function handleGoogleCredentialResponse(response) {
-    if (!response || !response.credential) return;
-    try {
-      const parts = response.credential.split('.');
-      const payload = JSON.parse(atob(parts[1]));
-      processGoogleUser({
-        email: payload.email,
-        name: payload.name,
-        picture: payload.picture,
-        googleId: payload.sub
-      });
-    } catch(e) {
-      console.error('Error parsing Google JWT:', e);
-    }
-  }
-
-  function openGooglePromptModal() {
-    const modal = document.getElementById('googleAuthModal');
-    if (modal) {
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-  }
-
-  function closeGooglePromptModal() {
-    const modal = document.getElementById('googleAuthModal');
-    if (modal) {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-  }
-
-  function submitGooglePromptLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById('googlePromptEmail').value.trim();
-    const name = document.getElementById('googlePromptName').value.trim() || email.split('@')[0];
-    
-    if (!email || !email.includes('@')) {
-      alert('कृपया एक वैध Google/Gmail ईमेल आईडी दर्ज करें।');
-      return;
-    }
-
-    closeGooglePromptModal();
-    processGoogleUser({
-      email: email,
-      name: name,
-      picture: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=4285f4`,
-      googleId: 'g_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 12)
+  // Listen to real auth state changes across sessions
+  if (fbAuth) {
+    fbAuth.onAuthStateChanged(async (user) => {
+      if (user) {
+        await syncFirebaseUser(user);
+      }
     });
   }
 
-  function processGoogleUser(googleData) {
-    const email = googleData.email.toLowerCase().trim();
-    const users = getRegisteredUsers();
-    let existing = users.find(u => u.email.toLowerCase() === email);
+  // Sync user profile & credits with Firestore & LocalStorage
+  async function syncFirebaseUser(fbUser, extra = {}) {
+    let name = extra.name || fbUser.displayName || fbUser.email.split('@')[0];
+    let studio = extra.studio || (name + ' Photo Studio');
+    let phone = extra.phone || '';
+    let credits = 5;
 
-    let sessionUser;
-    if (existing) {
-      existing.name = googleData.name || existing.name;
-      existing.picture = googleData.picture || existing.picture;
-      existing.provider = 'google';
-      existing.lastLogin = new Date().toISOString();
-      saveRegisteredUsers(users);
-      sessionUser = existing;
-      alert(`✅ Google Sign-In सफल!\nस्वागत है, ${sessionUser.name}!\nआपके वॉलेट में ${sessionUser.credits} Credits उपलब्ध हैं।`);
-    } else {
-      const newUser = {
-        id: 'usr_g_' + Date.now().toString(36),
-        name: googleData.name || email.split('@')[0],
-        studio: (googleData.name || email.split('@')[0]) + ' Studio',
-        phone: '',
-        email: email,
-        password: '',
-        picture: googleData.picture,
-        provider: 'google',
-        credits: 5, // 5 Free Welcome Credits!
-        createdAt: new Date().toISOString()
-      };
-      users.push(newUser);
-      saveRegisteredUsers(users);
-      sessionUser = newUser;
-      alert(`🎉 Google से अकाउंट सफलतापूर्वक बन गया!\nस्वागत है, ${sessionUser.name}!\n🎁 आपको 5 Free Welcome Credits तुरंत दे दिए गए हैं!`);
+    try {
+      if (fbDb) {
+        const userRef = fbDb.collection('users').doc(fbUser.uid);
+        const snap = await userRef.get();
+        if (snap.exists) {
+          const d = snap.data();
+          credits = (typeof d.credits === 'number') ? d.credits : credits;
+          studio = d.studio || studio;
+          name = d.name || name;
+          phone = d.phone || phone;
+          await userRef.update({
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+            picture: fbUser.photoURL || d.picture || null
+          });
+        } else {
+          // New User: initialize with 5 Free Welcome Credits!
+          await userRef.set({
+            uid: fbUser.uid,
+            name: name,
+            email: fbUser.email,
+            picture: fbUser.photoURL || null,
+            studio: studio,
+            phone: phone,
+            credits: 5,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+      }
+    } catch(dbErr) {
+      console.warn("Firestore sync optional warning:", dbErr);
+      const existing = getStoredUser();
+      if (existing && existing.id === fbUser.uid && typeof existing.credits === 'number') {
+        credits = existing.credits;
+      }
     }
 
-    fetch('/api/auth/google', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(googleData)
-    }).catch(err => console.log('Backend sync:', err));
+    const sessionUser = {
+      id: fbUser.uid,
+      name: name,
+      email: fbUser.email,
+      picture: fbUser.photoURL || null,
+      studio: studio,
+      phone: phone,
+      credits: credits,
+      lastLogin: new Date().toISOString()
+    };
 
     setStoredUser(sessionUser);
-    closeAuthModal();
+    updateUserUI();
 
     if (typeof pendingPackForAuth !== 'undefined' && pendingPackForAuth) {
       const p = pendingPackForAuth;
       pendingPackForAuth = null;
       openRechargeModal(p);
-    } else if (typeof pendingPack !== 'undefined' && pendingPack) {
-      const p = pendingPack;
-      pendingPack = null;
-      if (typeof buyPack === 'function') buyPack(p.name, p.amount, p.credits);
+    }
+    return sessionUser;
+  }
+
+  // REAL GOOGLE SIGN-IN POPUP
+  async function loginWithGoogle() {
+    if (!fbAuth || !fbGoogleProvider) {
+      alert('Firebase Auth लोड हो रहा है, कृपया 1 सेकंड बाद पुनः प्रयास करें।');
+      return;
+    }
+    try {
+      const result = await fbAuth.signInWithPopup(fbGoogleProvider);
+      const user = result.user;
+      const sessionUser = await syncFirebaseUser(user);
+      closeAuthModal();
+      alert('✅ Google से Sign In सफल!\nस्वागत है, ' + sessionUser.name + '!\nउपलब्ध क्रेडिट्स: ' + sessionUser.credits);
+    } catch (err) {
+      console.error("Firebase Google Auth Error:", err);
+      if (err.code === 'auth/popup-closed-by-user') {
+        return; // Popup closed by user
+      }
+      if (err.code === 'auth/unauthorized-domain') {
+        alert('⚠️ Firebase Notice:\nकृपया Firebase Console > Authentication > Settings > Authorized Domains में allbgremove.com जोड़ें।');
+      } else {
+        alert('Google Sign-In: ' + (err.message || 'त्रुटि हुई।'));
+      }
     }
   }
 
@@ -1974,76 +1986,20 @@
     }
   }
 
-  // REAL LOGIN HANDLER
-  function handleLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-    const password = document.getElementById('loginPassword').value;
-    const errorEl = document.getElementById('loginErrorMsg');
-
-    if (!email || !password) {
-      if (errorEl) {
-        errorEl.textContent = 'कृपया ईमेल और पासवर्ड दोनों दर्ज करें।';
-        errorEl.classList.remove('hidden');
-      }
-      return;
-    }
-
-    const users = getRegisteredUsers();
-    const foundUser = users.find(u => u.email.toLowerCase() === email);
-
-    if (!foundUser) {
-      if (errorEl) {
-        errorEl.innerHTML = '❌ यह ईमेल रजिस्टर्ड नहीं है! कृपया <b>Create Account</b> टैब से नया अकाउंट बनाएं।';
-        errorEl.classList.remove('hidden');
-      }
-      return;
-    }
-
-    if (foundUser.password !== password) {
-      if (errorEl) {
-        errorEl.innerHTML = '❌ गलत पासवर्ड! कृपया सही पासवर्ड दर्ज करें।';
-        errorEl.classList.remove('hidden');
-      }
-      return;
-    }
-
-    if (errorEl) errorEl.classList.add('hidden');
-    
-    const sessionUser = {
-      id: foundUser.id,
-      name: foundUser.name,
-      studio: foundUser.studio || foundUser.name + ' Studio',
-      phone: foundUser.phone || '',
-      email: foundUser.email,
-      credits: foundUser.credits !== undefined ? foundUser.credits : 5,
-      lastLogin: new Date().toISOString()
-    };
-    setStoredUser(sessionUser);
-    closeAuthModal();
-
-    alert('✅ स्वागत है, ' + sessionUser.name + '!\nआप सफलतापूर्वक Sign In हो चुके हैं।\nआपके वॉलेट में ' + sessionUser.credits + ' Credits उपलब्ध हैं।');
-
-    if (pendingPackForAuth) {
-      const p = pendingPackForAuth;
-      pendingPackForAuth = null;
-      openRechargeModal(p);
-    }
-  }
-
-  // REAL SIGN UP HANDLER
-  function handleSignUp(e) {
+  // REAL EMAIL & PASSWORD SIGN UP
+  async function handleSignUp(e) {
     e.preventDefault();
     const name = document.getElementById('signupName').value.trim();
-    const studio = document.getElementById('signupStudio').value.trim();
+    const studio = document.getElementById('signupStudio').value.trim() || (name + ' Photo Studio');
     const phone = document.getElementById('signupPhone').value.trim();
     const email = document.getElementById('signupEmail').value.trim().toLowerCase();
     const password = document.getElementById('signupPassword').value;
     const errorEl = document.getElementById('signupErrorMsg');
+    const submitBtn = e.target.querySelector('button[type="submit"]');
 
     if (!name || !email || !password) {
       if (errorEl) {
-        errorEl.textContent = 'नाम, ईमेल और पासवर्ड अनिवार्य हैं।';
+        errorEl.textContent = 'कृपया नाम, ईमेल और पासवर्ड दर्ज करें।';
         errorEl.classList.remove('hidden');
       }
       return;
@@ -2057,49 +2013,86 @@
       return;
     }
 
-    const users = getRegisteredUsers();
-    if (users.some(u => u.email.toLowerCase() === email)) {
+    try {
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> खाता बन रहा है...';
+      }
+      if (errorEl) errorEl.classList.add('hidden');
+
+      const userCred = await fbAuth.createUserWithEmailAndPassword(email, password);
+      const user = userCred.user;
+      await user.updateProfile({ displayName: name });
+      const sessionUser = await syncFirebaseUser(user, { name, studio, phone, isNew: true });
+      closeAuthModal();
+      alert('🎉 बधाई हो! आपका खाता सफलतापूर्वक बन गया है!\nस्वागत है, ' + sessionUser.name + '!\n🎁 आपको 5 Free Welcome Credits मिल गए हैं!');
+    } catch (err) {
+      console.error("Firebase SignUp Error:", err);
       if (errorEl) {
-        errorEl.innerHTML = '⚠️ यह ईमेल पहले से रजिस्टर्ड है! कृपया <b>Sign In</b> टैब पर जाकर लॉगिन करें।';
+        let msg = err.message;
+        if (err.code === 'auth/email-already-in-use') {
+          msg = '⚠️ यह ईमेल पहले से रजिस्टर्ड है! कृपया <b>Sign In</b> टैब पर जाकर लॉगिन करें।';
+        } else if (err.code === 'auth/weak-password') {
+          msg = 'पासवर्ड कमजोर है। कम से कम 6 अक्षरों का पासवर्ड रखें।';
+        } else if (err.code === 'auth/invalid-email') {
+          msg = 'अमान्य ईमेल पता। कृपया सही ईमेल दर्ज करें।';
+        }
+        errorEl.innerHTML = msg;
+        errorEl.classList.remove('hidden');
+      }
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-user-plus mr-2"></i> Create Account with 5 Free Credits';
+      }
+    }
+  }
+
+  // REAL EMAIL & PASSWORD SIGN IN
+  async function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginErrorMsg');
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+
+    if (!email || !password) {
+      if (errorEl) {
+        errorEl.textContent = 'कृपया ईमेल और पासवर्ड दोनों दर्ज करें।';
         errorEl.classList.remove('hidden');
       }
       return;
     }
 
-    const newUser = {
-      id: 'usr_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
-      name: name,
-      studio: studio || name + ' Photo Studio',
-      phone: phone || '',
-      email: email,
-      password: password,
-      credits: 5,
-      createdAt: new Date().toISOString()
-    };
+    try {
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> लॉगिन हो रहा है...';
+      }
+      if (errorEl) errorEl.classList.add('hidden');
 
-    users.push(newUser);
-    saveRegisteredUsers(users);
-
-    if (errorEl) errorEl.classList.add('hidden');
-
-    const sessionUser = {
-      id: newUser.id,
-      name: newUser.name,
-      studio: newUser.studio,
-      phone: newUser.phone,
-      email: newUser.email,
-      credits: newUser.credits,
-      createdAt: newUser.createdAt
-    };
-    setStoredUser(sessionUser);
-    closeAuthModal();
-
-    alert('🎉 बधाई हो ' + name + '!\nआपका अकाउंट सफलतापूर्वक बन गया है।\n🎁 आपको 5 Free Welcome Credits तुरंत दे दिए गए हैं!');
-
-    if (pendingPackForAuth) {
-      const p = pendingPackForAuth;
-      pendingPackForAuth = null;
-      openRechargeModal(p);
+      const userCred = await fbAuth.signInWithEmailAndPassword(email, password);
+      const user = userCred.user;
+      const sessionUser = await syncFirebaseUser(user);
+      closeAuthModal();
+      alert('✅ स्वागत है, ' + sessionUser.name + '!\nआप सफलतापूर्वक Sign In हो चुके हैं।\nउपलब्ध क्रेडिट्स: ' + sessionUser.credits);
+    } catch (err) {
+      console.error("Firebase Login Error:", err);
+      if (errorEl) {
+        let msg = err.message;
+        if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+          msg = '❌ ईमेल या पासवर्ड अमान्य है। कृपया सही क्रेडेंशियल दर्ज करें।';
+        } else if (err.code === 'auth/too-many-requests') {
+          msg = 'सुरक्षा कारणों से यह खाता अस्थायी रूप से ब्लॉक किया गया है। थोड़ी देर बाद प्रयास करें।';
+        }
+        errorEl.innerHTML = msg;
+        errorEl.classList.remove('hidden');
+      }
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket mr-2"></i> Sign In to Account';
+      }
     }
   }
 
@@ -2142,6 +2135,12 @@
     }
     const menu = document.getElementById('userProfileDropdown');
     if (menu) menu.classList.add('hidden');
+
+    try {
+      if (fbAuth) fbAuth.signOut();
+    } catch(err) {
+      console.warn("Firebase signOut error:", err);
+    }
 
     // Remove user session immediately
     localStorage.removeItem('passportsnap_user');
@@ -2264,6 +2263,14 @@
     }
     user.credits = (user.credits || 0) + activeRechargePack.credits;
     setStoredUser(user);
+
+    if (fbDb && fbAuth && fbAuth.currentUser) {
+      try {
+        fbDb.collection('users').doc(fbAuth.currentUser.uid).update({
+          credits: firebase.firestore.FieldValue.increment(activeRechargePack.credits)
+        }).catch(e => console.warn("Firestore recharge credit update:", e));
+      } catch(e) {}
+    }
 
     // Save transaction
     let txns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
