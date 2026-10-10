@@ -105,12 +105,12 @@ def process_bg(image):
     
     input_tensor = transform(image).unsqueeze(0).to(device)
     
-    with torch.no_grad():
-        preds = m(input_tensor)[-1].sigmoid().cpu()
+    with torch.inference_mode():
+        preds = m(input_tensor)[-1].sigmoid()
     
-    pred = preds[0].squeeze()
+    pred = preds[0].squeeze().cpu()
     mask = transforms.ToPILImage()(pred)
-    mask = mask.resize(original_size, Image.LANCZOS)
+    mask = mask.resize(original_size, Image.BILINEAR)
     
     result = image.convert("RGBA")
     result.putalpha(mask)
@@ -123,6 +123,11 @@ async def process_all(file: UploadFile = File(...), enhance: str = "false", x_ap
     try:
         data = await file.read()
         img_pil = Image.open(io.BytesIO(data)).convert("RGB")
+        
+        # Clamp to max 1280px for passport photos (faster inference, minimal GPU billable ms)
+        max_dim = 1280
+        if max(img_pil.size) > max_dim:
+            img_pil.thumbnail((max_dim, max_dim), Image.Resampling.LANCZOS)
         
         is_enhance = enhance.lower() in ("true", "1", "yes")
         
@@ -137,7 +142,7 @@ async def process_all(file: UploadFile = File(...), enhance: str = "false", x_ap
         result = process_bg(img_pil)
         
         buf = io.BytesIO()
-        result.save(buf, format="PNG")
+        result.save(buf, format="PNG", compress_level=1)
         return Response(content=buf.getvalue(), media_type="image/png")
     except Exception as e:
         import traceback
