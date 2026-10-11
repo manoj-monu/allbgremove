@@ -400,19 +400,7 @@
     transform: rotate(-90deg);
   }
 
-  /* Anti-Screenshot Print & Screen Capture Guard */
-  @media print {
-    body { background: #000 !important; }
-    body > *:not(#antiScreenshotShield) { display: none !important; }
-    #antiScreenshotShield {
-      display: flex !important;
-      position: fixed !important;
-      inset: 0 !important;
-      background: #000 !important;
-      color: #fff !important;
-      z-index: 9999999 !important;
-    }
-  }
+
 
   /* Anti-Screenshot Mobile & Touch Protection */
   canvas, img, #cropWrapper, #previewWrap, .photo-preview-wrap, #mainCanvas {
@@ -3338,141 +3326,6 @@
       }
     });
 
-    // 6. Anti-Screenshot Blanking Shield (Desktop & Mobile: PrintScreen, Snipping Tool, Vol+Power, 3-Finger Gesture, & Blur)
-    const getBlankShield = () => document.getElementById('antiScreenshotShield');
-    let isFilePicking = false;
-    let blankTimer = null;
-
-    const triggerBlankShield = (duration = 2800) => {
-      const shield = getBlankShield();
-      if (!shield) return;
-      shield.style.display = 'flex';
-      
-      // Wipe clipboard so screenshot bitmap is emptied
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText('').catch(() => {});
-      }
-      
-      showProtectedToast('🔒 Screenshots Disabled! Screen protected by allbgremove.com');
-
-      if (blankTimer) clearTimeout(blankTimer);
-      if (duration > 0) {
-        blankTimer = setTimeout(() => {
-          shield.style.display = 'none';
-        }, duration);
-      }
-    };
-
-    const hideBlankShield = () => {
-      if (blankTimer) clearTimeout(blankTimer);
-      const shield = getBlankShield();
-      if (shield) shield.style.display = 'none';
-    };
-
-    // Helper to identify desktop and mobile screenshot keys
-    const isScreenshotKeyEvent = (e) => {
-      const k = (e.key || '').toLowerCase();
-      const c = (e.code || '').toLowerCase();
-      const code = e.keyCode || e.which || 0;
-      return (
-        k === 'printscreen' || c === 'printscreen' || code === 44 ||
-        // Mobile Android / iOS Volume buttons used in screenshot combos
-        k === 'volumedown' || k === 'audiovolumedown' || c === 'audiovolumedown' || code === 25 || code === 174 ||
-        k === 'volumeup' || k === 'audiovolumeup' || c === 'audiovolumeup' || code === 24 || code === 175 ||
-        k === 'power' || c === 'power' ||
-        // Desktop shortcuts (Win+Shift+S, Ctrl+Shift+S, Ctrl+P)
-        ((e.ctrlKey || e.metaKey) && (k === 's' || k === 'p' || e.shiftKey))
-      );
-    };
-
-    // Keydown detection (PrintScreen, Volume Down, Volume Up, Power)
-    window.addEventListener('keydown', function(e) {
-      if (isScreenshotKeyEvent(e)) {
-        if (e.key === 'p' || e.key === 'P' || e.key === 's' || e.key === 'S') {
-          if (e.ctrlKey || e.metaKey) e.preventDefault();
-        }
-        triggerBlankShield(3200);
-      }
-    }, true);
-
-    // Keyup detection
-    window.addEventListener('keyup', function(e) {
-      if (isScreenshotKeyEvent(e)) {
-        triggerBlankShield(3200);
-      }
-    }, true);
-
-    // 📱 MOBILE 3-Finger & 4-Finger Screenshot Gesture Detection (Xiaomi, Realme, Oppo, Vivo, OnePlus, Samsung)
-    window.addEventListener('touchstart', function(e) {
-      if (e.touches && e.touches.length >= 3) {
-        if (e.cancelable) e.preventDefault();
-        e.stopPropagation();
-        triggerBlankShield(3500);
-      }
-    }, { capture: true, passive: false });
-
-    window.addEventListener('touchmove', function(e) {
-      if (e.touches && e.touches.length >= 3) {
-        if (e.cancelable) e.preventDefault();
-        e.stopPropagation();
-        triggerBlankShield(3500);
-      }
-    }, { capture: true, passive: false });
-
-    // File picker tracking so camera / file upload doesn't trigger blank
-    const fileIn = document.getElementById('fileIn');
-    if (fileIn) {
-      fileIn.addEventListener('click', () => { isFilePicking = true; });
-      fileIn.addEventListener('change', () => { setTimeout(() => { isFilePicking = false; }, 1000); });
-    }
-
-    // 📱 MOBILE & DESKTOP: Visibility Change (Fires on Android screenshot capture, assistant, quick settings, app switcher)
-    document.addEventListener('visibilitychange', function() {
-      if (isFilePicking) return;
-      if (document.hidden || document.visibilityState === 'hidden') {
-        const appContainer = document.getElementById('app-container');
-        if (appContainer && appContainer.style.display !== 'none') {
-          const shield = getBlankShield();
-          if (shield) shield.style.display = 'flex';
-        }
-      } else {
-        setTimeout(() => {
-          hideBlankShield();
-        }, 800);
-      }
-    });
-
-    // Pagehide event
-    window.addEventListener('pagehide', function() {
-      if (isFilePicking) return;
-      const appContainer = document.getElementById('app-container');
-      if (appContainer && appContainer.style.display !== 'none') {
-        const shield = getBlankShield();
-        if (shield) shield.style.display = 'flex';
-      }
-    });
-
-    // Window blur: triggers when Snipping Tool or mobile notification shade / screenshot modal takes focus
-    window.addEventListener('blur', function() {
-      if (isFilePicking) return;
-      const appContainer = document.getElementById('app-container');
-      if (appContainer && appContainer.style.display !== 'none') {
-        const shield = getBlankShield();
-        if (!shield) return;
-        shield.style.display = 'flex';
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText('').catch(() => {});
-        }
-      }
-    });
-
-    // Window focus: restore view with slight delay
-    window.addEventListener('focus', function() {
-      isFilePicking = false;
-      setTimeout(() => {
-        hideBlankShield();
-      }, 500);
-    });
   })();
 
   let toastTimer = null;
@@ -3492,21 +3345,7 @@
 
 </script>
 
-  <!-- ================= ANTI-SCREENSHOT BLANK SHIELD ================= -->
-  <div id="antiScreenshotShield" style="position:fixed; inset:0; z-index:9999999; background:#000000; display:none; flex-direction:column; align-items:center; justify-content:center; color:white; text-align:center; padding:20px; font-family:'Plus Jakarta Sans', sans-serif;">
-    <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:24px; padding:36px 32px; max-width:440px; box-shadow:0 20px 50px rgba(0,0,0,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);">
-      <div style="width:68px; height:68px; border-radius:50%; background:rgba(99,102,241,0.25); border:2px solid #6366f1; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; color:#818cf8; font-size:28px;">
-        <i class="fa-solid fa-shield-halved"></i>
-      </div>
-      <h2 style="font-size:22px; font-weight:800; color:#ffffff; margin-bottom:8px; letter-spacing:-0.3px;">Protected Content</h2>
-      <p style="font-size:14px; color:#94a3b8; line-height:1.5; margin-bottom:18px;">
-        Screenshots and screen capture are disabled to protect image rights. Please return to the window to continue.
-      </p>
-      <div style="display:inline-block; font-size:12px; font-weight:700; color:#a5b4fc; background:rgba(99,102,241,0.25); border:1px solid rgba(99,102,241,0.4); padding:6px 14px; border-radius:20px;">
-        🔒 allbgremove.com Anti-Screenshot Shield
-      </div>
-    </div>
-  </div>
+
 
   <!-- ================= AUTH MODAL (Login & Sign Up) ================= -->
   <div id="authModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
