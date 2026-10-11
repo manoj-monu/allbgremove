@@ -265,36 +265,28 @@
     50% { box-shadow: 0 10px 30px rgba(16, 185, 129, 0.65); transform: scale(1.01); }
   }
 
-  /* Clear Highlighted Action Buttons */
-  .btn-align-center {
-    background: #eff6ff !important;
-    border: 1.5px solid #3b82f6 !important;
-    color: #1d4ed8 !important;
-    font-weight: 800 !important;
+  /* Position & Action Buttons (Clean & Default-Friendly) */
+  .btn-sheet-pos {
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #334155 !important;
+    font-weight: 700 !important;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
   }
-  .btn-align-center:hover { background: #dbeafe !important; transform: translateY(-1px); }
-
-  .btn-align-topleft {
-    background: #fefce8 !important;
-    border: 1.5px solid #eab308 !important;
-    color: #854d0e !important;
+  .btn-sheet-pos:hover {
+    background: #f8fafc !important;
+    border-color: #94a3b8 !important;
+    color: #0f172a !important;
+    transform: translateY(-1px);
+  }
+  .btn-sheet-pos.active {
+    background: #eef2ff !important;
+    border: 2px solid #4f46e5 !important;
+    color: #4338ca !important;
     font-weight: 800 !important;
-    cursor: pointer;
-    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2) !important;
   }
-  .btn-align-topleft:hover { background: #fef9c3 !important; transform: translateY(-1px); }
-
-  .btn-align-fill {
-    background: #ecfdf5 !important;
-    border: 1.5px solid #10b981 !important;
-    color: #065f46 !important;
-    font-weight: 800 !important;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-align-fill:hover { background: #d1fae5 !important; transform: translateY(-1px); }
   
   canvas { max-width: 100%; max-height: 65vh; object-fit: contain; box-shadow: 0 15px 35px rgba(0,0,0,0.15); border-radius: 8px; -webkit-touch-callout: none !important; -webkit-user-select: none !important; user-select: none !important; -webkit-user-drag: none !important; }
   
@@ -1335,25 +1327,36 @@
           <div class="form-group" style="margin-bottom:14px;">
             <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:6px;"><i class="fa-solid fa-table-cells text-primary mr-1"></i> Auto-Fit Grid (Scale to fit)</label>
             <select id="gridLayout" onchange="onGridLayoutChange()" style="font-weight:700;">
-              <option value="actual">Actual Size (From Crop Step)</option>
-              <option value="2x2">Fit 4 Photos (2x2)</option>
-              <option value="3x2">Fit 6 Photos (3x2)</option>
-              <option value="4x2" selected>Fit 8 Photos (4x2 / 2x4 • Standard 4x6)</option>
+              <option value="4x3" selected>Fit 12 Photos (4x3 • 3 Columns x 4 Rows)</option>
+              <option value="4x2">Fit 8 Photos (4x2 / 2x4 • 2 Columns x 4 Rows)</option>
+              <option value="3x2">Fit 6 Photos (3x2 • 2 Columns x 3 Rows)</option>
+              <option value="2x2">Fit 4 Photos (2x2 • 2 Columns x 2 Rows)</option>
               <option value="3x3">Fit 9 Photos (3x3)</option>
-              <option value="4x3">Fit 12 Photos (4x3)</option>
               <option value="5x3">Fit 15 Photos (5x3)</option>
               <option value="4x4">Fit 16 Photos (4x4)</option>
               <option value="5x4">Fit 20 Photos (5x4)</option>
               <option value="6x4">Fit 24 Photos (6x4)</option>
               <option value="6x5">Fit 30 Photos (5x6 - A4 Studio)</option>
-              <option value="8x4">Fit 32 Photos (8x4)</option>
-              <option value="6x6">Fit 36 Photos (6x6)</option>
+              <option value="actual">Actual Size (From Crop Step)</option>
             </select>
           </div>
 
           <div class="form-group" style="margin-bottom:14px;">
-            <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:6px;"><i class="fa-solid fa-hashtag text-primary mr-1"></i> Number of Photos (फोटो संख्या)</label>
-            <input type="number" id="photoCount" value="8" min="1" max="100" onchange="updatePrintLayout()" style="font-weight:700;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label style="font-size:12px; font-weight:800; color:var(--text); margin:0;">
+                <i class="fa-solid fa-hashtag text-primary mr-1"></i> NUMBER OF PHOTOS (फोटो संख्या: 1 से 12)
+              </label>
+              <span id="photoCountDisplay" style="font-size:11.5px; font-weight:800; color:var(--primary); background:#eef2ff; padding:2px 8px; border-radius:8px;">3 Photos (Default)</span>
+            </div>
+            <input type="number" id="photoCount" value="3" min="1" max="12" oninput="onPhotoCountChanged(this.value)" onchange="onPhotoCountChanged(this.value)" style="font-weight:800; font-size:16px;">
+            
+            <!-- Quick Preset Count Buttons -->
+            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:8px;">
+              <button type="button" class="btn btn-outline" id="btnCount_3" onclick="setPhotoCount(3)" style="padding:7px 4px; font-size:12px; font-weight:800; border-radius:8px; background:#eef2ff; border:2px solid #4f46e5; color:#4338ca;">3 Photos</button>
+              <button type="button" class="btn btn-outline" id="btnCount_6" onclick="setPhotoCount(6)" style="padding:7px 4px; font-size:12px; font-weight:800; border-radius:8px;">6 Photos</button>
+              <button type="button" class="btn btn-outline" id="btnCount_9" onclick="setPhotoCount(9)" style="padding:7px 4px; font-size:12px; font-weight:800; border-radius:8px;">9 Photos</button>
+              <button type="button" class="btn btn-outline" id="btnCount_12" onclick="setPhotoCount(12)" style="padding:7px 4px; font-size:12px; font-weight:800; border-radius:8px;">12 (Full)</button>
+            </div>
           </div>
 
           <div class="form-group" style="display:flex; gap:10px; margin-bottom:14px;">
@@ -1378,19 +1381,19 @@
             </div>
           </div>
 
-          <!-- Highlighted Distinct Position Buttons -->
+          <!-- Clean Uniform Default Position Buttons -->
           <div class="form-group" style="margin-bottom:14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px 12px;">
             <label style="font-size:11.5px; font-weight:800; color:var(--text); margin-bottom:8px; display:block;">
-              <i class="fa-solid fa-arrows-to-dot text-indigo-600 mr-1"></i> Photo Position (फोटो पोजीशन सेट करें):
+              <i class="fa-solid fa-arrows-to-dot text-indigo-600 mr-1"></i> PHOTO POSITION (फोटो अलाइनमेंट):
             </label>
             <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;">
-              <button type="button" class="btn btn-align-center" style="padding:9px 6px; font-size:12.5px; border-radius:9px; box-shadow:0 1px 4px rgba(59,130,246,0.15);" onclick="centerPhotosOnSheet()" title="Center align photos on sheet">
-                🎯 Center (बीच)
-              </button>
-              <button type="button" class="btn btn-align-topleft" style="padding:9px 6px; font-size:12.5px; border-radius:9px; box-shadow:0 1px 4px rgba(234,179,8,0.15);" onclick="topLeftPhotosOnSheet()" title="Top-Left align photos on sheet">
+              <button type="button" id="posBtn_topleft" class="btn btn-sheet-pos active" style="padding:9px 6px; font-size:12.5px; border-radius:9px;" onclick="setSheetPosition('topleft')" title="Top-Left align photos on sheet">
                 📐 Top-Left (कोने)
               </button>
-              <button type="button" class="btn btn-align-fill" style="padding:9px 6px; font-size:12.5px; border-radius:9px; box-shadow:0 1px 4px rgba(16,185,129,0.15);" onclick="distributeEvenlyOnSheet()" title="Fill page evenly">
+              <button type="button" id="posBtn_center" class="btn btn-sheet-pos" style="padding:9px 6px; font-size:12.5px; border-radius:9px;" onclick="setSheetPosition('center')" title="Center align photos on sheet">
+                🎯 Center (बीच)
+              </button>
+              <button type="button" id="posBtn_fill" class="btn btn-sheet-pos" style="padding:9px 6px; font-size:12.5px; border-radius:9px;" onclick="setSheetPosition('fill')" title="Fill page evenly">
                 ✨ Fill (फैलाएं)
               </button>
             </div>
@@ -2229,8 +2232,78 @@
     applyAdjustments();
     finalImage.src = document.getElementById('adjCanvas').toDataURL('image/png');
     finalImage.onload = () => {
-      updatePrintLayout();
+      // Set default 4x6 Portrait, 4x3 grid (3 cols x 4 rows), 3 photos, topleft position
+      const pSize = document.getElementById('paperSize');
+      if (pSize) pSize.value = '4x6P';
+      const gLayout = document.getElementById('gridLayout');
+      if (gLayout) gLayout.value = '4x3';
+      
+      setPhotoCount(3);
+      setSheetPosition('topleft');
       goToStep(5);
+    }
+  }
+
+  function setPhotoCount(count) {
+    const input = document.getElementById('photoCount');
+    if (input) {
+      input.value = count;
+      onPhotoCountChanged(count);
+    }
+  }
+
+  function onPhotoCountChanged(val) {
+    let num = parseInt(val) || 1;
+    if (num < 1) num = 1;
+    if (num > 12) num = 12;
+    const input = document.getElementById('photoCount');
+    if (input) input.value = num;
+    
+    // Update count display badge
+    const badge = document.getElementById('photoCountDisplay');
+    if (badge) {
+      badge.textContent = num + (num === 1 ? ' Photo' : ' Photos');
+    }
+    
+    // Update preset buttons active state
+    [3, 6, 9, 12].forEach(n => {
+      const btn = document.getElementById('btnCount_' + n);
+      if (btn) {
+        if (num === n) {
+          btn.style.background = '#eef2ff';
+          btn.style.borderColor = '#4f46e5';
+          btn.style.color = '#4338ca';
+          btn.style.boxShadow = '0 2px 6px rgba(79,70,229,0.2)';
+        } else {
+          btn.style.background = 'white';
+          btn.style.borderColor = '#cbd5e1';
+          btn.style.color = '#475569';
+          btn.style.boxShadow = 'none';
+        }
+      }
+    });
+
+    updatePrintLayout();
+  }
+
+  function setSheetPosition(pos) {
+    ['topleft', 'center', 'fill'].forEach(p => {
+      const btn = document.getElementById('posBtn_' + p);
+      if (btn) {
+        if (p === pos) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      }
+    });
+
+    if (pos === 'topleft') {
+      topLeftPhotosOnSheet();
+    } else if (pos === 'center') {
+      centerPhotosOnSheet();
+    } else if (pos === 'fill') {
+      distributeEvenlyOnSheet();
     }
   }
 
@@ -2360,7 +2433,12 @@
     const val = document.getElementById('gridLayout').value;
     if (val !== 'actual') {
        const parts = val.split('x').map(Number);
-       document.getElementById('photoCount').value = parts[0] * parts[1];
+       const maxCount = parts[0] * parts[1];
+       const input = document.getElementById('photoCount');
+       if (input) {
+         input.max = maxCount;
+         onPhotoCountChanged(input.value);
+       }
     }
     isCustomOffset = false;
     updatePrintLayout();
