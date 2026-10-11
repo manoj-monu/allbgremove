@@ -112,14 +112,15 @@
           ⭐ Unlimited Plan
         </div>
         <div>
-          <span class="text-xs font-extrabold tracking-wider uppercase text-secondary bg-pink-50 px-3 py-1 rounded-full">Pro Unlimited</span>
+          <span class="text-xs font-extrabold tracking-wider uppercase text-secondary bg-pink-50 px-3 py-1 rounded-full">1 Month Validity</span>
           <h3 class="text-2xl font-bold mt-4 mb-2 text-gray-900">₹99 Unlimited</h3>
           <p class="text-sm text-gray-500 mb-6">Unlimited access for studios, creators & cyber cafes.</p>
           <div class="flex items-baseline gap-1 mb-6">
             <span class="text-4xl font-extrabold text-gray-900">₹99</span>
-            <span class="text-gray-500 text-sm">/ Unlimited photos</span>
+            <span class="text-gray-500 text-sm">/ 1 Month Validity</span>
           </div>
           <ul class="space-y-3 text-sm text-gray-600 mb-8 border-t pt-6">
+            <li class="flex items-center gap-3"><i class="fa-solid fa-calendar-check text-primary"></i> <strong>Validity: 1 Month (30 Days Unlimited)</strong></li>
             <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> <strong>Unlimited Wallet Credits & Downloads</strong></li>
             <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> AI HD Face Enhancement & Auto Retouch</li>
             <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> All Passport, Visa, PAN & Stamp Sizes</li>
@@ -129,8 +130,8 @@
             <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Priority 24/7 Support</li>
           </ul>
         </div>
-        <button onclick="buyPack('Unlimited Plan', 99, 9999)" class="w-full py-3.5 px-4 bg-gradient-to-r from-primary to-secondary hover:opacity-95 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-bolt"></i> Subscribe ₹99 Unlimited
+        <button onclick="buyPack('1 Month Unlimited Plan', 99, 9999)" class="w-full py-3.5 px-4 bg-gradient-to-r from-primary to-secondary hover:opacity-95 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-bolt"></i> Subscribe ₹99 (1 Month Unlimited)
         </button>
       </div>
 
@@ -200,7 +201,11 @@
       <div class="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-200">
         <div class="flex justify-between items-center mb-2">
           <span class="text-gray-600 text-sm">Selected Pack:</span>
-          <span class="font-bold text-gray-900" id="modalPackName">Unlimited Plan</span>
+          <span class="font-bold text-gray-900" id="modalPackName">1 Month Unlimited Plan</span>
+        </div>
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-gray-600 text-sm">Plan Validity:</span>
+          <span class="font-bold text-emerald-600">1 Month (30 Days)</span>
         </div>
         <div class="flex justify-between items-center mb-2">
           <span class="text-gray-600 text-sm">Credits Added:</span>
@@ -281,7 +286,7 @@
   </footer>
 
   <script>
-    let selectedPack = { name: 'Unlimited Plan', amount: 99, credits: 9999 };
+    let selectedPack = { name: '1 Month Unlimited Plan', amount: 99, credits: 9999 };
     let pendingPack = null;
     let currentAuthTab = 'login';
 

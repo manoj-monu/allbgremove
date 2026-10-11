@@ -771,16 +771,17 @@
         
         <!-- Plan 2: Unlimited 99 -->
         <div class="border-2 border-primary rounded-3xl p-8 hover:shadow-2xl transition bg-white shadow-xl shadow-indigo-100 relative flex flex-col justify-between transform md:-translate-y-2">
-          <div class="absolute -top-3.5 right-6 bg-gradient-to-r from-primary to-secondary text-white text-xs font-extrabold px-4 py-1 rounded-full shadow-md">Unlimited Plan</div>
+          <div class="absolute -top-3.5 right-6 bg-gradient-to-r from-primary to-secondary text-white text-xs font-extrabold px-4 py-1 rounded-full shadow-md">1 Month Validity</div>
           <div>
             <span class="text-xs font-bold text-primary uppercase tracking-wider bg-indigo-50 px-3 py-1 rounded-full">Best Value</span>
             <h3 class="font-bold text-2xl mt-4 mb-1 text-gray-900">Pro Unlimited</h3>
             <p class="text-gray-500 text-sm mb-4 border-b pb-4">Full access for creators & studios</p>
             <div class="flex items-baseline gap-1 mb-6">
               <span class="text-4xl font-extrabold text-gray-900">₹99</span>
-              <span class="text-gray-500 text-sm">/ Unlimited photos</span>
+              <span class="text-gray-500 text-sm">/ 1 Month Validity</span>
             </div>
             <ul class="space-y-3.5 text-sm text-gray-600 mb-8">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-calendar-check text-indigo-600"></i> <strong>Validity: 1 Month (30 Days Unlimited)</strong></li>
               <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> <strong>Unlimited Photo Processing</strong></li>
               <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Unlimited Wallet Credits</li>
               <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> AI HD Face Enhancement</li>
@@ -790,7 +791,7 @@
             </ul>
           </div>
           <button onclick="openRechargeModal()" class="block w-full py-3.5 text-center bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-xl hover:opacity-95 transition shadow-lg shadow-indigo-200">
-            Subscribe Now - ₹99
+            Subscribe Now - ₹99 / Month
           </button>
         </div>
       </div>
@@ -2330,7 +2331,7 @@
 
   // ================= REAL AUTHENTICATION & WALLET SYSTEM =================
   let currentAuthTab = 'login';
-  let activeRechargePack = { name: 'Unlimited Plan', amount: 99, credits: 9999 };
+  let activeRechargePack = { name: '1 Month Unlimited Plan', amount: 99, credits: 9999 };
   let pendingPackForAuth = null;
 
   function getRegisteredUsers() {
@@ -3663,12 +3664,12 @@
       <!-- Pack Select Cards -->
       <div class="mb-6" id="packCardsContainer">
         <!-- Single Unlimited Pack -->
-        <div onclick="selectRechargePack('Unlimited Plan', 99, 9999, this)" class="pack-card active cursor-pointer border-2 border-secondary bg-pink-50/40 rounded-2xl p-5 text-center transition relative shadow-sm hover:shadow-md">
-          <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-secondary text-white text-[11px] font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider">Unlimited Plan</span>
+        <div onclick="selectRechargePack('1 Month Unlimited Plan', 99, 9999, this)" class="pack-card active cursor-pointer border-2 border-secondary bg-pink-50/40 rounded-2xl p-5 text-center transition relative shadow-sm hover:shadow-md">
+          <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-secondary text-white text-[11px] font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider">1 Month Validity</span>
           <span class="text-xs font-bold text-secondary uppercase tracking-wide">Studio & Personal Pro</span>
-          <div class="text-3xl font-black text-gray-900 my-2">₹99</div>
-          <span class="text-xs font-extrabold text-green-700 bg-green-100 px-3 py-1 rounded-full">Unlimited Photos & Credits</span>
-          <p class="text-xs text-gray-500 mt-2">No watermark • 300 DPI High Resolution • All AI Features</p>
+          <div class="text-3xl font-black text-gray-900 my-2">₹99 <span class="text-sm font-normal text-gray-500">/ 1 Month</span></div>
+          <span class="text-xs font-extrabold text-green-700 bg-green-100 px-3 py-1 rounded-full">Validity: 1 Month (30 Days Unlimited)</span>
+          <p class="text-xs text-gray-500 mt-2">No watermark • 300 DPI High Resolution • All AI Features Included</p>
         </div>
       </div>
 
@@ -3676,7 +3677,11 @@
       <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-6">
         <div class="flex justify-between items-center text-sm mb-1">
           <span class="text-gray-600">Selected Plan:</span>
-          <span class="font-bold text-gray-900" id="rechargeSelectedName">Unlimited Plan</span>
+          <span class="font-bold text-gray-900" id="rechargeSelectedName">1 Month Unlimited Plan</span>
+        </div>
+        <div class="flex justify-between items-center text-sm mb-1">
+          <span class="text-gray-600">Plan Validity:</span>
+          <span class="font-bold text-emerald-600">1 Month (30 Days)</span>
         </div>
         <div class="flex justify-between items-center text-sm mb-2">
           <span class="text-gray-600">Total Credits:</span>
