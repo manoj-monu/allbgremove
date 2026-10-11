@@ -163,7 +163,7 @@ def main():
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
       <div>
         <h3 class="text-xl font-bold text-gray-800">Get in Touch</h3>
-        <p class="mt-4"><strong>Email:</strong> support@passportsnappro.com</p>
+        <p class="mt-4"><strong>Email:</strong> passportphoto2026@gmail.com</p>
         <p class="mt-2"><strong>Phone:</strong> +91 98765 43210</p>
         <p class="mt-2"><strong>Address:</strong><br>Ambad, Nashik, Maharashtra, India - 422010</p>
       </div>
