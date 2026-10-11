@@ -3153,7 +3153,7 @@
     if (userEl) userEl.textContent = 'Welcome, ' + (name || 'User') + '!';
     if (creditsEl) creditsEl.textContent = (credits !== undefined ? credits : 5) + ' Credits';
     if (noteEl) {
-      noteEl.textContent = customNote || 'Watermark is now removed! You can edit, enhance, and download clean, watermark-free biometric photos.';
+      noteEl.innerHTML = customNote || 'Watermark is now removed! You can edit, enhance, and download clean, watermark-free biometric photos.';
     }
 
     modal.classList.remove('hidden');
@@ -3179,6 +3179,27 @@
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     }, 200);
+  }
+
+  // ================= DEDICATED UTR PENDING MODAL CONTROLLER =================
+  function openUtrPendingModal(utr, email, waUrl) {
+    const modal = document.getElementById('utrPendingModal');
+    const utrEl = document.getElementById('pendingModalUtr');
+    const waBtn = document.getElementById('pendingModalWaBtn');
+    if (utrEl) utrEl.textContent = utr || '--';
+    if (waBtn && waUrl) waBtn.href = waUrl;
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  }
+
+  function closeUtrPendingModal() {
+    const modal = document.getElementById('utrPendingModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
   }
 
   // ================= CENTERED 0 CREDITS MODAL CONTROLLER (ENGLISH ONLY, LARGE TEXT) =================
@@ -3823,25 +3844,8 @@
       const waMsg = encodeURIComponent(`नमस्ते मनोज जी, मैंने allbgremove.com पर 1 Month Unlimited Plan (₹99) के लिए PhonePe से पेमेंट कर दिया है।\n\nमेरा ईमेल: ${user.email}\nUTR नंबर: ${utr}\n\nकृपया मेरा प्लान अप्रूव और चालू करें।`);
       const waUrl = `https://wa.me/918668656820?text=${waMsg}`;
 
-      const pendingHtml = `
-        <div class="space-y-4">
-          <p class="text-sm text-gray-600">आपका 12-अंकों का UTR (<b>${utr}</b>) एडमिन वेरिफिकेशन के लिए दर्ज कर लिया गया है। जैसे ही मनोज जी आपके PhonePe ₹99 को कन्फ़र्म करेंगे, आपका <b>1 Month Unlimited Plan</b> तुरंत चालू हो जाएगा।</p>
-          <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 font-bold flex items-center gap-2">
-            <i class="fa-solid fa-clock text-amber-600 text-base"></i>
-            <span>बैंक वेरिफिकेशन समय: 2 से 5 मिनट</span>
-          </div>
-          <a href="${waUrl}" target="_blank" class="block w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm rounded-xl shadow-lg transition text-center flex items-center justify-center gap-2">
-            <i class="fa-brands fa-whatsapp text-lg"></i> Send Screenshot on WhatsApp (1-Min Unlock)
-          </a>
-        </div>
-      `;
-
-      showLoginSuccessModal(
-        user.name || user.email,
-        'Pending',
-        '⏳ UTR दर्ज हो गया (Pending Verification)',
-        pendingHtml
-      );
+      // 4. Show Dedicated, Beautiful Pending Approval Modal
+      openUtrPendingModal(utr, user.email, waUrl);
     }, 1000);
   }
 
@@ -4142,6 +4146,56 @@
       <button onclick="closeLoginSuccessModal()" class="w-full py-4 sm:py-5 px-8 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-700 hover:to-indigo-700 text-white font-black text-lg sm:text-xl rounded-2xl shadow-xl shadow-emerald-500/30 hover:shadow-2xl transition transform active:scale-95 flex items-center justify-center gap-3">
         <span>Continue to Photo Maker</span>
         <i class="fa-solid fa-arrow-right text-xl"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= DEDICATED UTR SUBMITTED / PENDING APPROVAL MODAL ================= -->
+  <div id="utrPendingModal" class="fixed inset-0 z-[100000] bg-black/75 backdrop-blur-md hidden items-center justify-center p-4 sm:p-6" onclick="if(event.target === this) closeUtrPendingModal()">
+    <div id="utrPendingCard" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative border-2 border-amber-200 text-center transform transition-all duration-300">
+      <!-- Close button -->
+      <button onclick="closeUtrPendingModal()" aria-label="Close" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none transition cursor-pointer">&times;</button>
+      
+      <!-- Clock Icon Badge -->
+      <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-100 to-amber-200 border-4 border-amber-300/60 flex items-center justify-center mx-auto mb-4 shadow-sm">
+        <i class="fa-solid fa-clock-rotate-left text-3xl text-amber-600"></i>
+      </div>
+
+      <!-- Heading -->
+      <h2 class="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">Payment Verification</h2>
+      <p class="text-xs sm:text-sm font-bold text-amber-700 mt-1">UTR सफलतापूर्वक दर्ज हो गया है!</p>
+      
+      <!-- Details Card -->
+      <div class="bg-gradient-to-br from-amber-50/80 via-white to-amber-50/50 border border-amber-200 rounded-2xl p-4 my-5 text-left shadow-xs space-y-2.5">
+        <div class="flex justify-between items-center text-xs pb-2 border-b border-amber-100">
+          <span class="text-gray-500 font-semibold">12-Digit UTR:</span>
+          <span id="pendingModalUtr" class="font-mono font-black text-gray-900 text-sm">--</span>
+        </div>
+        <div class="flex justify-between items-center text-xs pb-2 border-b border-amber-100">
+          <span class="text-gray-500 font-semibold">Selected Plan:</span>
+          <span class="font-black text-purple-700">1 Month Unlimited (₹99)</span>
+        </div>
+        <div class="flex justify-between items-center text-xs">
+          <span class="text-gray-500 font-semibold">Status:</span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-amber-100 text-amber-800">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+            Awaiting Owner Approval
+          </span>
+        </div>
+      </div>
+
+      <p class="text-xs text-gray-500 mb-5 leading-relaxed">
+        जैसे ही मनोज जी आपके PhonePe ₹99 का मिलान करेंगे, आपका <b>Unlimited Plan</b> चालू हो जाएगा (आमतौर पर 2 से 5 मिनट में)।
+      </p>
+
+      <!-- WhatsApp Fast-track Button -->
+      <a id="pendingModalWaBtn" href="#" target="_blank" class="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-emerald-500/25 transition flex items-center justify-center gap-2 mb-3">
+        <i class="fa-brands fa-whatsapp text-lg"></i> Send Screenshot on WhatsApp (Fast Unlock)
+      </a>
+
+      <!-- Close / OK Button -->
+      <button onclick="closeUtrPendingModal()" class="w-full py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm rounded-xl transition cursor-pointer">
+        ठीक है, जारी रखें (OK)
       </button>
     </div>
   </div>
