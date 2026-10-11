@@ -478,6 +478,117 @@
     user-select: none !important;
     -webkit-user-drag: none !important;
   }
+
+  /* ================= ULTIMATE MOBILE RESPONSIVENESS ================= */
+  @media (max-width: 899px) {
+    /* Navbar Padding & Alignment */
+    nav .h-\[70px\] {
+      height: 62px !important;
+    }
+    
+    /* Container & Stepper */
+    #app-container {
+      padding-top: 66px !important;
+    }
+    .container {
+      padding: 4px 8px 24px 8px !important;
+      gap: 12px !important;
+    }
+    .stepper {
+      overflow-x: auto !important;
+      flex-wrap: nowrap !important;
+      justify-content: flex-start !important;
+      padding: 6px 8px !important;
+      gap: 6px !important;
+      -webkit-overflow-scrolling: touch !important;
+      scrollbar-width: none !important;
+      margin-bottom: 2px !important;
+    }
+    .stepper::-webkit-scrollbar { display: none; }
+    .step {
+      font-size: 11px !important;
+      white-space: nowrap !important;
+      gap: 5px !important;
+    }
+    .step-num {
+      width: 20px !important;
+      height: 20px !important;
+      font-size: 10px !important;
+    }
+    .step-line {
+      width: 12px !important;
+      min-width: 12px !important;
+    }
+
+    /* Editor Layout: Photo Stage First on Mobile, Controls Below */
+    .editor-layout {
+      flex-direction: column-reverse !important;
+      gap: 12px !important;
+      width: 100% !important;
+    }
+    .canvas-container {
+      min-height: 250px !important;
+      max-height: 46vh !important;
+      padding: 10px 6px !important;
+      border-radius: 14px !important;
+      overflow: auto !important;
+    }
+    .sidebar {
+      width: 100% !important;
+      padding: 14px 12px !important;
+      border-radius: 16px !important;
+      max-height: none !important;
+      overflow-y: visible !important;
+    }
+    
+    /* Crop Stage on Mobile */
+    .crop-stage-container {
+      gap: 8px !important;
+      max-width: 100% !important;
+      justify-content: center !important;
+    }
+    .crop-vertical-zoom-panel {
+      padding: 6px 3px !important;
+    }
+    .vzoom-track-container {
+      height: 90px !important;
+    }
+
+    /* Canvas sizing across all steps */
+    #bgCanvas, #adjCanvas, #sheetCanvas {
+      max-width: 100% !important;
+      max-height: 42vh !important;
+      height: auto !important;
+      object-fit: contain !important;
+    }
+
+    /* Navigation Footer on Mobile */
+    .nav-footer {
+      flex-wrap: wrap !important;
+      gap: 6px !important;
+    }
+    .nav-footer button {
+      flex: 1 1 auto !important;
+      min-width: 80px !important;
+      padding: 9px 10px !important;
+      font-size: 12.5px !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .logo span {
+      font-size: 17px !important;
+    }
+    .card {
+      padding: 14px 10px !important;
+    }
+    .upload-area {
+      padding: 26px 10px !important;
+    }
+    .upload-icon {
+      font-size: 32px !important;
+    }
+  }
 </style>
 </head>
 <body class="overflow-x-hidden">
@@ -508,25 +619,25 @@
         </div>
 
         <!-- Right Side Actions -->
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0" id="navAuthContainer">
+        <div class="flex items-center gap-1.5 sm:gap-3 shrink-0" id="navAuthContainer">
           <!-- Logged Out -->
-          <div id="navLoggedOut" class="flex items-center gap-2">
-            <button onclick="openAuthModal('login')" class="px-4 py-2 text-xs xl:text-sm font-bold text-gray-700 hover:text-indigo-600 hover:bg-gray-100/70 rounded-full transition whitespace-nowrap cursor-pointer">Login</button>
-            <button onclick="openAuthModal('signup')" class="px-4 py-2 text-xs xl:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-full shadow-md shadow-indigo-200 hover:shadow-indigo-300 transition whitespace-nowrap cursor-pointer">Create Account</button>
+          <div id="navLoggedOut" class="flex items-center gap-1.5 sm:gap-2">
+            <button onclick="openAuthModal('login')" class="px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs xl:text-sm font-bold text-gray-700 hover:text-indigo-600 hover:bg-gray-100/70 rounded-full transition whitespace-nowrap cursor-pointer">Login</button>
+            <button onclick="openAuthModal('signup')" class="px-3 sm:px-4 py-1.5 sm:py-2 text-xs xl:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-full shadow-md shadow-indigo-200 hover:shadow-indigo-300 transition whitespace-nowrap cursor-pointer">Register</button>
           </div>
 
           <!-- Logged In -->
-          <div id="navLoggedIn" class="hidden items-center gap-2 sm:gap-2.5">
+          <div id="navLoggedIn" class="hidden items-center gap-1.5 sm:gap-2.5">
             <!-- Wallet Credits Button -->
-            <button onclick="openRechargeModal()" class="flex items-center gap-2 bg-gradient-to-r from-amber-50 to-indigo-50 hover:from-amber-100 hover:to-indigo-100 border border-amber-200/90 pl-3 pr-1.5 py-1 rounded-full text-xs font-bold text-gray-800 transition shadow-xs shrink-0 cursor-pointer" title="Click to recharge credits">
+            <button onclick="openRechargeModal()" class="flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-amber-50 to-indigo-50 hover:from-amber-100 hover:to-indigo-100 border border-amber-200/90 pl-2 sm:pl-3 pr-1 sm:pr-1.5 py-1 rounded-full text-xs font-bold text-gray-800 transition shadow-xs shrink-0 cursor-pointer" title="Click to recharge credits">
               <i class="fa-solid fa-coins text-amber-500 text-xs"></i>
-              <span class="whitespace-nowrap"><span id="navCreditsCount" class="text-indigo-600 font-black">5</span> Credits</span>
-              <span class="bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-xs whitespace-nowrap">+ Recharge</span>
+              <span class="whitespace-nowrap"><span id="navCreditsCount" class="text-indigo-600 font-black">5</span><span class="hidden sm:inline"> Credits</span></span>
+              <span class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] sm:text-[11px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full shadow-xs whitespace-nowrap">+<span class="hidden xs:inline"> Recharge</span></span>
             </button>
 
             <!-- User Profile Dropdown Button -->
             <div class="relative group" id="userMenuWrapper" onmouseenter="showUserDropdown()" onmouseleave="hideUserDropdown()">
-              <button id="navUserMenuBtn" onclick="toggleUserDropdown(event)" class="flex items-center gap-2 py-1 px-2.5 rounded-full hover:bg-gray-100 transition cursor-pointer border border-gray-200 bg-white shadow-xs">
+              <button id="navUserMenuBtn" onclick="toggleUserDropdown(event)" class="flex items-center gap-1.5 sm:gap-2 py-1 px-2 sm:px-2.5 rounded-full hover:bg-gray-100 transition cursor-pointer border border-gray-200 bg-white shadow-xs">
                 <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-600 to-pink-500 text-white font-black flex items-center justify-center text-xs shadow-xs shrink-0 overflow-hidden" id="navUserAvatar">
                   U
                 </div>
@@ -562,8 +673,8 @@
               </div>
             </div>
 
-            <!-- Direct 1-Click Logout Button -->
-            <button type="button" onclick="handleLogout(event)" class="px-3 py-1.5 text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-full transition flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0 whitespace-nowrap" title="Sign Out">
+            <!-- Direct 1-Click Logout Button (hidden on mobile, accessible via profile dropdown) -->
+            <button type="button" onclick="handleLogout(event)" class="hidden sm:flex px-3 py-1.5 text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-full transition items-center gap-1.5 cursor-pointer shadow-xs shrink-0 whitespace-nowrap" title="Sign Out">
               <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
               <span>Logout</span>
             </button>
@@ -591,97 +702,97 @@
 
   <div id="landing-page-container">
   <!-- Hero Section -->
-  <section class="pt-32 pb-20 hero-bg">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+  <section class="pt-24 sm:pt-32 pb-12 sm:pb-20 hero-bg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
       
       <!-- Left Content -->
       <div>
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-primary text-sm font-semibold mb-6 border border-indigo-100">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-primary text-xs sm:text-sm font-semibold mb-4 sm:mb-6 border border-indigo-100">
           <i class="fa-solid fa-wand-magic-sparkles"></i> AI Powered • Fast • Secure
         </div>
-        <h1 class="text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-4 sm:mb-6">
           Create <span class="text-primary">Perfect</span><br>Passport Photos in Seconds
         </h1>
-        <p class="text-gray-600 text-lg mb-8">
+        <p class="text-gray-600 text-sm sm:text-lg mb-6 sm:mb-8">
           Upload your photo, let our AI do the magic! Get high-quality, passport size photos for passports, visas, ID cards and more. Simple, fast and professional.
         </p>
         
         <!-- Small Features -->
-        <div class="grid grid-cols-2 gap-4 mb-8">
-          <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-crop-simple"></i></div><span class="text-sm font-semibold">Auto Crop<br><span class="text-xs text-gray-500 font-normal">Strict Size</span></span></div>
-          <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center"><i class="fa-solid fa-eraser"></i></div><span class="text-sm font-semibold">Background<br><span class="text-xs text-gray-500 font-normal">Removal</span></span></div>
-          <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center"><i class="fa-solid fa-face-smile"></i></div><span class="text-sm font-semibold">AI Enhance<br><span class="text-xs text-gray-500 font-normal">& Retouch</span></span></div>
-          <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center"><i class="fa-solid fa-print"></i></div><span class="text-sm font-semibold">Print Ready<br><span class="text-xs text-gray-500 font-normal">A4 / 4x6</span></span></div>
+        <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div class="flex items-center gap-2.5 sm:gap-3"><div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-crop-simple text-sm"></i></div><span class="text-xs sm:text-sm font-semibold">Auto Crop<br><span class="text-[11px] sm:text-xs text-gray-500 font-normal">Strict Size</span></span></div>
+          <div class="flex items-center gap-2.5 sm:gap-3"><div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-eraser text-sm"></i></div><span class="text-xs sm:text-sm font-semibold">Background<br><span class="text-[11px] sm:text-xs text-gray-500 font-normal">Removal</span></span></div>
+          <div class="flex items-center gap-2.5 sm:gap-3"><div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-face-smile text-sm"></i></div><span class="text-xs sm:text-sm font-semibold">AI Enhance<br><span class="text-[11px] sm:text-xs text-gray-500 font-normal">& Retouch</span></span></div>
+          <div class="flex items-center gap-2.5 sm:gap-3"><div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-print text-sm"></i></div><span class="text-xs sm:text-sm font-semibold">Print Ready<br><span class="text-[11px] sm:text-xs text-gray-500 font-normal">A4 / 4x6</span></span></div>
         </div>
 
         <!-- Upload Box -->
-        <div onclick="document.getElementById('fileIn').click()" class="block border-2 border-dashed border-primary bg-indigo-50/50 rounded-2xl p-8 text-center hover:bg-indigo-50 hover:border-indigo-600 transition group cursor-pointer">
-          <button class="bg-primary text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-indigo-200 group-hover:scale-105 transition flex items-center gap-2 mx-auto mb-4">
+        <div onclick="document.getElementById('fileIn').click()" class="block border-2 border-dashed border-primary bg-indigo-50/50 rounded-2xl p-6 sm:p-8 text-center hover:bg-indigo-50 hover:border-indigo-600 transition group cursor-pointer">
+          <button class="bg-primary text-white font-bold py-3 px-6 sm:px-8 rounded-xl shadow-lg shadow-indigo-200 group-hover:scale-105 transition flex items-center gap-2 mx-auto mb-3 sm:mb-4 text-sm sm:text-base">
             <i class="fa-solid fa-cloud-arrow-up"></i> Upload Your Photo
           </button>
-          <p class="text-sm text-gray-500 font-medium">Click to browse or drag and drop<br>JPG, PNG (Max 10MB)</p>
+          <p class="text-xs sm:text-sm text-gray-500 font-medium">Click to browse or drag and drop<br>JPG, PNG (Max 10MB)</p>
         </div>
         
-        <div class="mt-6 flex items-center gap-2 text-sm text-gray-500">
+        <div class="mt-4 sm:mt-6 flex items-center gap-2 text-xs sm:text-sm text-gray-500">
           <i class="fa-solid fa-shield-halved text-green-500"></i> Your photos are safe with us. 100% secure • No data stored.
         </div>
       </div>
 
       <!-- Right Visual (6-Photo Passport Print Sheet Mockup) -->
-      <div class="relative">
-        <div class="absolute inset-0 bg-gradient-to-tr from-indigo-100 to-pink-100 rounded-[3rem] transform rotate-3 scale-105 -z-10"></div>
-        <div class="bg-white rounded-[2rem] p-4 shadow-2xl relative border border-indigo-50">
+      <div class="relative mt-6 lg:mt-0">
+        <div class="absolute inset-0 bg-gradient-to-tr from-indigo-100 to-pink-100 rounded-[2rem] sm:rounded-[3rem] transform rotate-2 sm:rotate-3 scale-105 -z-10"></div>
+        <div class="bg-white rounded-2xl sm:rounded-[2rem] p-3 sm:p-4 shadow-2xl relative border border-indigo-50">
           
           <!-- Top Badges -->
-          <div class="flex justify-between items-center mb-3 px-2">
-            <span class="inline-flex items-center gap-1.5 bg-indigo-600 text-white text-xs font-extrabold px-3 py-1.5 rounded-full shadow-md">
-              <i class="fa-solid fa-print"></i> 4×6" Ready-to-Print Sheet • 6 Photos
+          <div class="flex justify-between items-center mb-2.5 px-1 sm:px-2 gap-1.5 flex-wrap">
+            <span class="inline-flex items-center gap-1 bg-indigo-600 text-white text-[10px] sm:text-xs font-extrabold px-2.5 py-1 sm:py-1.5 rounded-full shadow-md">
+              <i class="fa-solid fa-print"></i> 4×6" Ready-to-Print Sheet
             </span>
-            <span class="inline-flex items-center gap-1.5 bg-emerald-600 text-white text-xs font-extrabold px-3 py-1.5 rounded-full shadow-md">
-              <i class="fa-solid fa-circle-check"></i> India & US Visa Approved
+            <span class="inline-flex items-center gap-1 bg-emerald-600 text-white text-[10px] sm:text-xs font-extrabold px-2.5 py-1 sm:py-1.5 rounded-full shadow-md">
+              <i class="fa-solid fa-circle-check"></i> India & US Approved
             </span>
           </div>
 
           <!-- 6-Photo Print Sheet Mockup -->
-          <div class="relative rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50 p-1.5 shadow-inner group">
-            <img src="assets/passport_sheet_hero.jpg" alt="6 Photo Passport Print Sheet" class="w-full h-[460px] object-contain rounded-xl bg-white shadow-md transition transform group-hover:scale-[1.01]">
+          <div class="relative rounded-xl sm:rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50 p-1 sm:p-1.5 shadow-inner group">
+            <img src="assets/passport_sheet_hero.jpg" alt="6 Photo Passport Print Sheet" class="w-full h-auto max-h-[320px] sm:max-h-[460px] object-contain rounded-lg sm:rounded-xl bg-white shadow-md transition transform group-hover:scale-[1.01]">
             
             <!-- Before Selfie Overlay Badge -->
-            <div class="absolute bottom-4 left-4 bg-white/95 backdrop-blur-md p-2 rounded-xl shadow-xl border border-gray-200 flex items-center gap-2.5">
-              <img src="assets/before.jpg" class="w-12 h-14 object-cover rounded-lg border border-gray-200 shadow-sm" alt="Original Selfie">
+            <div class="absolute bottom-2.5 sm:bottom-4 left-2.5 sm:left-4 bg-white/95 backdrop-blur-md p-1.5 sm:p-2 rounded-lg sm:rounded-xl shadow-xl border border-gray-200 flex items-center gap-2">
+              <img src="assets/before.jpg" class="w-9 h-11 sm:w-12 sm:h-14 object-cover rounded-md sm:rounded-lg border border-gray-200 shadow-xs" alt="Original Selfie">
               <div class="text-left leading-tight pr-1">
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">From Casual Selfie</span>
-                <span class="text-xs font-extrabold text-indigo-700">➔ 6-Photo Sheet</span>
+                <span class="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase tracking-wider block">From Selfie</span>
+                <span class="text-[11px] sm:text-xs font-extrabold text-indigo-700">➔ 6-Photo Sheet</span>
               </div>
             </div>
 
             <!-- Instant Quality Stamp -->
-            <div class="absolute top-4 right-4 bg-slate-900/85 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5">
-              <i class="fa-solid fa-crown text-amber-400"></i> Studio HD • 600 DPI
+            <div class="absolute top-2.5 sm:top-4 right-2.5 sm:right-4 bg-slate-900/85 backdrop-blur-sm text-white px-2.5 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold shadow-lg flex items-center gap-1">
+              <i class="fa-solid fa-crown text-amber-400"></i> Studio HD
             </div>
           </div>
           
           <!-- Badges below showing Indian & Global Support -->
-          <div class="grid grid-cols-4 gap-2 mt-4 pb-1 text-center">
-            <div class="bg-indigo-50/60 p-2 rounded-xl border border-indigo-100/60">
-              <div class="text-base mb-0.5">🇮🇳</div>
-              <span class="text-[11px] font-bold text-gray-800 block">India Passport</span>
-              <span class="text-[9.5px] text-gray-500">35×45 / 38.5×45mm</span>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 mt-3 sm:mt-4 pb-1 text-center">
+            <div class="bg-indigo-50/60 p-1.5 sm:p-2 rounded-xl border border-indigo-100/60">
+              <div class="text-sm sm:text-base mb-0.5">🇮🇳</div>
+              <span class="text-[10.5px] sm:text-[11px] font-bold text-gray-800 block">India Passport</span>
+              <span class="text-[9px] sm:text-[9.5px] text-gray-500">35×45mm</span>
             </div>
-            <div class="bg-purple-50/60 p-2 rounded-xl border border-purple-100/60">
-              <div class="text-base mb-0.5">🇺🇸</div>
-              <span class="text-[11px] font-bold text-gray-800 block">US Visa & OCI</span>
-              <span class="text-[9.5px] text-gray-500">2×2 Inch (51×51mm)</span>
+            <div class="bg-purple-50/60 p-1.5 sm:p-2 rounded-xl border border-purple-100/60">
+              <div class="text-sm sm:text-base mb-0.5">🇺🇸</div>
+              <span class="text-[10.5px] sm:text-[11px] font-bold text-gray-800 block">US Visa & OCI</span>
+              <span class="text-[9px] sm:text-[9.5px] text-gray-500">2×2 Inch</span>
             </div>
-            <div class="bg-emerald-50/60 p-2 rounded-xl border border-emerald-100/60">
-              <div class="text-base mb-0.5">🇬🇧</div>
-              <span class="text-[11px] font-bold text-gray-800 block">UK / Schengen</span>
-              <span class="text-[9.5px] text-gray-500">35×45mm Standard</span>
+            <div class="bg-emerald-50/60 p-1.5 sm:p-2 rounded-xl border border-emerald-100/60">
+              <div class="text-sm sm:text-base mb-0.5">🇬🇧</div>
+              <span class="text-[10.5px] sm:text-[11px] font-bold text-gray-800 block">UK / Schengen</span>
+              <span class="text-[9px] sm:text-[9.5px] text-gray-500">35×45mm</span>
             </div>
-            <div class="bg-amber-50/60 p-2 rounded-xl border border-amber-100/60">
-              <div class="text-base mb-0.5">🖨️</div>
-              <span class="text-[11px] font-bold text-gray-800 block">Print Ready</span>
-              <span class="text-[9.5px] text-gray-500">4×6 / 5×7 / A4</span>
+            <div class="bg-amber-50/60 p-1.5 sm:p-2 rounded-xl border border-amber-100/60">
+              <div class="text-sm sm:text-base mb-0.5">🖨️</div>
+              <span class="text-[10.5px] sm:text-[11px] font-bold text-gray-800 block">Print Ready</span>
+              <span class="text-[9px] sm:text-[9.5px] text-gray-500">4×6 / A4</span>
             </div>
           </div>
         </div>
