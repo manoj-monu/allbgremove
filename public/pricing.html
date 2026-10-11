@@ -81,7 +81,7 @@
 
   <!-- Pricing Cards Grid -->
   <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-20">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto gap-8">
       
       <!-- Free Plan -->
       <div class="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm flex flex-col justify-between hover:shadow-lg transition">
@@ -106,75 +106,31 @@
         </button>
       </div>
 
-      <!-- Starter Pack -->
-      <div class="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm flex flex-col justify-between hover:shadow-lg transition">
-        <div>
-          <span class="text-xs font-extrabold tracking-wider uppercase text-primary bg-indigo-50 px-3 py-1 rounded-full">Starter Pack</span>
-          <h3 class="text-2xl font-bold mt-4 mb-2 text-gray-900">₹99 Pack</h3>
-          <p class="text-sm text-gray-500 mb-6">Great for students and single family use.</p>
-          <div class="flex items-baseline gap-1 mb-6">
-            <span class="text-4xl font-extrabold text-gray-900">₹99</span>
-            <span class="text-gray-500 text-sm">/ 40 photos (₹2.47/photo)</span>
-          </div>
-          <ul class="space-y-3 text-sm text-gray-600 mb-8 border-t pt-6">
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> <strong>40 Wallet Credits</strong></li>
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> AI HD Face Enhancement</li>
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> All Passport, PAN & Stamp Sizes</li>
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> 114+ Studio Frames</li>
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Credits Never Expire</li>
-          </ul>
-        </div>
-        <button onclick="buyPack('Starter Pack', 99, 40)" class="w-full py-3 px-4 bg-primary hover:bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-bolt"></i> Buy ₹99 Pack
-        </button>
-      </div>
-
-      <!-- Studio Pack (Popular) -->
+      <!-- Unlimited Pack (Popular) -->
       <div class="bg-white rounded-3xl p-8 border-2 border-secondary shadow-xl relative flex flex-col justify-between hover:-translate-y-1 transition">
         <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-secondary text-white text-xs font-extrabold px-4 py-1 rounded-full shadow-md tracking-wide uppercase">
-          ⭐ Most Popular for Studios
+          ⭐ Unlimited Plan
         </div>
         <div>
-          <span class="text-xs font-extrabold tracking-wider uppercase text-secondary bg-pink-50 px-3 py-1 rounded-full">Studio Pack</span>
-          <h3 class="text-2xl font-bold mt-4 mb-2 text-gray-900">₹199 Pack</h3>
-          <p class="text-sm text-gray-500 mb-6">Designed specifically for photo studios & cyber cafes.</p>
+          <span class="text-xs font-extrabold tracking-wider uppercase text-secondary bg-pink-50 px-3 py-1 rounded-full">Pro Unlimited</span>
+          <h3 class="text-2xl font-bold mt-4 mb-2 text-gray-900">₹99 Unlimited</h3>
+          <p class="text-sm text-gray-500 mb-6">Unlimited access for studios, creators & cyber cafes.</p>
           <div class="flex items-baseline gap-1 mb-6">
-            <span class="text-4xl font-extrabold text-gray-900">₹199</span>
-            <span class="text-gray-500 text-sm">/ 100 photos (₹1.99/photo)</span>
+            <span class="text-4xl font-extrabold text-gray-900">₹99</span>
+            <span class="text-gray-500 text-sm">/ Unlimited photos</span>
           </div>
           <ul class="space-y-3 text-sm text-gray-600 mb-8 border-t pt-6">
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> <strong>100 Wallet Credits</strong></li>
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Superfast RunPod GPU Server</li>
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> 100% Full Photo & Passport Modes</li>
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Horizontal & Vertical Margin Sliders</li>
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Priority 24/7 WhatsApp Support</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> <strong>Unlimited Wallet Credits & Downloads</strong></li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> AI HD Face Enhancement & Auto Retouch</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> All Passport, Visa, PAN & Stamp Sizes</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> 114+ Studio Suit & Dress Templates</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> 300 DPI High-Res Export (No Watermark)</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Fast RunPod GPU Serverless Processing</li>
+            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Priority 24/7 Support</li>
           </ul>
         </div>
-        <button onclick="buyPack('Studio Pack', 199, 100)" class="w-full py-3 px-4 bg-gradient-to-r from-primary to-secondary hover:opacity-95 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-crown"></i> Buy Studio Pack
-        </button>
-      </div>
-
-      <!-- Cyber Cafe Bulk Pack -->
-      <div class="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm flex flex-col justify-between hover:shadow-lg transition">
-        <div>
-          <span class="text-xs font-extrabold tracking-wider uppercase text-purple-600 bg-purple-50 px-3 py-1 rounded-full">Pro Pack</span>
-          <h3 class="text-2xl font-bold mt-4 mb-2 text-gray-900">₹499 Bulk</h3>
-          <p class="text-sm text-gray-500 mb-6">High volume printing with lowest per-photo cost.</p>
-          <div class="flex items-baseline gap-1 mb-6">
-            <span class="text-4xl font-extrabold text-gray-900">₹499</span>
-            <span class="text-gray-500 text-sm">/ 300 photos (₹1.66/photo)</span>
-          </div>
-          <ul class="space-y-3 text-sm text-gray-600 mb-8 border-t pt-6">
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> <strong>300 Wallet Credits</strong></li>
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> High-Resolution 300 DPI Exports</li>
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Suit & Dress Changing Engine</li>
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Multi-User Cafe Login Access</li>
-            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> Instant GST Invoicing</li>
-          </ul>
-        </div>
-        <button onclick="buyPack('Cyber Cafe Bulk', 499, 300)" class="w-full py-3 px-4 bg-gray-900 hover:bg-black text-white font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-store"></i> Buy Bulk ₹499
+        <button onclick="buyPack('Unlimited Plan', 99, 9999)" class="w-full py-3.5 px-4 bg-gradient-to-r from-primary to-secondary hover:opacity-95 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-bolt"></i> Subscribe ₹99 Unlimited
         </button>
       </div>
 
@@ -216,7 +172,7 @@
 
         <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
           <h4 class="font-bold text-lg text-gray-900 mb-2">Can photo studios and cyber cafes use this service commercially?</h4>
-          <p class="text-gray-600 text-sm">Yes, absolutely! Our ₹199 and ₹499 plans are specially optimized for Indian cyber cafes, CSC centers, and photography studios with complete commercial print rights.</p>
+          <p class="text-gray-600 text-sm">Yes, absolutely! Our ₹99 Unlimited plan is specially optimized for Indian cyber cafes, CSC centers, and photography studios with complete commercial print rights.</p>
         </div>
 
         <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
@@ -244,15 +200,15 @@
       <div class="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-200">
         <div class="flex justify-between items-center mb-2">
           <span class="text-gray-600 text-sm">Selected Pack:</span>
-          <span class="font-bold text-gray-900" id="modalPackName">Studio Pack</span>
+          <span class="font-bold text-gray-900" id="modalPackName">Unlimited Plan</span>
         </div>
         <div class="flex justify-between items-center mb-2">
           <span class="text-gray-600 text-sm">Credits Added:</span>
-          <span class="font-bold text-primary" id="modalPackCredits">+100 Credits</span>
+          <span class="font-bold text-primary" id="modalPackCredits">Unlimited</span>
         </div>
         <div class="flex justify-between items-center border-t border-gray-200 pt-2 font-bold text-lg">
           <span class="text-gray-900">Amount to Pay:</span>
-          <span class="text-green-600" id="modalPackAmount">₹199</span>
+          <span class="text-green-600" id="modalPackAmount">₹99</span>
         </div>
       </div>
 
@@ -285,7 +241,10 @@
             <i class="fa-solid fa-camera-retro text-primary text-2xl"></i>
             <span class="font-bold text-xl tracking-tight">allbgremove<span class="text-primary">.com</span></span>
           </div>
-          <p class="text-gray-400 text-sm mb-6">AI-powered biometric passport photo generator and background removal suite.</p>
+          <p class="text-gray-400 text-sm mb-4">AI-powered biometric passport photo generator and background removal suite.</p>
+          <div class="text-gray-400 text-xs mb-6 space-y-1">
+            <p><i class="fa-solid fa-location-dot text-primary mr-1"></i> <strong>Office:</strong> Ambad, Nashik, Maharashtra, India - 422010</p>
+          </div>
         </div>
         <div>
           <h4 class="font-bold mb-6 text-lg">Product & Guides</h4>
@@ -322,7 +281,7 @@
   </footer>
 
   <script>
-    let selectedPack = { name: 'Studio Pack', amount: 199, credits: 100 };
+    let selectedPack = { name: 'Unlimited Plan', amount: 99, credits: 9999 };
     let pendingPack = null;
     let currentAuthTab = 'login';
 
@@ -891,7 +850,7 @@
       selectedPack = { name, amount, credits };
       document.getElementById('modalPackName').textContent = name;
       document.getElementById('modalPackAmount').textContent = '₹' + amount;
-      document.getElementById('modalPackCredits').textContent = '+' + credits + ' Credits';
+      document.getElementById('modalPackCredits').textContent = credits >= 9999 ? 'Unlimited Credits' : '+' + credits + ' Credits';
       if (document.getElementById('payMobile')) {
         document.getElementById('payMobile').value = user.phone || '';
       }

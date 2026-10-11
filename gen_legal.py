@@ -165,7 +165,7 @@ def main():
         <h3 class="text-xl font-bold text-gray-800">Get in Touch</h3>
         <p class="mt-4"><strong>Email:</strong> support@passportsnappro.com</p>
         <p class="mt-2"><strong>Phone:</strong> +91 98765 43210</p>
-        <p class="mt-2"><strong>Address:</strong><br>123 Startup Hub, Tech Park<br>New Delhi, India 110001</p>
+        <p class="mt-2"><strong>Address:</strong><br>Ambad, Nashik, Maharashtra, India - 422010</p>
       </div>
       
       <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">

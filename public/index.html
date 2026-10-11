@@ -748,67 +748,50 @@
       <h2 class="text-4xl font-extrabold mb-4">Pricing Plans</h2>
       <p class="text-gray-500 mb-12">Choose the plan that fits your needs</p>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 text-left">
-        <!-- Plan 1 -->
-        <div class="border border-gray-200 rounded-3xl p-6 hover:shadow-xl transition bg-white flex flex-col">
-          <h3 class="font-bold text-lg mb-2">Free Plan</h3>
-          <p class="text-gray-500 text-sm mb-4 border-b pb-4">5 Credits</p>
-          <ul class="space-y-3 text-sm text-gray-600 mb-8 flex-1">
-            <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Basic tools</li>
-            <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Standard quality</li>
-            <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Perfect layouts</li>
-          </ul>
-          <a href="#" onclick="document.getElementById('fileIn').click(); return false;" class="block w-full py-2 text-center text-primary font-semibold border-2 border-primary rounded-xl hover:bg-indigo-50 transition">Get Started</a>
+      <div class="grid grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto gap-8 text-left">
+        <!-- Plan 1: Free -->
+        <div class="border border-gray-200 rounded-3xl p-8 hover:shadow-xl transition bg-white flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold text-gray-500 uppercase tracking-wider bg-gray-100 px-3 py-1 rounded-full">Free</span>
+            <h3 class="font-bold text-2xl mt-4 mb-1 text-gray-900">Free Plan</h3>
+            <p class="text-gray-500 text-sm mb-4 border-b pb-4">5 Free Credits on Signup</p>
+            <div class="flex items-baseline gap-1 mb-6">
+              <span class="text-4xl font-extrabold text-gray-900">₹0</span>
+              <span class="text-gray-500 text-sm">/ forever free</span>
+            </div>
+            <ul class="space-y-3.5 text-sm text-gray-600 mb-8">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Basic editing tools</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Standard photo quality</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Indian passport standard layouts</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Print sheet with preview</li>
+            </ul>
+          </div>
+          <a href="#" onclick="document.getElementById('fileIn').click(); return false;" class="block w-full py-3 text-center text-primary font-bold border-2 border-primary rounded-xl hover:bg-indigo-50 transition">Get Started Free</a>
         </div>
         
-        <!-- Plan 2 -->
-        <div class="border-2 border-primary rounded-3xl p-6 hover:shadow-xl transition bg-white shadow-xl shadow-indigo-100 relative flex flex-col transform md:-translate-y-4">
-          <div class="absolute -top-3 right-6 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">Most Popular</div>
-          <h3 class="font-bold text-lg mb-1">Monthly</h3>
-          <div class="flex items-baseline gap-1 mb-4 border-b pb-4"><span class="text-3xl font-extrabold">₹99</span><span class="text-sm text-gray-500">/ month</span></div>
-          <ul class="space-y-3 text-sm text-gray-600 mb-8 flex-1">
-            <li><i class="fa-solid fa-check text-green-500 mr-2"></i> 100 credits</li>
-            <li><i class="fa-solid fa-check text-green-500 mr-2"></i> AI Features</li>
-            <li><i class="fa-solid fa-check text-green-500 mr-2"></i> HD quality</li>
-          </ul>
-          <a href="pricing.html" class="block w-full py-3 text-center bg-primary text-white font-semibold rounded-xl hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">Subscribe Now</a>
-        </div>
-        
-        <!-- Plan 3 -->
-        <div class="border border-gray-200 rounded-3xl p-6 hover:shadow-xl transition bg-white relative flex flex-col">
-          <div class="absolute -top-3 right-6 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">Best Value</div>
-          <h3 class="font-bold text-lg mb-1">3 Months</h3>
-          <div class="flex items-baseline gap-1 mb-4 border-b pb-4"><span class="text-3xl font-extrabold">₹250</span><span class="text-sm text-gray-500">/ 3 months</span></div>
-          <ul class="space-y-3 text-sm text-gray-600 mb-8 flex-1">
-            <li><i class="fa-solid fa-check text-green-500 mr-2"></i> 350 credits</li>
-            <li><i class="fa-solid fa-check text-green-500 mr-2"></i> AI Features</li>
-            <li><i class="fa-solid fa-check text-green-500 mr-2"></i> HD quality</li>
-          </ul>
-          <a href="pricing.html" class="block w-full py-2 text-center bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">Subscribe Now</a>
-        </div>
-        
-        <!-- Plan 4 -->
-        <div class="border border-gray-200 rounded-3xl p-6 hover:shadow-xl transition bg-white relative flex flex-col">
-          <div class="absolute -top-3 right-6 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">Save 10%</div>
-          <h3 class="font-bold text-lg mb-1">6 Months</h3>
-          <div class="flex items-baseline gap-1 mb-4 border-b pb-4"><span class="text-3xl font-extrabold">₹499</span><span class="text-sm text-gray-500">/ 6 months</span></div>
-          <ul class="space-y-3 text-sm text-gray-600 mb-8 flex-1">
-            <li><i class="fa-solid fa-check text-green-500 mr-2"></i> 700 credits</li>
-            <li><i class="fa-solid fa-check text-green-500 mr-2"></i> All features</li>
-          </ul>
-          <a href="pricing.html" class="block w-full py-2 text-center bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">Subscribe Now</a>
-        </div>
-        
-        <!-- Plan 5 -->
-        <div class="border border-gray-200 rounded-3xl p-6 hover:shadow-xl transition bg-white relative flex flex-col">
-          <div class="absolute -top-3 right-6 bg-yellow-400 text-gray-900 text-xs font-bold px-3 py-1 rounded-full">Save 20%</div>
-          <h3 class="font-bold text-lg mb-1">Yearly</h3>
-          <div class="flex items-baseline gap-1 mb-4 border-b pb-4"><span class="text-3xl font-extrabold">₹999</span><span class="text-sm text-gray-500">/ year</span></div>
-          <ul class="space-y-3 text-sm text-gray-600 mb-8 flex-1">
-            <li><i class="fa-solid fa-check text-green-500 mr-2"></i> 1500 credits</li>
-            <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Priority Support</li>
-          </ul>
-          <a href="pricing.html" class="block w-full py-2 text-center bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">Subscribe Now</a>
+        <!-- Plan 2: Unlimited 99 -->
+        <div class="border-2 border-primary rounded-3xl p-8 hover:shadow-2xl transition bg-white shadow-xl shadow-indigo-100 relative flex flex-col justify-between transform md:-translate-y-2">
+          <div class="absolute -top-3.5 right-6 bg-gradient-to-r from-primary to-secondary text-white text-xs font-extrabold px-4 py-1 rounded-full shadow-md">Unlimited Plan</div>
+          <div>
+            <span class="text-xs font-bold text-primary uppercase tracking-wider bg-indigo-50 px-3 py-1 rounded-full">Best Value</span>
+            <h3 class="font-bold text-2xl mt-4 mb-1 text-gray-900">Pro Unlimited</h3>
+            <p class="text-gray-500 text-sm mb-4 border-b pb-4">Full access for creators & studios</p>
+            <div class="flex items-baseline gap-1 mb-6">
+              <span class="text-4xl font-extrabold text-gray-900">₹99</span>
+              <span class="text-gray-500 text-sm">/ Unlimited photos</span>
+            </div>
+            <ul class="space-y-3.5 text-sm text-gray-600 mb-8">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> <strong>Unlimited Photo Processing</strong></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Unlimited Wallet Credits</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> AI HD Face Enhancement</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> 114+ Studio Suit & Dress Templates</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> 300 DPI Export (Watermark Free)</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Superfast RunPod Priority GPU</li>
+            </ul>
+          </div>
+          <button onclick="openRechargeModal()" class="block w-full py-3.5 text-center bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-xl hover:opacity-95 transition shadow-lg shadow-indigo-200">
+            Subscribe Now - ₹99
+          </button>
         </div>
       </div>
     </div>
@@ -890,7 +873,10 @@
             <i class="fa-solid fa-camera-retro text-primary text-2xl"></i>
             <span class="font-bold text-xl tracking-tight">allbgremove<span class="text-primary">.com</span></span>
           </div>
-          <p class="text-gray-400 text-sm mb-6">Create passport, visa, ID and more photos with our easy-to-use online tool.</p>
+          <p class="text-gray-400 text-sm mb-4">Create passport, visa, ID and more photos with our easy-to-use online tool.</p>
+          <div class="text-gray-400 text-xs mb-6 space-y-1">
+            <p><i class="fa-solid fa-location-dot text-primary mr-1"></i> <strong>Office:</strong> Ambad, Nashik, Maharashtra, India - 422010</p>
+          </div>
           <div class="flex gap-4">
             <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition"><i class="fa-brands fa-facebook-f"></i></a>
             <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition"><i class="fa-brands fa-twitter"></i></a>
@@ -2344,7 +2330,7 @@
 
   // ================= REAL AUTHENTICATION & WALLET SYSTEM =================
   let currentAuthTab = 'login';
-  let activeRechargePack = { name: 'Studio Pack', amount: 199, credits: 100 };
+  let activeRechargePack = { name: 'Unlimited Plan', amount: 99, credits: 9999 };
   let pendingPackForAuth = null;
 
   function getRegisteredUsers() {
@@ -3047,7 +3033,7 @@
   }
 
   // ================= PROTECTED RECHARGE & PAYMENT GATEWAY =================
-  function openRechargeModal(packName = 'Studio Pack') {
+  function openRechargeModal(packName = 'Unlimited Plan') {
     // 🔒 STRICT LOGIN CHECK: No payment without login!
     const user = getStoredUser();
     if (!user) {
@@ -3074,15 +3060,15 @@
   function selectRechargePack(name, amount, credits, el) {
     activeRechargePack = { name, amount, credits };
     document.querySelectorAll('.pack-card').forEach(c => {
-      c.classList.remove('active', 'border-secondary', 'bg-pink-50/30');
+      c.classList.remove('active', 'border-secondary', 'bg-pink-50/40');
       c.classList.add('border-gray-200');
     });
     if (el) {
-      el.classList.add('active', 'border-secondary', 'bg-pink-50/30');
+      el.classList.add('active', 'border-secondary', 'bg-pink-50/40');
       el.classList.remove('border-gray-200');
     }
     document.getElementById('rechargeSelectedName').textContent = name;
-    document.getElementById('rechargeSelectedCredits').textContent = '+' + credits + ' Credits';
+    document.getElementById('rechargeSelectedCredits').textContent = credits >= 9999 ? 'Unlimited' : '+' + credits + ' Credits';
     document.getElementById('rechargeSelectedAmount').textContent = '₹' + amount;
   }
 
@@ -3625,7 +3611,7 @@
 
       <!-- Buttons -->
       <div class="flex flex-col sm:flex-row gap-3">
-        <button onclick="closeZeroCreditsModal(); openRechargeModal('Studio Pack');" class="flex-1 py-4 sm:py-5 px-6 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-lg sm:text-xl rounded-2xl shadow-xl shadow-amber-500/30 hover:shadow-2xl transition transform active:scale-95 flex items-center justify-center gap-3 cursor-pointer">
+        <button onclick="closeZeroCreditsModal(); openRechargeModal('Unlimited Plan');" class="flex-1 py-4 sm:py-5 px-6 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-lg sm:text-xl rounded-2xl shadow-xl shadow-amber-500/30 hover:shadow-2xl transition transform active:scale-95 flex items-center justify-center gap-3 cursor-pointer">
           <i class="fa-solid fa-bolt text-xl"></i>
           <span>Recharge Wallet Now</span>
         </button>
@@ -3675,34 +3661,14 @@
       </div>
 
       <!-- Pack Select Cards -->
-      <div class="grid grid-cols-2 gap-3 mb-6" id="packCardsContainer">
-        <!-- Pack 1 -->
-        <div onclick="selectRechargePack('Starter Pack', 99, 40, this)" class="pack-card cursor-pointer border-2 border-gray-200 hover:border-primary rounded-2xl p-4 text-center transition">
-          <span class="text-xs font-bold text-gray-500">Starter</span>
-          <div class="text-2xl font-black text-gray-900 my-1">₹99</div>
-          <span class="text-xs font-bold text-primary bg-indigo-50 px-2 py-0.5 rounded-full">+40 Photos</span>
-        </div>
-
-        <!-- Pack 2 (Default Active) -->
-        <div onclick="selectRechargePack('Studio Pack', 199, 100, this)" class="pack-card active cursor-pointer border-2 border-secondary bg-pink-50/30 rounded-2xl p-4 text-center transition relative">
-          <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-secondary text-white text-[10px] font-extrabold px-2 py-0.2 rounded-full uppercase">Popular</span>
-          <span class="text-xs font-bold text-secondary">Studio Pro</span>
-          <div class="text-2xl font-black text-gray-900 my-1">₹199</div>
-          <span class="text-xs font-bold text-secondary bg-pink-50 px-2 py-0.5 rounded-full">+100 Photos</span>
-        </div>
-
-        <!-- Pack 3 -->
-        <div onclick="selectRechargePack('Cyber Cafe Bulk', 499, 300, this)" class="pack-card cursor-pointer border-2 border-gray-200 hover:border-primary rounded-2xl p-4 text-center transition">
-          <span class="text-xs font-bold text-gray-500">Bulk Cafe</span>
-          <div class="text-2xl font-black text-gray-900 my-1">₹499</div>
-          <span class="text-xs font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full">+300 Photos</span>
-        </div>
-
-        <!-- Pack 4 -->
-        <div onclick="selectRechargePack('Unlimited Monthly', 999, 1000, this)" class="pack-card cursor-pointer border-2 border-gray-200 hover:border-primary rounded-2xl p-4 text-center transition">
-          <span class="text-xs font-bold text-gray-500">Unlimited</span>
-          <div class="text-2xl font-black text-gray-900 my-1">₹999</div>
-          <span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">Unlimited / Mo</span>
+      <div class="mb-6" id="packCardsContainer">
+        <!-- Single Unlimited Pack -->
+        <div onclick="selectRechargePack('Unlimited Plan', 99, 9999, this)" class="pack-card active cursor-pointer border-2 border-secondary bg-pink-50/40 rounded-2xl p-5 text-center transition relative shadow-sm hover:shadow-md">
+          <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-secondary text-white text-[11px] font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider">Unlimited Plan</span>
+          <span class="text-xs font-bold text-secondary uppercase tracking-wide">Studio & Personal Pro</span>
+          <div class="text-3xl font-black text-gray-900 my-2">₹99</div>
+          <span class="text-xs font-extrabold text-green-700 bg-green-100 px-3 py-1 rounded-full">Unlimited Photos & Credits</span>
+          <p class="text-xs text-gray-500 mt-2">No watermark • 300 DPI High Resolution • All AI Features</p>
         </div>
       </div>
 
@@ -3710,15 +3676,15 @@
       <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-6">
         <div class="flex justify-between items-center text-sm mb-1">
           <span class="text-gray-600">Selected Plan:</span>
-          <span class="font-bold text-gray-900" id="rechargeSelectedName">Studio Pack</span>
+          <span class="font-bold text-gray-900" id="rechargeSelectedName">Unlimited Plan</span>
         </div>
         <div class="flex justify-between items-center text-sm mb-2">
           <span class="text-gray-600">Total Credits:</span>
-          <span class="font-bold text-primary" id="rechargeSelectedCredits">+100 Credits</span>
+          <span class="font-bold text-primary" id="rechargeSelectedCredits">Unlimited</span>
         </div>
         <div class="flex justify-between items-center border-t border-gray-200 pt-2 text-base font-extrabold">
           <span class="text-gray-900">Total Payable:</span>
-          <span class="text-xl text-green-600" id="rechargeSelectedAmount">₹199</span>
+          <span class="text-xl text-green-600" id="rechargeSelectedAmount">₹99</span>
         </div>
       </div>
 
