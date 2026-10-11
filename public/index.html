@@ -186,32 +186,36 @@
   @media (min-width: 900px) {
     .editor-layout {
       flex-direction: row-reverse;
-      align-items: center; /* Exactly centered vertically with the photo! */
+      align-items: stretch; /* Both stretch to the EXACT same full height! */
       justify-content: center;
       gap: 24px;
+      min-height: 520px;
     }
     .sidebar {
-      width: 390px;
-      max-height: calc(100vh - 165px);
-      overflow-y: auto;
+      width: 400px;
+      min-height: 520px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
     .canvas-container {
-      min-height: 480px;
-      max-height: calc(100vh - 165px);
+      min-height: 520px;
+      flex: 1;
+      min-width: 0;
     }
   }
   
   .sidebar { 
     background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
     border-radius: var(--radius); border: 1px solid rgba(229, 231, 235, 0.9); 
-    padding: 16px 20px; box-shadow: var(--shadow-lg); 
+    padding: 22px 24px; box-shadow: var(--shadow-lg); 
     display: flex; flex-direction: column; justify-content: space-between;
   }
   
   .canvas-container { 
     background: rgba(255,255,255,0.7); backdrop-filter: blur(8px);
     border-radius: var(--radius); border: 1px solid rgba(229, 231, 235, 0.8); box-shadow: var(--shadow-lg); 
-    display: flex; align-items: center; justify-content: center; padding: 20px; min-height: 480px; 
+    display: flex; align-items: center; justify-content: center; padding: 20px; min-height: 520px; 
     background-image: radial-gradient(rgba(99, 102, 241, 0.12) 1px, transparent 1px); background-size: 20px 20px; overflow: auto; 
   }
 
@@ -1118,26 +1122,38 @@
   <div id="step-3" class="view-panel">
     <div class="editor-layout">
       <div class="sidebar">
-        <h2>Background</h2>
-        
-        <div style="margin-bottom:15px; display:flex; align-items:center; gap:8px;">
-          <input type="checkbox" id="doEnhance" checked style="width:18px; height:18px; accent-color:var(--primary); cursor:pointer;">
-          <label for="doEnhance" style="margin:0; font-size:14px; cursor:pointer; color:var(--text); text-transform:none; letter-spacing:0;">Enable AI Face Enhancement (HD)</label>
-        </div>
-        <button class="btn btn-primary" style="width:100%; margin-bottom:10px;" onclick="removeBgApi()">✨ AI Remove Background</button>
-        <div id="progressContainer" class="progress-container"><div id="progressBar" class="progress-bar"></div></div>
-        <div id="progressText" class="progress-text">0% Scanning...</div>
-        <div id="bgLoader" class="loader" style="display:none;"></div>
-        
-        <div class="form-group" style="margin-top:20px;">
-          <label>Pick Background Color</label>
-          <input type="color" id="bgColor" value="#ffffff" oninput="applyBgColor()">
-        </div>
-        
-        <div style="display:flex; gap:10px; margin-bottom:20px;">
-          <button class="btn btn-outline" style="flex:1; padding:10px;" onclick="setBg('#ffffff')">White</button>
-          <button class="btn btn-outline" style="flex:1; padding:10px; background:#3B82F6; color:white; border-color:#3B82F6;" onclick="setBg('#3B82F6')">Blue</button>
-          <button class="btn btn-outline" style="flex:1; padding:10px; background:#EF4444; color:white; border-color:#EF4444;" onclick="setBg('#EF4444')">Red</button>
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h2 style="font-size:18px; font-weight:800; margin:0; color:#111827;">Background Color</h2>
+            <span style="font-size:11px; font-weight:700; color:#4f46e5; background:#eef2ff; padding:2px 8px; border-radius:12px;">Step 3 of 5</span>
+          </div>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px; line-height:1.4;">Remove background and choose official passport background color.</p>
+          
+          <div style="margin-bottom:12px; display:flex; align-items:center; gap:8px; background:#f8fafc; padding:8px 12px; border-radius:10px; border:1px solid #e2e8f0;">
+            <input type="checkbox" id="doEnhance" checked style="width:16px; height:16px; accent-color:var(--primary); cursor:pointer;">
+            <label for="doEnhance" style="margin:0; font-size:13px; font-weight:600; cursor:pointer; color:var(--text); text-transform:none; letter-spacing:0;">Enable AI Face Enhancement (HD)</label>
+          </div>
+          <button class="btn btn-primary" style="width:100%; margin-bottom:14px; padding:11px 20px; font-weight:800; font-size:14px;" onclick="removeBgApi()">✨ AI Remove Background</button>
+          <div id="progressContainer" class="progress-container"><div id="progressBar" class="progress-bar"></div></div>
+          <div id="progressText" class="progress-text">0% Scanning...</div>
+          <div id="bgLoader" class="loader" style="display:none;"></div>
+          
+          <div class="form-group" style="margin-top:16px; margin-bottom:12px;">
+            <label style="font-size:11px; font-weight:800; color:var(--text-muted); margin-bottom:6px; display:block;">CUSTOM COLOR PICKER</label>
+            <input type="color" id="bgColor" value="#ffffff" oninput="applyBgColor()" style="height:42px; padding:4px 8px; cursor:pointer;">
+          </div>
+          
+          <div style="margin-top:10px;">
+            <label style="font-size:11px; font-weight:800; color:var(--text-muted); margin-bottom:6px; display:block;">POPULAR PASSPORT PRESETS</label>
+            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:14px;">
+              <button class="btn btn-outline" style="padding:8px 6px; font-size:12px; font-weight:700;" onclick="setBg('#ffffff')">White</button>
+              <button class="btn btn-outline" style="padding:8px 6px; font-size:12px; font-weight:700; background:#3B82F6; color:white; border-color:#3B82F6;" onclick="setBg('#3B82F6')">Blue</button>
+              <button class="btn btn-outline" style="padding:8px 6px; font-size:12px; font-weight:700; background:#EF4444; color:white; border-color:#EF4444;" onclick="setBg('#EF4444')">Red</button>
+              <button class="btn btn-outline" style="padding:8px 6px; font-size:12px; font-weight:700; background:#93C5FD; color:#1E3A8A; border-color:#93C5FD;" onclick="setBg('#93C5FD')">Sky Blue</button>
+              <button class="btn btn-outline" style="padding:8px 6px; font-size:12px; font-weight:700; background:#E5E7EB; color:#1F2937; border-color:#D1D5DB;" onclick="setBg('#E5E7EB')">Light Grey</button>
+              <button class="btn btn-outline" style="padding:8px 6px; font-size:12px; font-weight:700; background:#1E3A8A; color:white; border-color:#1E3A8A;" onclick="setBg('#1E3A8A')">Navy Blue</button>
+            </div>
+          </div>
         </div>
 
         <div class="nav-footer">
