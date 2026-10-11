@@ -1248,7 +1248,10 @@
           </div>
           <p style="font-size:13.5px; color:var(--text-muted); margin-bottom:16px; line-height:1.4;">Fine-tune photo lighting and select HD export quality.</p>
 
-          <button class="btn btn-primary" style="width:100%; margin-bottom:16px; padding:12px 20px; font-size:15px; font-weight:800;" onclick="autoEnhance()">✨ Auto Enhance (स्मार्ट सुधार)</button>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:12px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;"><i class="fa-solid fa-wand-magic-sparkles text-primary mr-1"></i> LIGHTING & ADJUSTMENTS</span>
+            <button type="button" onclick="autoEnhance()" style="background:#eef2ff; border:1.5px solid #818cf8; color:#3730a3; padding:4px 10px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;" title="Preview Auto Enhance">✨ Test Enhance</button>
+          </div>
           
           <div class="form-group" style="margin-bottom:14px;">
             <label style="font-size:12px; margin-bottom:6px; display:block;">Brightness <span id="vB" class="slider-val">100%</span></label>
@@ -1289,7 +1292,7 @@
 
         <div class="nav-footer" style="margin-top:16px; padding-top:16px;">
           <button class="btn btn-outline" style="padding:10px 22px; font-size:14px; font-weight:700;" onclick="goToStep(3)">Back</button>
-          <button class="btn btn-primary" style="padding:10px 26px; font-size:15px; font-weight:800;" onclick="preparePrintStep()">Layout & Print ➔</button>
+          <button id="btnEnhanceStep" class="btn btn-primary" style="padding:11px 26px; font-size:15px; font-weight:800; background:linear-gradient(135deg, #6366f1 0%, #a855f7 100%); box-shadow:0 4px 18px rgba(99,102,241,0.4);" onclick="handleEnhanceAndLayout()">✨ Auto Enhance & Print Layout ➔</button>
         </div>
       </div>
       <div class="canvas-container" style="position:relative; display:inline-flex; align-items:center; justify-content:center; max-height:65vh;">
@@ -2207,6 +2210,17 @@
     document.getElementById('slC').value = 115;
     document.getElementById('slS').value = 105;
     applyAdjustments();
+  }
+
+  function handleEnhanceAndLayout() {
+    const b = +document.getElementById('slB').value;
+    const c = +document.getElementById('slC').value;
+    const s = +document.getElementById('slS').value;
+    // Agar manually sliders change nahi kiye hain (100% par hain), to auto enhance apply karke aage badhein
+    if (b === 100 && c === 100 && s === 100) {
+      autoEnhance();
+    }
+    preparePrintStep();
   }
 
   // 5. Print Layout
