@@ -183,7 +183,7 @@
   .sidebar { width: 100%; flex-shrink: 0; }
   .canvas-container { flex-grow: 1; min-width: 0; width: 100%; }
   
-  @media (min-width: 900px) {
+  @media (min-width: 768px) {
     .editor-layout {
       flex-direction: row-reverse;
       align-items: stretch; /* Both stretch to the EXACT same full height! */
@@ -479,8 +479,8 @@
     -webkit-user-drag: none !important;
   }
 
-  /* ================= ULTIMATE MOBILE RESPONSIVENESS ================= */
-  @media (max-width: 899px) {
+  /* ================= ULTIMATE MOBILE RESPONSIVENESS (<768px ONLY) ================= */
+  @media (max-width: 767px) {
     /* Navbar Padding & Alignment */
     nav .h-\[70px\] {
       height: 62px !important;
@@ -608,7 +608,7 @@
         </a>
 
         <!-- Center Nav Links (Desktop) -->
-        <div class="hidden lg:flex items-center gap-1 xl:gap-2">
+        <div class="hidden md:flex items-center gap-1 xl:gap-2">
           <a href="#" class="px-3.5 py-1.5 rounded-full text-[13px] xl:text-sm font-bold bg-indigo-50 text-indigo-600 shadow-xs whitespace-nowrap transition">Home</a>
           <a href="pricing.html" class="px-3.5 py-1.5 rounded-full text-[13px] xl:text-sm font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100/70 whitespace-nowrap transition">Pricing</a>
           <a href="requirements.html" class="px-3.5 py-1.5 rounded-full text-[13px] xl:text-sm font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100/70 whitespace-nowrap transition">Photo Guide</a>
@@ -681,14 +681,14 @@
           </div>
 
           <!-- Mobile Hamburger Button -->
-          <button id="mobileNavToggleBtn" onclick="toggleMobileNav()" class="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center text-gray-700 hover:bg-gray-100 border border-gray-200 transition cursor-pointer shrink-0" aria-label="Toggle Menu">
+          <button id="mobileNavToggleBtn" onclick="toggleMobileNav()" class="md:hidden w-9 h-9 rounded-xl flex items-center justify-center text-gray-700 hover:bg-gray-100 border border-gray-200 transition cursor-pointer shrink-0" aria-label="Toggle Menu">
             <i class="fa-solid fa-bars text-sm" id="mobileNavIcon"></i>
           </button>
         </div>
       </div>
 
       <!-- Mobile Dropdown Menu -->
-      <div id="mobileNavMenu" class="hidden lg:hidden border-t border-gray-100 py-3 bg-white/95 backdrop-blur-md rounded-b-2xl shadow-xl px-2 space-y-1">
+      <div id="mobileNavMenu" class="hidden md:hidden border-t border-gray-100 py-3 bg-white/95 backdrop-blur-md rounded-b-2xl shadow-xl px-2 space-y-1">
         <a href="#" class="block px-4 py-2 text-sm font-bold text-indigo-600 bg-indigo-50 rounded-xl">Home</a>
         <a href="pricing.html" class="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 rounded-xl">Pricing</a>
         <a href="requirements.html" class="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 rounded-xl">Photo Guide</a>
@@ -703,7 +703,7 @@
   <div id="landing-page-container">
   <!-- Hero Section -->
   <section class="pt-24 sm:pt-32 pb-12 sm:pb-20 hero-bg">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center">
       
       <!-- Left Content -->
       <div>
@@ -727,7 +727,7 @@
 
         <!-- Upload Box -->
         <div onclick="document.getElementById('fileIn').click()" class="block border-2 border-dashed border-primary bg-indigo-50/50 rounded-2xl p-6 sm:p-8 text-center hover:bg-indigo-50 hover:border-indigo-600 transition group cursor-pointer">
-          <button class="bg-primary text-white font-bold py-3 px-6 sm:px-8 rounded-xl shadow-lg shadow-indigo-200 group-hover:scale-105 transition flex items-center gap-2 mx-auto mb-3 sm:mb-4 text-sm sm:text-base">
+          <button class="bg-primary text-white font-bold py-3 px-6 sm:px-8 rounded-xl shadow-lg shadow-indigo-200 group-hover:scale-105 transition flex items-center gap-2 mx-auto mb-3 sm:mb-4 text-sm sm:base">
             <i class="fa-solid fa-cloud-arrow-up"></i> Upload Your Photo
           </button>
           <p class="text-xs sm:text-sm text-gray-500 font-medium">Click to browse or drag and drop<br>JPG, PNG (Max 10MB)</p>
@@ -739,7 +739,7 @@
       </div>
 
       <!-- Right Visual (6-Photo Passport Print Sheet Mockup) -->
-      <div class="relative mt-6 lg:mt-0">
+      <div class="relative mt-6 md:mt-0">
         <div class="absolute inset-0 bg-gradient-to-tr from-indigo-100 to-pink-100 rounded-[2rem] sm:rounded-[3rem] transform rotate-2 sm:rotate-3 scale-105 -z-10"></div>
         <div class="bg-white rounded-2xl sm:rounded-[2rem] p-3 sm:p-4 shadow-2xl relative border border-indigo-50">
           
@@ -847,8 +847,8 @@
         <p class="text-gray-500">Get your professional photo in 6 easy steps.</p>
       </div>
       
-      <div class="flex flex-wrap lg:flex-nowrap justify-between gap-6 relative">
-        <div class="text-center w-full lg:w-auto step-line">
+      <div class="flex flex-wrap md:flex-nowrap justify-between gap-4 md:gap-6 relative">
+        <div class="text-center w-full md:w-auto step-line">
           <div class="w-16 h-16 bg-white rounded-2xl shadow-md border border-gray-100 flex items-center justify-center text-primary text-2xl mx-auto mb-4 relative">
             <i class="fa-solid fa-cloud-arrow-up"></i>
             <div class="absolute -top-3 -left-3 w-6 h-6 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center">1</div>
@@ -857,7 +857,7 @@
           <p class="text-xs text-gray-500">Choose or drag & drop</p>
         </div>
         
-        <div class="text-center w-full lg:w-auto step-line">
+        <div class="text-center w-full md:w-auto step-line">
           <div class="w-16 h-16 bg-white rounded-2xl shadow-md border border-gray-100 flex items-center justify-center text-purple-600 text-2xl mx-auto mb-4 relative">
             <i class="fa-solid fa-crop-simple"></i>
             <div class="absolute -top-3 -left-3 w-6 h-6 rounded-full bg-purple-600 text-white text-xs font-bold flex items-center justify-center">2</div>
@@ -866,7 +866,7 @@
           <p class="text-xs text-gray-500">Auto-crop to right size</p>
         </div>
         
-        <div class="text-center w-full lg:w-auto step-line">
+        <div class="text-center w-full md:w-auto step-line">
           <div class="w-16 h-16 bg-white rounded-2xl shadow-md border border-gray-100 flex items-center justify-center text-green-600 text-2xl mx-auto mb-4 relative">
             <i class="fa-solid fa-eraser"></i>
             <div class="absolute -top-3 -left-3 w-6 h-6 rounded-full bg-green-600 text-white text-xs font-bold flex items-center justify-center">3</div>
@@ -875,7 +875,7 @@
           <p class="text-xs text-gray-500">Auto remove & choose color</p>
         </div>
         
-        <div class="text-center w-full lg:w-auto step-line">
+        <div class="text-center w-full md:w-auto step-line">
           <div class="w-16 h-16 bg-white rounded-2xl shadow-md border border-gray-100 flex items-center justify-center text-orange-500 text-2xl mx-auto mb-4 relative">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
             <div class="absolute -top-3 -left-3 w-6 h-6 rounded-full bg-orange-500 text-white text-xs font-bold flex items-center justify-center">4</div>
@@ -884,7 +884,7 @@
           <p class="text-xs text-gray-500">Make your photo sharp</p>
         </div>
         
-        <div class="text-center w-full lg:w-auto step-line">
+        <div class="text-center w-full md:w-auto step-line">
           <div class="w-16 h-16 bg-white rounded-2xl shadow-md border border-gray-100 flex items-center justify-center text-pink-500 text-2xl mx-auto mb-4 relative">
             <i class="fa-solid fa-sliders"></i>
             <div class="absolute -top-3 -left-3 w-6 h-6 rounded-full bg-pink-500 text-white text-xs font-bold flex items-center justify-center">5</div>
@@ -893,7 +893,7 @@
           <p class="text-xs text-gray-500">Brightness, contrast etc.</p>
         </div>
         
-        <div class="text-center w-full lg:w-auto">
+        <div class="text-center w-full md:w-auto">
           <div class="w-16 h-16 bg-white rounded-2xl shadow-md border border-gray-100 flex items-center justify-center text-blue-600 text-2xl mx-auto mb-4 relative">
             <i class="fa-solid fa-download"></i>
             <div class="absolute -top-3 -left-3 w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">6</div>
