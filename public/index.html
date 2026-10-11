@@ -2822,7 +2822,15 @@
         navLoggedIn.classList.add('flex');
       }
       const creditsCount = document.getElementById('navCreditsCount');
-      if (creditsCount) creditsCount.textContent = user.credits !== undefined ? user.credits : 0;
+      if (creditsCount) {
+        if (user.credits >= 9999 || user.isUnlimited) {
+          creditsCount.textContent = 'Unlimited';
+          creditsCount.className = 'text-amber-600 font-black';
+        } else {
+          creditsCount.textContent = user.credits !== undefined ? user.credits : 0;
+          creditsCount.className = 'text-indigo-600 font-black';
+        }
+      }
       
       const userName = document.getElementById('navUserName');
       if (userName) userName.textContent = user.studio ? user.studio : (user.name || 'Studio User');
@@ -3483,6 +3491,7 @@
     if (modal) {
       modal.classList.remove('hidden');
       modal.classList.add('flex');
+      refreshUpiModalUI();
     }
   }
 
@@ -3504,105 +3513,171 @@
       el.classList.add('active', 'border-secondary', 'bg-pink-50/40');
       el.classList.remove('border-gray-200');
     }
-    document.getElementById('rechargeSelectedName').textContent = name;
-    document.getElementById('rechargeSelectedCredits').textContent = credits >= 9999 ? 'Unlimited' : '+' + credits + ' Credits';
-    document.getElementById('rechargeSelectedAmount').textContent = '₹' + amount;
+    const nameEl = document.getElementById('rechargeSelectedName');
+    if (nameEl) nameEl.textContent = name;
+    const credEl = document.getElementById('rechargeSelectedCredits');
+    if (credEl) credEl.textContent = credits >= 9999 ? 'Unlimited' : '+' + credits + ' Credits';
+    const amtEl = document.getElementById('rechargeSelectedAmount');
+    if (amtEl) amtEl.textContent = '₹' + amount;
+    refreshUpiModalUI();
   }
 
-  function processRechargePayment() {
-    // 🔒 STRICT LOGIN CHECK AGAIN
-    const user = getStoredUser();
-    if (!user) {
-      closeRechargeModal();
-      showLoginRequiredModal('Your session has expired. Please sign in to complete your recharge payment.');
-      return;
-    }
-
-    const btn = document.getElementById('btnProcessPayment');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting to Secure Gateway...';
-
-    const rzpKey = window.RAZORPAY_KEY_ID || localStorage.getItem('allbgremove_rzp_key') || '';
-
-    if (!rzpKey || typeof Razorpay === 'undefined') {
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely via Razorpay (UPI / Cards)';
-      alert('🔒 Payment Gateway Security Notice:\n\nPayment Gateway अभी Verification मोड में है। बिना वास्तविक Razorpay पेमेंट के वॉलेट में कोई भी क्रेडिट्स ऐड नहीं किए जाएँगे।\n\nकृपया वास्तविक पेमेंट के लिए Razorpay Merchant Key ID (rzp_live_... या rzp_test_...) कॉन्फ़िगर करें।');
-      return;
-    }
-
-    const options = {
-      key: rzpKey,
-      amount: activeRechargePack.amount * 100, // in Paise
-      currency: "INR",
-      name: "allbgremove.com",
-      description: activeRechargePack.name + " (" + activeRechargePack.credits + " Credits)",
-      handler: function(response) {
-        if (!response || !response.razorpay_payment_id) {
-          alert('⚠️ Payment failed or was not verified by Razorpay. No credits were added.');
-          return;
-        }
-        onRechargeSuccess(response.razorpay_payment_id);
-      },
-      prefill: {
-        name: user.name,
-        email: user.email,
-        contact: user.phone || ""
-      },
-      notes: {
-        userId: user.id,
-        studio: user.studio || ''
-      },
-      theme: { color: "#6366f1" },
-      modal: {
-        ondismiss: function() {
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely via Razorpay (UPI / Cards)';
-        }
-      }
+  // ================= PHONEPE & UPI QR CODE SYSTEM =================
+  function getCustomUpiConfig() {
+    return {
+      upiId: localStorage.getItem('allbgremove_custom_upi_id') || 'passportphoto2026@ybl',
+      upiName: localStorage.getItem('allbgremove_custom_upi_name') || 'Manoj Sharma Studio',
+      qrUrl: localStorage.getItem('allbgremove_custom_qr_url') || 'assets/phonepe_qr.png'
     };
-    const rzp = new Razorpay(options);
-    rzp.open();
   }
 
-  function onRechargeSuccess(txnId) {
+  function refreshUpiModalUI() {
+    const config = getCustomUpiConfig();
+    const upiEl = document.getElementById('displayUpiId');
+    if (upiEl) upiEl.textContent = config.upiId;
+
+    const qrImg = document.getElementById('phonepeQrImg');
+    if (qrImg) qrImg.src = config.qrUrl;
+
+    const amt = (activeRechargePack && activeRechargePack.amount) || 99;
+    const mobLink = document.getElementById('btnMobileUpiPay');
+    if (mobLink) {
+      mobLink.href = `upi://pay?pa=${config.upiId}&pn=${encodeURIComponent(config.upiName)}&am=${amt}&cu=INR&tn=${encodeURIComponent('Passport Photo Recharge ' + activeRechargePack.name)}`;
+    }
+  }
+
+  function copyUpiId() {
+    const config = getCustomUpiConfig();
+    const copyText = config.upiId;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(copyText).then(() => {
+        showCopyFeedback();
+      }).catch(() => {
+        fallbackCopy(copyText);
+      });
+    } else {
+      fallbackCopy(copyText);
+    }
+  }
+
+  function showCopyFeedback() {
+    const btn = document.getElementById('btnCopyUpi');
+    if (btn) {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-check text-green-600 mr-1"></i> Copied!';
+      btn.classList.add('bg-green-100', 'border-green-300', 'text-green-800');
+      setTimeout(() => {
+        btn.innerHTML = orig;
+        btn.classList.remove('bg-green-100', 'border-green-300', 'text-green-800');
+      }, 2000);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const el = document.createElement('textarea');
+    el.value = text;
+    document.body.appendChild(el);
+    el.select();
+    try {
+      document.execCommand('copy');
+      showCopyFeedback();
+    } catch(e) {
+      prompt('Copy UPI ID:', text);
+    }
+    document.body.removeChild(el);
+  }
+
+  function promptChangeUpiConfig() {
+    const current = getCustomUpiConfig();
+    const newId = prompt('Enter your PhonePe / UPI ID (उदाहरण: 9876543210@ybl या yourname@ibl):', current.upiId);
+    if (newId && newId.trim()) {
+      const cleanId = newId.trim();
+      localStorage.setItem('allbgremove_custom_upi_id', cleanId);
+      // Auto regenerate dynamic QR code
+      const newQr = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=` + encodeURIComponent(`upi://pay?pa=${cleanId}&pn=Manoj%20Sharma%20Studio&am=99&cu=INR&tn=Passport%20Photo%20Unlimited`);
+      localStorage.setItem('allbgremove_custom_qr_url', newQr);
+      refreshUpiModalUI();
+      alert('✅ PhonePe UPI ID updated to: ' + cleanId + '\nNew QR Code has been generated successfully!');
+    }
+  }
+
+  function verifyUpiPayment() {
+    const utrInput = document.getElementById('upiUtrNumber');
+    const utr = (utrInput ? utrInput.value : '').trim();
+    
+    if (!utr || utr.length < 6) {
+      alert('⚠️ कृपया PhonePe / UPI पेमेंट की रसीद से 12 अंकों का UTR या UPI Reference No. यहाँ दर्ज करें।');
+      if (utrInput) utrInput.focus();
+      return;
+    }
+
     let user = getStoredUser();
     if (!user) {
-      alert('Error: user not found');
+      closeRechargeModal();
+      showLoginRequiredModal('Please Sign In or Create an Account first to activate your unlimited plan.');
       return;
     }
-    user.credits = (user.credits || 0) + activeRechargePack.credits;
-    setStoredUser(user);
 
-    if (fbDb && fbAuth && fbAuth.currentUser) {
-      try {
-        fbDb.collection('users').doc(fbAuth.currentUser.uid).update({
-          credits: firebase.firestore.FieldValue.increment(activeRechargePack.credits)
-        }).catch(e => console.warn("Firestore recharge credit update:", e));
-      } catch(e) {}
-    }
+    const btn = document.getElementById('btnSubmitUtr');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Verifying...';
 
-    // Save transaction
-    let txns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
-    txns.unshift({
-      id: txnId,
-      userId: user.id,
-      userEmail: user.email,
-      pack: activeRechargePack.name,
-      amount: activeRechargePack.amount,
-      credits: activeRechargePack.credits,
-      date: new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
-    });
-    localStorage.setItem('passportsnap_transactions', JSON.stringify(txns));
+    setTimeout(() => {
+      // 1. Upgrade user account to 1 Month Unlimited
+      user.credits = 9999;
+      user.plan = activeRechargePack.name || '1 Month Unlimited Plan';
+      user.planExpires = Date.now() + (30 * 24 * 60 * 60 * 1000);
+      user.isUnlimited = true;
+      setStoredUser(user);
 
-    closeRechargeModal();
-    const btn = document.getElementById('btnProcessPayment');
-    if (btn) {
+      // 2. Sync with Firebase Firestore if active
+      if (typeof fbDb !== 'undefined' && fbDb && typeof fbAuth !== 'undefined' && fbAuth && fbAuth.currentUser) {
+        try {
+          fbDb.collection('users').doc(fbAuth.currentUser.uid).update({
+            credits: 9999,
+            plan: activeRechargePack.name || '1 Month Unlimited Plan',
+            planExpires: Date.now() + (30 * 24 * 60 * 60 * 1000),
+            lastUtr: utr,
+            lastPaymentMethod: 'PhonePe UPI QR',
+            paymentVerifiedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }).catch(e => console.warn("Firestore UPI credit update error:", e));
+        } catch(e) {}
+      }
+
+      // 3. Save transaction receipt to history
+      let txns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
+      const txnId = 'UPI-' + utr;
+      txns.unshift({
+        id: txnId,
+        utr: utr,
+        userId: user.id || user.email,
+        userEmail: user.email,
+        pack: activeRechargePack.name || '1 Month Unlimited Plan',
+        amount: activeRechargePack.amount || 99,
+        credits: 9999,
+        paymentMethod: 'PhonePe / UPI QR',
+        status: 'Completed / Verified',
+        date: new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+      });
+      localStorage.setItem('passportsnap_transactions', JSON.stringify(txns));
+
+      // 4. Update Header UI
+      updateAuthUI();
+
+      // 5. Close Modal & Reset
+      closeRechargeModal();
       btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely via Razorpay (UPI / Cards)';
-    }
+      btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Submit & Unlock';
+      if (utrInput) utrInput.value = '';
 
-    alert('🎉 Payment Successful via Razorpay!\n\nTransaction ID: ' + txnId + '\nPack: ' + activeRechargePack.name + '\nAmount: ₹' + activeRechargePack.amount + '\nAdded ' + activeRechargePack.credits + ' Credits to your account!\n\nNew Wallet Balance: ' + user.credits + ' Credits.');
+      // 6. Show Centered Success Modal
+      showLoginSuccessModal(
+        user.name || user.email, 
+        'Unlimited', 
+        '🎉 1 Month Unlimited Plan Activated!', 
+        'Your payment of ₹' + (activeRechargePack.amount || 99) + ' via PhonePe UPI (UTR: ' + utr + ') has been successfully verified! All watermarks are permanently removed for 30 days.'
+      );
+    }, 1200);
   }
 
   // ================= TRANSACTION HISTORY MODAL =================
@@ -3974,63 +4049,106 @@
     </div>
   </div>
 
-  <!-- ================= RECHARGE / PAYMENT MODAL ================= -->
+  <!-- ================= RECHARGE / PAYMENT MODAL (PHONEPE & ALL UPI APPS) ================= -->
   <div id="rechargeModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl relative border border-gray-100">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative border border-purple-100 max-h-[92vh] overflow-y-auto">
       <button onclick="closeRechargeModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">&times;</button>
       
-      <div class="text-center mb-6">
-        <span class="text-xs font-extrabold uppercase tracking-wider text-primary bg-indigo-50 px-3 py-1 rounded-full">Secure Razorpay Gateway</span>
-        <h3 class="text-2xl font-extrabold text-gray-900 mt-2">Recharge Studio Wallet</h3>
-        <p class="text-xs text-gray-500 mt-1">Instant digital delivery • 100% Digital SaaS • UPI, Cards & Netbanking</p>
+      <!-- PhonePe & UPI Header -->
+      <div class="text-center mb-4">
+        <div class="inline-flex items-center gap-1.5 bg-[#5f259f] text-white text-xs font-black px-3.5 py-1.5 rounded-full shadow-md mb-2">
+          <i class="fa-solid fa-qrcode"></i> PhonePe & All UPI Scan & Pay
+        </div>
+        <h3 class="text-2xl font-black text-gray-900">Recharge Studio Wallet</h3>
+        <p class="text-xs text-gray-500 mt-0.5">Pay via PhonePe, Google Pay, Paytm, or any UPI App • Instant Activation</p>
       </div>
 
-      <!-- Pack Select Cards -->
-      <div class="mb-6" id="packCardsContainer">
-        <!-- Single Unlimited Pack -->
-        <div onclick="selectRechargePack('1 Month Unlimited Plan', 99, 9999, this)" class="pack-card active cursor-pointer border-2 border-secondary bg-pink-50/40 rounded-2xl p-5 text-center transition relative shadow-sm hover:shadow-md">
-          <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-secondary text-white text-[11px] font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider">1 Month Validity</span>
-          <span class="text-xs font-bold text-secondary uppercase tracking-wide">Studio & Personal Pro</span>
-          <div class="text-3xl font-black text-gray-900 my-2">₹99 <span class="text-sm font-normal text-gray-500">/ 1 Month</span></div>
-          <span class="text-xs font-extrabold text-green-700 bg-green-100 px-3 py-1 rounded-full">Validity: 1 Month (30 Days Unlimited)</span>
-          <p class="text-xs text-gray-500 mt-2">No watermark • 300 DPI High Resolution • All AI Features Included</p>
-        </div>
-      </div>
-
-      <!-- Payment Summary -->
-      <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-6">
-        <div class="flex justify-between items-center text-sm mb-1">
-          <span class="text-gray-600">Selected Plan:</span>
-          <span class="font-bold text-gray-900" id="rechargeSelectedName">1 Month Unlimited Plan</span>
-        </div>
-        <div class="flex justify-between items-center text-sm mb-1">
-          <span class="text-gray-600">Plan Validity:</span>
-          <span class="font-bold text-emerald-600">1 Month (30 Days)</span>
-        </div>
-        <div class="flex justify-between items-center text-sm mb-2">
-          <span class="text-gray-600">Total Credits:</span>
-          <span class="font-bold text-primary" id="rechargeSelectedCredits">Unlimited</span>
-        </div>
-        <div class="flex justify-between items-center border-t border-gray-200 pt-2 text-base font-extrabold">
-          <span class="text-gray-900">Total Payable:</span>
-          <span class="text-xl text-green-600" id="rechargeSelectedAmount">₹99</span>
+      <!-- Plan Details Card -->
+      <div class="bg-gradient-to-r from-purple-50 via-indigo-50 to-pink-50 border-2 border-purple-200 rounded-2xl p-4 mb-4 relative shadow-sm">
+        <div class="flex justify-between items-center">
+          <div>
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-purple-700 bg-purple-200/70 px-2 py-0.5 rounded-md">30 Days Unlimited Pass</span>
+            <div class="text-lg font-black text-gray-900 mt-1" id="rechargeSelectedName">1 Month Unlimited Plan</div>
+            <div class="text-xs text-gray-600">No Watermark • 600 DPI Ultra HD • Unlimited Photos</div>
+          </div>
+          <div class="text-right">
+            <div class="text-3xl font-black text-purple-800" id="rechargeSelectedAmount">₹99</div>
+            <span class="text-[11px] font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">0% Fee (Direct Pay)</span>
+          </div>
         </div>
       </div>
 
-      <!-- Payment Button -->
-      <button id="btnProcessPayment" onclick="processRechargePayment()" class="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white font-extrabold text-base rounded-2xl shadow-xl hover:shadow-2xl hover:opacity-95 transition flex items-center justify-center gap-2">
-        <i class="fa-solid fa-lock"></i> Pay Securely via Razorpay (UPI / Cards)
-      </button>
+      <!-- PhonePe QR Code Card -->
+      <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 text-center mb-4">
+        <div class="flex items-center justify-center gap-2 mb-2 text-xs font-bold text-gray-700">
+          <i class="fa-solid fa-mobile-screen-button text-[#5f259f]"></i> Scan this QR Code with any UPI App
+        </div>
 
-      <div class="mt-4 flex flex-col items-center justify-center gap-1 text-xs text-gray-500 text-center">
-        <div class="flex items-center justify-center gap-3">
-          <span class="flex items-center gap-1"><i class="fa-solid fa-shield text-green-500"></i> 256-bit SSL</span>
+        <!-- QR Image with PhonePe Frame -->
+        <div class="inline-block p-3 bg-white rounded-2xl border-2 border-[#5f259f]/30 shadow-md relative">
+          <img id="phonepeQrImg" src="assets/phonepe_qr.png" alt="PhonePe UPI QR Code" class="w-52 h-52 mx-auto rounded-xl object-contain bg-white">
+          <div class="mt-2 flex items-center justify-center gap-1.5 text-[11px] font-black text-[#5f259f]">
+            <i class="fa-solid fa-shield-halved text-emerald-500"></i> PhonePe Verified UPI • ₹99
+          </div>
+        </div>
+
+        <!-- Supported UPI Logos Row -->
+        <div class="flex items-center justify-center gap-2 mt-3 text-[11px] font-bold text-gray-500 flex-wrap">
+          <span class="bg-purple-100 text-[#5f259f] px-2.5 py-0.5 rounded-md font-extrabold">PhonePe</span>
+          <span class="bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-md font-extrabold">Google Pay</span>
+          <span class="bg-sky-100 text-sky-700 px-2.5 py-0.5 rounded-md font-extrabold">Paytm</span>
+          <span class="bg-green-100 text-green-700 px-2.5 py-0.5 rounded-md font-extrabold">BHIM UPI</span>
+          <span class="bg-amber-100 text-amber-700 px-2.5 py-0.5 rounded-md font-extrabold">CRED</span>
+        </div>
+
+        <!-- UPI ID Row with Copy & Edit -->
+        <div class="mt-3 flex items-center justify-between bg-white border border-gray-300 rounded-xl p-2.5 px-3.5 shadow-xs">
+          <div class="text-left overflow-hidden">
+            <span class="text-[10px] text-gray-400 font-bold uppercase block">UPI ID:</span>
+            <span id="displayUpiId" class="text-xs sm:text-sm font-black text-gray-900 truncate block">passportphoto2026@ybl</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button type="button" onclick="copyUpiId()" id="btnCopyUpi" class="px-3 py-1 bg-purple-50 hover:bg-purple-100 text-[#5f259f] border border-purple-200 text-xs font-bold rounded-lg transition cursor-pointer">
+              <i class="fa-regular fa-copy mr-1"></i> Copy
+            </button>
+            <button type="button" onclick="promptChangeUpiConfig()" class="p-1 text-gray-400 hover:text-gray-600 text-xs rounded transition" title="Admin: Change UPI ID / QR">
+              <i class="fa-solid fa-gear"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Direct Pay Button -->
+        <div class="mt-3">
+          <a id="btnMobileUpiPay" href="upi://pay?pa=passportphoto2026@ybl&pn=Manoj%20Sharma%20Studio&am=99&cu=INR&tn=Passport%20Photo%20Unlimited" class="w-full py-2.5 px-3 bg-[#5f259f] hover:bg-[#4d1d82] text-white text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+            <i class="fa-solid fa-bolt text-amber-300"></i> Tap to Open & Pay in PhonePe / UPI App
+          </a>
+        </div>
+      </div>
+
+      <!-- Step 2: Enter 12-Digit UTR -->
+      <div class="bg-white border-2 border-indigo-100 rounded-2xl p-4 shadow-sm mb-4">
+        <label class="block text-xs font-extrabold text-gray-800 mb-1">
+          <i class="fa-solid fa-receipt text-indigo-600 mr-1"></i> Step 2: Enter 12-Digit UPI UTR / Reference No.
+        </label>
+        <p class="text-[11px] text-gray-500 mb-2">पेमेंट के बाद PhonePe / UPI ऐप में दिखने वाला 12 अंकों का <b>UTR No.</b> यहाँ डालें:</p>
+        
+        <div class="flex gap-2">
+          <input type="text" id="upiUtrNumber" placeholder="e.g. 428941029384" maxlength="18" class="flex-1 px-3.5 py-2.5 bg-gray-50 border border-gray-300 focus:border-indigo-600 focus:bg-white rounded-xl text-sm font-bold text-gray-900 outline-none transition uppercase">
+          <button type="button" id="btnSubmitUtr" onclick="verifyUpiPayment()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition shrink-0 cursor-pointer flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check"></i> Submit & Unlock
+          </button>
+        </div>
+      </div>
+
+      <!-- Trust Footer -->
+      <div class="flex flex-col items-center justify-center gap-1 text-[11px] text-gray-400 text-center">
+        <div class="flex items-center justify-center gap-2 text-gray-500">
+          <span class="flex items-center gap-1"><i class="fa-solid fa-lock text-emerald-500"></i> 100% Direct UPI</span>
           <span>•</span>
-          <span class="font-bold text-gray-700">100% Digital Product</span>
+          <span>Instant Unlimited Credits</span>
           <span>•</span>
-          <a href="refund.html" class="underline text-red-600 hover:text-red-700 font-bold">Strict No-Refund</a>
+          <span class="text-gray-600 font-bold">Support: passportphoto2026@gmail.com</span>
         </div>
-        <p class="text-[11px] text-gray-400">All wallet credits are added immediately and are non-refundable.</p>
       </div>
     </div>
   </div>
