@@ -3309,23 +3309,6 @@
       }
     }, false);
 
-    // 5. Prevent keyboard save & copy shortcuts on canvas area
-    document.addEventListener('keydown', function(e) {
-      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
-        e.preventDefault();
-        showProtectedToast('🔒 Direct saving disabled. Use the Download button after login.');
-        return false;
-      }
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C')) {
-        const sel = window.getSelection ? window.getSelection().toString() : '';
-        if (!sel && (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA')) {
-          e.preventDefault();
-          showProtectedToast('🔒 Copying disabled for protected canvas images.');
-          return false;
-        }
-      }
-    });
-
   })();
 
   let toastTimer = null;
