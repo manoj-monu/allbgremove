@@ -2970,7 +2970,8 @@
       // 🔒 ONLY show Admin link to Manoj Kumar Sharma
       const adminLink = document.getElementById('navAdminLink');
       if (adminLink) {
-        const isAdmin = user && user.email && (user.email.toLowerCase() === 'passportphoto2026@gmail.com');
+        const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com'];
+        const isAdmin = user && user.email && authorizedOwners.includes(user.email.toLowerCase().trim());
         if (isAdmin) {
           adminLink.classList.remove('hidden');
           adminLink.classList.add('flex');
