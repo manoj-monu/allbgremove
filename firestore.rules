@@ -30,9 +30,24 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // 🔒 OWNER ADMIN RULE (MANOJ KUMAR SHARMA ONLY)
+    function isOwnerAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == "passportphoto2026@gmail.com"
+      );
+    }
+
+    // 🔒 PAYMENT REQUESTS (UTR APPROVALS & VERIFICATION)
+    match /payment_requests/{reqId} {
+      // Authenticated users can submit their UTR
+      allow create: if request.auth != null;
+      // ONLY Owner Admin (passportphoto2026@gmail.com) can view, approve or reject
+      allow read, update, delete: if isOwnerAdmin();
+    }
+
     // Default deny all other collections
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if isOwnerAdmin();
     }
   }
 }
