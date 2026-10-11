@@ -1133,10 +1133,6 @@
             <input type="checkbox" id="doEnhance" checked style="width:18px; height:18px; accent-color:var(--primary); cursor:pointer;">
             <label for="doEnhance" style="margin:0; font-size:14px; font-weight:700; cursor:pointer; color:var(--text); text-transform:none; letter-spacing:0;">Enable AI Face Enhancement (HD)</label>
           </div>
-          <button class="btn btn-primary" style="width:100%; margin-bottom:16px; padding:13px 20px; font-weight:800; font-size:15px;" onclick="removeBgApi()">✨ AI Remove Background</button>
-          <div id="progressContainer" class="progress-container"><div id="progressBar" class="progress-bar"></div></div>
-          <div id="progressText" class="progress-text">0% Scanning...</div>
-          <div id="bgLoader" class="loader" style="display:none;"></div>
           
           <div class="form-group" style="margin-top:16px; margin-bottom:14px;">
             <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:6px; display:block;">CUSTOM COLOR PICKER</label>
@@ -1154,11 +1150,20 @@
               <button class="btn btn-outline" style="padding:10px 8px; font-size:13px; font-weight:700; background:#1E3A8A; color:white; border-color:#1E3A8A;" onclick="setBg('#1E3A8A')">Navy Blue</button>
             </div>
           </div>
+
+          <div id="progressContainer" class="progress-container"><div id="progressBar" class="progress-bar"></div></div>
+          <div id="progressText" class="progress-text">0% Scanning...</div>
+          <div id="bgLoader" class="loader" style="display:none;"></div>
+
+          <div id="bgRemovedBadge" style="display:none; align-items:center; justify-content:space-between; background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; padding:10px 14px; border-radius:10px; font-size:13px; font-weight:700; margin-top:12px;">
+            <span><i class="fa-solid fa-circle-check text-emerald-600 mr-2"></i> Background Removed!</span>
+            <button type="button" onclick="removeBgApi(true)" style="background:transparent; border:none; color:#047857; font-weight:800; text-decoration:underline; cursor:pointer; font-size:12px;">🔄 Re-run AI</button>
+          </div>
         </div>
 
         <div class="nav-footer" style="margin-top:16px; padding-top:16px;">
           <button class="btn btn-outline" style="padding:10px 22px; font-size:14px; font-weight:700;" onclick="goToStep(2)">Back</button>
-          <button class="btn btn-primary" style="padding:10px 26px; font-size:15px; font-weight:800;" onclick="goToStep(4); applyAdjustments();">Next ➔</button>
+          <button id="btnBgStep" class="btn btn-primary" style="padding:10px 26px; font-size:15px; font-weight:800;" onclick="handleBgStepAction()">✨ AI Remove Background</button>
         </div>
       </div>
       <div class="canvas-container">
@@ -1736,6 +1741,7 @@
     croppedImage.onload = () => {
       bgRemovedImage.src = croppedImage.src; // Init bg removed as same
       bgRemovedImage.onload = () => {
+        resetBgState();
         initBgCanvas();
         goToStep(3);
       }
@@ -1743,6 +1749,43 @@
   }
 
   // 3. Background
+  let isBgRemoved = false;
+
+  function resetBgState() {
+    isBgRemoved = false;
+    const btn = document.getElementById('btnBgStep');
+    if (btn) {
+      btn.innerHTML = '✨ AI Remove Background';
+      btn.disabled = false;
+      btn.className = 'btn btn-primary';
+      btn.style.boxShadow = '';
+    }
+    const badge = document.getElementById('bgRemovedBadge');
+    if (badge) badge.style.display = 'none';
+  }
+
+  function setBgRemovedSuccess() {
+    isBgRemoved = true;
+    const btn = document.getElementById('btnBgStep');
+    if (btn) {
+      btn.innerHTML = 'Next ➔';
+      btn.disabled = false;
+      btn.className = 'btn btn-primary';
+      btn.style.boxShadow = '0 4px 18px rgba(79, 70, 229, 0.45)';
+    }
+    const badge = document.getElementById('bgRemovedBadge');
+    if (badge) badge.style.display = 'flex';
+  }
+
+  function handleBgStepAction() {
+    if (!isBgRemoved) {
+      removeBgApi();
+    } else {
+      goToStep(4);
+      applyAdjustments();
+    }
+  }
+
   function initBgCanvas() {
     applyBgColor();
   }
@@ -1762,7 +1805,13 @@
     drawWatermark(ctx, c.width, c.height);
   }
 
-  async function removeBgApi() {
+  async function removeBgApi(forceRerun) {
+    const btn = document.getElementById('btnBgStep');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Removing BG...';
+    }
+
     document.getElementById('scannerOverlay').style.display = 'block';
     document.getElementById('progressContainer').style.display = 'block';
     document.getElementById('progressText').style.display = 'block';
@@ -1820,6 +1869,7 @@
             document.getElementById('progressContainer').style.display = 'none';
             document.getElementById('progressText').style.display = 'none';
             applyBgColor();
+            setBgRemovedSuccess();
         }, 500);
       };
       
@@ -1829,6 +1879,10 @@
         document.getElementById('scannerOverlay').style.display = 'none';
         document.getElementById('progressContainer').style.display = 'none';
         document.getElementById('progressText').style.display = 'none';
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '✨ AI Remove Background';
+        }
       };
 
       bgRemovedImage.src = url;
@@ -1839,6 +1893,10 @@
       document.getElementById('scannerOverlay').style.display = 'none';
       document.getElementById('progressContainer').style.display = 'none';
       document.getElementById('progressText').style.display = 'none';
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '✨ AI Remove Background';
+      }
     }
   }
 
