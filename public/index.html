@@ -550,6 +550,9 @@
                   <a href="pricing.html" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition">
                     <i class="fa-solid fa-tags text-purple-500 w-4"></i> View Plans & Pricing
                   </a>
+                  <a href="admin.html" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-indigo-700 bg-indigo-50/80 hover:bg-indigo-100 transition">
+                    <i class="fa-solid fa-crown text-amber-500 w-4"></i> 👑 Owner Admin Panel
+                  </a>
                   <div class="border-t border-gray-100 mt-1 pt-1">
                     <button type="button" onclick="handleLogout(event)" class="w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 transition cursor-pointer">
                       <i class="fa-solid fa-arrow-right-from-bracket w-4"></i> Sign Out
@@ -1056,6 +1059,7 @@
             <li><a href="shipping.html" class="hover:text-white transition">Shipping Policy</a></li>
             <li><a href="disclaimer.html" class="hover:text-white transition">Disclaimer Notice</a></li>
             <li><a href="contact.html" class="hover:text-white transition">Contact Us</a></li>
+            <li><a href="admin.html" class="hover:text-amber-400 transition text-amber-300/80 font-bold"><i class="fa-solid fa-crown text-amber-400 mr-1"></i> Owner Admin Panel</a></li>
           </ul>
         </div>
       </div>
@@ -3631,16 +3635,32 @@
       setStoredUser(user);
 
       // 2. Sync with Firebase Firestore if active
-      if (typeof fbDb !== 'undefined' && fbDb && typeof fbAuth !== 'undefined' && fbAuth && fbAuth.currentUser) {
+      if (typeof fbDb !== 'undefined' && fbDb) {
         try {
-          fbDb.collection('users').doc(fbAuth.currentUser.uid).update({
-            credits: 9999,
-            plan: activeRechargePack.name || '1 Month Unlimited Plan',
-            planExpires: Date.now() + (30 * 24 * 60 * 60 * 1000),
-            lastUtr: utr,
-            lastPaymentMethod: 'PhonePe UPI QR',
-            paymentVerifiedAt: firebase.firestore.FieldValue.serverTimestamp()
-          }).catch(e => console.warn("Firestore UPI credit update error:", e));
+          // Record payment request for Admin Panel real-time tracking
+          fbDb.collection('payment_requests').doc(utr).set({
+            utr: utr,
+            userId: user.id || (fbAuth && fbAuth.currentUser ? fbAuth.currentUser.uid : ''),
+            userEmail: user.email || '',
+            userName: user.name || user.studio || 'Studio User',
+            userPhone: user.phone || '',
+            pack: activeRechargePack.name || '1 Month Unlimited Plan',
+            amount: activeRechargePack.amount || 99,
+            status: 'Approved',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            date: new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+          }, { merge: true }).catch(e => console.warn("Firestore payment_requests error:", e));
+
+          if (fbAuth && fbAuth.currentUser) {
+            fbDb.collection('users').doc(fbAuth.currentUser.uid).update({
+              credits: 9999,
+              plan: activeRechargePack.name || '1 Month Unlimited Plan',
+              planExpires: Date.now() + (30 * 24 * 60 * 60 * 1000),
+              lastUtr: utr,
+              lastPaymentMethod: 'PhonePe UPI QR',
+              paymentVerifiedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(e => console.warn("Firestore UPI credit update error:", e));
+          }
         } catch(e) {}
       }
 

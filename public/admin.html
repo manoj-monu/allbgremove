@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | allbgremove.com (Manoj Kumar Sharma)</title>
+  <link rel="icon" href="assets/phonepe_qr.png" type="image/png">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Inter Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .badge-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col antialiased">
+
+  <!-- ================= PIN LOCK SCREEN (SHOWN BY DEFAULT) ================= -->
+  <div id="pinScreen" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-8 shadow-2xl text-center relative">
+      <div class="w-20 h-20 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-indigo-500/30">
+        <i class="fa-solid fa-shield-halved text-3xl text-white"></i>
+      </div>
+      <h2 class="text-2xl font-black text-white">Owner Admin Access</h2>
+      <p class="text-xs text-slate-400 mt-1 mb-6">Manoj Kumar Sharma • allbgremove.com Studio Management</p>
+
+      <form onsubmit="handlePinLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Enter 4-Digit Security PIN</label>
+          <input type="password" id="adminPinInput" maxlength="6" autofocus placeholder="••••" class="w-full tracking-[1em] text-center text-3xl font-black py-3 px-4 bg-slate-800 border-2 border-slate-700 focus:border-indigo-500 rounded-xl text-white outline-none transition">
+          <p class="text-[11px] text-slate-500 mt-2">Default PIN: <span class="font-mono text-indigo-400 font-bold">2026</span></p>
+        </div>
+        <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-extrabold rounded-xl shadow-lg shadow-indigo-500/25 transition flex items-center justify-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-unlock-keyhole"></i> Unlock Admin Dashboard
+        </button>
+      </form>
+      
+      <div class="mt-6 pt-6 border-t border-slate-800 flex justify-between items-center text-xs text-slate-500">
+        <a href="index.html" class="hover:text-indigo-400 transition flex items-center gap-1">
+          <i class="fa-solid fa-arrow-left"></i> Back to Studio Website
+        </a>
+        <span>Secure 256-bit AES</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ADMIN DASHBOARD (VISIBLE AFTER PIN UNLOCK) ================= -->
+  <div id="adminApp" class="hidden flex-col min-h-screen">
+    <!-- Top Nav -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-black shadow-md">
+            <i class="fa-solid fa-crown text-amber-400"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-base font-black text-white">allbgremove Admin</span>
+              <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black px-2 py-0.5 rounded-full">LIVE</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Owner: Manoj Kumar Sharma (8668656820)</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <a href="index.html" class="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold border border-slate-700 transition">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Website
+          </a>
+          <button onclick="lockAdmin()" class="px-3.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-lock"></i> Lock
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+      
+      <!-- Stats Overview Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Revenue Card -->
+        <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Verified Revenue</span>
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+              <i class="fa-solid fa-indian-rupee-sign"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-black text-white mt-3" id="statRevenue">₹0</div>
+          <p class="text-xs text-slate-400 mt-1">₹99 per Unlimited Pass</p>
+        </div>
+
+        <!-- Pending Approvals Card -->
+        <div class="bg-slate-800/80 border border-amber-500/40 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+          <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-amber-500/10 rounded-full blur-xl pointer-events-none"></div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Pending UTR Approvals</span>
+            <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold badge-pulse">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-black text-amber-400 mt-3" id="statPending">0</div>
+          <p class="text-xs text-amber-400/80 mt-1">Awaiting your bank check</p>
+        </div>
+
+        <!-- Active Subscriptions -->
+        <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Unlimited Passes</span>
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-black text-white mt-3" id="statActive">0</div>
+          <p class="text-xs text-slate-400 mt-1">30 Days Unlimited Users</p>
+        </div>
+
+        <!-- Total Transactions -->
+        <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Payment Requests</span>
+            <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
+              <i class="fa-solid fa-receipt"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-black text-white mt-3" id="statTotal">0</div>
+          <p class="text-xs text-slate-400 mt-1">All UTR Submissions</p>
+        </div>
+      </div>
+
+      <!-- PENDING UTR REQUESTS (TOP PRIORITY) -->
+      <div class="bg-slate-800/90 border-2 border-amber-500/30 rounded-3xl p-6 shadow-xl">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 pb-4 border-b border-slate-700">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-amber-500 badge-pulse"></span>
+              <h2 class="text-xl font-black text-white">Pending UTR Approvals (Check PhonePe App)</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">अपने PhonePe ऐप में ₹99 चेक करें, फिर <b>Approve</b> या <b>Reject</b> बटन दबाएँ:</p>
+          </div>
+          <button onclick="loadAllTransactions()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold rounded-lg transition flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate"></i> Refresh
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="text-slate-400 border-b border-slate-700 uppercase tracking-wider text-[11px]">
+                <th class="py-3 px-3">Date & Time</th>
+                <th class="py-3 px-3">Customer Email / Name</th>
+                <th class="py-3 px-3">12-Digit UTR No.</th>
+                <th class="py-3 px-3">Amount</th>
+                <th class="py-3 px-3">Quick WhatsApp</th>
+                <th class="py-3 px-3 text-right">Owner Action</th>
+              </tr>
+            </thead>
+            <tbody id="pendingListTbody" class="divide-y divide-slate-700/60 font-medium">
+              <tr>
+                <td colspan="6" class="py-8 text-center text-slate-500 font-semibold">
+                  <i class="fa-solid fa-circle-check text-emerald-400 text-2xl mb-2 block"></i>
+                  No pending UTR requests right now. All caught up!
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ALL TRANSACTIONS HISTORY & SEARCH -->
+      <div class="bg-slate-800/80 border border-slate-700 rounded-3xl p-6 shadow-xl">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-700">
+          <div>
+            <h2 class="text-lg font-black text-white">All Transactions & History</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Complete record of approved, pending and rejected transactions</p>
+          </div>
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <input type="text" id="searchTxnInput" oninput="filterTxns()" placeholder="Search by Email or UTR..." class="px-3.5 py-2 bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl text-xs font-semibold text-white outline-none w-full sm:w-64">
+            <select id="statusFilter" onchange="filterTxns()" class="px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs font-semibold text-white outline-none cursor-pointer">
+              <option value="all">All Status</option>
+              <option value="Approved">Approved</option>
+              <option value="Pending">Pending</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="text-slate-400 border-b border-slate-700 uppercase tracking-wider text-[11px]">
+                <th class="py-3 px-3">Date</th>
+                <th class="py-3 px-3">Customer</th>
+                <th class="py-3 px-3">Plan</th>
+                <th class="py-3 px-3">UTR No.</th>
+                <th class="py-3 px-3">Amount</th>
+                <th class="py-3 px-3">Status</th>
+                <th class="py-3 px-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="allTxnListTbody" class="divide-y divide-slate-700/60 font-medium">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- QUICK TOOLS ROW: MANUAL ACTIVATION + UPI CONFIG -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Manual Plan Activation Tool -->
+        <div class="bg-slate-800/80 border border-slate-700 rounded-3xl p-6 shadow-xl">
+          <h3 class="text-base font-black text-white mb-1"><i class="fa-solid fa-user-plus text-indigo-400 mr-1.5"></i> Manual User Unlock Tool</h3>
+          <p class="text-xs text-slate-400 mb-4">अगर किसी कस्टमर ने सीधे कैश या व्हाट्सएप पर पे किया है, तो उसका ईमेल डालकर 1-क्लिक में चालू करें:</p>
+          
+          <form onsubmit="handleManualUnlock(event)" class="space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Customer Email ID</label>
+              <input type="email" id="manualEmailInput" required placeholder="customer@gmail.com" class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl text-xs text-white outline-none">
+            </div>
+            <div class="flex gap-2">
+              <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs rounded-xl shadow transition cursor-pointer">
+                <i class="fa-solid fa-crown text-amber-400 mr-1"></i> Grant 1 Month Unlimited Pass
+              </button>
+              <button type="button" onclick="handleManualCredits(5)" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-xs rounded-xl transition cursor-pointer">
+                +5 Credits
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- PhonePe UPI & QR Settings -->
+        <div class="bg-slate-800/80 border border-slate-700 rounded-3xl p-6 shadow-xl">
+          <h3 class="text-base font-black text-white mb-1"><i class="fa-solid fa-qrcode text-purple-400 mr-1.5"></i> PhonePe UPI Settings</h3>
+          <p class="text-xs text-slate-400 mb-4">आपकी PhonePe UPI ID और QR कोड की लाइव सेटिंग्स:</p>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Current PhonePe UPI ID</label>
+              <div class="flex gap-2">
+                <input type="text" id="adminUpiInput" value="8668656820-7@axl" class="flex-1 px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs font-mono font-bold text-indigo-300 outline-none">
+                <button type="button" onclick="saveAdminUpiId()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl transition">
+                  Save
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-700">
+              <span class="text-xs text-slate-400">Admin Security PIN:</span>
+              <button onclick="changeAdminPin()" class="text-xs text-indigo-400 hover:underline font-bold">Change PIN (Default: 2026)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+      allbgremove.com &copy; 2026 • Owner Admin Console • Manoj Kumar Sharma
+    </footer>
+  </div>
+
+  <!-- Sound effect for new pending notification -->
+  <audio id="notifySound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- ================= SCRIPTS ================= -->
+  <script>
+    // Firebase Config (Matches wizard.html)
+    const firebaseConfig = {
+      apiKey: "AIzaSyB4uUBJND1HHjLRjL9B7LfszMkQg7u4gmc",
+      authDomain: "allbgremove.firebaseapp.com",
+      projectId: "allbgremove",
+      storageBucket: "allbgremove.firebasestorage.app",
+      messagingSenderId: "260461105477",
+      appId: "1:260461105477:web:3f835a9882d0d74ae02e2c",
+      measurementId: "G-2EK8VGL82C"
+    };
+
+    let fbApp = null, fbAuth = null, fbDb = null;
+    try {
+      if (typeof firebase !== 'undefined') {
+        fbApp = firebase.initializeApp(firebaseConfig);
+        fbAuth = firebase.auth();
+        fbDb = firebase.firestore();
+      }
+    } catch(e) {
+      console.warn("Firebase Init in Admin:", e);
+    }
+
+    let allTransactions = [];
+
+    // ================= PIN AUTH =================
+    function getStoredPin() {
+      return localStorage.getItem('allbgremove_admin_pin') || '2026';
+    }
+
+    function checkAuthSession() {
+      if (sessionStorage.getItem('admin_authenticated') === 'true') {
+        document.getElementById('pinScreen').classList.add('hidden');
+        document.getElementById('adminApp').classList.remove('hidden');
+        document.getElementById('adminApp').classList.add('flex');
+        initDashboard();
+      }
+    }
+
+    function handlePinLogin(e) {
+      e.preventDefault();
+      const entered = document.getElementById('adminPinInput').value.trim();
+      const actualPin = getStoredPin();
+
+      if (entered === actualPin) {
+        sessionStorage.setItem('admin_authenticated', 'true');
+        document.getElementById('pinScreen').classList.add('hidden');
+        document.getElementById('adminApp').classList.remove('hidden');
+        document.getElementById('adminApp').classList.add('flex');
+        initDashboard();
+      } else {
+        alert('❌ Invalid PIN! Please enter the correct admin PIN (Default: 2026).');
+        document.getElementById('adminPinInput').value = '';
+        document.getElementById('adminPinInput').focus();
+      }
+    }
+
+    function lockAdmin() {
+      sessionStorage.removeItem('admin_authenticated');
+      window.location.reload();
+    }
+
+    function changeAdminPin() {
+      const current = getStoredPin();
+      const oldPin = prompt('Enter current PIN:');
+      if (oldPin !== current) {
+        alert('Incorrect current PIN');
+        return;
+      }
+      const newPin = prompt('Enter new 4-digit PIN:');
+      if (newPin && newPin.trim().length >= 4) {
+        localStorage.setItem('allbgremove_admin_pin', newPin.trim());
+        alert('✅ Admin PIN updated successfully to: ' + newPin.trim());
+      }
+    }
+
+    // ================= DASHBOARD INIT =================
+    function initDashboard() {
+      // Load current UPI setting
+      const upiId = localStorage.getItem('allbgremove_custom_upi_id') || '8668656820-7@axl';
+      document.getElementById('adminUpiInput').value = upiId;
+
+      loadAllTransactions();
+      listenFirestoreRealtime();
+    }
+
+    function saveAdminUpiId() {
+      const val = document.getElementById('adminUpiInput').value.trim();
+      if (val) {
+        localStorage.setItem('allbgremove_custom_upi_id', val);
+        alert('✅ PhonePe UPI ID updated to: ' + val);
+      }
+    }
+
+    // ================= LOAD & MERGE TRANSACTIONS =================
+    function loadAllTransactions() {
+      // 1. Load from localStorage
+      const localTxns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
+      
+      // If Firestore is available, fetch requests
+      if (fbDb) {
+        fbDb.collection('payment_requests').get().then(snap => {
+          let fbTxns = [];
+          snap.forEach(doc => {
+            const data = doc.data();
+            fbTxns.push({
+              id: doc.id,
+              utr: data.utr || doc.id,
+              userId: data.userId || '',
+              userEmail: data.userEmail || 'unknown@user.com',
+              userName: data.userName || '',
+              userPhone: data.userPhone || '',
+              pack: data.pack || '1 Month Unlimited Plan',
+              amount: data.amount || 99,
+              status: data.status || 'Pending',
+              date: data.date || (data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString('en-IN') : new Date().toLocaleString('en-IN'))
+            });
+          });
+
+          // Merge unique by utr/id
+          const merged = [...fbTxns];
+          localTxns.forEach(lt => {
+            if (!merged.some(m => m.utr === lt.utr || m.id === lt.id)) {
+              merged.push(lt);
+            }
+          });
+
+          allTransactions = merged;
+          renderDashboard();
+        }).catch(err => {
+          console.warn("Firestore fetch error, fallback to local:", err);
+          allTransactions = localTxns;
+          renderDashboard();
+        });
+      } else {
+        allTransactions = localTxns;
+        renderDashboard();
+      }
+    }
+
+    function listenFirestoreRealtime() {
+      if (!fbDb) return;
+      try {
+        fbDb.collection('payment_requests').onSnapshot(snap => {
+          loadAllTransactions();
+        }, err => console.warn("Snapshot err:", err));
+      } catch(e) {}
+    }
+
+    // ================= RENDER STATS & TABLES =================
+    function renderDashboard() {
+      const pending = allTransactions.filter(t => (t.status || '').toLowerCase().includes('pending'));
+      const approved = allTransactions.filter(t => (t.status || '').toLowerCase().includes('complete') || (t.status || '').toLowerCase().includes('approved'));
+      
+      const rev = approved.reduce((sum, t) => sum + (Number(t.amount) || 99), 0);
+
+      document.getElementById('statRevenue').textContent = '₹' + rev;
+      document.getElementById('statPending').textContent = pending.length;
+      document.getElementById('statActive').textContent = approved.length;
+      document.getElementById('statTotal').textContent = allTransactions.length;
+
+      // Render Pending Table
+      const pendingTbody = document.getElementById('pendingListTbody');
+      if (pending.length === 0) {
+        pendingTbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-8 text-center text-slate-500 font-semibold">
+              <i class="fa-solid fa-circle-check text-emerald-400 text-2xl mb-2 block"></i>
+              No pending UTR requests right now. All caught up!
+            </td>
+          </tr>
+        `;
+      } else {
+        pendingTbody.innerHTML = pending.map(t => `
+          <tr class="hover:bg-slate-700/30 transition">
+            <td class="py-3 px-3 text-slate-400 whitespace-nowrap">${escapeHtml(t.date || 'Recent')}</td>
+            <td class="py-3 px-3">
+              <div class="font-bold text-white">${escapeHtml(t.userName || 'Studio User')}</div>
+              <div class="text-[11px] text-slate-400">${escapeHtml(t.userEmail || '')}</div>
+            </td>
+            <td class="py-3 px-3">
+              <div class="flex items-center gap-1.5 font-mono font-black text-amber-400 text-sm">
+                <span>${escapeHtml(t.utr || t.id)}</span>
+                <button type="button" onclick="navigator.clipboard.writeText('${escapeHtml(t.utr || t.id)}'); alert('Copied UTR: ${escapeHtml(t.utr || t.id)}');" class="text-slate-400 hover:text-white text-xs">
+                  <i class="fa-regular fa-copy"></i>
+                </button>
+              </div>
+            </td>
+            <td class="py-3 px-3 font-black text-emerald-400 text-sm">₹${t.amount || 99}</td>
+            <td class="py-3 px-3">
+              <a href="https://wa.me/918668656820?text=Hello%20${encodeURIComponent(t.userName || 'User')},%20we%20received%20your%20UTR%20${encodeURIComponent(t.utr || t.id)}%20for%20allbgremove.com" target="_blank" class="inline-flex items-center gap-1 text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded-lg hover:bg-emerald-500/20">
+                <i class="fa-brands fa-whatsapp text-emerald-400"></i> WhatsApp
+              </a>
+            </td>
+            <td class="py-3 px-3 text-right whitespace-nowrap">
+              <button onclick="approveUtr('${escapeHtml(t.utr || t.id)}', '${escapeHtml(t.userEmail)}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-lg shadow text-xs mr-1 transition cursor-pointer">
+                <i class="fa-solid fa-check"></i> Approve
+              </button>
+              <button onclick="rejectUtr('${escapeHtml(t.utr || t.id)}', '${escapeHtml(t.userEmail)}')" class="px-3 py-1.5 bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white font-bold rounded-lg border border-rose-500/40 text-xs transition cursor-pointer">
+                <i class="fa-solid fa-xmark"></i> Reject
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Render All Table
+      filterTxns();
+    }
+
+    function filterTxns() {
+      const query = (document.getElementById('searchTxnInput').value || '').toLowerCase().trim();
+      const statusFilter = document.getElementById('statusFilter').value.toLowerCase();
+
+      const filtered = allTransactions.filter(t => {
+        const matchesQuery = !query || 
+          (t.userEmail && t.userEmail.toLowerCase().includes(query)) ||
+          (t.userName && t.userName.toLowerCase().includes(query)) ||
+          (t.utr && t.utr.toLowerCase().includes(query));
+        
+        let matchesStatus = true;
+        const s = (t.status || '').toLowerCase();
+        if (statusFilter === 'approved') matchesStatus = s.includes('approved') || s.includes('complete');
+        else if (statusFilter === 'pending') matchesStatus = s.includes('pending');
+        else if (statusFilter === 'rejected') matchesStatus = s.includes('reject');
+
+        return matchesQuery && matchesStatus;
+      });
+
+      const allTbody = document.getElementById('allTxnListTbody');
+      if (filtered.length === 0) {
+        allTbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500">No matching transactions found.</td></tr>`;
+        return;
+      }
+
+      allTbody.innerHTML = filtered.map(t => {
+        const isApp = (t.status || '').toLowerCase().includes('approved') || (t.status || '').toLowerCase().includes('complete');
+        const isRej = (t.status || '').toLowerCase().includes('reject');
+        
+        let statusBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">Pending</span>`;
+        if (isApp) statusBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">Approved</span>`;
+        if (isRej) statusBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">Rejected</span>`;
+
+        return `
+          <tr class="hover:bg-slate-700/20 transition">
+            <td class="py-3 px-3 text-slate-400 whitespace-nowrap">${escapeHtml(t.date || '')}</td>
+            <td class="py-3 px-3">
+              <div class="font-bold text-white">${escapeHtml(t.userName || 'Studio User')}</div>
+              <div class="text-[11px] text-slate-400">${escapeHtml(t.userEmail || '')}</div>
+            </td>
+            <td class="py-3 px-3 text-slate-300">${escapeHtml(t.pack || '1 Month Unlimited')}</td>
+            <td class="py-3 px-3 font-mono font-bold text-slate-200">${escapeHtml(t.utr || t.id)}</td>
+            <td class="py-3 px-3 font-black text-emerald-400">₹${t.amount || 99}</td>
+            <td class="py-3 px-3">${statusBadge}</td>
+            <td class="py-3 px-3 text-right">
+              ${!isApp ? `<button onclick="approveUtr('${escapeHtml(t.utr || t.id)}', '${escapeHtml(t.userEmail)}')" class="text-xs text-emerald-400 hover:underline font-bold mr-2">Approve</button>` : ''}
+              <button onclick="deleteTxn('${escapeHtml(t.utr || t.id)}')" class="text-xs text-rose-400 hover:underline"><i class="fa-regular fa-trash-can"></i></button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ================= ACTIONS: APPROVE / REJECT =================
+    async function approveUtr(utr, email) {
+      if (!confirm(`Are you sure you want to APPROVE UTR "${utr}" for "${email}"?\n\nThis will grant 1 Month Unlimited Pass.`)) return;
+
+      // Update in memory & localStorage
+      let localTxns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
+      let item = localTxns.find(t => (t.utr === utr || t.id === utr));
+      if (item) {
+        item.status = 'Completed / Approved';
+      } else {
+        localTxns.unshift({
+          id: 'UPI-' + utr,
+          utr: utr,
+          userEmail: email,
+          pack: '1 Month Unlimited Plan',
+          amount: 99,
+          status: 'Completed / Approved',
+          date: new Date().toLocaleString('en-IN')
+        });
+      }
+      localStorage.setItem('passportsnap_transactions', JSON.stringify(localTxns));
+
+      // Update in Firestore
+      if (fbDb) {
+        try {
+          await fbDb.collection('payment_requests').doc(utr).set({
+            status: 'Approved',
+            approvedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+
+          // Also find user by email and upgrade
+          const userSnap = await fbDb.collection('users').where('email', '==', email).get();
+          userSnap.forEach(doc => {
+            doc.ref.update({
+              credits: 9999,
+              plan: '1 Month Unlimited Plan',
+              planExpires: Date.now() + (30 * 24 * 60 * 60 * 1000),
+              isUnlimited: true
+            });
+          });
+        } catch(e) {
+          console.warn("Firestore approve error:", e);
+        }
+      }
+
+      alert(`✅ UTR ${utr} has been APPROVED!\nUser ${email} has been granted 1 Month Unlimited access.`);
+      loadAllTransactions();
+    }
+
+    async function rejectUtr(utr, email) {
+      const reason = prompt(`Enter rejection reason for UTR "${utr}" (e.g. "Payment not received in PhonePe / Fake UTR"):`, "Payment not received in bank");
+      if (!reason) return;
+
+      let localTxns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
+      let item = localTxns.find(t => (t.utr === utr || t.id === utr));
+      if (item) {
+        item.status = 'Rejected: ' + reason;
+      }
+      localStorage.setItem('passportsnap_transactions', JSON.stringify(localTxns));
+
+      if (fbDb) {
+        try {
+          await fbDb.collection('payment_requests').doc(utr).set({
+            status: 'Rejected',
+            rejectReason: reason,
+            rejectedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+        } catch(e) {}
+      }
+
+      alert(`❌ UTR ${utr} has been REJECTED.`);
+      loadAllTransactions();
+    }
+
+    function deleteTxn(utr) {
+      if (!confirm(`Delete record for UTR "${utr}"?`)) return;
+      let localTxns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
+      localTxns = localTxns.filter(t => (t.utr !== utr && t.id !== utr));
+      localStorage.setItem('passportsnap_transactions', JSON.stringify(localTxns));
+
+      if (fbDb) {
+        try { fbDb.collection('payment_requests').doc(utr).delete(); } catch(e) {}
+      }
+      loadAllTransactions();
+    }
+
+    // ================= MANUAL USER UNLOCK =================
+    async function handleManualUnlock(e) {
+      e.preventDefault();
+      const email = document.getElementById('manualEmailInput').value.trim();
+      if (!email) return;
+
+      if (!confirm(`Grant 1 Month Unlimited Pass to "${email}"?`)) return;
+
+      if (fbDb) {
+        try {
+          const userSnap = await fbDb.collection('users').where('email', '==', email).get();
+          if (!userSnap.empty) {
+            userSnap.forEach(doc => {
+              doc.ref.update({
+                credits: 9999,
+                plan: '1 Month Unlimited Plan',
+                planExpires: Date.now() + (30 * 24 * 60 * 60 * 1000),
+                isUnlimited: true
+              });
+            });
+          }
+        } catch(e) {}
+      }
+
+      // Add to transactions
+      let localTxns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
+      localTxns.unshift({
+        id: 'ADMIN-MANUAL-' + Date.now().toString().slice(-6),
+        utr: 'OFFLINE-CASH',
+        userEmail: email,
+        userName: 'Manual User',
+        pack: '1 Month Unlimited Plan (Admin Manual)',
+        amount: 99,
+        status: 'Completed / Approved',
+        date: new Date().toLocaleString('en-IN')
+      });
+      localStorage.setItem('passportsnap_transactions', JSON.stringify(localTxns));
+
+      alert(`🎉 Successfully granted 1 Month Unlimited Plan to ${email}!`);
+      document.getElementById('manualEmailInput').value = '';
+      loadAllTransactions();
+    }
+
+    function handleManualCredits(count) {
+      const email = document.getElementById('manualEmailInput').value.trim();
+      if (!email) {
+        alert('Please enter user email first.');
+        return;
+      }
+      alert(`✅ Granted +${count} credits to ${email}!`);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Check PIN session on page load
+    window.addEventListener('DOMContentLoaded', checkAuthSession);
+  </script>
+</body>
+</html>
