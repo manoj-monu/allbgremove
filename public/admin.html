@@ -324,6 +324,21 @@
         document.getElementById('adminApp').classList.remove('hidden');
         document.getElementById('adminApp').classList.add('flex');
         initDashboard();
+        return;
+      }
+
+      if (fbAuth) {
+        fbAuth.onAuthStateChanged((user) => {
+          const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com'];
+          if (user && user.email && authorizedOwners.includes(user.email.toLowerCase().trim())) {
+            sessionStorage.setItem('admin_authenticated', 'true');
+            sessionStorage.setItem('admin_user_email', user.email);
+            document.getElementById('pinScreen').classList.add('hidden');
+            document.getElementById('adminApp').classList.remove('hidden');
+            document.getElementById('adminApp').classList.add('flex');
+            initDashboard();
+          }
+        });
       }
     }
 
