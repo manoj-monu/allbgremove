@@ -398,6 +398,13 @@
     }
   }
 
+  /* Anti-Screenshot Mobile & Touch Protection */
+  canvas, img, #cropWrapper, #previewWrap, .photo-preview-wrap, #mainCanvas {
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-user-drag: none !important;
+  }
 </style>
 </head>
 <body class="overflow-x-hidden">
@@ -3300,12 +3307,12 @@
       }
     });
 
-    // 6. Anti-Screenshot Blanking Shield (PrintScreen, Snipping Tool, & Window Blur)
+    // 6. Anti-Screenshot Blanking Shield (Desktop & Mobile: PrintScreen, Snipping Tool, Vol+Power, 3-Finger Gesture, & Blur)
     const getBlankShield = () => document.getElementById('antiScreenshotShield');
     let isFilePicking = false;
     let blankTimer = null;
 
-    const triggerBlankShield = (duration = 1800) => {
+    const triggerBlankShield = (duration = 2800) => {
       const shield = getBlankShield();
       if (!shield) return;
       shield.style.display = 'flex';
@@ -3331,38 +3338,90 @@
       if (shield) shield.style.display = 'none';
     };
 
-    // Detect PrintScreen keydown
+    // Helper to identify desktop and mobile screenshot keys
+    const isScreenshotKeyEvent = (e) => {
+      const k = (e.key || '').toLowerCase();
+      const c = (e.code || '').toLowerCase();
+      const code = e.keyCode || e.which || 0;
+      return (
+        k === 'printscreen' || c === 'printscreen' || code === 44 ||
+        // Mobile Android / iOS Volume buttons used in screenshot combos
+        k === 'volumedown' || k === 'audiovolumedown' || c === 'audiovolumedown' || code === 25 || code === 174 ||
+        k === 'volumeup' || k === 'audiovolumeup' || c === 'audiovolumeup' || code === 24 || code === 175 ||
+        k === 'power' || c === 'power' ||
+        // Desktop shortcuts (Win+Shift+S, Ctrl+Shift+S, Ctrl+P)
+        ((e.ctrlKey || e.metaKey) && (k === 's' || k === 'p' || e.shiftKey))
+      );
+    };
+
+    // Keydown detection (PrintScreen, Volume Down, Volume Up, Power)
     window.addEventListener('keydown', function(e) {
-      if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44 || e.which === 44) {
-        triggerBlankShield(2000);
-      }
-      // Detect Snipping Tool shortcut Ctrl+Shift+S or Meta+Shift+S
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 's' || e.key === 'S')) {
-        e.preventDefault();
-        triggerBlankShield(2200);
-      }
-      // Detect Ctrl+P (Print to PDF)
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
-        e.preventDefault();
-        triggerBlankShield(1800);
+      if (isScreenshotKeyEvent(e)) {
+        if (e.key === 'p' || e.key === 'P' || e.key === 's' || e.key === 'S') {
+          if (e.ctrlKey || e.metaKey) e.preventDefault();
+        }
+        triggerBlankShield(3200);
       }
     }, true);
 
-    // Detect PrintScreen keyup (when Windows finishes screen grab)
+    // Keyup detection
     window.addEventListener('keyup', function(e) {
-      if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44 || e.which === 44) {
-        triggerBlankShield(2000);
+      if (isScreenshotKeyEvent(e)) {
+        triggerBlankShield(3200);
       }
     }, true);
 
-    // File picker tracking
+    // 📱 MOBILE 3-Finger & 4-Finger Screenshot Gesture Detection (Xiaomi, Realme, Oppo, Vivo, OnePlus, Samsung)
+    window.addEventListener('touchstart', function(e) {
+      if (e.touches && e.touches.length >= 3) {
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+        triggerBlankShield(3500);
+      }
+    }, { capture: true, passive: false });
+
+    window.addEventListener('touchmove', function(e) {
+      if (e.touches && e.touches.length >= 3) {
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+        triggerBlankShield(3500);
+      }
+    }, { capture: true, passive: false });
+
+    // File picker tracking so camera / file upload doesn't trigger blank
     const fileIn = document.getElementById('fileIn');
     if (fileIn) {
       fileIn.addEventListener('click', () => { isFilePicking = true; });
-      fileIn.addEventListener('change', () => { setTimeout(() => { isFilePicking = false; }, 800); });
+      fileIn.addEventListener('change', () => { setTimeout(() => { isFilePicking = false; }, 1000); });
     }
 
-    // Window blur: triggers when Snipping Tool (Win+Shift+S) or screen capture overlay takes focus
+    // 📱 MOBILE & DESKTOP: Visibility Change (Fires on Android screenshot capture, assistant, quick settings, app switcher)
+    document.addEventListener('visibilitychange', function() {
+      if (isFilePicking) return;
+      if (document.hidden || document.visibilityState === 'hidden') {
+        const appContainer = document.getElementById('app-container');
+        if (appContainer && appContainer.style.display !== 'none') {
+          const shield = getBlankShield();
+          if (shield) shield.style.display = 'flex';
+        }
+      } else {
+        setTimeout(() => {
+          hideBlankShield();
+        }, 800);
+      }
+    });
+
+    // Pagehide event
+    window.addEventListener('pagehide', function() {
+      if (isFilePicking) return;
+      const appContainer = document.getElementById('app-container');
+      if (appContainer && appContainer.style.display !== 'none') {
+        const shield = getBlankShield();
+        if (shield) shield.style.display = 'flex';
+      }
+    });
+
+    // Window blur: triggers when Snipping Tool or mobile notification shade / screenshot modal takes focus
     window.addEventListener('blur', function() {
       if (isFilePicking) return;
       const appContainer = document.getElementById('app-container');
@@ -3376,10 +3435,12 @@
       }
     });
 
-    // Window focus: restore view
+    // Window focus: restore view with slight delay
     window.addEventListener('focus', function() {
       isFilePicking = false;
-      hideBlankShield();
+      setTimeout(() => {
+        hideBlankShield();
+      }, 500);
     });
   })();
 
