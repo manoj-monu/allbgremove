@@ -2968,6 +2968,33 @@
             lastLogin: firebase.firestore.FieldValue.serverTimestamp()
           });
         }
+
+        // 🔒 REAL-TIME OWNER APPROVAL LISTENER
+        userRef.onSnapshot(docSnap => {
+          if (docSnap && docSnap.exists) {
+            const data = docSnap.data();
+            let u = getStoredUser();
+            if (u && u.id === fbUser.uid) {
+              const prevUnlimited = !!u.isUnlimited;
+              u.credits = (typeof data.credits === 'number') ? data.credits : u.credits;
+              u.plan = data.plan || u.plan;
+              u.planExpires = data.planExpires || u.planExpires;
+              u.isUnlimited = (u.credits >= 9999 || data.isUnlimited || data.plan === '1 Month Unlimited Plan');
+              setStoredUser(u);
+              updateAuthUI();
+
+              // Trigger celebration when Admin approves!
+              if (!prevUnlimited && u.isUnlimited) {
+                showLoginSuccessModal(
+                  u.name || u.email,
+                  'Unlimited',
+                  '🎉 Plan Approved & Activated!',
+                  'मनोज जी (Studio Owner) ने आपका पेमेंट कन्फ़र्म करके प्लान चालू कर दिया है! 1 Month Unlimited Pass सक्रिय है।'
+                );
+              }
+            }
+          }
+        }, err => console.warn("User snapshot listener:", err));
       }
     } catch(dbErr) {
       console.warn("Firestore sync optional warning:", dbErr);
@@ -3639,17 +3666,9 @@
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Verifying...';
 
     setTimeout(() => {
-      // 1. Upgrade user account to 1 Month Unlimited
-      user.credits = 9999;
-      user.plan = activeRechargePack.name || '1 Month Unlimited Plan';
-      user.planExpires = Date.now() + (30 * 24 * 60 * 60 * 1000);
-      user.isUnlimited = true;
-      setStoredUser(user);
-
-      // 2. Sync with Firebase Firestore if active
+      // 1. Record payment request in Firestore for Owner Admin (Manoj Kumar Sharma)
       if (typeof fbDb !== 'undefined' && fbDb) {
         try {
-          // Record payment request for Admin Panel real-time tracking
           fbDb.collection('payment_requests').doc(utr).set({
             utr: utr,
             userId: user.id || (fbAuth && fbAuth.currentUser ? fbAuth.currentUser.uid : ''),
@@ -3658,25 +3677,14 @@
             userPhone: user.phone || '',
             pack: activeRechargePack.name || '1 Month Unlimited Plan',
             amount: activeRechargePack.amount || 99,
-            status: 'Approved',
+            status: 'Pending',
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             date: new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
           }, { merge: true }).catch(e => console.warn("Firestore payment_requests error:", e));
-
-          if (fbAuth && fbAuth.currentUser) {
-            fbDb.collection('users').doc(fbAuth.currentUser.uid).update({
-              credits: 9999,
-              plan: activeRechargePack.name || '1 Month Unlimited Plan',
-              planExpires: Date.now() + (30 * 24 * 60 * 60 * 1000),
-              lastUtr: utr,
-              lastPaymentMethod: 'PhonePe UPI QR',
-              paymentVerifiedAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).catch(e => console.warn("Firestore UPI credit update error:", e));
-          }
         } catch(e) {}
       }
 
-      // 3. Save transaction receipt to history
+      // 2. Save transaction receipt to history as Pending
       let txns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
       const txnId = 'UPI-' + utr;
       txns.unshift({
@@ -3686,30 +3694,43 @@
         userEmail: user.email,
         pack: activeRechargePack.name || '1 Month Unlimited Plan',
         amount: activeRechargePack.amount || 99,
-        credits: 9999,
+        credits: 0,
         paymentMethod: 'PhonePe / UPI QR',
-        status: 'Completed / Verified',
+        status: 'Pending Owner Approval',
         date: new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
       });
       localStorage.setItem('passportsnap_transactions', JSON.stringify(txns));
 
-      // 4. Update Header UI
-      updateAuthUI();
-
-      // 5. Close Modal & Reset
+      // 3. Close Recharge Modal & Reset
       closeRechargeModal();
       btn.disabled = false;
       btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Submit & Unlock';
       if (utrInput) utrInput.value = '';
 
-      // 6. Show Centered Success Modal
+      // 4. Show Pending Approval Modal with direct WhatsApp link to Manoj Kumar Sharma
+      const waMsg = encodeURIComponent(`नमस्ते मनोज जी, मैंने allbgremove.com पर 1 Month Unlimited Plan (₹99) के लिए PhonePe से पेमेंट कर दिया है।\n\nमेरा ईमेल: ${user.email}\nUTR नंबर: ${utr}\n\nकृपया मेरा प्लान अप्रूव और चालू करें।`);
+      const waUrl = `https://wa.me/918668656820?text=${waMsg}`;
+
+      const pendingHtml = `
+        <div class="space-y-4">
+          <p class="text-sm text-gray-600">आपका 12-अंकों का UTR (<b>${utr}</b>) एडमिन वेरिफिकेशन के लिए दर्ज कर लिया गया है। जैसे ही मनोज जी आपके PhonePe ₹99 को कन्फ़र्म करेंगे, आपका <b>1 Month Unlimited Plan</b> तुरंत चालू हो जाएगा।</p>
+          <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 font-bold flex items-center gap-2">
+            <i class="fa-solid fa-clock text-amber-600 text-base"></i>
+            <span>बैंक वेरिफिकेशन समय: 2 से 5 मिनट</span>
+          </div>
+          <a href="${waUrl}" target="_blank" class="block w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm rounded-xl shadow-lg transition text-center flex items-center justify-center gap-2">
+            <i class="fa-brands fa-whatsapp text-lg"></i> Send Screenshot on WhatsApp (1-Min Unlock)
+          </a>
+        </div>
+      `;
+
       showLoginSuccessModal(
-        user.name || user.email, 
-        'Unlimited', 
-        '🎉 1 Month Unlimited Plan Activated!', 
-        'Your payment of ₹' + (activeRechargePack.amount || 99) + ' via PhonePe UPI (UTR: ' + utr + ') has been successfully verified! All watermarks are permanently removed for 30 days.'
+        user.name || user.email,
+        'Pending',
+        '⏳ UTR दर्ज हो गया (Pending Verification)',
+        pendingHtml
       );
-    }, 1200);
+    }, 1000);
   }
 
   // ================= TRANSACTION HISTORY MODAL =================
