@@ -1498,7 +1498,7 @@
               <span><i class="fa-solid fa-file-invoice text-primary mr-1"></i> Paper Size (शीट साइज)</span>
               <span style="background:var(--primary); color:white; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:6px;">DEFAULT 4×6</span>
             </label>
-            <select id="paperSize" onchange="updatePrintLayout()" style="background:#ffffff; border:1.5px solid #4f46e5; border-radius:10px; padding:10px 14px; font-size:14.5px; font-weight:700; color:#1e1b4b; width:100%; box-shadow:0 1px 4px rgba(79,70,229,0.12); cursor:pointer;">
+            <select id="paperSize" onchange="onPaperSizeChange()" style="background:#ffffff; border:1.5px solid #4f46e5; border-radius:10px; padding:10px 14px; font-size:14.5px; font-weight:700; color:#1e1b4b; width:100%; box-shadow:0 1px 4px rgba(79,70,229,0.12); cursor:pointer;">
               <option value="4x6P" selected>4x6 inch Portrait (102 x 152 mm) • Default Studio</option>
               <option value="4x6L">4x6 inch Landscape (152 x 102 mm)</option>
               <option value="A4P">A4 Portrait (210 x 297 mm)</option>
@@ -1527,15 +1527,15 @@
 
           <div class="form-group" style="margin-bottom:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <label style="font-size:12px; font-weight:800; color:var(--text); margin:0;">
-                <i class="fa-solid fa-hashtag text-primary mr-1"></i> NUMBER OF PHOTOS (फोटो संख्या: 1 से 12)
+              <label id="photoCountLabel" style="font-size:12px; font-weight:800; color:var(--text); margin:0;">
+                <i class="fa-solid fa-hashtag text-primary mr-1"></i> NUMBER OF PHOTOS (फोटो संख्या: 1 से <span id="maxPhotosLabelSpan">12</span>)
               </label>
               <span id="photoCountDisplay" style="font-size:11.5px; font-weight:800; color:var(--primary); background:#eef2ff; padding:2px 8px; border-radius:8px;">3 Photos (Default)</span>
             </div>
             <input type="number" id="photoCount" value="3" min="1" max="12" oninput="onPhotoCountChanged(this.value)" onchange="onPhotoCountChanged(this.value)" style="font-weight:800; font-size:16px;">
             
             <!-- Quick Preset Count Buttons -->
-            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:8px;">
+            <div id="presetCountButtons" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:8px;">
               <button type="button" class="btn btn-outline" id="btnCount_3" onclick="setPhotoCount(3)" style="padding:7px 4px; font-size:12px; font-weight:800; border-radius:8px; background:#eef2ff; border:2px solid #4f46e5; color:#4338ca;">3 Photos</button>
               <button type="button" class="btn btn-outline" id="btnCount_6" onclick="setPhotoCount(6)" style="padding:7px 4px; font-size:12px; font-weight:800; border-radius:8px;">6 Photos</button>
               <button type="button" class="btn btn-outline" id="btnCount_9" onclick="setPhotoCount(9)" style="padding:7px 4px; font-size:12px; font-weight:800; border-radius:8px;">9 Photos</button>
@@ -2438,35 +2438,63 @@
       const gLayout = document.getElementById('gridLayout');
       if (gLayout) gLayout.value = '4x3';
       
+      updateMaxPhotoCount(12, false);
       setPhotoCount(3);
       setSheetPosition('topleft');
       goToStep(5);
     }
   }
 
-  function setPhotoCount(count) {
-    const input = document.getElementById('photoCount');
-    if (input) {
-      input.value = count;
-      onPhotoCountChanged(count);
+  let currentPresetCounts = [3, 6, 9, 12];
+
+  function updateQuickPresetButtons(maxCount) {
+    let presets = [];
+    if (maxCount <= 4) {
+      presets = [1, 2, 3, maxCount];
+    } else if (maxCount <= 6) {
+      presets = [2, 3, 4, maxCount];
+    } else if (maxCount <= 8) {
+      presets = [2, 4, 6, maxCount];
+    } else if (maxCount <= 12) {
+      presets = [3, 6, 9, maxCount];
+    } else if (maxCount <= 16) {
+      presets = [4, 8, 12, maxCount];
+    } else if (maxCount <= 20) {
+      presets = [5, 10, 15, maxCount];
+    } else if (maxCount <= 24) {
+      presets = [6, 12, 18, maxCount];
+    } else if (maxCount <= 30) {
+      presets = [6, 12, 20, maxCount];
+    } else {
+      const q1 = Math.max(1, Math.round(maxCount * 0.25));
+      const q2 = Math.max(2, Math.round(maxCount * 0.5));
+      const q3 = Math.max(3, Math.round(maxCount * 0.75));
+      presets = [q1, q2, q3, maxCount];
     }
+    presets = Array.from(new Set(presets)).filter(n => n >= 1 && n <= maxCount);
+    currentPresetCounts = presets;
+
+    const container = document.getElementById('presetCountButtons');
+    if (!container) return;
+
+    const input = document.getElementById('photoCount');
+    const currentVal = input ? parseInt(input.value) || 0 : 0;
+
+    container.style.gridTemplateColumns = `repeat(${presets.length}, 1fr)`;
+    container.innerHTML = presets.map((n, idx) => {
+      const isFull = (idx === presets.length - 1);
+      const label = isFull ? `${n} (Full)` : `${n} Photos`;
+      const isActive = (currentVal === n);
+      const activeStyle = isActive 
+        ? "background:#eef2ff; border:2px solid #4f46e5; color:#4338ca; box-shadow:0 2px 6px rgba(79,70,229,0.2);" 
+        : "background:white; border:1px solid #cbd5e1; color:#475569; box-shadow:none;";
+      return `<button type="button" class="btn btn-outline" id="btnCount_${n}" onclick="setPhotoCount(${n})" style="padding:7px 4px; font-size:12px; font-weight:800; border-radius:8px; ${activeStyle}">${label}</button>`;
+    }).join('');
   }
 
-  function onPhotoCountChanged(val) {
-    let num = parseInt(val) || 1;
-    if (num < 1) num = 1;
-    if (num > 12) num = 12;
-    const input = document.getElementById('photoCount');
-    if (input) input.value = num;
-    
-    // Update count display badge
-    const badge = document.getElementById('photoCountDisplay');
-    if (badge) {
-      badge.textContent = num + (num === 1 ? ' Photo' : ' Photos');
-    }
-    
-    // Update preset buttons active state
-    [3, 6, 9, 12].forEach(n => {
+  function updatePresetButtonStyles(num) {
+    if (!currentPresetCounts || !currentPresetCounts.length) return;
+    currentPresetCounts.forEach(n => {
       const btn = document.getElementById('btnCount_' + n);
       if (btn) {
         if (num === n) {
@@ -2482,8 +2510,52 @@
         }
       }
     });
+  }
+
+  function setPhotoCount(count) {
+    const input = document.getElementById('photoCount');
+    if (input) {
+      input.value = count;
+      onPhotoCountChanged(count);
+    }
+  }
+
+  function onPhotoCountChanged(val) {
+    const input = document.getElementById('photoCount');
+    const maxAllowed = parseInt(input ? input.max : 30) || 30;
+    let num = parseInt(val) || 1;
+    if (num < 1) num = 1;
+    if (num > maxAllowed) num = maxAllowed;
+    if (input) input.value = num;
+    
+    // Update count display badge
+    const badge = document.getElementById('photoCountDisplay');
+    if (badge) {
+      badge.textContent = num + (num === 1 ? ' Photo' : ' Photos');
+    }
+    
+    // Update preset buttons active state
+    updatePresetButtonStyles(num);
 
     updatePrintLayout();
+  }
+
+  function updateMaxPhotoCount(maxCount, setFull = false) {
+    const input = document.getElementById('photoCount');
+    if (input) {
+      input.max = maxCount;
+      if (setFull) {
+        input.value = maxCount;
+      } else if (parseInt(input.value) > maxCount) {
+        input.value = maxCount;
+      }
+    }
+
+    const maxSpan = document.getElementById('maxPhotosLabelSpan');
+    if (maxSpan) maxSpan.textContent = maxCount;
+
+    updateQuickPresetButtons(maxCount);
+    onPhotoCountChanged(input ? input.value : maxCount);
   }
 
   function setSheetPosition(pos) {
@@ -2629,17 +2701,27 @@
     updatePrintLayout(true);
   }
 
+  function onPaperSizeChange() {
+    const val = document.getElementById('gridLayout').value;
+    if (val === 'actual') {
+       const m = getSheetMetrics();
+       if (m) updateMaxPhotoCount(m.cols * m.rows, false);
+    }
+    isCustomOffset = false;
+    updatePrintLayout();
+  }
+
   function onGridLayoutChange() {
     const val = document.getElementById('gridLayout').value;
+    let maxCount = 12;
     if (val !== 'actual') {
        const parts = val.split('x').map(Number);
-       const maxCount = parts[0] * parts[1];
-       const input = document.getElementById('photoCount');
-       if (input) {
-         input.max = maxCount;
-         onPhotoCountChanged(input.value);
-       }
+       maxCount = parts[0] * parts[1];
+    } else {
+       const m = getSheetMetrics();
+       if (m) maxCount = m.cols * m.rows;
     }
+    updateMaxPhotoCount(maxCount, true);
     isCustomOffset = false;
     updatePrintLayout();
   }
