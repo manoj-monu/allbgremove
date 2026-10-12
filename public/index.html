@@ -2856,12 +2856,36 @@
     ctx.restore();
   }
 
+  function isUserUnlimited(u) {
+    if (!u) return false;
+    const email = (u.email || '').toLowerCase().trim();
+    const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com'];
+    if (authorizedOwners.includes(email)) return true;
+    if (u.isUnlimited === true) return true;
+    if (typeof u.credits === 'number' && u.credits >= 9999) return true;
+    if (u.plan && u.plan.toLowerCase().includes('unlimited')) {
+      if (!u.planExpires || u.planExpires > Date.now()) return true;
+    }
+    return false;
+  }
+
   function deductCredit() {
     let user = getStoredUser();
     if (!user) {
       showLoginRequiredModal('Please Sign In or Create an Account to download your official passport photo print sheet.');
       return false;
     }
+
+    // 🔒 UNLIMITED APPROVED USERS & STUDIO OWNERS: NEVER DEDUCT CREDITS, NEVER ASK FOR RECHARGE!
+    if (isUserUnlimited(user)) {
+      if (!user.isUnlimited || user.credits < 9999) {
+        user.isUnlimited = true;
+        user.credits = 9999;
+        setStoredUser(user);
+      }
+      return true;
+    }
+
     if (user.credits <= 0) {
       showZeroCreditsModal();
       return false;
@@ -3007,11 +3031,20 @@
   }
 
   function updateUserUI() {
-    const user = getStoredUser();
+    let user = getStoredUser();
     const navLoggedOut = document.getElementById('navLoggedOut');
     const navLoggedIn = document.getElementById('navLoggedIn');
     
     if (user) {
+      if (isUserUnlimited(user)) {
+        user.isUnlimited = true;
+        if (typeof user.credits !== 'number' || user.credits < 9999) {
+          user.credits = 9999;
+          user.plan = user.plan || '1 Month Unlimited Plan';
+          localStorage.setItem('passportsnap_user', JSON.stringify(user));
+        }
+      }
+
       if (navLoggedOut) navLoggedOut.classList.add('hidden');
       if (navLoggedIn) {
         navLoggedIn.classList.remove('hidden');
@@ -3019,7 +3052,7 @@
       }
       const creditsCount = document.getElementById('navCreditsCount');
       if (creditsCount) {
-        if (user.credits >= 9999 || user.isUnlimited) {
+        if (isUserUnlimited(user)) {
           creditsCount.textContent = 'Unlimited';
           creditsCount.className = 'text-amber-600 font-black';
         } else {
@@ -3133,23 +3166,54 @@
     let studio = extra.studio || (name + ' Photo Studio');
     let phone = extra.phone || '';
     let credits = 5;
+    let isUnlimited = false;
+    let plan = 'Free Plan';
+    let planExpires = null;
+
+    const emailLower = (fbUser.email || '').toLowerCase().trim();
+    const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com'];
+    if (authorizedOwners.includes(emailLower)) {
+      isUnlimited = true;
+      credits = 9999;
+      plan = 'Owner Lifetime Unlimited';
+    }
 
     try {
       if (fbDb) {
+        // 1. Check approved_users collection in Firestore (Primary approval registry)
+        try {
+          const appSnap = await fbDb.collection('approved_users').doc(emailLower).get();
+          if (appSnap && appSnap.exists) {
+            const ad = appSnap.data();
+            if (ad.isUnlimited || ad.credits >= 9999) {
+              isUnlimited = true;
+              credits = 9999;
+              plan = ad.plan || '1 Month Unlimited Plan';
+              planExpires = ad.planExpires || null;
+            }
+          }
+        } catch(e) {}
+
         const userRef = fbDb.collection('users').doc(fbUser.uid);
-        const snap = await userRef.get();
-        if (snap.exists) {
+        const snap = await userRef.get().catch(() => null);
+        if (snap && snap.exists) {
           const d = snap.data();
-          credits = (typeof d.credits === 'number') ? d.credits : credits;
+          if (!isUnlimited) {
+            credits = (typeof d.credits === 'number') ? d.credits : credits;
+            isUnlimited = (credits >= 9999 || !!d.isUnlimited || d.plan === '1 Month Unlimited Plan');
+            plan = d.plan || plan;
+            planExpires = d.planExpires || planExpires;
+          }
           studio = d.studio || studio;
           name = d.name || name;
           phone = d.phone || phone;
           await userRef.update({
             lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-            picture: fbUser.photoURL || d.picture || null
-          });
+            picture: fbUser.photoURL || d.picture || null,
+            ...(isUnlimited ? { isUnlimited: true, credits: 9999, plan: plan } : {})
+          }).catch(() => null);
         } else {
-          // New User: initialize with 5 Free Welcome Credits!
+          // New User
           await userRef.set({
             uid: fbUser.uid,
             name: name,
@@ -3157,10 +3221,12 @@
             picture: fbUser.photoURL || null,
             studio: studio,
             phone: phone,
-            credits: 5,
+            credits: isUnlimited ? 9999 : 5,
+            isUnlimited: isUnlimited,
+            plan: plan,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-          });
+          }).catch(() => null);
         }
 
         // 🔒 REAL-TIME OWNER APPROVAL LISTENER
@@ -3170,12 +3236,15 @@
             let u = getStoredUser();
             if (u && u.id === fbUser.uid) {
               const prevUnlimited = !!u.isUnlimited;
-              u.credits = (typeof data.credits === 'number') ? data.credits : u.credits;
-              u.plan = data.plan || u.plan;
-              u.planExpires = data.planExpires || u.planExpires;
-              u.isUnlimited = (u.credits >= 9999 || data.isUnlimited || data.plan === '1 Month Unlimited Plan');
+              if (data.isUnlimited || data.credits >= 9999 || isUserUnlimited(u)) {
+                u.isUnlimited = true;
+                u.credits = 9999;
+                u.plan = data.plan || u.plan;
+              } else {
+                u.credits = (typeof data.credits === 'number') ? data.credits : u.credits;
+              }
               setStoredUser(u);
-              updateAuthUI();
+              updateUserUI();
 
               // Trigger celebration when Admin approves!
               if (!prevUnlimited && u.isUnlimited) {
@@ -3189,6 +3258,20 @@
             }
           }
         }, err => console.warn("User snapshot listener:", err));
+
+        // Also real-time listen to approved_users doc
+        fbDb.collection('approved_users').doc(emailLower).onSnapshot(docSnap => {
+          if (docSnap && docSnap.exists) {
+            let u = getStoredUser();
+            if (u) {
+              u.isUnlimited = true;
+              u.credits = 9999;
+              u.plan = docSnap.data().plan || '1 Month Unlimited Plan';
+              setStoredUser(u);
+              updateUserUI();
+            }
+          }
+        }, () => {});
       }
     } catch(dbErr) {
       console.warn("Firestore sync optional warning:", dbErr);
@@ -3205,7 +3288,10 @@
       picture: fbUser.photoURL || null,
       studio: studio,
       phone: phone,
-      credits: credits,
+      credits: isUnlimited ? 9999 : credits,
+      isUnlimited: isUnlimited,
+      plan: plan,
+      planExpires: planExpires,
       lastLogin: new Date().toISOString()
     };
 

@@ -2,46 +2,39 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // 🔒 OWNER ADMIN RULE (MANOJ KUMAR SHARMA ONLY)
+    function isOwnerAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == "passportphoto2026@gmail.com" ||
+        request.auth.token.email == "manoj.watkar61@gmail.com"
+      );
+    }
+
+    // 🔒 APPROVED UNLIMITED USERS (CLOUD REGISTRY)
+    match /approved_users/{docId} {
+      allow read: if true;
+      allow write: if isOwnerAdmin();
+    }
+
     // 🔒 USER PROFILES & CREDITS
     match /users/{userId} {
-      // Users can only read their own data
-      allow read: if request.auth != null && request.auth.uid == userId;
-
-      // New users can only create their own account with max 5 free credits
-      allow create: if request.auth != null && request.auth.uid == userId
-                    && request.resource.data.credits <= 5;
-
-      // Users can only update their own profile and deduct credits for downloads
-      allow update: if request.auth != null && request.auth.uid == userId;
-
-      // Prevent account deletion directly from client
-      allow delete: if false;
+      // Users can read/update their own data, or Owner Admin can manage
+      allow read: if request.auth != null && (request.auth.uid == userId || isOwnerAdmin());
+      allow create: if request.auth != null && (request.auth.uid == userId || isOwnerAdmin());
+      allow update: if request.auth != null && (request.auth.uid == userId || isOwnerAdmin());
+      allow delete: if isOwnerAdmin();
     }
 
     // 🔒 PAYMENT TRANSACTIONS & RECHARGES
     match /transactions/{txnId} {
-      // Users can only view their own transactions
-      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
-
-      // Record new payments for verified users
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-
-      // Immutable: Transactions cannot be modified or deleted
-      allow update, delete: if false;
-    }
-
-    // 🔒 OWNER ADMIN RULE (MANOJ KUMAR SHARMA ONLY)
-    function isOwnerAdmin() {
-      return request.auth != null && (
-        request.auth.token.email == "passportphoto2026@gmail.com"
-      );
+      allow read: if request.auth != null && (request.auth.uid == resource.data.userId || isOwnerAdmin());
+      allow create: if request.auth != null;
+      allow update, delete: if isOwnerAdmin();
     }
 
     // 🔒 PAYMENT REQUESTS (UTR APPROVALS & VERIFICATION)
     match /payment_requests/{reqId} {
-      // Authenticated users can submit their UTR
       allow create: if request.auth != null;
-      // ONLY Owner Admin (passportphoto2026@gmail.com) can view, approve or reject
       allow read, update, delete: if isOwnerAdmin();
     }
 

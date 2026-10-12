@@ -626,16 +626,31 @@
             approvedAt: firebase.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
 
-          // Also find user by email and upgrade
-          const userSnap = await fbDb.collection('users').where('email', '==', email).get();
-          userSnap.forEach(doc => {
-            doc.ref.update({
+          const emailLower = (email || '').toLowerCase().trim();
+          if (emailLower) {
+            await fbDb.collection('approved_users').doc(emailLower).set({
+              email: emailLower,
+              isUnlimited: true,
               credits: 9999,
               plan: '1 Month Unlimited Plan',
               planExpires: Date.now() + (30 * 24 * 60 * 60 * 1000),
-              isUnlimited: true
+              approvedBy: 'Owner Admin',
+              approvedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+          }
+
+          // Also find user by email and upgrade
+          const userSnap = await fbDb.collection('users').where('email', '==', email).get().catch(() => null);
+          if (userSnap && !userSnap.empty) {
+            userSnap.forEach(doc => {
+              doc.ref.update({
+                credits: 9999,
+                plan: '1 Month Unlimited Plan',
+                planExpires: Date.now() + (30 * 24 * 60 * 60 * 1000),
+                isUnlimited: true
+              }).catch(() => {});
             });
-          });
+          }
         } catch(e) {
           console.warn("Firestore approve error:", e);
         }
@@ -688,31 +703,46 @@
       const email = document.getElementById('manualEmailInput').value.trim();
       if (!email) return;
 
+      const emailLower = email.toLowerCase().trim();
       if (!confirm(`Grant 1 Month Unlimited Pass to "${email}"?`)) return;
 
       if (fbDb) {
         try {
-          const userSnap = await fbDb.collection('users').where('email', '==', email).get();
-          if (!userSnap.empty) {
+          // 1. Primary Source of Truth: Write to approved_users collection!
+          await fbDb.collection('approved_users').doc(emailLower).set({
+            email: emailLower,
+            isUnlimited: true,
+            credits: 9999,
+            plan: '1 Month Unlimited Plan',
+            planExpires: Date.now() + (30 * 24 * 60 * 60 * 1000),
+            approvedBy: 'Owner Admin',
+            approvedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+
+          // 2. Also try to update user doc if already registered
+          const userSnap = await fbDb.collection('users').where('email', '==', email).get().catch(() => null);
+          if (userSnap && !userSnap.empty) {
             userSnap.forEach(doc => {
               doc.ref.update({
                 credits: 9999,
                 plan: '1 Month Unlimited Plan',
                 planExpires: Date.now() + (30 * 24 * 60 * 60 * 1000),
                 isUnlimited: true
-              });
+              }).catch(() => {});
             });
           }
-        } catch(e) {}
+        } catch(e) {
+          console.warn("Manual unlock error:", e);
+        }
       }
 
       // Add to transactions
       let localTxns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
       localTxns.unshift({
         id: 'ADMIN-MANUAL-' + Date.now().toString().slice(-6),
-        utr: 'OFFLINE-CASH',
+        utr: 'MANUAL-UNLIMITED',
         userEmail: email,
-        userName: 'Manual User',
+        userName: 'Unlimited User',
         pack: '1 Month Unlimited Plan (Admin Manual)',
         amount: 99,
         status: 'Completed / Approved',
@@ -720,7 +750,7 @@
       });
       localStorage.setItem('passportsnap_transactions', JSON.stringify(localTxns));
 
-      alert(`🎉 Successfully granted 1 Month Unlimited Plan to ${email}!`);
+      alert(`🎉 Successfully granted 1 Month Unlimited Plan to ${email}!\n\nUser can now refresh allbgremove.com to get instant Unlimited access without any recharge.`);
       document.getElementById('manualEmailInput').value = '';
       loadAllTransactions();
     }
