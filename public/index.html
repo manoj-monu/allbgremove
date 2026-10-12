@@ -4092,13 +4092,6 @@
     }
   }
 
-    showLoginSuccessModal(
-      user.name || user.email,
-      isUnlimited ? 'Unlimited' : user.credits,
-      '🎉 Payment Successful!',
-      `Razorpay Payment ID: ${paymentId}\n\nआपका ${pack.name} तुरंत सक्रिय हो गया है!`
-    );
-  }
 
   // ================= PHONEPE & UPI QR CODE SYSTEM =================
   function getCustomUpiConfig() {
