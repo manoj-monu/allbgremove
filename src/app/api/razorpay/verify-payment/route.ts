@@ -39,10 +39,9 @@ export async function POST(request: NextRequest) {
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest('hex');
 
-    const isSignatureValid = crypto.timingSafeEqual(
-      Buffer.from(expectedSignature, 'utf-8'),
-      Buffer.from(razorpay_signature, 'utf-8')
-    );
+    const expBuf = Buffer.from(expectedSignature, 'utf-8');
+    const provBuf = Buffer.from(razorpay_signature, 'utf-8');
+    const isSignatureValid = expBuf.length === provBuf.length && crypto.timingSafeEqual(expBuf, provBuf);
 
     if (!isSignatureValid) {
       console.error('SECURITY ALERT: Invalid Razorpay cryptographic signature provided!', {

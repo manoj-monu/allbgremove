@@ -22,10 +22,9 @@ export async function POST(request: NextRequest) {
       .update(payloadB64)
       .digest('hex');
 
-    const isValid = crypto.timingSafeEqual(
-      Buffer.from(expectedSig, 'utf-8'),
-      Buffer.from(providedSig, 'utf-8')
-    );
+    const expBuf = Buffer.from(expectedSig, 'utf-8');
+    const provBuf = Buffer.from(providedSig, 'utf-8');
+    const isValid = expBuf.length === provBuf.length && crypto.timingSafeEqual(expBuf, provBuf);
 
     if (!isValid) {
       return NextResponse.json({ valid: false, error: 'Token cryptographic signature verification failed' }, { status: 403 });
