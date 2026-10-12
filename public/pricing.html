@@ -881,12 +881,12 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing Secure Payment...';
 
-      const rzpKey = window.RAZORPAY_KEY_ID || localStorage.getItem('allbgremove_rzp_key') || '';
+      const rzpKey = 'rzp_live_TnAn3d4To4Q8Lg';
       
       if (!rzpKey || typeof Razorpay === 'undefined') {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Pay Securely via UPI / Cards';
-        alert('🔒 Payment Gateway Security Notice:\n\nPayment Gateway अभी Verification मोड में है। बिना वास्तविक Razorpay पेमेंट के वॉलेट में कोई भी क्रेडिट्स ऐड नहीं किए जाएँगे।\n\nकृपया वास्तविक पेमेंट के लिए Razorpay Merchant Key ID (rzp_live_... या rzp_test_...) कॉन्फ़िगर करें।');
+        alert('Payment gateway is loading. Please check your internet connection.');
         return;
       }
 
@@ -919,11 +919,46 @@
       btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Pay Securely via UPI / Cards';
     }
 
-    function onPaymentSuccess(txnId) {
+    async function onPaymentSuccess(txnId) {
       let user = getStoredUser();
       if (!user) return;
-      user.credits = (user.credits || 0) + selectedPack.credits;
+      
+      const isUnlimited = (selectedPack.credits >= 9999 || selectedPack.name.toLowerCase().includes('unlimited'));
+      if (isUnlimited) {
+        user.isUnlimited = true;
+        user.credits = 9999;
+        user.plan = selectedPack.name;
+        user.planExpires = Date.now() + (30 * 24 * 60 * 60 * 1000);
+      } else {
+        user.credits = (user.credits || 0) + selectedPack.credits;
+      }
       setStoredUser(user);
+
+      // Sync with Firestore
+      if (typeof fbDb !== 'undefined' && fbDb) {
+        try {
+          const emailLower = (user.email || '').toLowerCase().trim();
+          if (isUnlimited && emailLower) {
+            await fbDb.collection('approved_users').doc(emailLower).set({
+              email: emailLower,
+              isUnlimited: true,
+              credits: 9999,
+              plan: selectedPack.name,
+              planExpires: user.planExpires,
+              paymentId: txnId,
+              activatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+          }
+          if (fbAuth && fbAuth.currentUser) {
+            await fbDb.collection('users').doc(fbAuth.currentUser.uid).update({
+              credits: user.credits,
+              isUnlimited: !!user.isUnlimited,
+              plan: user.plan || selectedPack.name,
+              planExpires: user.planExpires || null
+            }).catch(() => {});
+          }
+        } catch(e) {}
+      }
       
       let txns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
       txns.unshift({
@@ -933,12 +968,14 @@
         pack: selectedPack.name,
         amount: selectedPack.amount,
         credits: selectedPack.credits,
+        paymentMethod: 'Razorpay Real Gateway',
+        status: 'Success / Completed',
         date: new Date().toLocaleDateString('en-IN')
       });
       localStorage.setItem('passportsnap_transactions', JSON.stringify(txns));
 
       closePaymentModal();
-      alert('🎉 Payment Successful!\nTransaction ID: ' + txnId + '\nAdded ' + selectedPack.credits + ' Credits to your wallet!\nTotal Balance: ' + user.credits + ' Credits.');
+      alert('🎉 Payment Successful!\n\nTransaction ID: ' + txnId + '\nPlan: ' + selectedPack.name + '\n' + (isUnlimited ? 'Unlimited 30-Day Pass Activated!' : 'Added ' + selectedPack.credits + ' Credits!'));
       
       updateNavWallet();
       const btn = document.getElementById('payNowBtn');

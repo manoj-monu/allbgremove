@@ -3879,6 +3879,166 @@
     refreshUpiModalUI();
   }
 
+  // ================= REAL RAZORPAY PAYMENT GATEWAY INTEGRATION =================
+  const RAZORPAY_LIVE_KEY_ID = 'rzp_live_TnAn3d4To4Q8Lg';
+
+  function payWithRazorpay() {
+    const user = getStoredUser();
+    if (!user) {
+      showLoginRequiredModal('Please Sign In or Create an Account first to complete your recharge.');
+      return;
+    }
+
+    if (typeof Razorpay === 'undefined') {
+      alert('Payment Gateway loading... Please check your internet connection.');
+      return;
+    }
+
+    const pack = activeRechargePack || { name: '1 Month Unlimited Plan', amount: 99, credits: 9999 };
+    const amountInPaise = Math.round(Number(pack.amount || 99) * 100);
+
+    const btn = document.getElementById('btnRazorpayInstant');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Opening Razorpay Secure Checkout...';
+    }
+
+    const options = {
+      key: RAZORPAY_LIVE_KEY_ID,
+      amount: amountInPaise,
+      currency: "INR",
+      name: "allbgremove.com",
+      description: pack.name + (pack.credits >= 9999 ? ' (Unlimited 30 Days)' : ' (' + pack.credits + ' Credits)'),
+      handler: function (response) {
+        if (!response || !response.razorpay_payment_id) {
+          alert('⚠️ Payment could not be verified by Razorpay.');
+          return;
+        }
+        handleRazorpaySuccess(response.razorpay_payment_id, pack);
+      },
+      prefill: {
+        name: user.name || user.studio || '',
+        email: user.email || '',
+        contact: user.phone || ''
+      },
+      notes: {
+        userId: user.id || '',
+        userEmail: user.email || '',
+        packName: pack.name
+      },
+      theme: { color: "#4f46e5" },
+      modal: {
+        ondismiss: function() {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-bolt text-amber-300 text-xl"></i><span>Pay via Razorpay (Instant Auto-Activation)</span><i class="fa-solid fa-arrow-right text-sm opacity-80"></i>';
+          }
+        }
+      }
+    };
+
+    try {
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', function (resp) {
+        alert('Payment Failed: ' + (resp.error ? resp.error.description : 'Transaction cancelled'));
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-bolt text-amber-300 text-xl"></i><span>Pay via Razorpay (Instant Auto-Activation)</span><i class="fa-solid fa-arrow-right text-sm opacity-80"></i>';
+        }
+      });
+      rzp.open();
+    } catch(err) {
+      console.error("Razorpay open error:", err);
+      alert('Could not open payment gateway. Please try direct UPI.');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-bolt text-amber-300 text-xl"></i><span>Pay via Razorpay (Instant Auto-Activation)</span><i class="fa-solid fa-arrow-right text-sm opacity-80"></i>';
+      }
+    }
+  }
+
+  async function handleRazorpaySuccess(paymentId, pack) {
+    let user = getStoredUser();
+    if (!user) return;
+
+    const isUnlimited = (pack.credits >= 9999 || pack.name.toLowerCase().includes('unlimited'));
+    if (isUnlimited) {
+      user.isUnlimited = true;
+      user.credits = 9999;
+      user.plan = pack.name;
+      user.planExpires = Date.now() + (30 * 24 * 60 * 60 * 1000);
+    } else {
+      user.credits = (user.credits || 0) + Number(pack.credits || 0);
+    }
+    setStoredUser(user);
+    updateUserUI();
+
+    const emailLower = (user.email || '').toLowerCase().trim();
+
+    // Sync to Firestore
+    if (typeof fbDb !== 'undefined' && fbDb) {
+      try {
+        if (isUnlimited && emailLower) {
+          await fbDb.collection('approved_users').doc(emailLower).set({
+            email: emailLower,
+            isUnlimited: true,
+            credits: 9999,
+            plan: pack.name,
+            planExpires: user.planExpires,
+            paymentId: paymentId,
+            activatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+        }
+
+        if (fbAuth && fbAuth.currentUser) {
+          await fbDb.collection('users').doc(fbAuth.currentUser.uid).update({
+            credits: user.credits,
+            isUnlimited: !!user.isUnlimited,
+            plan: user.plan || pack.name,
+            planExpires: user.planExpires || null
+          }).catch(() => {});
+        }
+
+        await fbDb.collection('transactions').doc(paymentId).set({
+          id: paymentId,
+          userId: user.id || (fbAuth && fbAuth.currentUser ? fbAuth.currentUser.uid : ''),
+          userEmail: user.email,
+          pack: pack.name,
+          amount: pack.amount,
+          credits: pack.credits,
+          paymentMethod: 'Razorpay Real Gateway',
+          status: 'Success / Completed',
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(() => {});
+      } catch(e) {
+        console.warn("Firestore payment sync:", e);
+      }
+    }
+
+    let txns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
+    txns.unshift({
+      id: paymentId,
+      userId: user.id,
+      userEmail: user.email,
+      pack: pack.name,
+      amount: pack.amount,
+      credits: pack.credits,
+      paymentMethod: 'Razorpay (Real Gateway)',
+      status: 'Success / Completed',
+      date: new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+    });
+    localStorage.setItem('passportsnap_transactions', JSON.stringify(txns));
+
+    closeRechargeModal();
+
+    showLoginSuccessModal(
+      user.name || user.email,
+      isUnlimited ? 'Unlimited' : user.credits,
+      '🎉 Payment Successful!',
+      `Razorpay Payment ID: ${paymentId}\n\nआपका ${pack.name} तुरंत सक्रिय हो गया है!`
+    );
+  }
+
   // ================= PHONEPE & UPI QR CODE SYSTEM =================
   function getCustomUpiConfig() {
     return {
@@ -4476,6 +4636,25 @@
             <span class="text-[11px] font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">0% Fee (Direct Pay)</span>
           </div>
         </div>
+      </div>
+
+      <!-- Option 1: Instant Razorpay Online Pay -->
+      <div class="mb-4">
+        <button type="button" onclick="payWithRazorpay()" id="btnRazorpayInstant" class="w-full py-4 px-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-700 hover:to-purple-700 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl shadow-indigo-500/25 transition transform active:scale-95 flex items-center justify-center gap-3 cursor-pointer">
+          <i class="fa-solid fa-bolt text-amber-300 text-xl"></i>
+          <span>Pay via Razorpay (Instant Auto-Activation)</span>
+          <i class="fa-solid fa-arrow-right text-sm opacity-80"></i>
+        </button>
+        <div class="flex items-center justify-center gap-2 mt-2 text-[11px] text-gray-500 font-bold">
+          <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-emerald-500"></i> UPI (GPay, PhonePe, Paytm) • Cards • NetBanking</span>
+        </div>
+      </div>
+
+      <!-- Divider for Optional Offline Manual UPI -->
+      <div class="relative flex py-2 items-center mb-3">
+        <div class="flex-grow border-t border-gray-200"></div>
+        <span class="flex-shrink mx-3 text-[10px] font-black uppercase tracking-wider text-gray-400 bg-white px-2">OR PAY VIA DIRECT PHONEPE QR</span>
+        <div class="flex-grow border-t border-gray-200"></div>
       </div>
 
       <!-- PhonePe QR Code Card -->
