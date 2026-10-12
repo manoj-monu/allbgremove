@@ -6,7 +6,11 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         {
           source: '/',
-          destination: '/index.html',
+          destination: '/app.html',
+        },
+        {
+          source: '/index.html',
+          destination: '/app.html',
         },
       ],
       afterFiles: [],
