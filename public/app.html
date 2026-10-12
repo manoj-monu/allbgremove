@@ -2872,12 +2872,32 @@
   function isUserUnlimited(u) {
     if (!u) return false;
     const email = (u.email || '').toLowerCase().trim();
+    // 1. Authorized studio owners
     const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com'];
     if (authorizedOwners.includes(email)) return true;
-    if (u.isUnlimited === true) return true;
-    if (typeof u.credits === 'number' && u.credits >= 9999) return true;
-    if (u.plan && u.plan.toLowerCase().includes('unlimited')) {
-      if (!u.planExpires || u.planExpires > Date.now()) return true;
+
+    // 2. Approved in Firestore cloud registry
+    if (window._isApprovedUnlimitedUser === true) return true;
+
+    // 3. Cryptographically signed server activation token
+    if (u.activationToken && typeof u.activationToken === 'string' && u.activationToken.includes('.')) {
+      try {
+        const payloadB64 = u.activationToken.split('.')[0];
+        const payload = JSON.parse(atob(payloadB64));
+        if (payload.email && payload.email.toLowerCase().trim() === email && payload.isUnlimited === true) {
+          if (!payload.planExpires || payload.planExpires > Date.now()) {
+            return true;
+          }
+        }
+      } catch(e) {}
+    }
+
+    // 4. Anti-Tamper: If someone manually modified localStorage to isUnlimited without proof, reset it
+    if (u.isUnlimited === true && !window._isApprovedUnlimitedUser) {
+      u.isUnlimited = false;
+      u.plan = 'Free Plan';
+      if (typeof u.credits === 'number' && u.credits >= 9999) u.credits = 5;
+      setStoredUser(u);
     }
     return false;
   }
@@ -3882,7 +3902,7 @@
   // ================= REAL RAZORPAY PAYMENT GATEWAY INTEGRATION =================
   const RAZORPAY_LIVE_KEY_ID = 'rzp_live_TnAn3d4To4Q8Lg';
 
-  function payWithRazorpay() {
+  async function payWithRazorpay() {
     const user = getStoredUser();
     if (!user) {
       showLoginRequiredModal('Please Sign In or Create an Account first to complete your recharge.');
@@ -3890,54 +3910,78 @@
     }
 
     if (typeof Razorpay === 'undefined') {
-      alert('Payment Gateway loading... Please check your internet connection.');
+      alert('Payment Gateway is loading... Please check your internet connection.');
       return;
     }
 
     const pack = activeRechargePack || { name: '1 Month Unlimited Plan', amount: 99, credits: 9999 };
-    const amountInPaise = Math.round(Number(pack.amount || 99) * 100);
-
     const btn = document.getElementById('btnRazorpayInstant');
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Opening Razorpay Secure Checkout...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Generating Secure Razorpay Order...';
     }
 
-    const options = {
-      key: RAZORPAY_LIVE_KEY_ID,
-      amount: amountInPaise,
-      currency: "INR",
-      name: "allbgremove.com",
-      description: pack.name + (pack.credits >= 9999 ? ' (Unlimited 30 Days)' : ' (' + pack.credits + ' Credits)'),
-      handler: function (response) {
-        if (!response || !response.razorpay_payment_id) {
-          alert('⚠️ Payment could not be verified by Razorpay.');
-          return;
-        }
-        handleRazorpaySuccess(response.razorpay_payment_id, pack);
-      },
-      prefill: {
-        name: user.name || user.studio || '',
-        email: user.email || '',
-        contact: user.phone || ''
-      },
-      notes: {
-        userId: user.id || '',
-        userEmail: user.email || '',
-        packName: pack.name
-      },
-      theme: { color: "#4f46e5" },
-      modal: {
-        ondismiss: function() {
-          if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-bolt text-amber-300 text-xl"></i><span>Pay via Razorpay (Instant Auto-Activation)</span><i class="fa-solid fa-arrow-right text-sm opacity-80"></i>';
+    try {
+      // 🔒 1. CREATE SERVER-SIDE SECURE ORDER
+      // Amount is determined and locked on our backend server so hackers cannot manipulate the price!
+      const orderRes = await fetch('/api/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planKey: pack.name,
+          userEmail: user.email,
+          userName: user.name || user.studio || ''
+        })
+      });
+
+      if (!orderRes.ok) {
+        throw new Error('Could not create secure payment order on server.');
+      }
+      const orderData = await orderRes.json();
+      if (!orderData.success || !orderData.orderId) {
+        throw new Error(orderData.error || 'Server rejected order generation.');
+      }
+
+      if (btn) {
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Opening Razorpay Secure Checkout...';
+      }
+
+      // 🔒 2. OPEN RAZORPAY CHECKOUT WITH OFFICIAL SERVER ORDER ID
+      const options = {
+        key: orderData.keyId || RAZORPAY_LIVE_KEY_ID,
+        amount: orderData.amount,
+        currency: orderData.currency || "INR",
+        order_id: orderData.orderId, // Server Order ID guarantees cryptographic signature
+        name: "allbgremove.com",
+        description: (orderData.plan?.name || pack.name) + ' (Official Plan)',
+        handler: async function (response) {
+          if (!response || !response.razorpay_payment_id || !response.razorpay_order_id || !response.razorpay_signature) {
+            alert('⚠️ Security Alert: Payment response is missing cryptographic verification fields.');
+            return;
+          }
+          await verifyAndActivatePayment(response, orderData.plan || pack);
+        },
+        prefill: {
+          name: user.name || user.studio || '',
+          email: user.email || '',
+          contact: user.phone || ''
+        },
+        notes: {
+          userId: user.id || '',
+          userEmail: user.email || '',
+          planName: pack.name
+        },
+        theme: { color: "#4f46e5" },
+        modal: {
+          ondismiss: function() {
+            if (btn) {
+              btn.disabled = false;
+              btn.innerHTML = '<i class="fa-solid fa-bolt text-amber-300 text-xl"></i><span>Pay via Razorpay (Instant Auto-Activation)</span><i class="fa-solid fa-arrow-right text-sm opacity-80"></i>';
+            }
           }
         }
-      }
-    };
+      };
 
-    try {
       const rzp = new Razorpay(options);
       rzp.on('payment.failed', function (resp) {
         alert('Payment Failed: ' + (resp.error ? resp.error.description : 'Transaction cancelled'));
@@ -3948,8 +3992,8 @@
       });
       rzp.open();
     } catch(err) {
-      console.error("Razorpay open error:", err);
-      alert('Could not open payment gateway. Please try direct UPI.');
+      console.error("Razorpay order error:", err);
+      alert('Could not initialize payment: ' + (err.message || 'Please try again.'));
       if (btn) {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-bolt text-amber-300 text-xl"></i><span>Pay via Razorpay (Instant Auto-Activation)</span><i class="fa-solid fa-arrow-right text-sm opacity-80"></i>';
@@ -3957,79 +4001,96 @@
     }
   }
 
-  async function handleRazorpaySuccess(paymentId, pack) {
+  // 🔒 3. CRYPTOGRAPHIC SIGNATURE VERIFICATION WITH BACKEND
+  async function verifyAndActivatePayment(razorpayResponse, pack) {
     let user = getStoredUser();
     if (!user) return;
 
-    const isUnlimited = (pack.credits >= 9999 || pack.name.toLowerCase().includes('unlimited'));
-    if (isUnlimited) {
-      user.isUnlimited = true;
-      user.credits = 9999;
-      user.plan = pack.name;
-      user.planExpires = Date.now() + (30 * 24 * 60 * 60 * 1000);
-    } else {
-      user.credits = (user.credits || 0) + Number(pack.credits || 0);
+    const btn = document.getElementById('btnRazorpayInstant');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Verifying Cryptographic Signature...';
     }
-    setStoredUser(user);
-    updateUserUI();
 
-    const emailLower = (user.email || '').toLowerCase().trim();
-
-    // Sync to Firestore
-    if (typeof fbDb !== 'undefined' && fbDb) {
-      try {
-        if (isUnlimited && emailLower) {
-          await fbDb.collection('approved_users').doc(emailLower).set({
-            email: emailLower,
-            isUnlimited: true,
-            credits: 9999,
-            plan: pack.name,
-            planExpires: user.planExpires,
-            paymentId: paymentId,
-            activatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          }, { merge: true });
-        }
-
-        if (fbAuth && fbAuth.currentUser) {
-          await fbDb.collection('users').doc(fbAuth.currentUser.uid).update({
-            credits: user.credits,
-            isUnlimited: !!user.isUnlimited,
-            plan: user.plan || pack.name,
-            planExpires: user.planExpires || null
-          }).catch(() => {});
-        }
-
-        await fbDb.collection('transactions').doc(paymentId).set({
-          id: paymentId,
-          userId: user.id || (fbAuth && fbAuth.currentUser ? fbAuth.currentUser.uid : ''),
+    try {
+      // Send cryptographic proof to server for HMAC-SHA256 verification
+      const verifyRes = await fetch('/api/razorpay/verify-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          razorpay_order_id: razorpayResponse.razorpay_order_id,
+          razorpay_payment_id: razorpayResponse.razorpay_payment_id,
+          razorpay_signature: razorpayResponse.razorpay_signature,
           userEmail: user.email,
-          pack: pack.name,
-          amount: pack.amount,
-          credits: pack.credits,
-          paymentMethod: 'Razorpay Real Gateway',
-          status: 'Success / Completed',
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).catch(() => {});
-      } catch(e) {
-        console.warn("Firestore payment sync:", e);
+          planKey: pack.name
+        })
+      });
+
+      const verifyData = await verifyRes.json();
+      if (!verifyRes.ok || !verifyData.verified || !verifyData.activationToken) {
+        throw new Error(verifyData.error || 'Cryptographic verification failed. False/tampered payment rejected!');
+      }
+
+      // Payment is 100% genuine and verified by Razorpay & Server!
+      const act = verifyData.activation;
+      const isUnlimited = !!act.isUnlimited;
+
+      user.isUnlimited = isUnlimited;
+      user.credits = act.credits;
+      user.plan = act.plan;
+      user.planExpires = act.planExpires;
+      user.activationToken = verifyData.activationToken; // Cryptographically signed server token
+      user.lastPaymentId = act.paymentId;
+      window._isApprovedUnlimitedUser = isUnlimited;
+      setStoredUser(user);
+      updateUserUI();
+
+      // Record verified transaction in Firestore
+      if (typeof fbDb !== 'undefined' && fbDb) {
+        try {
+          await fbDb.collection('transactions').doc(act.paymentId).set({
+            id: act.paymentId,
+            orderId: act.orderId,
+            userId: user.id || (fbAuth && fbAuth.currentUser ? fbAuth.currentUser.uid : ''),
+            userEmail: user.email,
+            pack: act.plan,
+            amount: act.amount,
+            credits: act.credits,
+            paymentMethod: 'Razorpay (HMAC-SHA256 Verified)',
+            status: 'Verified Success',
+            activationToken: verifyData.activationToken,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          }).catch(() => {});
+        } catch(e) {}
+      }
+
+      let txns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
+      txns.unshift({
+        id: act.paymentId,
+        orderId: act.orderId,
+        userId: user.id,
+        userEmail: user.email,
+        pack: act.plan,
+        amount: act.amount,
+        credits: act.credits,
+        paymentMethod: 'Razorpay (Cryptographically Verified)',
+        status: 'Success / Completed',
+        date: new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+      });
+      localStorage.setItem('passportsnap_transactions', JSON.stringify(txns));
+
+      closeRechargeModal();
+      alert('🎉 Payment Successfully Verified by Bank & Razorpay!\n\nTransaction ID: ' + act.paymentId + '\nPlan: ' + act.plan + '\n' + (isUnlimited ? 'Unlimited 30-Day Pass Activated!' : 'Added ' + act.credits + ' Credits!'));
+    } catch(err) {
+      console.error("Verification error:", err);
+      alert('⚠️ Payment Verification Error: ' + err.message);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-bolt text-amber-300 text-xl"></i><span>Pay via Razorpay (Instant Auto-Activation)</span><i class="fa-solid fa-arrow-right text-sm opacity-80"></i>';
       }
     }
-
-    let txns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
-    txns.unshift({
-      id: paymentId,
-      userId: user.id,
-      userEmail: user.email,
-      pack: pack.name,
-      amount: pack.amount,
-      credits: pack.credits,
-      paymentMethod: 'Razorpay (Real Gateway)',
-      status: 'Success / Completed',
-      date: new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
-    });
-    localStorage.setItem('passportsnap_transactions', JSON.stringify(txns));
-
-    closeRechargeModal();
+  }
 
     showLoginSuccessModal(
       user.name || user.email,

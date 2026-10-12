@@ -18,10 +18,18 @@ service cloud.firestore {
 
     // 🔒 USER PROFILES & CREDITS
     match /users/{userId} {
-      // Users can read/update their own data, or Owner Admin can manage
+      // Users can read their own data, or Owner Admin can manage
       allow read: if request.auth != null && (request.auth.uid == userId || isOwnerAdmin());
-      allow create: if request.auth != null && (request.auth.uid == userId || isOwnerAdmin());
-      allow update: if request.auth != null && (request.auth.uid == userId || isOwnerAdmin());
+      allow create: if request.auth != null && (request.auth.uid == userId || isOwnerAdmin())
+                    && (!('isUnlimited' in request.resource.data) || request.resource.data.isUnlimited == false || isOwnerAdmin())
+                    && (!('credits' in request.resource.data) || request.resource.data.credits <= 5 || isOwnerAdmin());
+      allow update: if isOwnerAdmin() || (
+        request.auth != null && request.auth.uid == userId
+        // A regular user cannot upgrade themselves to unlimited or alter plan
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['isUnlimited', 'plan', 'planExpires']))
+        // A regular user can only spend credits (decrement), NEVER increase them!
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['credits']) || request.resource.data.credits <= resource.data.credits)
+      );
       allow delete: if isOwnerAdmin();
     }
 

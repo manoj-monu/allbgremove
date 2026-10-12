@@ -869,7 +869,7 @@
       document.getElementById('paymentModal').classList.remove('flex');
     }
 
-    function processPayment() {
+    async function processPayment() {
       const user = getStoredUser();
       if (!user) {
         closePaymentModal();
@@ -879,109 +879,165 @@
 
       const btn = document.getElementById('payNowBtn');
       btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing Secure Payment...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating Secure Razorpay Order...';
 
-      const rzpKey = 'rzp_live_TnAn3d4To4Q8Lg';
-      
-      if (!rzpKey || typeof Razorpay === 'undefined') {
+      try {
+        // 🔒 1. CREATE SERVER-SIDE SECURE ORDER
+        const orderRes = await fetch('/api/razorpay/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            planKey: selectedPack.name,
+            userEmail: user.email,
+            userName: user.name || ''
+          })
+        });
+
+        if (!orderRes.ok) {
+          throw new Error('Server order creation failed.');
+        }
+        const orderData = await orderRes.json();
+        if (!orderData.success || !orderData.orderId) {
+          throw new Error(orderData.error || 'Server rejected order request.');
+        }
+
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Opening Razorpay Secure Checkout...';
+
+        // 🔒 2. OPEN CHECKOUT WITH OFFICIAL ORDER ID
+        const options = {
+          key: orderData.keyId || 'rzp_live_TnAn3d4To4Q8Lg',
+          amount: orderData.amount,
+          currency: orderData.currency || "INR",
+          order_id: orderData.orderId,
+          name: "allbgremove.com",
+          description: selectedPack.name + " (Official Plan)",
+          handler: async function (response) {
+            if (!response || !response.razorpay_payment_id || !response.razorpay_order_id || !response.razorpay_signature) {
+              alert('⚠️ Security Alert: Payment response is missing cryptographic verification fields.');
+              return;
+            }
+            await onPaymentVerified(response, orderData.plan || selectedPack);
+          },
+          prefill: {
+            name: user.name || '',
+            email: user.email || '',
+            contact: document.getElementById('payMobile')?.value || user.phone || ""
+          },
+          notes: {
+            userId: user.id || '',
+            userEmail: user.email || '',
+            planName: selectedPack.name
+          },
+          theme: { color: "#6366f1" },
+          modal: {
+            ondismiss: function() {
+              btn.disabled = false;
+              btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Pay Securely via UPI / Cards';
+            }
+          }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (resp) {
+          alert('Payment Failed: ' + (resp.error ? resp.error.description : 'Transaction cancelled'));
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Pay Securely via UPI / Cards';
+        });
+        rzp.open();
+      } catch (err) {
+        console.error("Order error:", err);
+        alert('Could not start secure payment: ' + (err.message || 'Please try again.'));
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Pay Securely via UPI / Cards';
-        alert('Payment gateway is loading. Please check your internet connection.');
-        return;
       }
-
-      const options = {
-        key: rzpKey,
-        amount: selectedPack.amount * 100, // in paise
-        currency: "INR",
-        name: "allbgremove.com",
-        description: selectedPack.name + " (" + selectedPack.credits + " Credits)",
-        handler: function (response) {
-          if (!response || !response.razorpay_payment_id) {
-            alert('⚠️ Payment failed or was not verified by Razorpay. No credits were added.');
-            return;
-          }
-          onPaymentSuccess(response.razorpay_payment_id);
-        },
-        prefill: {
-          name: user.name,
-          email: user.email,
-          contact: document.getElementById('payMobile').value || user.phone || ""
-        },
-        notes: {
-          userId: user.id
-        },
-        theme: { color: "#6366f1" }
-      };
-      const rzp = new Razorpay(options);
-      rzp.open();
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Pay Securely via UPI / Cards';
     }
 
-    async function onPaymentSuccess(txnId) {
+    // 🔒 3. VERIFY CRYPTOGRAPHIC SIGNATURE ON SERVER
+    async function onPaymentVerified(razorpayResponse, pack) {
       let user = getStoredUser();
       if (!user) return;
-      
-      const isUnlimited = (selectedPack.credits >= 9999 || selectedPack.name.toLowerCase().includes('unlimited'));
-      if (isUnlimited) {
-        user.isUnlimited = true;
-        user.credits = 9999;
-        user.plan = selectedPack.name;
-        user.planExpires = Date.now() + (30 * 24 * 60 * 60 * 1000);
-      } else {
-        user.credits = (user.credits || 0) + selectedPack.credits;
-      }
-      setStoredUser(user);
 
-      // Sync with Firestore
-      if (typeof fbDb !== 'undefined' && fbDb) {
-        try {
-          const emailLower = (user.email || '').toLowerCase().trim();
-          if (isUnlimited && emailLower) {
-            await fbDb.collection('approved_users').doc(emailLower).set({
-              email: emailLower,
-              isUnlimited: true,
-              credits: 9999,
-              plan: selectedPack.name,
-              planExpires: user.planExpires,
-              paymentId: txnId,
-              activatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
-          }
-          if (fbAuth && fbAuth.currentUser) {
-            await fbDb.collection('users').doc(fbAuth.currentUser.uid).update({
-              credits: user.credits,
-              isUnlimited: !!user.isUnlimited,
-              plan: user.plan || selectedPack.name,
-              planExpires: user.planExpires || null
-            }).catch(() => {});
-          }
-        } catch(e) {}
-      }
-      
-      let txns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
-      txns.unshift({
-        id: txnId,
-        userId: user.id,
-        userEmail: user.email,
-        pack: selectedPack.name,
-        amount: selectedPack.amount,
-        credits: selectedPack.credits,
-        paymentMethod: 'Razorpay Real Gateway',
-        status: 'Success / Completed',
-        date: new Date().toLocaleDateString('en-IN')
-      });
-      localStorage.setItem('passportsnap_transactions', JSON.stringify(txns));
-
-      closePaymentModal();
-      alert('🎉 Payment Successful!\n\nTransaction ID: ' + txnId + '\nPlan: ' + selectedPack.name + '\n' + (isUnlimited ? 'Unlimited 30-Day Pass Activated!' : 'Added ' + selectedPack.credits + ' Credits!'));
-      
-      updateNavWallet();
       const btn = document.getElementById('payNowBtn');
       if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Pay Securely via UPI / Cards';
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying Cryptographic Signature...';
+      }
+
+      try {
+        const verifyRes = await fetch('/api/razorpay/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            razorpay_order_id: razorpayResponse.razorpay_order_id,
+            razorpay_payment_id: razorpayResponse.razorpay_payment_id,
+            razorpay_signature: razorpayResponse.razorpay_signature,
+            userEmail: user.email,
+            planKey: pack.name
+          })
+        });
+
+        const verifyData = await verifyRes.json();
+        if (!verifyRes.ok || !verifyData.verified || !verifyData.activationToken) {
+          throw new Error(verifyData.error || 'Cryptographic verification failed. False/tampered payment rejected!');
+        }
+
+        const act = verifyData.activation;
+        const isUnlimited = !!act.isUnlimited;
+
+        user.isUnlimited = isUnlimited;
+        user.credits = act.credits;
+        user.plan = act.plan;
+        user.planExpires = act.planExpires;
+        user.activationToken = verifyData.activationToken;
+        user.lastPaymentId = act.paymentId;
+        setStoredUser(user);
+
+        // Record in Firestore
+        if (typeof fbDb !== 'undefined' && fbDb) {
+          try {
+            await fbDb.collection('transactions').doc(act.paymentId).set({
+              id: act.paymentId,
+              orderId: act.orderId,
+              userId: user.id || (fbAuth && fbAuth.currentUser ? fbAuth.currentUser.uid : ''),
+              userEmail: user.email,
+              pack: act.plan,
+              amount: act.amount,
+              credits: act.credits,
+              paymentMethod: 'Razorpay (HMAC-SHA256 Verified)',
+              status: 'Verified Success',
+              activationToken: verifyData.activationToken,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(() => {});
+          } catch(e) {}
+        }
+        
+        let txns = JSON.parse(localStorage.getItem('passportsnap_transactions') || '[]');
+        txns.unshift({
+          id: act.paymentId,
+          orderId: act.orderId,
+          userId: user.id,
+          userEmail: user.email,
+          pack: act.plan,
+          amount: act.amount,
+          credits: act.credits,
+          paymentMethod: 'Razorpay (Cryptographically Verified)',
+          status: 'Success / Completed',
+          date: new Date().toLocaleDateString('en-IN')
+        });
+        localStorage.setItem('passportsnap_transactions', JSON.stringify(txns));
+
+        closePaymentModal();
+        alert('🎉 Payment Successfully Verified by Bank & Razorpay!\n\nTransaction ID: ' + act.paymentId + '\nPlan: ' + act.plan + '\n' + (isUnlimited ? 'Unlimited 30-Day Pass Activated!' : 'Added ' + act.credits + ' Credits!'));
+        
+        updateNavWallet();
+      } catch(err) {
+        console.error("Verification error:", err);
+        alert('⚠️ Payment Verification Error: ' + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Pay Securely via UPI / Cards';
+        }
       }
     }
 
