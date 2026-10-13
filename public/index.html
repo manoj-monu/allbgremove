@@ -3462,6 +3462,36 @@
     console.warn("Firebase initialization warning:", e);
   }
 
+  // ================= SINGLE-DEVICE CONCURRENT LOGIN ENFORCEMENT =================
+  let _isConcurrentLoggingOut = false;
+
+  function getOrCreateSessionId(forceNew = false) {
+    let sid = localStorage.getItem('passportsnap_session_id');
+    if (!sid || forceNew) {
+      sid = 'sess_' + Date.now() + '_' + Math.random().toString(36).substring(2, 10);
+      localStorage.setItem('passportsnap_session_id', sid);
+    }
+    return sid;
+  }
+
+  function handleSingleDeviceLogout() {
+    if (_isConcurrentLoggingOut) return;
+    _isConcurrentLoggingOut = true;
+
+    try {
+      if (typeof fbAuth !== 'undefined' && fbAuth) {
+        fbAuth.signOut().catch(() => {});
+      }
+    } catch(e) {}
+
+    localStorage.removeItem('passportsnap_user');
+    localStorage.removeItem('passportsnap_session_id');
+    if (typeof updateUserUI === 'function') updateUserUI();
+
+    alert('⚠️ सत्र समाप्त (Session Terminated):\n\nआपका खाता किसी अन्य कंप्यूटर, मोबाइल या ब्राउज़र में लॉगिन किया गया है!\n\nसुरक्षा नियमों के अनुसार एक आईडी से एक समय में केवल एक ही जगह लॉगिन रहा जा सकता है। इसलिए इस डिवाइस से आपको ऑटोमैटिक लॉगआउट कर दिया गया है।');
+    window.location.reload();
+  }
+
   // Listen to real auth state changes across sessions
   if (fbAuth) {
     fbAuth.onAuthStateChanged(async (user) => {
@@ -3482,6 +3512,7 @@
     let plan = existing.plan || 'Free Plan';
     let planExpires = existing.planExpires || null;
     let activationToken = existing.activationToken || null;
+    const mySessionId = getOrCreateSessionId(extra.isNewLogin || false);
 
     const emailLower = (fbUser.email || '').toLowerCase().trim();
     const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com', 'monusharma847224@gmail.com'];
@@ -3546,6 +3577,7 @@
           phone = d.phone || phone;
           await userRef.set({
             lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+            currentSessionId: mySessionId,
             picture: fbUser.photoURL || d.picture || null,
             ...(isUnlimited ? { isUnlimited: true, credits: 9999, plan: plan } : {})
           }, { merge: true }).catch(() => null);
@@ -3558,6 +3590,7 @@
             picture: fbUser.photoURL || null,
             studio: studio,
             phone: phone,
+            currentSessionId: mySessionId,
             credits: isUnlimited ? 9999 : 5,
             isUnlimited: isUnlimited,
             plan: plan,
@@ -3566,10 +3599,21 @@
           }).catch(() => null);
         }
 
-        // 🔒 REAL-TIME APPROVAL LISTENER
+        // 🔒 REAL-TIME APPROVAL & SINGLE-DEVICE CONCURRENT SESSION LISTENER
         userRef.onSnapshot(docSnap => {
           if (docSnap && docSnap.exists) {
             const data = docSnap.data();
+
+            // 🔒 SINGLE-DEVICE ENFORCEMENT:
+            // If another device logged in with a newer session ID, kick this session out!
+            const remoteSessionId = data.currentSessionId;
+            const currentSessionId = localStorage.getItem('passportsnap_session_id');
+            if (remoteSessionId && currentSessionId && remoteSessionId !== currentSessionId) {
+              console.warn("Single device enforcement triggered. Logging out old session...");
+              handleSingleDeviceLogout();
+              return;
+            }
+
             let u = getStoredUser();
             if (u && u.id === fbUser.uid) {
               const prevUnlimited = !!u.isUnlimited;
@@ -3779,9 +3823,10 @@
     }
 
     try {
+      getOrCreateSessionId(true);
       const result = await fbAuth.signInWithPopup(fbGoogleProvider);
       const user = result.user;
-      const sessionUser = await syncFirebaseUser(user);
+      const sessionUser = await syncFirebaseUser(user, { isNewLogin: true });
       closeAuthModal();
       showLoginSuccessModal(sessionUser.name, sessionUser.credits, 'Google Sign-In Successful!');
     } catch (err) {
@@ -3930,10 +3975,11 @@
 
       if (fbAuth) {
         try {
+          getOrCreateSessionId(true);
           const userCred = await fbAuth.createUserWithEmailAndPassword(email, password);
           const user = userCred.user;
           await user.updateProfile({ displayName: name });
-          const sessionUser = await syncFirebaseUser(user, { name, studio, phone, isNew: true });
+          const sessionUser = await syncFirebaseUser(user, { name, studio, phone, isNew: true, isNewLogin: true });
           closeAuthModal();
           showLoginSuccessModal(sessionUser.name, sessionUser.credits, 'Account Created Successfully!', 'Welcome bonus of 5 Free Credits has been credited to your wallet.');
           return;
@@ -4034,9 +4080,10 @@
       if (errorEl) errorEl.classList.add('hidden');
 
       if (fbAuth) {
+        getOrCreateSessionId(true);
         const userCred = await fbAuth.signInWithEmailAndPassword(email, password);
         const user = userCred.user;
-        const sessionUser = await syncFirebaseUser(user);
+        const sessionUser = await syncFirebaseUser(user, { isNewLogin: true });
         closeAuthModal();
         showLoginSuccessModal(sessionUser.name, sessionUser.credits, 'Sign-In Successful!');
         return;
@@ -4140,6 +4187,7 @@
 
     // Remove user session immediately
     localStorage.removeItem('passportsnap_user');
+    localStorage.removeItem('passportsnap_session_id');
 
     // Update UI state immediately
     const navLoggedOut = document.getElementById('navLoggedOut');
