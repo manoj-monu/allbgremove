@@ -1600,16 +1600,16 @@
           <div class="form-group" style="margin-top:14px; margin-bottom:16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:12px;">
             <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
               <span style="font-weight:700; color:var(--text); font-size:12px;"><i class="fa-solid fa-sliders text-primary mr-1"></i> Print Quality (क्वालिटी):</span>
-              <span id="qualityBadgeSheet" style="font-size:11px; font-weight:800; background:#ecfdf5; color:#059669; padding:2px 8px; border-radius:12px; border:1px solid #a7f3d0;">Ultra HD (600 DPI)</span>
+              <span id="qualityBadgeSheet" style="font-size:11px; font-weight:800; background:#eff6ff; color:#2563eb; padding:2px 8px; border-radius:12px; border:1px solid #bfdbfe;">Standard (300 DPI - Photoshop Fit)</span>
             </label>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-              <button type="button" id="qualityBtnSheet_ultra" onclick="setExportQuality('ultra')" style="padding:10px 8px; border-radius:10px; border:2px solid var(--primary); background:white; cursor:pointer; text-align:center; transition:0.2s; box-shadow:0 2px 8px rgba(99,102,241,0.2);">
-                <div style="font-size:12px; font-weight:800; color:var(--primary);"><i class="fa-solid fa-crown mr-1 text-amber-500"></i> Ultra HD 600 DPI</div>
-                <div style="font-size:10.5px; color:#64748b; margin-top:2px;">Studio Lab Print</div>
+              <button type="button" id="qualityBtnSheet_standard" onclick="setExportQuality('standard')" style="padding:10px 8px; border-radius:10px; border:2px solid var(--primary); background:white; cursor:pointer; text-align:center; transition:0.2s; box-shadow:0 2px 8px rgba(99,102,241,0.2);">
+                <div style="font-size:12px; font-weight:800; color:var(--primary);"><i class="fa-solid fa-check-circle mr-1 text-emerald-500"></i> Standard 300 DPI</div>
+                <div style="font-size:10.5px; color:#64748b; margin-top:2px;">Photoshop 4x6 Perfect Fit</div>
               </button>
-              <button type="button" id="qualityBtnSheet_standard" onclick="setExportQuality('standard')" style="padding:10px 8px; border-radius:10px; border:1px solid #cbd5e1; background:#f8fafc; cursor:pointer; text-align:center; transition:0.2s;">
-                <div style="font-size:12px; font-weight:800; color:#334155;"><i class="fa-solid fa-cloud-arrow-up mr-1 text-indigo-500"></i> Standard 300 DPI</div>
-                <div style="font-size:10.5px; color:#64748b; margin-top:2px;">Normal / Fast Print</div>
+              <button type="button" id="qualityBtnSheet_ultra" onclick="setExportQuality('ultra')" style="padding:10px 8px; border-radius:10px; border:1px solid #cbd5e1; background:#f8fafc; cursor:pointer; text-align:center; transition:0.2s;">
+                <div style="font-size:12px; font-weight:800; color:#334155;"><i class="fa-solid fa-crown mr-1 text-amber-500"></i> Ultra HD 600 DPI</div>
+                <div style="font-size:10.5px; color:#64748b; margin-top:2px;">Studio Lab 2x Resolution</div>
               </button>
             </div>
           </div>
@@ -2212,7 +2212,7 @@
   }
 
   // ================= 2 OUTPUT QUALITY MODES (ULTRA HD 600 DPI / STANDARD 300 DPI) =================
-  let currentExportQuality = 'ultra'; // 'ultra' (600 DPI Studio Lab) or 'standard' (300 DPI Web/Forms)
+  let currentExportQuality = 'standard'; // 'standard' (300 DPI Photoshop Studio Lab Standard) or 'ultra' (600 DPI)
 
   function setExportQuality(q) {
     currentExportQuality = q;
@@ -4663,122 +4663,65 @@
     </div>
   </div>
 
-  <!-- ================= RECHARGE / PAYMENT MODAL (PHONEPE & ALL UPI APPS) ================= -->
+  <!-- ================= RECHARGE / PAYMENT MODAL (100% REAL RAZORPAY GATEWAY) ================= -->
   <div id="rechargeModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative border border-purple-100 max-h-[92vh] overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-indigo-100 max-h-[92vh] overflow-y-auto">
       <button onclick="closeRechargeModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">&times;</button>
       
-      <!-- PhonePe & UPI Header -->
-      <div class="text-center mb-4">
-        <div class="inline-flex items-center gap-1.5 bg-[#5f259f] text-white text-xs font-black px-3.5 py-1.5 rounded-full shadow-md mb-2">
-          <i class="fa-solid fa-qrcode"></i> PhonePe & All UPI Scan & Pay
+      <!-- Modern Header -->
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-black px-4 py-1.5 rounded-full shadow-md mb-2">
+          <i class="fa-solid fa-shield-halved text-amber-300"></i> Razorpay Certified Secure Checkout
         </div>
-        <h3 class="text-2xl font-black text-gray-900">Recharge Studio Wallet</h3>
-        <p class="text-xs text-gray-500 mt-0.5">Pay via PhonePe, Google Pay, Paytm, or any UPI App • Instant Activation</p>
+        <h3 class="text-2xl sm:text-3xl font-black text-gray-900">Recharge Studio Wallet</h3>
+        <p class="text-xs sm:text-sm text-gray-500 mt-1">Instant Auto-Activation • Direct UPI & Card Payment</p>
       </div>
 
       <!-- Plan Details Card -->
-      <div class="bg-gradient-to-r from-purple-50 via-indigo-50 to-pink-50 border-2 border-purple-200 rounded-2xl p-4 mb-4 relative shadow-sm">
+      <div class="bg-gradient-to-r from-purple-50 via-indigo-50 to-pink-50 border-2 border-purple-200 rounded-2xl p-5 mb-6 relative shadow-sm">
         <div class="flex justify-between items-center">
           <div>
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-purple-700 bg-purple-200/70 px-2 py-0.5 rounded-md">30 Days Unlimited Pass</span>
-            <div class="text-lg font-black text-gray-900 mt-1" id="rechargeSelectedName">1 Month Unlimited Plan</div>
-            <div class="text-xs text-gray-600">No Watermark • 600 DPI Ultra HD • Unlimited Photos</div>
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-purple-700 bg-purple-200/70 px-2.5 py-0.5 rounded-md">30 Days Unlimited Pass</span>
+            <div class="text-xl font-black text-gray-900 mt-1" id="rechargeSelectedName">1 Month Unlimited Plan</div>
+            <div class="text-xs text-gray-600 mt-0.5">No Watermark • 300 DPI Lab HD • Unlimited Photos</div>
           </div>
           <div class="text-right">
-            <div class="text-3xl font-black text-purple-800" id="rechargeSelectedAmount">₹99</div>
-            <span class="text-[11px] font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">0% Fee (Direct Pay)</span>
+            <div class="text-3xl sm:text-4xl font-black text-purple-800" id="rechargeSelectedAmount">₹99</div>
+            <span class="text-[11px] font-bold text-emerald-600 bg-emerald-100 px-2.5 py-0.5 rounded-full">Instant Auto-Activation</span>
           </div>
         </div>
       </div>
 
-      <!-- Option 1: Instant Razorpay Online Pay -->
-      <div class="mb-4">
-        <button type="button" onclick="payWithRazorpay()" id="btnRazorpayInstant" class="w-full py-4 px-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-700 hover:to-purple-700 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl shadow-indigo-500/25 transition transform active:scale-95 flex items-center justify-center gap-3 cursor-pointer">
+      <!-- Primary Action: Instant Razorpay Online Pay -->
+      <div class="mb-5">
+        <button type="button" onclick="payWithRazorpay()" id="btnRazorpayInstant" class="w-full py-4 sm:py-5 px-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-700 hover:to-purple-700 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl shadow-indigo-500/25 transition transform active:scale-95 flex items-center justify-center gap-3 cursor-pointer">
           <i class="fa-solid fa-bolt text-amber-300 text-xl"></i>
           <span>Pay via Razorpay (Instant Auto-Activation)</span>
           <i class="fa-solid fa-arrow-right text-sm opacity-80"></i>
         </button>
-        <div class="flex items-center justify-center gap-2 mt-2 text-[11px] text-gray-500 font-bold">
-          <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-emerald-500"></i> UPI (GPay, PhonePe, Paytm) • Cards • NetBanking</span>
+      </div>
+
+      <!-- Supported Payment Logos Row -->
+      <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 text-center mb-5">
+        <div class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider mb-2.5">
+          All Payment Modes Supported
+        </div>
+        <div class="flex items-center justify-center gap-2 text-xs font-black flex-wrap">
+          <span class="bg-purple-100 text-[#5f259f] px-2.5 py-1 rounded-lg">PhonePe</span>
+          <span class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-lg">Google Pay</span>
+          <span class="bg-sky-100 text-sky-700 px-2.5 py-1 rounded-lg">Paytm</span>
+          <span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-lg">BHIM UPI</span>
+          <span class="bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-lg">Debit / Credit Cards</span>
+          <span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-lg">NetBanking</span>
         </div>
       </div>
 
-      <!-- Divider for Optional Offline Manual UPI -->
-      <div class="relative flex py-2 items-center mb-3">
-        <div class="flex-grow border-t border-gray-200"></div>
-        <span class="flex-shrink mx-3 text-[10px] font-black uppercase tracking-wider text-gray-400 bg-white px-2">OR PAY VIA DIRECT PHONEPE QR</span>
-        <div class="flex-grow border-t border-gray-200"></div>
-      </div>
-
-      <!-- PhonePe QR Code Card -->
-      <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 text-center mb-4">
-        <div class="flex items-center justify-center gap-2 mb-2 text-xs font-bold text-gray-700">
-          <i class="fa-solid fa-mobile-screen-button text-[#5f259f]"></i> Scan this QR Code with any UPI App
-        </div>
-
-        <!-- QR Image with PhonePe Frame -->
-        <div class="inline-block p-2.5 bg-white rounded-2xl border-2 border-[#5f259f]/30 shadow-md relative">
-          <img id="phonepeQrImg" src="assets/phonepe_qr.png" alt="PhonePe UPI QR Code" class="w-60 max-w-full mx-auto rounded-xl object-contain bg-white shadow-xs">
-          <div class="mt-2 flex items-center justify-center gap-1.5 text-xs font-black text-[#5f259f]">
-            <i class="fa-solid fa-circle-check text-emerald-500"></i> MANOJ KUMAR SHARMA • ₹99
-          </div>
-        </div>
-
-        <!-- Supported UPI Logos Row -->
-        <div class="flex items-center justify-center gap-2 mt-3 text-[11px] font-bold text-gray-500 flex-wrap">
-          <span class="bg-purple-100 text-[#5f259f] px-2.5 py-0.5 rounded-md font-extrabold">PhonePe</span>
-          <span class="bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-md font-extrabold">Google Pay</span>
-          <span class="bg-sky-100 text-sky-700 px-2.5 py-0.5 rounded-md font-extrabold">Paytm</span>
-          <span class="bg-green-100 text-green-700 px-2.5 py-0.5 rounded-md font-extrabold">BHIM UPI</span>
-          <span class="bg-amber-100 text-amber-700 px-2.5 py-0.5 rounded-md font-extrabold">CRED</span>
-        </div>
-
-        <!-- UPI ID Row with Copy & Edit -->
-        <div class="mt-3 flex items-center justify-between bg-white border border-gray-300 rounded-xl p-2.5 px-3.5 shadow-xs">
-          <div class="text-left overflow-hidden">
-            <span class="text-[10px] text-gray-400 font-bold uppercase block">PhonePe UPI ID (MANOJ KUMAR SHARMA):</span>
-            <span id="displayUpiId" class="text-xs sm:text-sm font-black text-gray-900 truncate block">8668656820-7@axl</span>
-          </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <button type="button" onclick="copyUpiId()" id="btnCopyUpi" class="px-3 py-1 bg-purple-50 hover:bg-purple-100 text-[#5f259f] border border-purple-200 text-xs font-bold rounded-lg transition cursor-pointer">
-              <i class="fa-regular fa-copy mr-1"></i> Copy
-            </button>
-            <button type="button" onclick="promptChangeUpiConfig()" class="p-1 text-gray-400 hover:text-gray-600 text-xs rounded transition" title="Admin: Change UPI ID / QR">
-              <i class="fa-solid fa-gear"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Mobile Direct Pay Button -->
-        <div class="mt-3">
-          <a id="btnMobileUpiPay" href="upi://pay?pa=8668656820-7@axl&pn=MANOJ%20KUMAR%20SHARMA&am=99&cu=INR&tn=Passport%20Photo%20Unlimited%20Plan" class="w-full py-2.5 px-3 bg-[#5f259f] hover:bg-[#4d1d82] text-white text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
-            <i class="fa-solid fa-bolt text-amber-300"></i> Tap to Open & Pay in PhonePe / UPI App
-          </a>
-        </div>
-      </div>
-
-      <!-- Step 2: Enter 12-Digit UTR -->
-      <div class="bg-white border-2 border-indigo-100 rounded-2xl p-4 shadow-sm mb-4">
-        <label class="block text-xs font-extrabold text-gray-800 mb-1">
-          <i class="fa-solid fa-receipt text-indigo-600 mr-1"></i> Step 2: Enter 12-Digit UPI UTR / Reference No.
-        </label>
-        <p class="text-[11px] text-gray-500 mb-2">पेमेंट के बाद PhonePe / UPI ऐप में दिखने वाला 12 अंकों का <b>UTR No.</b> यहाँ डालें:</p>
-        
-        <div class="flex gap-2">
-          <input type="text" id="upiUtrNumber" placeholder="e.g. 428941029384" maxlength="18" class="flex-1 px-3.5 py-2.5 bg-gray-50 border border-gray-300 focus:border-indigo-600 focus:bg-white rounded-xl text-sm font-bold text-gray-900 outline-none transition uppercase">
-          <button type="button" id="btnSubmitUtr" onclick="verifyUpiPayment()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition shrink-0 cursor-pointer flex items-center gap-1.5">
-            <i class="fa-solid fa-circle-check"></i> Submit & Unlock
-          </button>
-        </div>
-      </div>
-
-      <!-- Trust Footer -->
+      <!-- Trust & Security Footer -->
       <div class="flex flex-col items-center justify-center gap-1 text-[11px] text-gray-400 text-center">
         <div class="flex items-center justify-center gap-2 text-gray-500">
-          <span class="flex items-center gap-1"><i class="fa-solid fa-lock text-emerald-500"></i> 100% Direct UPI</span>
+          <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-emerald-500"></i> RBI 256-Bit SSL Secured</span>
           <span>•</span>
-          <span>Instant Unlimited Credits</span>
+          <span>100% Automated</span>
           <span>•</span>
           <span class="text-gray-600 font-bold">Support: passportphoto2026@gmail.com</span>
         </div>
