@@ -1568,7 +1568,7 @@
           <div class="form-group" style="margin-bottom:14px;">
             <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:6px;"><i class="fa-solid fa-table-cells text-primary mr-1"></i> Auto-Fit Grid (Scale to fit)</label>
             <select id="gridLayout" onchange="onGridLayoutChange()" style="font-weight:700;">
-              <option value="4x3" selected>Fit 12 Photos (4x3 • 4 Cols x 3 Rows on Landscape)</option>
+              <option value="4x3" selected>Fit 12 Photos (3x4 Portrait / 4x3 • 12 Photos Default)</option>
               <option value="5x3">Fit 15 Photos (5x3 • 5 Cols x 3 Rows - 4x6 Landscape Fit)</option>
               <option value="6x3">Fit 18 Photos (6x3 • 6 Cols x 3 Rows - Popular 4x6 Landscape)</option>
               <option value="4x4">Fit 16 Photos (4x4 • 4 Cols x 4 Rows)</option>
@@ -1643,32 +1643,6 @@
                 ✨ Fill (फैलाएं)
               </button>
             </div>
-
-            <!-- In-Sidebar Sliders for Move/Adjust -->
-            <div style="margin-top:12px; padding-top:10px; border-top:1px dashed #cbd5e1; display:flex; flex-direction:column; gap:10px;">
-              <div>
-                <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; font-weight:800; color:#334155; margin-bottom:4px;">
-                  <span>↔️ Move Left-Right (बाएं-दाएं):</span>
-                  <span id="offsetXValBadgeSide" style="color:var(--primary); background:#eef2ff; padding:1px 6px; border-radius:6px; font-size:11px;">0.0mm</span>
-                </div>
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <button type="button" onclick="nudgeOffset('x', -1)" class="btn btn-outline" style="padding:2px 8px; font-size:11px; border-radius:6px;" title="-1mm">◀</button>
-                  <input type="range" id="sheetOffsetXSliderSide" min="0" max="60" step="0.5" value="0" style="flex:1; height:6px; cursor:pointer; accent-color:var(--primary);" oninput="onOffsetXSliderInput(this.value)">
-                  <button type="button" onclick="nudgeOffset('x', 1)" class="btn btn-outline" style="padding:2px 8px; font-size:11px; border-radius:6px;" title="+1mm">▶</button>
-                </div>
-              </div>
-              <div>
-                <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; font-weight:800; color:#334155; margin-bottom:4px;">
-                  <span>↕️ Move Up-Down (ऊपर-नीचे):</span>
-                  <span id="offsetYValBadgeSide" style="color:var(--primary); background:#eef2ff; padding:1px 6px; border-radius:6px; font-size:11px;">0.0mm</span>
-                </div>
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <button type="button" onclick="nudgeOffset('y', -1)" class="btn btn-outline" style="padding:2px 8px; font-size:11px; border-radius:6px;" title="-1mm">▲</button>
-                  <input type="range" id="sheetOffsetYSliderSide" min="0" max="60" step="0.5" value="0" style="flex:1; height:6px; cursor:pointer; accent-color:var(--primary);" oninput="onOffsetYSliderInput(this.value)">
-                  <button type="button" onclick="nudgeOffset('y', 1)" class="btn btn-outline" style="padding:2px 8px; font-size:11px; border-radius:6px;" title="+1mm">▼</button>
-                </div>
-              </div>
-            </div>
           </div>
 
           <!-- 2 Sheet Export Quality Options -->
@@ -1725,11 +1699,13 @@
         <div style="display:flex; align-items:center; justify-content:center; gap:12px; position:relative; max-width:100%;">
           
           <!-- Left Side Vertical Slider (Up-Down Shift) -->
-          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; background:white; padding:14px 10px; border-radius:14px; box-shadow:0 4px 15px rgba(0,0,0,0.08); border:1px solid #e5e7eb;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px; background:white; padding:12px 8px; border-radius:14px; box-shadow:0 4px 15px rgba(0,0,0,0.08); border:1.5px solid #e2e8f0;">
             <span style="font-size:10px; font-weight:800; color:var(--primary); letter-spacing:0.5px; text-transform:uppercase;">↕️ Y-Shift</span>
+            <button type="button" onclick="nudgeOffset('y', -0.5)" style="background:#f1f5f9; hover:background:#e2e8f0; border:1px solid #cbd5e1; border-radius:6px; width:26px; height:22px; cursor:pointer; font-size:10px; font-weight:800; color:#334155; display:flex; align-items:center; justify-content:center;" title="Move Up (ऊपर सरकाएं)">▲</button>
             <input type="range" id="sheetOffsetYSliderLeft" orient="vertical" min="0" max="60" step="0.5" value="4" 
                    style="writing-mode: vertical-lr; direction: rtl; appearance: slider-vertical; -webkit-appearance: slider-vertical; width: 18px; height: 160px; cursor: pointer; accent-color: var(--primary);" 
                    oninput="onOffsetYSliderInput(this.value)" title="Slide photos vertically (ऊपर-नीचे सरकाएं)">
+            <button type="button" onclick="nudgeOffset('y', 0.5)" style="background:#f1f5f9; hover:background:#e2e8f0; border:1px solid #cbd5e1; border-radius:6px; width:26px; height:22px; cursor:pointer; font-size:10px; font-weight:800; color:#334155; display:flex; align-items:center; justify-content:center;" title="Move Down (नीचे सरकाएं)">▼</button>
             <span id="offsetYValBadgeLeft" style="font-size:11px; font-weight:700; color:var(--primary); background:#eef2ff; padding:2px 6px; border-radius:6px; min-width:44px; text-align:center;">4.0mm</span>
           </div>
 
@@ -1740,24 +1716,28 @@
           </div>
 
           <!-- Right Side Vertical Slider (Up-Down Shift) -->
-          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; background:white; padding:14px 10px; border-radius:14px; box-shadow:0 4px 15px rgba(0,0,0,0.08); border:1px solid #e5e7eb;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px; background:white; padding:12px 8px; border-radius:14px; box-shadow:0 4px 15px rgba(0,0,0,0.08); border:1.5px solid #e2e8f0;">
             <span style="font-size:10px; font-weight:800; color:var(--primary); letter-spacing:0.5px; text-transform:uppercase;">↕️ Y-Shift</span>
+            <button type="button" onclick="nudgeOffset('y', -0.5)" style="background:#f1f5f9; hover:background:#e2e8f0; border:1px solid #cbd5e1; border-radius:6px; width:26px; height:22px; cursor:pointer; font-size:10px; font-weight:800; color:#334155; display:flex; align-items:center; justify-content:center;" title="Move Up (ऊपर सरकाएं)">▲</button>
             <input type="range" id="sheetOffsetYSlider" orient="vertical" min="0" max="60" step="0.5" value="4" 
                    style="writing-mode: vertical-lr; direction: rtl; appearance: slider-vertical; -webkit-appearance: slider-vertical; width: 18px; height: 160px; cursor: pointer; accent-color: var(--primary);" 
                    oninput="onOffsetYSliderInput(this.value)" title="Slide photos vertically (ऊपर-नीचे सरकाएं)">
+            <button type="button" onclick="nudgeOffset('y', 0.5)" style="background:#f1f5f9; hover:background:#e2e8f0; border:1px solid #cbd5e1; border-radius:6px; width:26px; height:22px; cursor:pointer; font-size:10px; font-weight:800; color:#334155; display:flex; align-items:center; justify-content:center;" title="Move Down (नीचे सरकाएं)">▼</button>
             <span id="offsetYValBadge" style="font-size:11px; font-weight:700; color:var(--primary); background:#eef2ff; padding:2px 6px; border-radius:6px; min-width:44px; text-align:center;">4.0mm</span>
           </div>
 
         </div>
 
         <!-- Bottom Horizontal Slider (Left-Right Shift) -->
-        <div style="display:flex; align-items:center; justify-content:center; gap:15px; margin-top:14px; background:white; padding:10px 20px; border-radius:14px; box-shadow:0 4px 15px rgba(0,0,0,0.08); border:1px solid #e5e7eb; width:min(550px, 92%);">
+        <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-top:14px; background:white; padding:10px 18px; border-radius:14px; box-shadow:0 4px 15px rgba(0,0,0,0.08); border:1.5px solid #e2e8f0; width:min(580px, 92%);">
           <span style="font-size:12px; font-weight:800; color:var(--primary); white-space:nowrap; display:flex; align-items:center; gap:6px;">
             ↔️ X-Shift (बाएं-दाएं सरकाएं):
           </span>
+          <button type="button" onclick="nudgeOffset('x', -0.5)" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; width:26px; height:22px; cursor:pointer; font-size:10px; font-weight:800; color:#334155; display:flex; align-items:center; justify-content:center;" title="Move Left (बाएं सरकाएं)">◀</button>
           <input type="range" id="sheetOffsetXSlider" min="0" max="60" step="0.5" value="4" 
                  style="flex:1; height:8px; cursor:pointer; accent-color:var(--primary);" 
                  oninput="onOffsetXSliderInput(this.value)" title="Slide photos horizontally (बाएं-दाएं सरकाएं)">
+          <button type="button" onclick="nudgeOffset('x', 0.5)" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; width:26px; height:22px; cursor:pointer; font-size:10px; font-weight:800; color:#334155; display:flex; align-items:center; justify-content:center;" title="Move Right (दाएं सरकाएं)">▶</button>
           <span id="offsetXValBadge" style="font-size:12px; font-weight:700; color:var(--primary); background:#eef2ff; padding:2px 8px; border-radius:6px; min-width:50px; text-align:center;">4.0mm</span>
         </div>
 
@@ -2614,14 +2594,14 @@
     applyAdjustments();
     finalImage.src = document.getElementById('adjCanvas').toDataURL('image/png');
     finalImage.onload = () => {
-      // Default to 4x6 Landscape, 15 photos, Center position
+      // Default to 4x6 Portrait (102x152 mm), 12 photos (4x3), Center position
       const pSize = document.getElementById('paperSize');
-      if (pSize) pSize.value = '4x6L';
+      if (pSize) pSize.value = '4x6P';
       const gLayout = document.getElementById('gridLayout');
-      if (gLayout) gLayout.value = '5x3';
+      if (gLayout) gLayout.value = '4x3';
       
-      updateMaxPhotoCount(15, false);
-      setPhotoCount(15);
+      updateMaxPhotoCount(12, false);
+      setPhotoCount(12);
       setSheetPosition('center');
       goToStep(5);
     }
