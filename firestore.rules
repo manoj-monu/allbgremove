@@ -47,6 +47,12 @@ service cloud.firestore {
       allow read, update, delete: if isOwnerAdmin();
     }
 
+    // 🔒 LOGIN AUDIT LOGS & IP TRACKING
+    match /login_history/{logId} {
+      allow create: if request.auth != null;
+      allow read, update, delete: if isOwnerAdmin();
+    }
+
     // Default deny all other collections
     match /{document=**} {
       allow read, write: if isOwnerAdmin();

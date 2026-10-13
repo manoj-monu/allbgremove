@@ -3492,6 +3492,64 @@
     window.location.reload();
   }
 
+  // 🔒 AUDIT LOGGING: RECORD CLIENT IP, LOCATION & DEVICE
+  async function recordLoginAudit(fbUser, sessionId) {
+    if (!fbUser || !fbUser.uid) return;
+    const auditKey = 'audited_' + (sessionId || fbUser.uid);
+    if (sessionStorage.getItem(auditKey)) return;
+    sessionStorage.setItem(auditKey, 'true');
+
+    try {
+      const res = await fetch('/api/auth/record-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: fbUser.uid,
+          userEmail: fbUser.email,
+          userName: fbUser.displayName || '',
+          sessionId: sessionId || ''
+        })
+      });
+
+      if (!res.ok) return;
+      const json = await res.json();
+      if (!json.success || !json.data) return;
+      const log = json.data;
+
+      if (typeof fbDb !== 'undefined' && fbDb) {
+        const logId = 'log_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+        await fbDb.collection('login_history').doc(logId).set({
+          id: logId,
+          userId: fbUser.uid,
+          userEmail: (fbUser.email || '').toLowerCase().trim(),
+          userName: fbUser.displayName || 'Studio User',
+          ip: log.ip,
+          city: log.city,
+          region: log.region,
+          country: log.country,
+          location: log.location,
+          device: log.device,
+          userAgent: log.userAgent,
+          sessionId: sessionId || '',
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          dateStr: log.dateStr
+        }).catch(() => null);
+
+        // Also record on users/{uid} with lastIp, lastLocation, knownIps array
+        const userDocRef = fbDb.collection('users').doc(fbUser.uid);
+        await userDocRef.set({
+          lastIp: log.ip,
+          lastLocation: log.location,
+          lastDevice: log.device,
+          knownIps: firebase.firestore.FieldValue.arrayUnion(log.ip),
+          lastLoginTime: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }).catch(() => null);
+      }
+    } catch(err) {
+      console.warn("Audit record warning:", err);
+    }
+  }
+
   // Listen to real auth state changes across sessions
   if (fbAuth) {
     fbAuth.onAuthStateChanged(async (user) => {
@@ -3598,6 +3656,9 @@
             lastLogin: firebase.firestore.FieldValue.serverTimestamp()
           }).catch(() => null);
         }
+
+        // Trigger IP & Location audit recording
+        recordLoginAudit(fbUser, mySessionId);
 
         // 🔒 REAL-TIME APPROVAL & SINGLE-DEVICE CONCURRENT SESSION LISTENER
         userRef.onSnapshot(docSnap => {

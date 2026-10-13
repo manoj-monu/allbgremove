@@ -226,6 +226,123 @@
         </div>
       </div>
 
+      <!-- ================= USER LOGIN & IP ADDRESS TRACKING CENTER ================= -->
+      <div class="bg-slate-800/80 border border-slate-700/80 rounded-3xl p-6 shadow-2xl space-y-6">
+        
+        <!-- Header & Top Stats -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-700/60 pb-5">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                <i class="fa-solid fa-network-wired text-sm"></i>
+              </span>
+              <h2 class="text-lg font-black text-white tracking-tight">User Login & IP Address Security Monitor</h2>
+              <span class="bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
+                Live Audit
+              </span>
+            </div>
+            <p class="text-xs text-slate-400">
+              हर यूजर का IP Address, लोकेशन (शहर/राज्य), डिवाइस और लॉगिन हिस्ट्री — कौन सा यूजर कितने IP और कितनी जगहों से लॉगिन हुआ।
+            </p>
+          </div>
+
+          <!-- Micro Metric Counters -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div class="bg-slate-900/80 border border-slate-700/70 rounded-2xl px-3.5 py-2.5">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Monitored Users</div>
+              <div id="statTrackedUsers" class="text-lg font-black text-cyan-400 mt-0.5">0</div>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-700/70 rounded-2xl px-3.5 py-2.5">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Distinct IPs</div>
+              <div id="statUniqueIps" class="text-lg font-black text-emerald-400 mt-0.5">0</div>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-700/70 rounded-2xl px-3.5 py-2.5">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Multi-IP Alerts</div>
+              <div id="statMultiIpAlerts" class="text-lg font-black text-rose-400 mt-0.5">0</div>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-700/70 rounded-2xl px-3.5 py-2.5">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Logins</div>
+              <div id="statRecentLogins" class="text-lg font-black text-amber-400 mt-0.5">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Toolbar: View Switcher & Search / Filter -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <!-- View Switch Tabs -->
+          <div class="inline-flex p-1 bg-slate-900/90 border border-slate-700/80 rounded-2xl gap-1">
+            <button type="button" id="tabBtnUserIp" onclick="switchAuditTab('users')" class="px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer bg-cyan-600 text-white shadow">
+              <i class="fa-solid fa-users-viewfinder mr-1.5"></i> User IP Summary (अकाउंट अनुसार)
+            </button>
+            <button type="button" id="tabBtnLogStream" onclick="switchAuditTab('logs')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition cursor-pointer">
+              <i class="fa-solid fa-clock-rotate-left mr-1.5"></i> Live Login Stream (पूरी हिस्ट्री)
+            </button>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="flex items-center gap-2">
+            <div class="relative flex-1 sm:w-64">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+              <input type="text" id="searchAuditInput" oninput="filterUserAudits()" placeholder="Search user, email, IP, city..." class="w-full pl-8 pr-3 py-1.5 bg-slate-900 border border-slate-700 focus:border-cyan-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none">
+            </div>
+            <select id="auditFilterSelect" onchange="filterUserAudits()" class="px-3 py-1.5 bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-xl outline-none cursor-pointer">
+              <option value="all">All Accounts</option>
+              <option value="multi">🚨 Multi-IP Only (&gt;1 IP)</option>
+              <option value="single">✅ Single IP Only</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- VIEW 1: User IP Summary Table -->
+        <div id="userIpSummaryContainer" class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="text-slate-400 border-b border-slate-700/80 uppercase tracking-wider text-[11px]">
+                <th class="py-3 px-3">User</th>
+                <th class="py-3 px-3">IP Count & Status</th>
+                <th class="py-3 px-3">Known IP Addresses</th>
+                <th class="py-3 px-3">Last Location</th>
+                <th class="py-3 px-3">Last Device / OS</th>
+                <th class="py-3 px-3 text-right">Last Login</th>
+              </tr>
+            </thead>
+            <tbody id="userIpSummaryTbody" class="divide-y divide-slate-700/60 font-medium">
+              <tr>
+                <td colspan="6" class="py-8 text-center text-slate-500">
+                  <i class="fa-solid fa-circle-notch fa-spin text-cyan-400 text-xl mb-2 block"></i>
+                  Loading User IP audit records from Firestore...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- VIEW 2: Chronological Login History Stream Table (Hidden by default) -->
+        <div id="loginHistoryStreamContainer" class="overflow-x-auto hidden">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="text-slate-400 border-b border-slate-700/80 uppercase tracking-wider text-[11px]">
+                <th class="py-3 px-3">Login Time (IST)</th>
+                <th class="py-3 px-3">User</th>
+                <th class="py-3 px-3">IP Address</th>
+                <th class="py-3 px-3">Location</th>
+                <th class="py-3 px-3">Device / Browser</th>
+                <th class="py-3 px-3 text-right">Session ID</th>
+              </tr>
+            </thead>
+            <tbody id="loginHistoryStreamTbody" class="divide-y divide-slate-700/60 font-medium">
+              <tr>
+                <td colspan="6" class="py-8 text-center text-slate-500">
+                  <i class="fa-solid fa-circle-notch fa-spin text-cyan-400 text-xl mb-2 block"></i>
+                  Loading chronological login stream...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
       <!-- QUICK TOOLS ROW: MANUAL ACTIVATION + UPI CONFIG -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
@@ -419,6 +536,7 @@
 
       loadAllTransactions();
       listenFirestoreRealtime();
+      loadUserLoginAudits();
     }
 
     function saveAdminUpiId() {
@@ -764,6 +882,378 @@
         return;
       }
       alert(`✅ Granted +${count} credits to ${email}!`);
+    }
+
+    // ================= USER LOGIN & IP ADDRESS TRACKING LOGIC =================
+    let auditedUsersList = [];
+    let loginStreamLogs = [];
+    let activeAuditTab = 'users';
+    let usersSnapshotCache = null;
+
+    function switchAuditTab(tab) {
+      activeAuditTab = tab;
+      const userTabBtn = document.getElementById('tabBtnUserIp');
+      const logTabBtn = document.getElementById('tabBtnLogStream');
+      const userContainer = document.getElementById('userIpSummaryContainer');
+      const logContainer = document.getElementById('loginHistoryStreamContainer');
+
+      if (tab === 'users') {
+        userTabBtn.className = "px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer bg-cyan-600 text-white shadow";
+        logTabBtn.className = "px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition cursor-pointer";
+        userContainer.classList.remove('hidden');
+        logContainer.classList.add('hidden');
+      } else {
+        logTabBtn.className = "px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer bg-cyan-600 text-white shadow";
+        userTabBtn.className = "px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition cursor-pointer";
+        logContainer.classList.remove('hidden');
+        userContainer.classList.add('hidden');
+      }
+    }
+
+    function loadUserLoginAudits() {
+      if (!fbDb) {
+        renderAuditEmptyState("Firestore database not connected.");
+        return;
+      }
+
+      // 1. Real-time Listener on Login History collection (latest 200 logins)
+      try {
+        fbDb.collection('login_history')
+          .orderBy('timestamp', 'desc')
+          .limit(200)
+          .onSnapshot(snap => {
+            const logs = [];
+            snap.forEach(doc => {
+              const d = doc.data();
+              let dateStr = 'Recent';
+              let dateObj = null;
+              if (d.timestamp) {
+                dateObj = d.timestamp.toDate ? d.timestamp.toDate() : new Date(d.timestamp);
+                dateStr = dateObj.toLocaleString('en-IN', {
+                  day: '2-digit', month: 'short', year: 'numeric',
+                  hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+                });
+              }
+              logs.push({
+                id: doc.id,
+                userId: d.userId || '',
+                email: d.userEmail || d.email || 'Unknown',
+                displayName: d.userName || d.displayName || 'Studio User',
+                photoURL: d.photoURL || '',
+                ip: d.ip || 'Unknown IP',
+                location: d.location || 'India',
+                device: d.device || 'Browser',
+                sessionId: d.sessionId || '',
+                timestampStr: dateStr,
+                dateObj: dateObj
+              });
+            });
+            loginStreamLogs = logs;
+            rebuildAuditData();
+          }, err => {
+            console.warn("Login history snapshot notice:", err);
+          });
+      } catch (err) {
+        console.warn("login_history listener error:", err);
+      }
+
+      // 2. Real-time Listener on Users collection
+      try {
+        fbDb.collection('users').onSnapshot(snap => {
+          usersSnapshotCache = snap;
+          rebuildAuditData();
+        }, err => {
+          console.warn("Users snapshot notice:", err);
+        });
+      } catch (err) {
+        console.warn("users listener error:", err);
+      }
+    }
+
+    function rebuildAuditData() {
+      const usersMap = {};
+
+      if (usersSnapshotCache) {
+        usersSnapshotCache.forEach(doc => {
+          const d = doc.data();
+          const uid = doc.id;
+          const knownArr = Array.isArray(d.knownIps) ? d.knownIps : (d.lastIp ? [d.lastIp] : []);
+          let lastDate = null;
+          const loginTimeVal = d.lastLoginTime || d.lastLoginAt;
+          if (loginTimeVal) {
+            lastDate = loginTimeVal.toDate ? loginTimeVal.toDate() : new Date(loginTimeVal);
+          }
+
+          usersMap[uid] = {
+            uid: uid,
+            email: d.email || 'No Email',
+            displayName: d.displayName || d.name || 'Studio User',
+            photoURL: d.photoURL || '',
+            lastIp: d.lastIp || (knownArr[0] || 'Unknown IP'),
+            lastLocation: d.lastLocation || 'Unknown Location',
+            lastDevice: d.lastDevice || 'Unknown Device',
+            lastLoginAt: lastDate,
+            knownIpsSet: new Set(knownArr.filter(Boolean))
+          };
+        });
+      }
+
+      // Merge data from loginStreamLogs to ensure 100% coverage
+      loginStreamLogs.forEach(log => {
+        const uid = log.userId;
+        if (!uid) return;
+
+        if (!usersMap[uid]) {
+          usersMap[uid] = {
+            uid: uid,
+            email: log.email || 'No Email',
+            displayName: log.displayName || 'Studio User',
+            photoURL: log.photoURL || '',
+            lastIp: log.ip || 'Unknown IP',
+            lastLocation: log.location || 'Unknown Location',
+            lastDevice: log.device || 'Unknown Device',
+            lastLoginAt: log.dateObj,
+            knownIpsSet: new Set(log.ip && log.ip !== 'Unknown IP' ? [log.ip] : [])
+          };
+        } else {
+          if (log.ip && log.ip !== 'Unknown IP') {
+            usersMap[uid].knownIpsSet.add(log.ip);
+          }
+          if (!usersMap[uid].lastLocation || usersMap[uid].lastLocation === 'Unknown Location') {
+            usersMap[uid].lastLocation = log.location;
+          }
+          if (!usersMap[uid].lastDevice || usersMap[uid].lastDevice === 'Unknown Device') {
+            usersMap[uid].lastDevice = log.device;
+          }
+          if (!usersMap[uid].lastLoginAt && log.dateObj) {
+            usersMap[uid].lastLoginAt = log.dateObj;
+          }
+        }
+      });
+
+      // Convert map to sorted array
+      auditedUsersList = Object.values(usersMap).map(u => ({
+        ...u,
+        knownIps: Array.from(u.knownIpsSet)
+      })).sort((a, b) => {
+        const timeA = a.lastLoginAt ? new Date(a.lastLoginAt).getTime() : 0;
+        const timeB = b.lastLoginAt ? new Date(b.lastLoginAt).getTime() : 0;
+        return timeB - timeA;
+      });
+
+      updateAuditMetrics();
+      filterUserAudits();
+    }
+
+    function updateAuditMetrics() {
+      const allDistinctIps = new Set();
+      let multiIpCount = 0;
+
+      auditedUsersList.forEach(u => {
+        u.knownIps.forEach(ip => {
+          if (ip && ip !== 'Unknown IP') allDistinctIps.add(ip);
+        });
+        if (u.knownIps.length > 1) {
+          multiIpCount++;
+        }
+      });
+
+      loginStreamLogs.forEach(l => {
+        if (l.ip && l.ip !== 'Unknown IP') allDistinctIps.add(l.ip);
+      });
+
+      document.getElementById('statTrackedUsers').textContent = auditedUsersList.length;
+      document.getElementById('statUniqueIps').textContent = allDistinctIps.size;
+      document.getElementById('statMultiIpAlerts').textContent = multiIpCount;
+      document.getElementById('statRecentLogins').textContent = loginStreamLogs.length;
+    }
+
+    function filterUserAudits() {
+      const query = (document.getElementById('searchAuditInput')?.value || '').toLowerCase().trim();
+      const filter = document.getElementById('auditFilterSelect')?.value || 'all';
+
+      // 1. Filter User Summary
+      let filteredUsers = auditedUsersList.filter(u => {
+        const matchesQuery = !query || 
+          u.displayName.toLowerCase().includes(query) ||
+          u.email.toLowerCase().includes(query) ||
+          u.lastLocation.toLowerCase().includes(query) ||
+          u.lastDevice.toLowerCase().includes(query) ||
+          u.knownIps.some(ip => ip.toLowerCase().includes(query));
+
+        if (!matchesQuery) return false;
+
+        if (filter === 'multi') return u.knownIps.length > 1;
+        if (filter === 'single') return u.knownIps.length <= 1;
+        return true;
+      });
+
+      renderUserIpTable(filteredUsers);
+
+      // 2. Filter Login Logs Stream
+      let filteredLogs = loginStreamLogs.filter(l => {
+        if (!query) return true;
+        return l.displayName.toLowerCase().includes(query) ||
+               l.email.toLowerCase().includes(query) ||
+               l.ip.toLowerCase().includes(query) ||
+               l.location.toLowerCase().includes(query) ||
+               l.device.toLowerCase().includes(query);
+      });
+
+      renderLoginStreamTable(filteredLogs);
+    }
+
+    function renderUserIpTable(users) {
+      const tbody = document.getElementById('userIpSummaryTbody');
+      if (!tbody) return;
+
+      if (users.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-8 text-center text-slate-500 font-semibold">
+              <i class="fa-solid fa-user-slash text-slate-600 text-2xl mb-2 block"></i>
+              No user login records match your current filter.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = users.map(u => {
+        const isMulti = u.knownIps.length > 1;
+        const statusBadge = isMulti
+          ? `<span class="inline-flex items-center gap-1 bg-rose-500/15 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded-full text-[10px] font-black animate-pulse">
+               <i class="fa-solid fa-triangle-exclamation"></i> 🚨 ${u.knownIps.length} IPs (Multi-IP Alert)
+             </span>`
+          : `<span class="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[10px] font-bold">
+               <i class="fa-solid fa-circle-check"></i> ${u.knownIps.length || 1} IP Clean
+             </span>`;
+
+        const ipBadges = (u.knownIps.length > 0 ? u.knownIps : [u.lastIp || 'Unknown']).map(ip => `
+          <button type="button" onclick="copyIpAddress('${escapeHtml(ip)}')" title="Click to copy IP" class="inline-flex items-center gap-1 font-mono text-[11px] bg-slate-900 hover:bg-slate-700 text-cyan-300 border border-slate-700 px-2 py-0.5 rounded-lg transition cursor-pointer">
+            <span>${escapeHtml(ip)}</span>
+            <i class="fa-regular fa-copy text-[10px] text-slate-400"></i>
+          </button>
+        `).join(' ');
+
+        let lastTimeStr = 'Never';
+        if (u.lastLoginAt) {
+          const d = new Date(u.lastLoginAt);
+          lastTimeStr = d.toLocaleString('en-IN', {
+            day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true
+          });
+        }
+
+        const avatar = u.photoURL
+          ? `<img src="${escapeHtml(u.photoURL)}" class="w-8 h-8 rounded-full border border-slate-700 object-cover" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(u.displayName)}&background=0284c7&color=fff'">`
+          : `<div class="w-8 h-8 rounded-full bg-cyan-600/30 text-cyan-400 border border-cyan-500/30 flex items-center justify-center font-black text-xs">${escapeHtml((u.displayName || 'U')[0].toUpperCase())}</div>`;
+
+        return `
+          <tr class="hover:bg-slate-700/30 transition">
+            <td class="py-3 px-3">
+              <div class="flex items-center gap-2.5">
+                ${avatar}
+                <div>
+                  <div class="font-bold text-white">${escapeHtml(u.displayName || 'Studio User')}</div>
+                  <div class="text-[11px] text-slate-400 font-mono">${escapeHtml(u.email || '')}</div>
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-3 whitespace-nowrap">
+              ${statusBadge}
+            </td>
+            <td class="py-3 px-3">
+              <div class="flex flex-wrap gap-1 max-w-xs">
+                ${ipBadges}
+              </div>
+            </td>
+            <td class="py-3 px-3">
+              <div class="flex items-center gap-1.5 text-slate-300">
+                <i class="fa-solid fa-location-dot text-rose-400 text-xs"></i>
+                <span>${escapeHtml(u.lastLocation || 'India')}</span>
+              </div>
+            </td>
+            <td class="py-3 px-3">
+              <div class="flex items-center gap-1.5 text-slate-300">
+                <i class="fa-solid fa-laptop text-indigo-400 text-xs"></i>
+                <span>${escapeHtml(u.lastDevice || 'Desktop')}</span>
+              </div>
+            </td>
+            <td class="py-3 px-3 text-right text-slate-400 whitespace-nowrap font-mono text-[11px]">
+              ${lastTimeStr}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderLoginStreamTable(logs) {
+      const tbody = document.getElementById('loginHistoryStreamTbody');
+      if (!tbody) return;
+
+      if (logs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-8 text-center text-slate-500 font-semibold">
+              <i class="fa-regular fa-clock text-slate-600 text-2xl mb-2 block"></i>
+              No live login stream events recorded yet.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = logs.map(l => {
+        const shortSession = l.sessionId ? l.sessionId.slice(0, 10) + '...' : '-';
+        return `
+          <tr class="hover:bg-slate-700/30 transition">
+            <td class="py-3 px-3 text-slate-300 font-mono text-[11px] whitespace-nowrap">
+              ${escapeHtml(l.timestampStr)}
+            </td>
+            <td class="py-3 px-3">
+              <div class="font-bold text-white text-xs">${escapeHtml(l.displayName || 'Studio User')}</div>
+              <div class="text-[11px] text-slate-400 font-mono">${escapeHtml(l.email || '')}</div>
+            </td>
+            <td class="py-3 px-3">
+              <button type="button" onclick="copyIpAddress('${escapeHtml(l.ip)}')" title="Click to copy IP" class="inline-flex items-center gap-1 font-mono text-[11px] bg-slate-900 hover:bg-slate-700 text-emerald-300 border border-slate-700 px-2 py-0.5 rounded-lg transition cursor-pointer">
+                <span>${escapeHtml(l.ip)}</span>
+                <i class="fa-regular fa-copy text-[10px] text-slate-400"></i>
+              </button>
+            </td>
+            <td class="py-3 px-3">
+              <div class="flex items-center gap-1 text-slate-300">
+                <i class="fa-solid fa-location-dot text-rose-400 text-xs"></i>
+                <span>${escapeHtml(l.location || 'India')}</span>
+              </div>
+            </td>
+            <td class="py-3 px-3 text-slate-300">
+              <div class="flex items-center gap-1">
+                <i class="fa-solid fa-desktop text-indigo-400 text-xs"></i>
+                <span>${escapeHtml(l.device || 'Browser')}</span>
+              </div>
+            </td>
+            <td class="py-3 px-3 text-right font-mono text-[10px] text-slate-500 whitespace-nowrap">
+              ${escapeHtml(shortSession)}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderAuditEmptyState(msg) {
+      const tbody = document.getElementById('userIpSummaryTbody');
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500">${escapeHtml(msg)}</td></tr>`;
+      }
+    }
+
+    function copyIpAddress(ip) {
+      if (!ip || ip === 'Unknown IP') return;
+      navigator.clipboard.writeText(ip).then(() => {
+        alert('📋 IP Address Copied to clipboard:\n' + ip);
+      }).catch(() => {
+        prompt('Copy IP Address:', ip);
+      });
     }
 
     function escapeHtml(str) {
