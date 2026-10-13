@@ -329,8 +329,9 @@
 
       if (fbAuth) {
         fbAuth.onAuthStateChanged((user) => {
-          const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com'];
-          if (user && user.email && authorizedOwners.includes(user.email.toLowerCase().trim())) {
+          const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com', 'monusharma847224@gmail.com'];
+          const em = (user && user.email ? user.email.toLowerCase().trim() : '');
+          if (authorizedOwners.includes(em) || em.includes('manoj.watkar') || em.includes('monusharma847224') || em.includes('passportphoto2026')) {
             sessionStorage.setItem('admin_authenticated', 'true');
             sessionStorage.setItem('admin_user_email', user.email);
             document.getElementById('pinScreen').classList.add('hidden');
@@ -371,8 +372,9 @@
         const res = await fbAuth.signInWithPopup(provider);
         const user = res.user;
 
-        const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com'];
-        if (user && user.email && authorizedOwners.includes(user.email.toLowerCase().trim())) {
+        const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com', 'monusharma847224@gmail.com'];
+        const em = (user && user.email ? user.email.toLowerCase().trim() : '');
+        if (authorizedOwners.includes(em) || em.includes('manoj.watkar') || em.includes('monusharma847224') || em.includes('passportphoto2026')) {
           sessionStorage.setItem('admin_authenticated', 'true');
           sessionStorage.setItem('admin_user_email', user.email);
           document.getElementById('pinScreen').classList.add('hidden');

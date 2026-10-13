@@ -6,7 +6,8 @@ service cloud.firestore {
     function isOwnerAdmin() {
       return request.auth != null && (
         request.auth.token.email == "passportphoto2026@gmail.com" ||
-        request.auth.token.email == "manoj.watkar61@gmail.com"
+        request.auth.token.email == "manoj.watkar61@gmail.com" ||
+        request.auth.token.email == "monusharma847224@gmail.com"
       );
     }
 

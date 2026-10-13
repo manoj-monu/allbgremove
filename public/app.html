@@ -3149,14 +3149,23 @@
   function isUserUnlimited(u) {
     if (!u) return false;
     const email = (u.email || '').toLowerCase().trim();
-    // 1. Authorized studio owners
-    const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com'];
-    if (authorizedOwners.includes(email)) return true;
+    // 1. Authorized studio owners (Lifetime Unlimited)
+    const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com', 'monusharma847224@gmail.com'];
+    if (authorizedOwners.includes(email) || email.includes('manoj.watkar') || email.includes('monusharma847224') || email.includes('passportphoto2026')) {
+      return true;
+    }
 
     // 2. Approved in Firestore cloud registry
     if (window._isApprovedUnlimitedUser === true) return true;
 
-    // 3. Cryptographically signed server activation token
+    // 3. User object has active unlimited plan and valid expiry
+    if (u.isUnlimited === true && (u.credits >= 9999 || (u.plan && u.plan.toLowerCase().includes('unlimited')))) {
+      if (!u.planExpires || u.planExpires > Date.now()) {
+        return true;
+      }
+    }
+
+    // 4. Cryptographically signed server activation token
     if (u.activationToken && typeof u.activationToken === 'string' && u.activationToken.includes('.')) {
       try {
         const payloadB64 = u.activationToken.split('.')[0];
@@ -3169,13 +3178,6 @@
       } catch(e) {}
     }
 
-    // 4. Anti-Tamper: If someone manually modified localStorage to isUnlimited without proof, reset it
-    if (u.isUnlimited === true && !window._isApprovedUnlimitedUser) {
-      u.isUnlimited = false;
-      u.plan = 'Free Plan';
-      if (typeof u.credits === 'number' && u.credits >= 9999) u.credits = 5;
-      setStoredUser(u);
-    }
     return false;
   }
 
@@ -3395,8 +3397,9 @@
       // 🔒 ONLY show Admin link to Manoj Kumar Sharma
       const adminLink = document.getElementById('navAdminLink');
       if (adminLink) {
-        const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com'];
-        const isAdmin = user && user.email && authorizedOwners.includes(user.email.toLowerCase().trim());
+        const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com', 'monusharma847224@gmail.com'];
+        const e = (user && user.email ? user.email.toLowerCase().trim() : '');
+        const isAdmin = authorizedOwners.includes(e) || e.includes('manoj.watkar') || e.includes('monusharma847224') || e.includes('passportphoto2026');
         if (isAdmin) {
           adminLink.classList.remove('hidden');
           adminLink.classList.add('flex');
@@ -3472,25 +3475,48 @@
 
   // Sync user profile & credits with Firestore & LocalStorage
   async function syncFirebaseUser(fbUser, extra = {}) {
-    let name = extra.name || fbUser.displayName || fbUser.email.split('@')[0];
-    let studio = extra.studio || (name + ' Photo Studio');
-    let phone = extra.phone || '';
-    let credits = 5;
-    let isUnlimited = false;
-    let plan = 'Free Plan';
-    let planExpires = null;
+    const existing = getStoredUser() || {};
+    let name = extra.name || fbUser.displayName || existing.name || fbUser.email.split('@')[0];
+    let studio = extra.studio || existing.studio || (name + ' Photo Studio');
+    let phone = extra.phone || existing.phone || '';
+    let credits = (typeof existing.credits === 'number') ? existing.credits : 5;
+    let isUnlimited = !!existing.isUnlimited;
+    let plan = existing.plan || 'Free Plan';
+    let planExpires = existing.planExpires || null;
+    let activationToken = existing.activationToken || null;
 
     const emailLower = (fbUser.email || '').toLowerCase().trim();
-    const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com'];
-    if (authorizedOwners.includes(emailLower)) {
+    const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com', 'monusharma847224@gmail.com'];
+    const isOwnerUser = authorizedOwners.includes(emailLower) || emailLower.includes('manoj.watkar') || emailLower.includes('monusharma847224') || emailLower.includes('passportphoto2026');
+
+    if (isOwnerUser) {
       isUnlimited = true;
       credits = 9999;
-      plan = 'Owner Lifetime Unlimited';
+      plan = 'Owner Lifetime Unlimited Pass';
     }
 
+    // 🔒 1. AUTO-CHECK SERVER RAZORPAY VERIFIED PLAN FOR THIS USER
+    try {
+      const planRes = await fetch('/api/razorpay/user-plan?email=' + encodeURIComponent(emailLower));
+      if (planRes.ok) {
+        const planData = await planRes.json();
+        if (planData.isUnlimited) {
+          isUnlimited = true;
+          credits = 9999;
+          plan = planData.plan || '1 Month Unlimited Plan';
+          planExpires = planData.planExpires || planExpires;
+          if (planData.activationToken) activationToken = planData.activationToken;
+          window._isApprovedUnlimitedUser = true;
+        }
+      }
+    } catch(planErr) {
+      console.warn("User plan check warning:", planErr);
+    }
+
+    // 🔒 2. FIRESTORE SYNC & PERSISTENCE
     try {
       if (fbDb) {
-        // 1. Check approved_users collection in Firestore (Primary approval registry)
+        // Check approved_users collection
         try {
           const appSnap = await fbDb.collection('approved_users').doc(emailLower).get();
           if (appSnap && appSnap.exists) {
@@ -3508,20 +3534,23 @@
         const snap = await userRef.get().catch(() => null);
         if (snap && snap.exists) {
           const d = snap.data();
-          if (!isUnlimited) {
-            credits = (typeof d.credits === 'number') ? d.credits : credits;
-            isUnlimited = (credits >= 9999 || !!d.isUnlimited || d.plan === '1 Month Unlimited Plan');
+          if (d.isUnlimited || d.credits >= 9999) {
+            isUnlimited = true;
+            credits = 9999;
             plan = d.plan || plan;
             planExpires = d.planExpires || planExpires;
+          } else if (!isUnlimited) {
+            credits = (typeof d.credits === 'number') ? d.credits : credits;
+            plan = d.plan || plan;
           }
           studio = d.studio || studio;
           name = d.name || name;
           phone = d.phone || phone;
-          await userRef.update({
+          await userRef.set({
             lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
             picture: fbUser.photoURL || d.picture || null,
             ...(isUnlimited ? { isUnlimited: true, credits: 9999, plan: plan } : {})
-          }).catch(() => null);
+          }, { merge: true }).catch(() => null);
         } else {
           // New User
           await userRef.set({
@@ -3539,7 +3568,7 @@
           }).catch(() => null);
         }
 
-        // 🔒 REAL-TIME OWNER APPROVAL LISTENER
+        // 🔒 REAL-TIME APPROVAL LISTENER
         userRef.onSnapshot(docSnap => {
           if (docSnap && docSnap.exists) {
             const data = docSnap.data();
@@ -3550,26 +3579,25 @@
                 u.isUnlimited = true;
                 u.credits = 9999;
                 u.plan = data.plan || u.plan;
-              } else {
+              } else if (!isUserUnlimited(u)) {
                 u.credits = (typeof data.credits === 'number') ? data.credits : u.credits;
               }
               setStoredUser(u);
               updateUserUI();
 
-              // Trigger celebration when Admin approves!
               if (!prevUnlimited && u.isUnlimited) {
                 showLoginSuccessModal(
                   u.name || u.email,
                   'Unlimited',
                   '🎉 Plan Approved & Activated!',
-                  'मनोज जी (Studio Owner) ने आपका पेमेंट कन्फ़र्म करके प्लान चालू कर दिया है! 1 Month Unlimited Pass सक्रिय है।'
+                  'आपका पेमेंट कन्फ़र्म हो गया है! 1 Month Unlimited Pass सक्रिय है।'
                 );
               }
             }
           }
         }, err => console.warn("User snapshot listener:", err));
 
-        // Also real-time listen to approved_users doc
+        // Real-time listen to approved_users
         fbDb.collection('approved_users').doc(emailLower).onSnapshot(docSnap => {
           if (docSnap && docSnap.exists) {
             let u = getStoredUser();
@@ -3584,11 +3612,7 @@
         }, () => {});
       }
     } catch(dbErr) {
-      console.warn("Firestore sync optional warning:", dbErr);
-      const existing = getStoredUser();
-      if (existing && existing.id === fbUser.uid && typeof existing.credits === 'number') {
-        credits = existing.credits;
-      }
+      console.warn("Firestore sync warning:", dbErr);
     }
 
     const sessionUser = {
@@ -3602,6 +3626,7 @@
       isUnlimited: isUnlimited,
       plan: plan,
       planExpires: planExpires,
+      activationToken: activationToken,
       lastLogin: new Date().toISOString()
     };
 

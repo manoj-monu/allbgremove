@@ -394,25 +394,63 @@
 
   // Sync user profile & credits with Firestore & LocalStorage
   async function syncFirebaseUser(fbUser, extra = {}) {
-    let name = extra.name || fbUser.displayName || fbUser.email.split('@')[0];
-    let studio = extra.studio || (name + ' Photo Studio');
-    let phone = extra.phone || '';
-    let credits = 5;
+    const existing = getStoredUser() || {};
+    let name = extra.name || fbUser.displayName || existing.name || fbUser.email.split('@')[0];
+    let studio = extra.studio || existing.studio || (name + ' Photo Studio');
+    let phone = extra.phone || existing.phone || '';
+    let credits = (typeof existing.credits === 'number') ? existing.credits : 5;
+    let isUnlimited = !!existing.isUnlimited;
+    let plan = existing.plan || 'Free Plan';
+    let planExpires = existing.planExpires || null;
+    let activationToken = existing.activationToken || null;
+
+    const emailLower = (fbUser.email || '').toLowerCase().trim();
+    const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com', 'monusharma847224@gmail.com'];
+    const isOwnerUser = authorizedOwners.includes(emailLower) || emailLower.includes('manoj.watkar') || emailLower.includes('monusharma847224') || emailLower.includes('passportphoto2026');
+
+    if (isOwnerUser) {
+      isUnlimited = true;
+      credits = 9999;
+      plan = 'Owner Lifetime Unlimited Pass';
+    }
+
+    // Auto-check Razorpay Plan from server
+    try {
+      const planRes = await fetch('/api/razorpay/user-plan?email=' + encodeURIComponent(emailLower));
+      if (planRes.ok) {
+        const planData = await planRes.json();
+        if (planData.isUnlimited) {
+          isUnlimited = true;
+          credits = 9999;
+          plan = planData.plan || '1 Month Unlimited Plan';
+          planExpires = planData.planExpires || planExpires;
+          if (planData.activationToken) activationToken = planData.activationToken;
+        }
+      }
+    } catch(e) {}
 
     try {
       if (fbDb) {
         const userRef = fbDb.collection('users').doc(fbUser.uid);
-        const snap = await userRef.get();
-        if (snap.exists) {
+        const snap = await userRef.get().catch(() => null);
+        if (snap && snap.exists) {
           const d = snap.data();
-          credits = (typeof d.credits === 'number') ? d.credits : credits;
+          if (d.isUnlimited || d.credits >= 9999) {
+            isUnlimited = true;
+            credits = 9999;
+            plan = d.plan || plan;
+          } else if (!isUnlimited) {
+            credits = (typeof d.credits === 'number') ? d.credits : credits;
+            plan = d.plan || plan;
+          }
           studio = d.studio || studio;
           name = d.name || name;
           phone = d.phone || phone;
-          await userRef.update({
+          await userRef.set({
             lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-            picture: fbUser.photoURL || d.picture || null
-          });
+            picture: fbUser.photoURL || d.picture || null,
+            ...(isUnlimited ? { isUnlimited: true, credits: 9999, plan: plan } : {})
+          }, { merge: true }).catch(() => null);
         } else {
           await userRef.set({
             uid: fbUser.uid,
@@ -421,18 +459,16 @@
             picture: fbUser.photoURL || null,
             studio: studio,
             phone: phone,
-            credits: 5,
+            credits: isUnlimited ? 9999 : 5,
+            isUnlimited: isUnlimited,
+            plan: plan,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-          });
+          }).catch(() => null);
         }
       }
     } catch(dbErr) {
-      console.warn("Firestore sync optional warning:", dbErr);
-      const existing = getStoredUser();
-      if (existing && existing.id === fbUser.uid && typeof existing.credits === 'number') {
-        credits = existing.credits;
-      }
+      console.warn("Firestore sync warning:", dbErr);
     }
 
     const sessionUser = {
@@ -442,7 +478,11 @@
       picture: fbUser.photoURL || null,
       studio: studio,
       phone: phone,
-      credits: credits,
+      credits: isUnlimited ? 9999 : credits,
+      isUnlimited: isUnlimited,
+      plan: plan,
+      planExpires: planExpires,
+      activationToken: activationToken,
       lastLogin: new Date().toISOString()
     };
 
@@ -1052,7 +1092,17 @@
           navLoggedIn.classList.remove('hidden');
           navLoggedIn.classList.add('flex');
         }
-        if (count) count.textContent = user.credits;
+        if (count) {
+          const email = (user.email || '').toLowerCase().trim();
+          const isOwner = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com', 'monusharma847224@gmail.com'].includes(email) || email.includes('manoj.watkar') || email.includes('monusharma847224') || email.includes('passportphoto2026');
+          if (isOwner || user.isUnlimited || user.credits >= 9999) {
+            count.textContent = 'Unlimited';
+            count.className = 'text-amber-600 font-black';
+          } else {
+            count.textContent = user.credits;
+            count.className = 'text-primary font-black';
+          }
+        }
       } else {
         if (navLoggedOut) navLoggedOut.classList.remove('hidden');
         if (navLoggedIn) {
