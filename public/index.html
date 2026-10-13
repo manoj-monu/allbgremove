@@ -1281,7 +1281,7 @@
           </div>
 
           <!-- Photo Zoom Adjust -->
-          <div class="form-group" style="margin-bottom:16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px;">
+          <div class="form-group" style="margin-bottom:14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
               <span style="font-weight:700; font-size:13px; color:var(--text);"><i class="fa-solid fa-magnifying-glass text-primary mr-1"></i> Photo Zoom</span>
               <span id="sidebarZoomPercent" style="font-size:12px; font-weight:800; color:var(--primary); background:#eef2ff; padding:2px 8px; border-radius:6px;">100%</span>
@@ -1293,6 +1293,42 @@
               <button type="button" class="btn" style="flex:1; padding:8px 8px; font-size:12.5px; font-weight:800; border-radius:8px; border:1.5px solid #cbd5e1; background:#f8fafc; color:#334155; cursor:pointer;" onclick="resetZoom()">🔄 Reset</button>
             </div>
           </div>
+
+          <!-- Photo Move / Position Adjust on Crop Screen -->
+          <div class="form-group" style="margin-bottom:14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-weight:700; font-size:13px; color:var(--text);">
+                <i class="fa-solid fa-arrows-up-down-left-right text-indigo-600 mr-1"></i> Photo Move (ऊपर-नीचे / बाएं-दाएं)
+              </span>
+              <button type="button" class="btn btn-outline" style="padding:2px 8px; font-size:11px; border-radius:6px;" onclick="centerCropPhoto()">🎯 Center</button>
+            </div>
+
+            <!-- Left-Right Move Slider -->
+            <div style="margin-bottom:8px;">
+              <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; color:#475569; margin-bottom:3px;">
+                <span>↔️ Move Left-Right (बाएं-दाएं):</span>
+                <span id="cropPanXBadge" style="color:var(--primary); font-weight:800; background:#eef2ff; padding:1px 6px; border-radius:6px; font-size:11px;">0px</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <button type="button" class="btn btn-outline" style="padding:3px 8px; font-size:11px; border-radius:6px;" onclick="nudgeCropPan(-10, 0)" title="Shift Left">◀</button>
+                <input type="range" id="cropPanXSlider" min="-300" max="300" value="0" step="2" style="flex:1; height:6px; cursor:pointer; accent-color:var(--primary);" oninput="onCropPanSliderX(this.value)">
+                <button type="button" class="btn btn-outline" style="padding:3px 8px; font-size:11px; border-radius:6px;" onclick="nudgeCropPan(10, 0)" title="Shift Right">▶</button>
+              </div>
+            </div>
+
+            <!-- Up-Down Move Slider -->
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; color:#475569; margin-bottom:3px;">
+                <span>↕️ Move Up-Down (ऊपर-नीचे):</span>
+                <span id="cropPanYBadge" style="color:var(--primary); font-weight:800; background:#eef2ff; padding:1px 6px; border-radius:6px; font-size:11px;">0px</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <button type="button" class="btn btn-outline" style="padding:3px 8px; font-size:11px; border-radius:6px;" onclick="nudgeCropPan(0, -10)" title="Shift Up">▲</button>
+                <input type="range" id="cropPanYSlider" min="-300" max="300" value="0" step="2" style="flex:1; height:6px; cursor:pointer; accent-color:var(--primary);" oninput="onCropPanSliderY(this.value)">
+                <button type="button" class="btn btn-outline" style="padding:3px 8px; font-size:11px; border-radius:6px;" onclick="nudgeCropPan(0, 10)" title="Shift Down">▼</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Navigation Footer -->
@@ -1301,7 +1337,7 @@
           <button class="btn btn-primary" style="padding:10px 26px; font-size:15px; font-weight:800;" onclick="applyCropAndNext()">Crop & Next ➔</button>
         </div>
       </div>
-      <div class="canvas-container">
+      <div class="canvas-container" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
         <!-- Photo Stage with Crop Box & Vertical Zoom Slider on Right -->
         <div class="crop-stage-container">
           <div id="cropWrapper" style="position:relative; overflow:hidden; border:3px solid #4f46e5; box-shadow: 0 0 0 9999px rgba(0,0,0,0.55), 0 0 24px rgba(79, 70, 229, 0.5); border-radius:4px;">
@@ -1328,7 +1364,13 @@
             </button>
           </div>
         </div>
-      </div>
+
+        <!-- Quick Horizontal Move Slider under the photo -->
+        <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:12px; background:rgba(255,255,255,0.95); padding:8px 16px; border-radius:20px; box-shadow:0 3px 12px rgba(0,0,0,0.1); width:min(380px, 92%);">
+          <span style="font-size:11.5px; font-weight:800; color:var(--primary); white-space:nowrap;">↔️ Move Photo:</span>
+          <input type="range" id="cropPanXSliderCanvas" min="-300" max="300" value="0" step="2" style="flex:1; height:6px; cursor:pointer; accent-color:var(--primary);" oninput="onCropPanSliderX(this.value)">
+          <span id="cropPanXBadgeCanvas" style="font-size:11px; font-weight:700; color:var(--primary); background:#eef2ff; padding:2px 6px; border-radius:6px; min-width:38px; text-align:center;">0px</span>
+        </div>
     </div>
   </div>
 
@@ -1909,17 +1951,102 @@
     });
   }
 
+  let baseImgX = 0;
+  let baseImgY = 0;
+
+  function onCropPanSliderX(val) {
+    const shift = parseFloat(val) || 0;
+    imgX = baseImgX + shift;
+    const cropImg = document.getElementById('cropImg');
+    if (cropImg) cropImg.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+    ['cropPanXBadge', 'cropPanXBadgeCanvas'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) b.textContent = (shift >= 0 ? '+' : '') + Math.round(shift) + 'px';
+    });
+    ['cropPanXSlider', 'cropPanXSliderCanvas'].forEach(id => {
+      const s = document.getElementById(id);
+      if (s && parseFloat(s.value) !== shift) s.value = shift;
+    });
+  }
+
+  function onCropPanSliderY(val) {
+    const shift = parseFloat(val) || 0;
+    imgY = baseImgY + shift;
+    const cropImg = document.getElementById('cropImg');
+    if (cropImg) cropImg.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+    const b = document.getElementById('cropPanYBadge');
+    if (b) b.textContent = (shift >= 0 ? '+' : '') + Math.round(shift) + 'px';
+    const s = document.getElementById('cropPanYSlider');
+    if (s && parseFloat(s.value) !== shift) s.value = shift;
+  }
+
+  function nudgeCropPan(dx, dy) {
+    const sX = document.getElementById('cropPanXSlider');
+    const sY = document.getElementById('cropPanYSlider');
+    if (dx !== 0 && sX) {
+      const cur = parseFloat(sX.value) || 0;
+      onCropPanSliderX(cur + dx);
+    }
+    if (dy !== 0 && sY) {
+      const cur = parseFloat(sY.value) || 0;
+      onCropPanSliderY(cur + dy);
+    }
+  }
+
+  function centerCropPhoto() {
+    const wrap = document.getElementById('cropWrapper');
+    if (!wrap) return;
+    const visualW = parseFloat(wrap.style.width) || 200;
+    const visualH = parseFloat(wrap.style.height) || 250;
+    imgX = (visualW - (originalImage.width * imgScale)) / 2;
+    imgY = (visualH - (originalImage.height * imgScale)) / 2;
+    baseImgX = imgX;
+    baseImgY = imgY;
+    const cropImg = document.getElementById('cropImg');
+    if (cropImg) cropImg.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+    ['cropPanXSlider', 'cropPanXSliderCanvas', 'cropPanYSlider'].forEach(id => {
+      const s = document.getElementById(id);
+      if (s) s.value = 0;
+    });
+    ['cropPanXBadge', 'cropPanXBadgeCanvas', 'cropPanYBadge'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) b.textContent = '0px';
+    });
+  }
+
   function setupCrop() {
     const img = document.getElementById('cropImg');
     img.src = originalImage.src;
     currentZoomPercent = 100;
     imgX = 0; imgY = 0; imgScale = 1; isResettingCrop = true;
     updateCropBox();
+    baseImgX = imgX;
+    baseImgY = imgY;
     initVerticalZoomSlider();
     
-    // Basic drag logic
+    // Basic drag logic with slider synchronization
     img.onmousedown = (e) => { drag = true; startX = e.clientX - imgX; startY = e.clientY - imgY; e.preventDefault(); };
-    document.onmousemove = (e) => { if(drag) { imgX = e.clientX - startX; imgY = e.clientY - startY; img.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`; } };
+    document.onmousemove = (e) => { 
+      if(drag) { 
+        imgX = e.clientX - startX; 
+        imgY = e.clientY - startY; 
+        img.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`; 
+        const shiftX = Math.round(imgX - baseImgX);
+        const shiftY = Math.round(imgY - baseImgY);
+        ['cropPanXSlider', 'cropPanXSliderCanvas'].forEach(id => {
+          const s = document.getElementById(id);
+          if (s) s.value = shiftX;
+        });
+        const sY = document.getElementById('cropPanYSlider');
+        if (sY) sY.value = shiftY;
+        ['cropPanXBadge', 'cropPanXBadgeCanvas'].forEach(id => {
+          const b = document.getElementById(id);
+          if (b) b.textContent = (shiftX >= 0 ? '+' : '') + shiftX + 'px';
+        });
+        const bY = document.getElementById('cropPanYBadge');
+        if (bY) bY.textContent = (shiftY >= 0 ? '+' : '') + shiftY + 'px';
+      } 
+    };
     document.onmouseup = () => { drag = false; };
     // Wheel zoom
     document.getElementById('cropWrapper').onwheel = (e) => {
