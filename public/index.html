@@ -1524,16 +1524,21 @@
           <div class="form-group" style="margin-bottom:14px;">
             <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:6px;"><i class="fa-solid fa-table-cells text-primary mr-1"></i> Auto-Fit Grid (Scale to fit)</label>
             <select id="gridLayout" onchange="onGridLayoutChange()" style="font-weight:700;">
-              <option value="4x3" selected>Fit 12 Photos (4x3 • 3 Columns x 4 Rows)</option>
-              <option value="4x2">Fit 8 Photos (4x2 / 2x4 • 2 Columns x 4 Rows)</option>
-              <option value="3x2">Fit 6 Photos (3x2 • 2 Columns x 3 Rows)</option>
-              <option value="2x2">Fit 4 Photos (2x2 • 2 Columns x 2 Rows)</option>
+              <option value="4x3" selected>Fit 12 Photos (4x3 • 4 Cols x 3 Rows on Landscape)</option>
+              <option value="5x3">Fit 15 Photos (5x3 • 5 Cols x 3 Rows - 4x6 Landscape Fit)</option>
+              <option value="6x3">Fit 18 Photos (6x3 • 6 Cols x 3 Rows - Popular 4x6 Landscape)</option>
+              <option value="4x4">Fit 16 Photos (4x4 • 4 Cols x 4 Rows)</option>
+              <option value="5x4">Fit 20 Photos (5x4 • 5 Cols x 4 Rows)</option>
+              <option value="6x4">Fit 24 Photos (6x4 • 6 Cols x 4 Rows - High Density)</option>
+              <option value="7x4">Fit 28 Photos (7x4 • 7 Cols x 4 Rows)</option>
+              <option value="6x5">Fit 30 Photos (6x5 • 6 Cols x 5 Rows)</option>
+              <option value="8x4">Fit 32 Photos (8x4 • 8 Cols x 4 Rows)</option>
+              <option value="6x6">Fit 36 Photos (6x6 • 6 Cols x 6 Rows)</option>
+              <option value="8x5">Fit 40 Photos (8x5 • 8 Cols x 5 Rows)</option>
+              <option value="4x2">Fit 8 Photos (4x2 / 2x4)</option>
+              <option value="3x2">Fit 6 Photos (3x2 / 2x3)</option>
+              <option value="2x2">Fit 4 Photos (2x2)</option>
               <option value="3x3">Fit 9 Photos (3x3)</option>
-              <option value="5x3">Fit 15 Photos (5x3)</option>
-              <option value="4x4">Fit 16 Photos (4x4)</option>
-              <option value="5x4">Fit 20 Photos (5x4)</option>
-              <option value="6x4">Fit 24 Photos (6x4)</option>
-              <option value="6x5">Fit 30 Photos (5x6 - A4 Studio)</option>
               <option value="actual">Actual Size (From Crop Step)</option>
             </select>
           </div>
@@ -1541,18 +1546,18 @@
           <div class="form-group" style="margin-bottom:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
               <label id="photoCountLabel" style="font-size:12px; font-weight:800; color:var(--text); margin:0;">
-                <i class="fa-solid fa-hashtag text-primary mr-1"></i> NUMBER OF PHOTOS (फोटो संख्या: 1 से <span id="maxPhotosLabelSpan">12</span>)
+                <i class="fa-solid fa-hashtag text-primary mr-1"></i> NUMBER OF PHOTOS (फोटो संख्या: 1 से <span id="maxPhotosLabelSpan">60</span>)
               </label>
-              <span id="photoCountDisplay" style="font-size:11.5px; font-weight:800; color:var(--primary); background:#eef2ff; padding:2px 8px; border-radius:8px;">3 Photos (Default)</span>
+              <span id="photoCountDisplay" style="font-size:11.5px; font-weight:800; color:var(--primary); background:#eef2ff; padding:2px 8px; border-radius:8px;">12 Photos</span>
             </div>
-            <input type="number" id="photoCount" value="3" min="1" max="12" oninput="onPhotoCountChanged(this.value)" onchange="onPhotoCountChanged(this.value)" style="font-weight:800; font-size:16px;">
+            <input type="number" id="photoCount" value="12" min="1" max="60" oninput="onPhotoCountChanged(this.value)" onchange="onPhotoCountChanged(this.value)" style="font-weight:800; font-size:16px;">
             
             <!-- Quick Preset Count Buttons -->
             <div id="presetCountButtons" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:8px;">
-              <button type="button" class="btn btn-outline" id="btnCount_3" onclick="setPhotoCount(3)" style="padding:7px 4px; font-size:12px; font-weight:800; border-radius:8px; background:#eef2ff; border:2px solid #4f46e5; color:#4338ca;">3 Photos</button>
+              <button type="button" class="btn btn-outline" id="btnCount_3" onclick="setPhotoCount(3)" style="padding:7px 4px; font-size:12px; font-weight:800; border-radius:8px;">3 Photos</button>
               <button type="button" class="btn btn-outline" id="btnCount_6" onclick="setPhotoCount(6)" style="padding:7px 4px; font-size:12px; font-weight:800; border-radius:8px;">6 Photos</button>
               <button type="button" class="btn btn-outline" id="btnCount_9" onclick="setPhotoCount(9)" style="padding:7px 4px; font-size:12px; font-weight:800; border-radius:8px;">9 Photos</button>
-              <button type="button" class="btn btn-outline" id="btnCount_12" onclick="setPhotoCount(12)" style="padding:7px 4px; font-size:12px; font-weight:800; border-radius:8px;">12 (Full)</button>
+              <button type="button" class="btn btn-outline" id="btnCount_12" onclick="setPhotoCount(12)" style="padding:7px 4px; font-size:12px; font-weight:800; border-radius:8px; background:#eef2ff; border:2px solid #4f46e5; color:#4338ca;">12 (Full)</button>
             </div>
           </div>
 
@@ -2458,6 +2463,26 @@
     }
   }
 
+  const AVAILABLE_GRID_PRESETS = [
+    { val: '2x2', cap: 4 },
+    { val: '3x2', cap: 6 },
+    { val: '4x2', cap: 8 },
+    { val: '3x3', cap: 9 },
+    { val: '4x3', cap: 12 },
+    { val: '5x3', cap: 15 },
+    { val: '4x4', cap: 16 },
+    { val: '6x3', cap: 18 },
+    { val: '5x4', cap: 20 },
+    { val: '6x4', cap: 24 },
+    { val: '7x4', cap: 28 },
+    { val: '6x5', cap: 30 },
+    { val: '8x4', cap: 32 },
+    { val: '6x6', cap: 36 },
+    { val: '8x5', cap: 40 },
+    { val: '8x6', cap: 48 },
+    { val: '10x6', cap: 60 }
+  ];
+
   let currentPresetCounts = [3, 6, 9, 12];
 
   function updateQuickPresetButtons(maxCount) {
@@ -2465,19 +2490,31 @@
     if (maxCount <= 4) {
       presets = [1, 2, 3, maxCount];
     } else if (maxCount <= 6) {
-      presets = [2, 3, 4, maxCount];
+      presets = [2, 4, maxCount];
     } else if (maxCount <= 8) {
       presets = [2, 4, 6, maxCount];
     } else if (maxCount <= 12) {
       presets = [3, 6, 9, maxCount];
+    } else if (maxCount === 15) {
+      presets = [5, 10, 15];
     } else if (maxCount <= 16) {
       presets = [4, 8, 12, maxCount];
+    } else if (maxCount === 18) {
+      presets = [6, 12, 18];
     } else if (maxCount <= 20) {
       presets = [5, 10, 15, maxCount];
     } else if (maxCount <= 24) {
       presets = [6, 12, 18, maxCount];
+    } else if (maxCount <= 28) {
+      presets = [7, 14, 21, maxCount];
     } else if (maxCount <= 30) {
-      presets = [6, 12, 20, maxCount];
+      presets = [6, 12, 18, maxCount];
+    } else if (maxCount <= 32) {
+      presets = [8, 16, 24, maxCount];
+    } else if (maxCount <= 36) {
+      presets = [9, 18, 27, maxCount];
+    } else if (maxCount <= 40) {
+      presets = [10, 20, 30, maxCount];
     } else {
       const q1 = Math.max(1, Math.round(maxCount * 0.25));
       const q2 = Math.max(2, Math.round(maxCount * 0.5));
@@ -2535,11 +2572,35 @@
 
   function onPhotoCountChanged(val) {
     const input = document.getElementById('photoCount');
-    const maxAllowed = parseInt(input ? input.max : 30) || 30;
-    let num = parseInt(val) || 1;
+    if (val === '' || val === null || val === undefined) return;
+    let num = parseInt(val);
+    if (isNaN(num)) return;
     if (num < 1) num = 1;
-    if (num > maxAllowed) num = maxAllowed;
-    if (input) input.value = num;
+    if (num > 60) num = 60;
+
+    // Check if current grid can fit this count
+    const gridLayoutEl = document.getElementById('gridLayout');
+    const currentGrid = gridLayoutEl ? gridLayoutEl.value : '4x3';
+
+    if (gridLayoutEl && currentGrid !== 'actual') {
+      const parts = currentGrid.split('x').map(Number);
+      const currentCapacity = (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) ? (parts[0] * parts[1]) : 12;
+
+      // If user typed/stepped more photos than current grid capacity, auto-upgrade to grid that fits!
+      if (num > currentCapacity) {
+        const match = AVAILABLE_GRID_PRESETS.find(g => g.cap >= num);
+        if (match) {
+          gridLayoutEl.value = match.val;
+          const maxSpan = document.getElementById('maxPhotosLabelSpan');
+          if (maxSpan) maxSpan.textContent = match.cap;
+          updateQuickPresetButtons(match.cap);
+        }
+      }
+    }
+
+    if (input && document.activeElement !== input) {
+      input.value = num;
+    }
     
     // Update count display badge
     const badge = document.getElementById('photoCountDisplay');
@@ -2556,7 +2617,7 @@
   function updateMaxPhotoCount(maxCount, setFull = false) {
     const input = document.getElementById('photoCount');
     if (input) {
-      input.max = maxCount;
+      input.max = 60; // Allow full manual entry without capping
       if (setFull) {
         input.value = maxCount;
       } else if (parseInt(input.value) > maxCount) {
