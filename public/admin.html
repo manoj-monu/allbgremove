@@ -25,7 +25,7 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col antialiased">
 
-  <!-- ================= PIN LOCK SCREEN (SHOWN BY DEFAULT) ================= -->
+  <!-- ================= AUTH LOCK SCREEN (EMAIL ONLY) ================= -->
   <div id="pinScreen" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-8 shadow-2xl text-center relative">
       <div class="w-20 h-20 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-indigo-500/30">
@@ -42,25 +42,48 @@
 
       <div class="relative flex py-2 items-center mb-4">
         <div class="flex-grow border-t border-slate-800"></div>
-        <span class="flex-shrink mx-3 text-slate-500 text-[11px] font-bold uppercase tracking-wider">OR ENTER OWNER PIN</span>
+        <span class="flex-shrink mx-3 text-slate-500 text-[11px] font-bold uppercase tracking-wider">OR SIGN IN WITH ADMIN EMAIL</span>
         <div class="flex-grow border-t border-slate-800"></div>
       </div>
 
-      <form onsubmit="handlePinLogin(event)" class="space-y-4">
+      <!-- Email ID & Password Login Form -->
+      <form onsubmit="handleEmailLogin(event)" class="space-y-3.5 text-left">
         <div>
-          <input type="password" id="adminPinInput" maxlength="6" autofocus placeholder="••••" class="w-full tracking-[1em] text-center text-3xl font-black py-3 px-4 bg-slate-800 border-2 border-slate-700 focus:border-indigo-500 rounded-xl text-white outline-none transition">
-          <p class="text-[11px] text-slate-500 mt-2"><i class="fa-solid fa-lock text-slate-400 mr-1"></i> Enter your 4-digit Owner Security PIN</p>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Admin Email ID</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-envelope text-xs"></i>
+            </span>
+            <input type="email" id="adminEmailInput" required placeholder="owner@gmail.com" class="w-full pl-9 pr-4 py-2.5 bg-slate-800 border border-slate-700 focus:border-indigo-500 rounded-xl text-white text-sm outline-none transition">
+          </div>
         </div>
-        <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-extrabold rounded-xl shadow-lg shadow-indigo-500/25 transition flex items-center justify-center gap-2 cursor-pointer">
-          <i class="fa-solid fa-unlock-keyhole"></i> Unlock with PIN
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-lock text-xs"></i>
+            </span>
+            <input type="password" id="adminPasswordInput" required placeholder="••••••••" class="w-full pl-9 pr-4 py-2.5 bg-slate-800 border border-slate-700 focus:border-indigo-500 rounded-xl text-white text-sm outline-none transition">
+          </div>
+        </div>
+
+        <div id="adminAuthError" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/30 rounded-xl p-3 text-left"></div>
+
+        <button type="submit" id="adminEmailSubmitBtn" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-extrabold rounded-xl shadow-lg shadow-indigo-500/25 transition flex items-center justify-center gap-2 cursor-pointer mt-2">
+          <i class="fa-solid fa-envelope-circle-check"></i> Sign In with Email ID
         </button>
       </form>
       
+      <p class="text-[11px] text-slate-400 mt-4 text-center">
+        <i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Strictly protected: Only authorized Email IDs are permitted. PIN access is disabled.
+      </p>
+
       <div class="mt-6 pt-6 border-t border-slate-800 flex justify-between items-center text-xs text-slate-500">
         <a href="index.html" class="hover:text-indigo-400 transition flex items-center gap-1">
           <i class="fa-solid fa-arrow-left"></i> Back to Studio Website
         </a>
-        <span class="text-emerald-400 font-bold"><i class="fa-solid fa-shield-halved mr-1"></i> 2FA Protected</span>
+        <span class="text-emerald-400 font-bold"><i class="fa-solid fa-shield-halved mr-1"></i> Email-Only Access</span>
       </div>
     </div>
   </div>
@@ -79,7 +102,7 @@
               <span class="text-base font-black text-white">allbgremove Admin</span>
               <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black px-2 py-0.5 rounded-full">LIVE</span>
             </div>
-            <p class="text-[11px] text-slate-400">Owner: Manoj Kumar Sharma (8668656820)</p>
+            <p class="text-[11px] text-slate-400" id="adminLoggedUserText">Owner: Manoj Kumar Sharma (8668656820)</p>
           </div>
         </div>
 
@@ -384,8 +407,10 @@
             </div>
 
             <div class="flex items-center justify-between pt-2 border-t border-slate-700">
-              <span class="text-xs text-slate-400">Admin Security PIN:</span>
-              <button onclick="changeAdminPin()" class="text-xs text-indigo-400 hover:underline font-bold">Change PIN (Default: 2026)</button>
+              <span class="text-xs text-slate-400">Security Mode:</span>
+              <span class="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                <i class="fa-solid fa-envelope-circle-check"></i> Email ID Only (PIN Disabled)
+              </span>
             </div>
           </div>
         </div>
@@ -430,57 +455,116 @@
 
     let allTransactions = [];
 
-    // ================= PIN AUTH =================
-    function getStoredPin() {
-      return localStorage.getItem('allbgremove_admin_pin') || '2026';
+    // ================= EMAIL ONLY AUTH =================
+    const AUTHORIZED_ADMIN_EMAILS = [
+      'passportphoto2026@gmail.com',
+      'manoj.watkar61@gmail.com',
+      'monusharma847224@gmail.com'
+    ];
+
+    function isAuthorizedAdmin(email) {
+      if (!email) return false;
+      const em = email.toLowerCase().trim();
+      return AUTHORIZED_ADMIN_EMAILS.some(a => a.toLowerCase().trim() === em) ||
+             em.includes('manoj.watkar') ||
+             em.includes('monusharma847224') ||
+             em.includes('passportphoto2026');
+    }
+
+    function grantAdminAccess(email) {
+      sessionStorage.setItem('admin_authenticated', 'true');
+      sessionStorage.setItem('admin_user_email', email);
+      document.getElementById('pinScreen').classList.add('hidden');
+      document.getElementById('adminApp').classList.remove('hidden');
+      document.getElementById('adminApp').classList.add('flex');
+
+      const loggedUserText = document.getElementById('adminLoggedUserText');
+      if (loggedUserText) {
+        loggedUserText.innerHTML = `Owner: Manoj Kumar Sharma • <span class="text-indigo-400 font-bold">${escapeHtml(email)}</span>`;
+      }
+      initDashboard();
     }
 
     function checkAuthSession() {
       if (sessionStorage.getItem('admin_authenticated') === 'true') {
-        document.getElementById('pinScreen').classList.add('hidden');
-        document.getElementById('adminApp').classList.remove('hidden');
-        document.getElementById('adminApp').classList.add('flex');
-        initDashboard();
+        const savedEmail = sessionStorage.getItem('admin_user_email') || 'Authorized Owner';
+        grantAdminAccess(savedEmail);
         return;
       }
 
       if (fbAuth) {
         fbAuth.onAuthStateChanged((user) => {
-          const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com', 'monusharma847224@gmail.com'];
-          const em = (user && user.email ? user.email.toLowerCase().trim() : '');
-          if (authorizedOwners.includes(em) || em.includes('manoj.watkar') || em.includes('monusharma847224') || em.includes('passportphoto2026')) {
-            sessionStorage.setItem('admin_authenticated', 'true');
-            sessionStorage.setItem('admin_user_email', user.email);
-            document.getElementById('pinScreen').classList.add('hidden');
-            document.getElementById('adminApp').classList.remove('hidden');
-            document.getElementById('adminApp').classList.add('flex');
-            initDashboard();
+          if (user && user.email && isAuthorizedAdmin(user.email)) {
+            grantAdminAccess(user.email);
           }
         });
       }
     }
 
-    function handlePinLogin(e) {
+    async function handleEmailLogin(e) {
       e.preventDefault();
-      const entered = document.getElementById('adminPinInput').value.trim();
-      const actualPin = getStoredPin();
+      const email = document.getElementById('adminEmailInput').value.trim();
+      const password = document.getElementById('adminPasswordInput').value;
+      const errEl = document.getElementById('adminAuthError');
+      const submitBtn = document.getElementById('adminEmailSubmitBtn');
 
-      if (entered === actualPin) {
-        sessionStorage.setItem('admin_authenticated', 'true');
-        document.getElementById('pinScreen').classList.add('hidden');
-        document.getElementById('adminApp').classList.remove('hidden');
-        document.getElementById('adminApp').classList.add('flex');
-        initDashboard();
-      } else {
-        alert('❌ Invalid PIN! Please enter the correct admin PIN (Default: 2026).');
-        document.getElementById('adminPinInput').value = '';
-        document.getElementById('adminPinInput').focus();
+      if (errEl) {
+        errEl.classList.add('hidden');
+        errEl.textContent = '';
+      }
+
+      if (!isAuthorizedAdmin(email)) {
+        const msg = '⛔ ACCESS DENIED: Yeh Email ID (' + email + ') Admin access ke liye authorized nahi hai.';
+        if (errEl) {
+          errEl.textContent = msg;
+          errEl.classList.remove('hidden');
+        } else {
+          alert(msg);
+        }
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Logging in...';
+      }
+
+      try {
+        if (fbAuth) {
+          const userCred = await fbAuth.signInWithEmailAndPassword(email, password);
+          const user = userCred.user;
+          if (user && isAuthorizedAdmin(user.email)) {
+            grantAdminAccess(user.email);
+            return;
+          } else {
+            throw new Error('This account is not authorized as admin.');
+          }
+        } else {
+          throw new Error('Firebase Authentication is initializing. Please wait a moment.');
+        }
+      } catch (err) {
+        console.error("Admin Email Login Error:", err);
+        let msg = err.message || 'Login failed';
+        if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
+          msg = '❌ Galat Email ya Password! Kripya sahi credentials dalein.';
+        }
+        if (errEl) {
+          errEl.textContent = msg;
+          errEl.classList.remove('hidden');
+        } else {
+          alert(msg);
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fa-solid fa-envelope-circle-check mr-2"></i> Sign In with Email ID';
+        }
       }
     }
 
     async function loginWithGoogleOwner() {
       if (!fbAuth) {
-        alert('Firebase authentication initializing, please use PIN.');
+        alert('Firebase authentication initializing, please wait a moment.');
         return;
       }
       try {
@@ -489,44 +573,28 @@
         const res = await fbAuth.signInWithPopup(provider);
         const user = res.user;
 
-        const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com', 'monusharma847224@gmail.com'];
-        const em = (user && user.email ? user.email.toLowerCase().trim() : '');
-        if (authorizedOwners.includes(em) || em.includes('manoj.watkar') || em.includes('monusharma847224') || em.includes('passportphoto2026')) {
-          sessionStorage.setItem('admin_authenticated', 'true');
-          sessionStorage.setItem('admin_user_email', user.email);
-          document.getElementById('pinScreen').classList.add('hidden');
-          document.getElementById('adminApp').classList.remove('hidden');
-          document.getElementById('adminApp').classList.add('flex');
-          initDashboard();
+        if (user && user.email && isAuthorizedAdmin(user.email)) {
+          grantAdminAccess(user.email);
         } else {
-          alert('⛔ ACCESS DENIED: This Google account is not authorized to access the Owner Admin Console.');
+          alert('⛔ ACCESS DENIED: Only authorized owner Email IDs can access this Admin Console.\n\nLogged in as: ' + (user ? user.email : 'Unknown'));
           await fbAuth.signOut();
         }
       } catch(err) {
         if (err.code !== 'auth/popup-closed-by-user') {
-          alert('Google Auth Notice: ' + err.message + '\nYou can also unlock using your 4-digit PIN.');
+          alert('Google Auth Notice: ' + err.message);
         }
       }
     }
 
     function lockAdmin() {
+      if (fbAuth) {
+        fbAuth.signOut().catch(() => {});
+      }
       sessionStorage.removeItem('admin_authenticated');
+      sessionStorage.removeItem('admin_user_email');
       window.location.reload();
     }
 
-    function changeAdminPin() {
-      const current = getStoredPin();
-      const oldPin = prompt('Enter current PIN:');
-      if (oldPin !== current) {
-        alert('Incorrect current PIN');
-        return;
-      }
-      const newPin = prompt('Enter new 4-digit PIN:');
-      if (newPin && newPin.trim().length >= 4) {
-        localStorage.setItem('allbgremove_admin_pin', newPin.trim());
-        alert('✅ Admin PIN updated successfully to: ' + newPin.trim());
-      }
-    }
 
     // ================= DASHBOARD INIT =================
     function initDashboard() {
@@ -1261,7 +1329,7 @@
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // Check PIN session on page load
+    // Check auth session on page load
     window.addEventListener('DOMContentLoaded', checkAuthSession);
   </script>
 </body>
