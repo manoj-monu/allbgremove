@@ -1589,15 +1589,41 @@
               <i class="fa-solid fa-arrows-to-dot text-indigo-600 mr-1"></i> PHOTO POSITION (फोटो अलाइनमेंट):
             </label>
             <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;">
-              <button type="button" id="posBtn_topleft" class="btn btn-sheet-pos active" style="padding:9px 6px; font-size:12.5px; border-radius:9px;" onclick="setSheetPosition('topleft')" title="Top-Left align photos on sheet">
-                📐 Top-Left (कोने)
-              </button>
-              <button type="button" id="posBtn_center" class="btn btn-sheet-pos" style="padding:9px 6px; font-size:12.5px; border-radius:9px;" onclick="setSheetPosition('center')" title="Center align photos on sheet">
+              <button type="button" id="posBtn_center" class="btn btn-sheet-pos active" style="padding:9px 6px; font-size:12.5px; border-radius:9px;" onclick="setSheetPosition('center')" title="Center align photos on sheet">
                 🎯 Center (बीच)
+              </button>
+              <button type="button" id="posBtn_topleft" class="btn btn-sheet-pos" style="padding:9px 6px; font-size:12.5px; border-radius:9px;" onclick="setSheetPosition('topleft')" title="Top-Left align photos on sheet">
+                📐 Top-Left (कोने)
               </button>
               <button type="button" id="posBtn_fill" class="btn btn-sheet-pos" style="padding:9px 6px; font-size:12.5px; border-radius:9px;" onclick="setSheetPosition('fill')" title="Fill page evenly">
                 ✨ Fill (फैलाएं)
               </button>
+            </div>
+
+            <!-- In-Sidebar Sliders for Move/Adjust -->
+            <div style="margin-top:12px; padding-top:10px; border-top:1px dashed #cbd5e1; display:flex; flex-direction:column; gap:10px;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; font-weight:800; color:#334155; margin-bottom:4px;">
+                  <span>↔️ Move Left-Right (बाएं-दाएं):</span>
+                  <span id="offsetXValBadgeSide" style="color:var(--primary); background:#eef2ff; padding:1px 6px; border-radius:6px; font-size:11px;">0.0mm</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <button type="button" onclick="nudgeOffset('x', -1)" class="btn btn-outline" style="padding:2px 8px; font-size:11px; border-radius:6px;" title="-1mm">◀</button>
+                  <input type="range" id="sheetOffsetXSliderSide" min="0" max="60" step="0.5" value="0" style="flex:1; height:6px; cursor:pointer; accent-color:var(--primary);" oninput="onOffsetXSliderInput(this.value)">
+                  <button type="button" onclick="nudgeOffset('x', 1)" class="btn btn-outline" style="padding:2px 8px; font-size:11px; border-radius:6px;" title="+1mm">▶</button>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; font-weight:800; color:#334155; margin-bottom:4px;">
+                  <span>↕️ Move Up-Down (ऊपर-नीचे):</span>
+                  <span id="offsetYValBadgeSide" style="color:var(--primary); background:#eef2ff; padding:1px 6px; border-radius:6px; font-size:11px;">0.0mm</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <button type="button" onclick="nudgeOffset('y', -1)" class="btn btn-outline" style="padding:2px 8px; font-size:11px; border-radius:6px;" title="-1mm">▲</button>
+                  <input type="range" id="sheetOffsetYSliderSide" min="0" max="60" step="0.5" value="0" style="flex:1; height:6px; cursor:pointer; accent-color:var(--primary);" oninput="onOffsetYSliderInput(this.value)">
+                  <button type="button" onclick="nudgeOffset('y', 1)" class="btn btn-outline" style="padding:2px 8px; font-size:11px; border-radius:6px;" title="+1mm">▼</button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1645,15 +1671,24 @@
           <span style="font-size:12px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:5px;">
             <i class="fa-solid fa-arrows-up-down-left-right text-indigo-600"></i> Paper Margin & Align:
           </span>
-          <button class="btn btn-outline" style="padding:4px 12px; font-size:11px; border-radius:20px;" onclick="centerPhotosOnSheet()">🎯 Center (बीच में)</button>
-          <button class="btn btn-outline" style="padding:4px 12px; font-size:11px; border-radius:20px;" onclick="topLeftPhotosOnSheet()">📐 Top-Left (कोने में)</button>
-          <button class="btn btn-outline" style="padding:4px 12px; font-size:11px; border-radius:20px;" onclick="distributeEvenlyOnSheet()">✨ Fill Page (बराबर फैलाएं)</button>
+          <button class="btn btn-outline btn-sheet-pos active" id="tbBtn_center" style="padding:4px 12px; font-size:11px; border-radius:20px;" onclick="setSheetPosition('center')">🎯 Center (बीच में)</button>
+          <button class="btn btn-outline btn-sheet-pos" id="tbBtn_topleft" style="padding:4px 12px; font-size:11px; border-radius:20px;" onclick="setSheetPosition('topleft')">📐 Top-Left (कोने में)</button>
+          <button class="btn btn-outline btn-sheet-pos" id="tbBtn_fill" style="padding:4px 12px; font-size:11px; border-radius:20px;" onclick="setSheetPosition('fill')">✨ Fill Page (बराबर फैलाएं)</button>
           <button class="btn btn-outline" style="padding:4px 12px; font-size:11px; border-radius:20px;" onclick="resetSheetOffsets()">🔄 Reset</button>
         </div>
 
-        <!-- Canvas + Right Vertical Slider Wrapper -->
-        <div style="display:flex; align-items:center; justify-content:center; gap:14px; position:relative; max-width:100%;">
+        <!-- Canvas + Left & Right Vertical Sliders Wrapper -->
+        <div style="display:flex; align-items:center; justify-content:center; gap:12px; position:relative; max-width:100%;">
           
+          <!-- Left Side Vertical Slider (Up-Down Shift) -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; background:white; padding:14px 10px; border-radius:14px; box-shadow:0 4px 15px rgba(0,0,0,0.08); border:1px solid #e5e7eb;">
+            <span style="font-size:10px; font-weight:800; color:var(--primary); letter-spacing:0.5px; text-transform:uppercase;">↕️ Y-Shift</span>
+            <input type="range" id="sheetOffsetYSliderLeft" orient="vertical" min="0" max="60" step="0.5" value="4" 
+                   style="writing-mode: vertical-lr; direction: rtl; appearance: slider-vertical; -webkit-appearance: slider-vertical; width: 18px; height: 160px; cursor: pointer; accent-color: var(--primary);" 
+                   oninput="onOffsetYSliderInput(this.value)" title="Slide photos vertically (ऊपर-नीचे सरकाएं)">
+            <span id="offsetYValBadgeLeft" style="font-size:11px; font-weight:700; color:var(--primary); background:#eef2ff; padding:2px 6px; border-radius:6px; min-width:44px; text-align:center;">4.0mm</span>
+          </div>
+
           <!-- Paper Canvas -->
           <div style="position:relative; display:inline-block;">
             <canvas id="printCanvas" style="background:white; box-shadow:0 10px 40px rgba(0,0,0,0.2); max-height:72vh; max-width:82vw; display:block; border-radius:4px;"></canvas>
@@ -1674,7 +1709,7 @@
         <!-- Bottom Horizontal Slider (Left-Right Shift) -->
         <div style="display:flex; align-items:center; justify-content:center; gap:15px; margin-top:14px; background:white; padding:10px 20px; border-radius:14px; box-shadow:0 4px 15px rgba(0,0,0,0.08); border:1px solid #e5e7eb; width:min(550px, 92%);">
           <span style="font-size:12px; font-weight:800; color:var(--primary); white-space:nowrap; display:flex; align-items:center; gap:6px;">
-            ↔️ X-Shift (Side Margin):
+            ↔️ X-Shift (बाएं-दाएं सरकाएं):
           </span>
           <input type="range" id="sheetOffsetXSlider" min="0" max="60" step="0.5" value="4" 
                  style="flex:1; height:8px; cursor:pointer; accent-color:var(--primary);" 
@@ -2450,15 +2485,15 @@
     applyAdjustments();
     finalImage.src = document.getElementById('adjCanvas').toDataURL('image/png');
     finalImage.onload = () => {
-      // Set default 4x6 Portrait, 4x3 grid (3 cols x 4 rows), 3 photos, topleft position
+      // Default to 4x6 Landscape, 15 photos, Center position
       const pSize = document.getElementById('paperSize');
-      if (pSize) pSize.value = '4x6P';
+      if (pSize) pSize.value = '4x6L';
       const gLayout = document.getElementById('gridLayout');
-      if (gLayout) gLayout.value = '4x3';
+      if (gLayout) gLayout.value = '5x3';
       
-      updateMaxPhotoCount(12, false);
-      setPhotoCount(3);
-      setSheetPosition('topleft');
+      updateMaxPhotoCount(15, false);
+      setPhotoCount(15);
+      setSheetPosition('center');
       goToStep(5);
     }
   }
@@ -2632,16 +2667,24 @@
     onPhotoCountChanged(input ? input.value : maxCount);
   }
 
+  let currentSheetPosition = 'center';
+  let currentOffsetX_mm = 0;
+  let currentOffsetY_mm = 0;
+  let isCustomOffset = false;
+
   function setSheetPosition(pos) {
+    currentSheetPosition = pos;
     ['topleft', 'center', 'fill'].forEach(p => {
-      const btn = document.getElementById('posBtn_' + p);
-      if (btn) {
-        if (p === pos) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
+      ['posBtn_', 'tbBtn_'].forEach(prefix => {
+        const btn = document.getElementById(prefix + p);
+        if (btn) {
+          if (p === pos) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
         }
-      }
+      });
     });
 
     if (pos === 'topleft') {
@@ -2653,24 +2696,41 @@
     }
   }
 
-
-  let currentOffsetX_mm = 4;
-  let currentOffsetY_mm = 4;
-  let isCustomOffset = false;
+  function nudgeOffset(axis, delta) {
+    if (axis === 'x') {
+      let val = Math.max(0, Math.round((currentOffsetX_mm + delta) * 10) / 10);
+      onOffsetXSliderInput(val);
+    } else {
+      let val = Math.max(0, Math.round((currentOffsetY_mm + delta) * 10) / 10);
+      onOffsetYSliderInput(val);
+    }
+  }
 
   function onOffsetXSliderInput(val) {
     currentOffsetX_mm = parseFloat(val) || 0;
     isCustomOffset = true;
-    const badge = document.getElementById('offsetXValBadge');
-    if (badge) badge.textContent = currentOffsetX_mm.toFixed(1) + 'mm';
+    ['offsetXValBadge', 'offsetXValBadgeSide'].forEach(id => {
+      const badge = document.getElementById(id);
+      if (badge) badge.textContent = currentOffsetX_mm.toFixed(1) + 'mm';
+    });
+    ['sheetOffsetXSlider', 'sheetOffsetXSliderSide'].forEach(id => {
+      const s = document.getElementById(id);
+      if (s && parseFloat(s.value) !== currentOffsetX_mm) s.value = currentOffsetX_mm;
+    });
     updatePrintLayout(true);
   }
 
   function onOffsetYSliderInput(val) {
     currentOffsetY_mm = parseFloat(val) || 0;
     isCustomOffset = true;
-    const badge = document.getElementById('offsetYValBadge');
-    if (badge) badge.textContent = currentOffsetY_mm.toFixed(1) + 'mm';
+    ['offsetYValBadge', 'offsetYValBadgeLeft', 'offsetYValBadgeSide'].forEach(id => {
+      const badge = document.getElementById(id);
+      if (badge) badge.textContent = currentOffsetY_mm.toFixed(1) + 'mm';
+    });
+    ['sheetOffsetYSlider', 'sheetOffsetYSliderLeft', 'sheetOffsetYSliderSide'].forEach(id => {
+      const s = document.getElementById(id);
+      if (s && parseFloat(s.value) !== currentOffsetY_mm) s.value = currentOffsetY_mm;
+    });
     updatePrintLayout(true);
   }
 
@@ -2738,6 +2798,7 @@
   }
 
   function centerPhotosOnSheet() {
+    currentSheetPosition = 'center';
     const m = getSheetMetrics();
     if (!m) return;
     currentOffsetX_mm = Math.max(0, Math.round((m.maxSpareW / 2 / MM_TO_PX) * 10) / 10);
@@ -2747,18 +2808,20 @@
   }
 
   function topLeftPhotosOnSheet() {
+    currentSheetPosition = 'topleft';
     const pageMargin = +document.getElementById('pageMargin').value || 4;
     currentOffsetX_mm = pageMargin;
     currentOffsetY_mm = pageMargin;
-    isCustomOffset = false;
+    isCustomOffset = true;
     updatePrintLayout(true);
   }
 
   function resetSheetOffsets() {
-    topLeftPhotosOnSheet();
+    centerPhotosOnSheet();
   }
 
   function distributeEvenlyOnSheet() {
+    currentSheetPosition = 'fill';
     const m = getSheetMetrics();
     if (!m) return;
     const pageMargin = +document.getElementById('pageMargin').value || 4;
@@ -2782,7 +2845,11 @@
        if (m) updateMaxPhotoCount(m.cols * m.rows, false);
     }
     isCustomOffset = false;
-    updatePrintLayout();
+    if (currentSheetPosition === 'center') {
+      centerPhotosOnSheet();
+    } else {
+      updatePrintLayout();
+    }
   }
 
   function onGridLayoutChange() {
@@ -2797,7 +2864,11 @@
     }
     updateMaxPhotoCount(maxCount, true);
     isCustomOffset = false;
-    updatePrintLayout();
+    if (currentSheetPosition === 'center') {
+      centerPhotosOnSheet();
+    } else {
+      updatePrintLayout();
+    }
   }
 
   function updatePrintLayout(includeRuler = true, scaleMultiplier = 1) {
@@ -2824,28 +2895,44 @@
     const maxSpareW_mm = Math.round((m.maxSpareW / MM_TO_PX) * 10) / 10;
     const maxSpareH_mm = Math.round((m.maxSpareH / MM_TO_PX) * 10) / 10;
 
-    const xSlider = document.getElementById('sheetOffsetXSlider');
-    const ySlider = document.getElementById('sheetOffsetYSlider');
-    if (xSlider) {
-      xSlider.max = Math.max(maxSpareW_mm, 1).toString();
-      if (!isCustomOffset) {
+    if (!isCustomOffset) {
+      if (currentSheetPosition === 'center') {
+        currentOffsetX_mm = Math.max(0, Math.round((m.maxSpareW / 2 / MM_TO_PX) * 10) / 10);
+        currentOffsetY_mm = Math.max(0, Math.round((m.maxSpareH / 2 / MM_TO_PX) * 10) / 10);
+      } else {
         currentOffsetX_mm = Math.min(m.pageMargin / MM_TO_PX, maxSpareW_mm);
-      }
-      if (currentOffsetX_mm > maxSpareW_mm) currentOffsetX_mm = maxSpareW_mm;
-      xSlider.value = currentOffsetX_mm;
-      const xBadge = document.getElementById('offsetXValBadge');
-      if (xBadge) xBadge.textContent = currentOffsetX_mm.toFixed(1) + 'mm';
-    }
-    if (ySlider) {
-      ySlider.max = Math.max(maxSpareH_mm, 1).toString();
-      if (!isCustomOffset) {
         currentOffsetY_mm = Math.min(m.pageMargin / MM_TO_PX, maxSpareH_mm);
       }
-      if (currentOffsetY_mm > maxSpareH_mm) currentOffsetY_mm = maxSpareH_mm;
-      ySlider.value = currentOffsetY_mm;
-      const yBadge = document.getElementById('offsetYValBadge');
-      if (yBadge) yBadge.textContent = currentOffsetY_mm.toFixed(1) + 'mm';
     }
+
+    if (currentOffsetX_mm > maxSpareW_mm) currentOffsetX_mm = maxSpareW_mm;
+    if (currentOffsetY_mm > maxSpareH_mm) currentOffsetY_mm = maxSpareH_mm;
+
+    // Update X sliders & badges
+    ['sheetOffsetXSlider', 'sheetOffsetXSliderSide'].forEach(id => {
+      const s = document.getElementById(id);
+      if (s) {
+        s.max = Math.max(maxSpareW_mm, 1).toString();
+        s.value = currentOffsetX_mm;
+      }
+    });
+    ['offsetXValBadge', 'offsetXValBadgeSide'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) b.textContent = currentOffsetX_mm.toFixed(1) + 'mm';
+    });
+
+    // Update Y sliders & badges (Left, Right, and Side)
+    ['sheetOffsetYSlider', 'sheetOffsetYSliderLeft', 'sheetOffsetYSliderSide'].forEach(id => {
+      const s = document.getElementById(id);
+      if (s) {
+        s.max = Math.max(maxSpareH_mm, 1).toString();
+        s.value = currentOffsetY_mm;
+      }
+    });
+    ['offsetYValBadge', 'offsetYValBadgeLeft', 'offsetYValBadgeSide'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) b.textContent = currentOffsetY_mm.toFixed(1) + 'mm';
+    });
 
     const startX = currentOffsetX_mm * MM_TO_PX;
     const startY = currentOffsetY_mm * MM_TO_PX;
