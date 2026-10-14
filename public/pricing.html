@@ -342,28 +342,43 @@
 
     // ================= SINGLE-DEVICE CONCURRENT LOGIN ENFORCEMENT =================
     let _isConcurrentLoggingOut = false;
+    let _userDocUnsubscribe = null;
+    let _activeSessionTime = Date.now();
 
     function getOrCreateSessionId(forceNew = false) {
       let sid = localStorage.getItem('passportsnap_session_id');
+      const storedTime = localStorage.getItem('passportsnap_session_time');
+      if (storedTime) {
+        _activeSessionTime = parseInt(storedTime, 10) || Date.now();
+      }
       if (!sid || forceNew) {
         sid = 'sess_' + Date.now() + '_' + Math.random().toString(36).substring(2, 10);
+        _activeSessionTime = Date.now();
         localStorage.setItem('passportsnap_session_id', sid);
+        localStorage.setItem('passportsnap_session_time', String(_activeSessionTime));
       }
       return sid;
     }
 
-    function handleSingleDeviceLogout() {
+    async function handleSingleDeviceLogout() {
       if (_isConcurrentLoggingOut) return;
       _isConcurrentLoggingOut = true;
 
-      try {
-        if (typeof fbAuth !== 'undefined' && fbAuth) {
-          fbAuth.signOut().catch(() => {});
-        }
-      } catch(e) {}
+      if (_userDocUnsubscribe) {
+        try { _userDocUnsubscribe(); } catch(e) {}
+        _userDocUnsubscribe = null;
+      }
 
       localStorage.removeItem('passportsnap_user');
       localStorage.removeItem('passportsnap_session_id');
+      localStorage.removeItem('passportsnap_session_time');
+
+      try {
+        if (typeof fbAuth !== 'undefined' && fbAuth) {
+          await fbAuth.signOut();
+        }
+      } catch(e) {}
+
       if (typeof updateNavWallet === 'function') updateNavWallet();
 
       alert('⚠️ सत्र समाप्त (Session Terminated):\n\nआपका खाता किसी अन्य कंप्यूटर, मोबाइल या ब्राउज़र में लॉगिन किया गया है!\n\nसुरक्षा नियमों के अनुसार एक आईडी से एक समय में केवल एक ही जगह लॉगिन रहा जा सकता है। इसलिए इस डिवाइस से आपको ऑटोमैटिक लॉगआउट कर दिया गया है।');
@@ -375,6 +390,10 @@
         e.preventDefault();
         e.stopPropagation();
       }
+      if (_userDocUnsubscribe) {
+        try { _userDocUnsubscribe(); } catch(e) {}
+        _userDocUnsubscribe = null;
+      }
       try {
         if (fbAuth) fbAuth.signOut();
       } catch(err) {
@@ -382,6 +401,7 @@
       }
       localStorage.removeItem('passportsnap_user');
       localStorage.removeItem('passportsnap_session_id');
+      localStorage.removeItem('passportsnap_session_time');
       updateNavWallet();
       window.location.reload();
     }
@@ -425,7 +445,10 @@
 
   // Sync user profile & credits with Firestore & LocalStorage
   async function syncFirebaseUser(fbUser, extra = {}) {
-    const existing = getStoredUser() || {};
+    let existing = getStoredUser() || {};
+    if (existing.email && fbUser.email && existing.email.toLowerCase() !== fbUser.email.toLowerCase()) {
+      existing = {};
+    }
     let name = extra.name || fbUser.displayName || existing.name || fbUser.email.split('@')[0];
     let studio = extra.studio || existing.studio || (name + ' Photo Studio');
     let phone = extra.phone || existing.phone || '';
@@ -502,14 +525,24 @@
         }
 
         // 🔒 REAL-TIME SINGLE-DEVICE CONCURRENT SESSION LISTENER
-        userRef.onSnapshot(docSnap => {
+        if (_userDocUnsubscribe) {
+          try { _userDocUnsubscribe(); } catch(e) {}
+          _userDocUnsubscribe = null;
+        }
+
+        _userDocUnsubscribe = userRef.onSnapshot(docSnap => {
           if (docSnap && docSnap.exists) {
             const data = docSnap.data();
             const remoteSessionId = data.currentSessionId;
             const currentSessionId = localStorage.getItem('passportsnap_session_id');
-            if (remoteSessionId && currentSessionId && remoteSessionId !== currentSessionId) {
-              handleSingleDeviceLogout();
-              return;
+            const sessionAge = Date.now() - _activeSessionTime;
+
+            if (!isOwnerUser && isUnlimited && sessionAge > 8000) {
+              if (remoteSessionId && currentSessionId && remoteSessionId !== currentSessionId) {
+                console.warn("Single device enforcement triggered. Remote:", remoteSessionId, "Local:", currentSessionId);
+                handleSingleDeviceLogout();
+                return;
+              }
             }
           }
         }, () => {});
@@ -634,7 +667,6 @@
     }
 
     try {
-      getOrCreateSessionId(true);
       const result = await fbAuth.signInWithPopup(fbGoogleProvider);
       const user = result.user;
       const sessionUser = await syncFirebaseUser(user, { isNewLogin: true });
@@ -784,7 +816,6 @@
 
       if (fbAuth) {
         try {
-          getOrCreateSessionId(true);
           const userCred = await fbAuth.createUserWithEmailAndPassword(email, password);
           const user = userCred.user;
           await user.updateProfile({ displayName: name });
@@ -889,7 +920,6 @@
       if (errorEl) errorEl.classList.add('hidden');
 
       if (fbAuth) {
-        getOrCreateSessionId(true);
         const userCred = await fbAuth.signInWithEmailAndPassword(email, password);
         const user = userCred.user;
         const sessionUser = await syncFirebaseUser(user, { isNewLogin: true });
