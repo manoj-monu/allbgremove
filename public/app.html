@@ -197,7 +197,7 @@
   .sidebar { width: 100%; flex-shrink: 0; }
   .canvas-container { flex-grow: 1; min-width: 0; width: 100%; }
   
-  @media (min-width: 768px) {
+  @media (min-width: 992px) {
     .editor-layout {
       flex-direction: row-reverse;
       align-items: stretch; /* Both stretch to the EXACT same full height! */
@@ -481,6 +481,167 @@
     color: var(--primary, #6366f1);
     background: #eef2ff;
     transform: rotate(-90deg);
+  }
+
+  /* ================= TOUCH-FRIENDLY MOBILE CROP CONTROLS (< 992px) ================= */
+  .mobile-crop-panel {
+    display: none;
+    width: 100%;
+    max-width: 440px;
+    margin-top: 12px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1.5px solid #e0e7ff;
+    border-radius: 18px;
+    padding: 12px 14px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(99, 102, 241, 0.1);
+    flex-direction: column;
+    gap: 10px;
+    box-sizing: border-box;
+    z-index: 25;
+  }
+
+  .mob-ctrl-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .mob-ctrl-label {
+    font-size: 11.5px;
+    font-weight: 800;
+    color: #4338ca;
+    width: 76px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    letter-spacing: 0.2px;
+  }
+
+  .mob-ctrl-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    border: 1.5px solid #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    flex-shrink: 0;
+    touch-action: manipulation;
+    transition: all 0.15s ease;
+  }
+  .mob-ctrl-btn:active {
+    background: #eef2ff;
+    border-color: #6366f1;
+    color: #4f46e5;
+    transform: scale(0.92);
+  }
+
+  .mob-ctrl-slider {
+    flex: 1;
+    height: 10px;
+    cursor: pointer;
+    accent-color: var(--primary, #4f46e5);
+    border-radius: 6px;
+    touch-action: pan-x;
+  }
+
+  .mob-ctrl-badge {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--primary, #4f46e5);
+    background: #eef2ff;
+    padding: 4px 8px;
+    border-radius: 8px;
+    min-width: 44px;
+    text-align: center;
+    border: 1px solid #c7d2fe;
+    flex-shrink: 0;
+  }
+
+  .mob-ctrl-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+  }
+
+  .mob-action-btn-center {
+    flex: 1;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1.5px solid #818cf8;
+    background: #eef2ff;
+    color: #3730a3;
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all 0.15s ease;
+  }
+  .mob-action-btn-center:active {
+    background: #4f46e5;
+    color: white;
+    transform: scale(0.96);
+  }
+
+  .mob-action-btn-reset {
+    flex: 1;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1.5px solid #cbd5e1;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all 0.15s ease;
+  }
+  .mob-action-btn-reset:active {
+    background: #e2e8f0;
+    transform: scale(0.96);
+  }
+
+  @media (max-width: 991px) {
+    .crop-vertical-zoom-panel {
+      display: none !important;
+    }
+    .desktop-crop-h-panel {
+      display: none !important;
+    }
+    .mobile-crop-panel {
+      display: flex !important;
+    }
+    .crop-stage-container {
+      gap: 0 !important;
+      justify-content: center !important;
+      width: 100% !important;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .mobile-crop-panel {
+      display: none !important;
+    }
+    .desktop-crop-h-panel {
+      display: flex !important;
+    }
   }
 
 
@@ -1354,8 +1515,8 @@
           </div>
         </div>
 
-        <!-- Quick Horizontal Move Slider under the photo -->
-        <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px; background:rgba(255,255,255,0.96); backdrop-filter:blur(10px); padding:8px 18px; border-radius:24px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border:1.5px solid rgba(255,255,255,0.9); width:min(440px, 94%); z-index:25;">
+        <!-- Quick Horizontal Move Slider under the photo (Desktop only) -->
+        <div class="desktop-crop-h-panel" style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px; background:rgba(255,255,255,0.96); backdrop-filter:blur(10px); padding:8px 18px; border-radius:24px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border:1.5px solid rgba(255,255,255,0.9); width:min(440px, 94%); box-sizing:border-box; z-index:25;">
           <span style="font-size:12px; font-weight:800; color:var(--primary); white-space:nowrap; display:flex; align-items:center; gap:5px;">
             ↔️ Move (बाएं-दाएं):
           </span>
@@ -1370,6 +1531,58 @@
           <button type="button" class="vzoom-reset-btn" style="width:28px; height:28px; font-size:11px;" onclick="centerCropPhoto()" title="Center Photo">
             <i class="fa-solid fa-crosshairs"></i>
           </button>
+        </div>
+
+        <!-- Dedicated Mobile-Friendly Touch Control Bar (< 992px) -->
+        <div class="mobile-crop-panel">
+          <!-- Row 1: Zoom Control -->
+          <div class="mob-ctrl-row">
+            <span class="mob-ctrl-label"><i class="fa-solid fa-magnifying-glass text-indigo-600"></i> ज़ूम:</span>
+            <button type="button" class="mob-ctrl-btn" onclick="stepZoom(-10)" title="Zoom Out">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <input type="range" id="mobileZoomRange" min="50" max="300" value="100" step="1" oninput="setZoomPercent(this.value)" class="mob-ctrl-slider" title="Photo Zoom">
+            <button type="button" class="mob-ctrl-btn" onclick="stepZoom(10)" title="Zoom In">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+            <span id="mobileZoomBadge" class="mob-ctrl-badge">100%</span>
+          </div>
+
+          <!-- Row 2: Vertical Move (ऊपर-नीचे) -->
+          <div class="mob-ctrl-row">
+            <span class="mob-ctrl-label"><i class="fa-solid fa-arrows-up-down text-indigo-600"></i> ऊपर-नीचे:</span>
+            <button type="button" class="mob-ctrl-btn" onclick="nudgeCropPan(0, -10)" title="Move Photo Up">
+              <i class="fa-solid fa-chevron-up"></i>
+            </button>
+            <input type="range" id="mobilePanYRange" min="-300" max="300" value="0" step="2" oninput="onCropPanSliderY(this.value)" class="mob-ctrl-slider" title="Move Photo Up/Down">
+            <button type="button" class="mob-ctrl-btn" onclick="nudgeCropPan(0, 10)" title="Move Photo Down">
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <span id="mobilePanYBadge" class="mob-ctrl-badge">0px</span>
+          </div>
+
+          <!-- Row 3: Horizontal Move (बाएं-दाएं) -->
+          <div class="mob-ctrl-row">
+            <span class="mob-ctrl-label"><i class="fa-solid fa-arrows-left-right text-indigo-600"></i> बाएं-दाएं:</span>
+            <button type="button" class="mob-ctrl-btn" onclick="nudgeCropPan(-10, 0)" title="Move Photo Left">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <input type="range" id="mobilePanXRange" min="-300" max="300" value="0" step="2" oninput="onCropPanSliderX(this.value)" class="mob-ctrl-slider" title="Move Photo Left/Right">
+            <button type="button" class="mob-ctrl-btn" onclick="nudgeCropPan(10, 0)" title="Move Photo Right">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <span id="mobilePanXBadge" class="mob-ctrl-badge">0px</span>
+          </div>
+
+          <!-- Row 4: Quick Action Buttons (Center & Reset) -->
+          <div class="mob-ctrl-actions">
+            <button type="button" onclick="centerCropPhoto()" class="mob-action-btn-center" title="Center Photo">
+              <i class="fa-solid fa-crosshairs"></i> Center (बीच में लाएं)
+            </button>
+            <button type="button" onclick="resetZoom()" class="mob-action-btn-reset" title="Reset Zoom">
+              <i class="fa-solid fa-rotate-left"></i> Reset (रीसेट)
+            </button>
+          </div>
         </div>
     </div>
   </div>
@@ -1831,6 +2044,12 @@
       vProgress.style.height = pct + '%';
       vThumb.style.bottom = pct + '%';
     }
+
+    const mobBadge = document.getElementById('mobileZoomBadge');
+    if (mobBadge) mobBadge.textContent = Math.round(currentZoomPercent) + '%';
+    
+    const mobRange = document.getElementById('mobileZoomRange');
+    if (mobRange) mobRange.value = Math.round(currentZoomPercent);
   }
 
   function setZoomPercent(newPercent, preserveCenter = true) {
@@ -1941,11 +2160,11 @@
     imgX = baseImgX + shift;
     const cropImg = document.getElementById('cropImg');
     if (cropImg) cropImg.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
-    ['cropPanXBadge', 'cropPanXBadgeCanvas'].forEach(id => {
+    ['cropPanXBadge', 'cropPanXBadgeCanvas', 'mobilePanXBadge'].forEach(id => {
       const b = document.getElementById(id);
       if (b) b.textContent = (shift >= 0 ? '+' : '') + Math.round(shift) + 'px';
     });
-    ['cropPanXSlider', 'cropPanXSliderCanvas'].forEach(id => {
+    ['cropPanXSlider', 'cropPanXSliderCanvas', 'mobilePanXRange'].forEach(id => {
       const s = document.getElementById(id);
       if (s && parseFloat(s.value) !== shift) s.value = shift;
     });
@@ -1956,19 +2175,19 @@
     imgY = baseImgY + shift;
     const cropImg = document.getElementById('cropImg');
     if (cropImg) cropImg.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
-    ['cropPanYBadge', 'cropPanYBadgeCanvas'].forEach(id => {
+    ['cropPanYBadge', 'cropPanYBadgeCanvas', 'mobilePanYBadge'].forEach(id => {
       const b = document.getElementById(id);
       if (b) b.textContent = (shift >= 0 ? '+' : '') + Math.round(shift) + 'px';
     });
-    ['cropPanYSlider', 'cropPanYSliderCanvas'].forEach(id => {
+    ['cropPanYSlider', 'cropPanYSliderCanvas', 'mobilePanYRange'].forEach(id => {
       const s = document.getElementById(id);
       if (s && parseFloat(s.value) !== shift) s.value = shift;
     });
   }
 
   function nudgeCropPan(dx, dy) {
-    const sX = document.getElementById('cropPanXSliderCanvas') || document.getElementById('cropPanXSlider');
-    const sY = document.getElementById('cropPanYSliderCanvas') || document.getElementById('cropPanYSlider');
+    const sX = document.getElementById('cropPanXSliderCanvas') || document.getElementById('cropPanXSlider') || document.getElementById('mobilePanXRange');
+    const sY = document.getElementById('cropPanYSliderCanvas') || document.getElementById('cropPanYSlider') || document.getElementById('mobilePanYRange');
     if (dx !== 0 && sX) {
       const cur = parseFloat(sX.value) || 0;
       onCropPanSliderX(cur + dx);
@@ -1990,13 +2209,32 @@
     baseImgY = imgY;
     const cropImg = document.getElementById('cropImg');
     if (cropImg) cropImg.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
-    ['cropPanXSlider', 'cropPanXSliderCanvas', 'cropPanYSlider', 'cropPanYSliderCanvas'].forEach(id => {
+    ['cropPanXSlider', 'cropPanXSliderCanvas', 'cropPanYSlider', 'cropPanYSliderCanvas', 'mobilePanXRange', 'mobilePanYRange'].forEach(id => {
       const s = document.getElementById(id);
       if (s) s.value = 0;
     });
-    ['cropPanXBadge', 'cropPanXBadgeCanvas', 'cropPanYBadge', 'cropPanYBadgeCanvas'].forEach(id => {
+    ['cropPanXBadge', 'cropPanXBadgeCanvas', 'cropPanYBadge', 'cropPanYBadgeCanvas', 'mobilePanXBadge', 'mobilePanYBadge'].forEach(id => {
       const b = document.getElementById(id);
       if (b) b.textContent = '0px';
+    });
+  }
+
+  function syncAllPanBadgesAndSliders(shiftX, shiftY) {
+    ['cropPanXSlider', 'cropPanXSliderCanvas', 'mobilePanXRange'].forEach(id => {
+      const s = document.getElementById(id);
+      if (s) s.value = shiftX;
+    });
+    ['cropPanYSlider', 'cropPanYSliderCanvas', 'mobilePanYRange'].forEach(id => {
+      const s = document.getElementById(id);
+      if (s) s.value = shiftY;
+    });
+    ['cropPanXBadge', 'cropPanXBadgeCanvas', 'mobilePanXBadge'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) b.textContent = (shiftX >= 0 ? '+' : '') + shiftX + 'px';
+    });
+    ['cropPanYBadge', 'cropPanYBadgeCanvas', 'mobilePanYBadge'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) b.textContent = (shiftY >= 0 ? '+' : '') + shiftY + 'px';
     });
   }
 
@@ -2010,7 +2248,7 @@
     baseImgY = imgY;
     initVerticalZoomSlider();
     
-    // Basic drag logic with slider synchronization
+    // Basic mouse drag logic with slider synchronization
     img.onmousedown = (e) => { drag = true; startX = e.clientX - imgX; startY = e.clientY - imgY; e.preventDefault(); };
     document.onmousemove = (e) => { 
       if(drag) { 
@@ -2019,31 +2257,70 @@
         img.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`; 
         const shiftX = Math.round(imgX - baseImgX);
         const shiftY = Math.round(imgY - baseImgY);
-        ['cropPanXSlider', 'cropPanXSliderCanvas'].forEach(id => {
-          const s = document.getElementById(id);
-          if (s) s.value = shiftX;
-        });
-        ['cropPanYSlider', 'cropPanYSliderCanvas'].forEach(id => {
-          const s = document.getElementById(id);
-          if (s) s.value = shiftY;
-        });
-        ['cropPanXBadge', 'cropPanXBadgeCanvas'].forEach(id => {
-          const b = document.getElementById(id);
-          if (b) b.textContent = (shiftX >= 0 ? '+' : '') + shiftX + 'px';
-        });
-        ['cropPanYBadge', 'cropPanYBadgeCanvas'].forEach(id => {
-          const b = document.getElementById(id);
-          if (b) b.textContent = (shiftY >= 0 ? '+' : '') + shiftY + 'px';
-        });
+        syncAllPanBadgesAndSliders(shiftX, shiftY);
       } 
     };
     document.onmouseup = () => { drag = false; };
+
+    // 📱 Touch drag & Pinch-to-zoom for mobile screens
+    let touchDragging = false;
+    let touchStartX = 0, touchStartY = 0;
+    let pinchStartDist = 0;
+    let pinchStartZoom = 100;
+
+    img.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        touchDragging = true;
+        touchStartX = e.touches[0].clientX - imgX;
+        touchStartY = e.touches[0].clientY - imgY;
+        e.preventDefault();
+      } else if (e.touches.length === 2) {
+        touchDragging = false;
+        pinchStartDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        pinchStartZoom = currentZoomPercent;
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchmove', (e) => {
+      if (touchDragging && e.touches && e.touches.length === 1) {
+        imgX = e.touches[0].clientX - touchStartX;
+        imgY = e.touches[0].clientY - touchStartY;
+        img.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`; 
+        const shiftX = Math.round(imgX - baseImgX);
+        const shiftY = Math.round(imgY - baseImgY);
+        syncAllPanBadgesAndSliders(shiftX, shiftY);
+        e.preventDefault();
+      } else if (e.touches && e.touches.length === 2 && pinchStartDist > 0) {
+        const dist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const factor = dist / pinchStartDist;
+        setZoomPercent(pinchStartZoom * factor);
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchend', (e) => {
+      if (!e.touches || e.touches.length === 0) {
+        touchDragging = false;
+        pinchStartDist = 0;
+      }
+    });
+
     // Wheel zoom
-    document.getElementById('cropWrapper').onwheel = (e) => {
-      e.preventDefault();
-      const delta = e.deltaY < 0 ? 10 : -10;
-      setZoomPercent(currentZoomPercent + delta);
-    };
+    const cWrap = document.getElementById('cropWrapper');
+    if (cWrap) {
+      cWrap.onwheel = (e) => {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 10 : -10;
+        setZoomPercent(currentZoomPercent + delta);
+      };
+    }
   }
 
   // ================= UNIT & SIZE CONTROLLER (MM / CM / INCHES) =================
