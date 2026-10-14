@@ -483,176 +483,50 @@
     transform: rotate(-90deg);
   }
 
-  /* ================= TOUCH-FRIENDLY MOBILE CROP CONTROLS (< 992px) ================= */
-  .mobile-crop-panel {
-    display: none;
-    width: 100%;
-    max-width: 400px;
-    margin-top: 10px;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1.5px solid #e0e7ff;
-    border-radius: 16px;
-    padding: 8px 10px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(99, 102, 241, 0.08);
-    flex-direction: column;
-    gap: 7px;
-    box-sizing: border-box;
-    z-index: 25;
-  }
-
-  .mob-ctrl-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
-  }
-
-  .mob-ctrl-label {
-    font-size: 11px;
-    font-weight: 800;
-    color: #4338ca;
-    width: 68px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    letter-spacing: 0.2px;
-  }
-
-  .mob-ctrl-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    border: 1.5px solid #cbd5e1;
-    background: #f8fafc;
-    color: #334155;
+  /* ================= HORIZONTAL MOVE SLIDER UNDER PHOTO ================= */
+  .crop-h-panel {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    gap: 8px;
+    margin-top: 14px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 7px 16px;
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
+    width: min(420px, 96%);
+    box-sizing: border-box;
+    z-index: 25;
+  }
+  .crop-h-label {
+    font-size: 12px;
     font-weight: 800;
-    cursor: pointer;
-    flex-shrink: 0;
-    touch-action: manipulation;
-    transition: all 0.15s ease;
+    color: var(--primary, #4f46e5);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
-  .mob-ctrl-btn:active {
-    background: #eef2ff;
-    border-color: #6366f1;
-    color: #4f46e5;
-    transform: scale(0.92);
-  }
-
-  .mob-ctrl-slider {
+  .crop-h-panel input[type="range"] {
     flex: 1;
     height: 8px;
     cursor: pointer;
     accent-color: var(--primary, #4f46e5);
-    border-radius: 6px;
     touch-action: pan-x;
   }
-
-  .mob-ctrl-badge {
-    font-size: 10.5px;
+  .crop-h-badge {
+    font-size: 11px;
     font-weight: 800;
     color: var(--primary, #4f46e5);
     background: #eef2ff;
-    padding: 2px 6px;
-    border-radius: 6px;
-    min-width: 38px;
+    padding: 2px 8px;
+    border-radius: 8px;
+    min-width: 40px;
     text-align: center;
-    border: 1px solid #c7d2fe;
-    flex-shrink: 0;
-  }
-
-  .mob-ctrl-actions {
-    display: flex;
-    gap: 6px;
-    margin-top: 1px;
-  }
-
-  .mob-action-btn-center {
-    flex: 1;
-    padding: 7px 10px;
-    border-radius: 8px;
-    border: 1.5px solid #818cf8;
-    background: #eef2ff;
-    color: #3730a3;
-    font-size: 11px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    cursor: pointer;
-    touch-action: manipulation;
-    transition: all 0.15s ease;
-  }
-  .mob-action-btn-center:active {
-    background: #4f46e5;
-    color: white;
-    transform: scale(0.96);
-  }
-
-  .mob-action-btn-reset {
-    flex: 1;
-    padding: 7px 10px;
-    border-radius: 8px;
-    border: 1.5px solid #cbd5e1;
-    background: #f8fafc;
-    color: #475569;
-    font-size: 11px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    cursor: pointer;
-    touch-action: manipulation;
-    transition: all 0.15s ease;
-  }
-  .mob-action-btn-reset:active {
-    background: #e2e8f0;
-    transform: scale(0.96);
-  }
-
-  @media (max-width: 991px) {
-    .crop-vertical-zoom-panel {
-      display: none !important;
-    }
-    .desktop-crop-h-panel {
-      display: none !important;
-    }
-    .mobile-crop-panel {
-      display: flex !important;
-    }
-    .sidebar-zoom-group {
-      display: none !important;
-    }
-    .crop-stage-container {
-      gap: 0 !important;
-      justify-content: center !important;
-      width: 100% !important;
-      margin: 6px 0 !important;
-    }
-    .canvas-container {
-      min-height: auto !important;
-      max-height: none !important;
-      padding: 16px 8px 12px 8px !important;
-      border-radius: 18px !important;
-      overflow: visible !important;
-    }
-  }
-
-  @media (min-width: 992px) {
-    .mobile-crop-panel {
-      display: none !important;
-    }
-    .desktop-crop-h-panel {
-      display: flex !important;
-    }
+    white-space: nowrap;
   }
 
 
@@ -727,17 +601,95 @@
       overflow-y: visible !important;
     }
     
-    /* Crop Stage on Mobile */
+    /* Crop Stage & Side Sliding Buttons on Mobile (<768px) */
     .crop-stage-container {
-      gap: 8px !important;
+      gap: 6px !important;
+      width: 100% !important;
       max-width: 100% !important;
       justify-content: center !important;
+      align-items: center !important;
+      margin: 4px 0 !important;
     }
     .crop-vertical-zoom-panel {
-      padding: 6px 3px !important;
+      display: flex !important;
+      width: 36px !important;
+      min-width: 36px !important;
+      padding: 6px 2px !important;
+      border-radius: 20px !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), 0 1px 4px rgba(99, 102, 241, 0.15) !important;
+    }
+    .vzoom-step-btn {
+      width: 28px !important;
+      height: 28px !important;
+      font-size: 11px !important;
+      flex-shrink: 0 !important;
+    }
+    .vzoom-badge {
+      font-size: 9px !important;
+      min-width: 28px !important;
+      max-width: 34px !important;
+      padding: 1px 2px !important;
+      margin: 3px 0 !important;
+      letter-spacing: -0.4px !important;
     }
     .vzoom-track-container {
-      height: 90px !important;
+      height: 100px !important;
+      width: 6px !important;
+      margin: 4px 0 !important;
+    }
+    .vzoom-thumb {
+      width: 22px !important;
+      height: 22px !important;
+    }
+    .vzoom-thumb i {
+      font-size: 8px !important;
+    }
+    .vzoom-reset-btn {
+      width: 26px !important;
+      height: 26px !important;
+      font-size: 10px !important;
+      margin-top: 3px !important;
+    }
+    #cropPanYSliderCanvas {
+      height: 95px !important;
+      width: 22px !important;
+      touch-action: none !important;
+    }
+    #cropWrapper {
+      max-width: calc(100vw - 92px) !important;
+      max-height: 44vh !important;
+      flex-shrink: 1 !important;
+    }
+    .crop-h-panel {
+      display: flex !important;
+      width: min(340px, 96%) !important;
+      padding: 5px 8px !important;
+      gap: 4px !important;
+      margin-top: 8px !important;
+      border-radius: 20px !important;
+    }
+    .crop-h-panel .crop-h-label {
+      font-size: 11px !important;
+      gap: 2px !important;
+    }
+    .crop-h-panel .vzoom-step-btn {
+      width: 26px !important;
+      height: 26px !important;
+      font-size: 10px !important;
+    }
+    .crop-h-panel input[type="range"] {
+      height: 7px !important;
+    }
+    .crop-h-panel .crop-h-badge {
+      font-size: 10px !important;
+      min-width: 32px !important;
+      padding: 1px 4px !important;
+    }
+    .crop-h-panel .vzoom-reset-btn {
+      width: 26px !important;
+      height: 26px !important;
+      font-size: 10px !important;
+      margin-top: 0 !important;
     }
 
     /* Canvas sizing across all steps */
@@ -1526,74 +1478,22 @@
           </div>
         </div>
 
-        <!-- Quick Horizontal Move Slider under the photo (Desktop only) -->
-        <div class="desktop-crop-h-panel" style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px; background:rgba(255,255,255,0.96); backdrop-filter:blur(10px); padding:8px 18px; border-radius:24px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border:1.5px solid rgba(255,255,255,0.9); width:min(440px, 94%); box-sizing:border-box; z-index:25;">
-          <span style="font-size:12px; font-weight:800; color:var(--primary); white-space:nowrap; display:flex; align-items:center; gap:5px;">
-            ↔️ Move (बाएं-दाएं):
+        <!-- Horizontal Move Slider under the photo -->
+        <div id="cropHMoveBar" class="crop-h-panel">
+          <span class="crop-h-label">
+            ↔️ Move:
           </span>
-          <button type="button" class="vzoom-step-btn" style="width:28px; height:28px; font-size:11px;" onclick="nudgeCropPan(-10, 0)" title="Shift Left (बाएं सरकाएं)">
+          <button type="button" class="vzoom-step-btn" onclick="nudgeCropPan(-10, 0)" title="Shift Left (बाएं सरकाएं)">
             <i class="fa-solid fa-chevron-left"></i>
           </button>
-          <input type="range" id="cropPanXSliderCanvas" min="-300" max="300" value="0" step="2" style="flex:1; height:8px; cursor:pointer; accent-color:var(--primary);" oninput="onCropPanSliderX(this.value)" title="Slide photo horizontally (बाएं-दाएं सरकाएं)">
-          <button type="button" class="vzoom-step-btn" style="width:28px; height:28px; font-size:11px;" onclick="nudgeCropPan(10, 0)" title="Shift Right (दाएं सरकाएं)">
+          <input type="range" id="cropPanXSliderCanvas" min="-300" max="300" value="0" step="2" oninput="onCropPanSliderX(this.value)" title="Slide photo horizontally (बाएं-दाएं सरकाएं)">
+          <button type="button" class="vzoom-step-btn" onclick="nudgeCropPan(10, 0)" title="Shift Right (दाएं सरकाएं)">
             <i class="fa-solid fa-chevron-right"></i>
           </button>
-          <span id="cropPanXBadgeCanvas" style="font-size:11px; font-weight:800; color:var(--primary); background:#eef2ff; padding:2px 8px; border-radius:8px; min-width:44px; text-align:center;">0px</span>
-          <button type="button" class="vzoom-reset-btn" style="width:28px; height:28px; font-size:11px;" onclick="centerCropPhoto()" title="Center Photo">
+          <span id="cropPanXBadgeCanvas" class="crop-h-badge">0px</span>
+          <button type="button" class="vzoom-reset-btn" onclick="centerCropPhoto()" title="Center Photo (बीच में लाएं)">
             <i class="fa-solid fa-crosshairs"></i>
           </button>
-        </div>
-
-        <!-- Dedicated Mobile-Friendly Touch Control Bar (< 992px) -->
-        <div class="mobile-crop-panel">
-          <!-- Row 1: Zoom Control -->
-          <div class="mob-ctrl-row">
-            <span class="mob-ctrl-label"><i class="fa-solid fa-magnifying-glass text-indigo-600"></i> ज़ूम:</span>
-            <button type="button" class="mob-ctrl-btn" onclick="stepZoom(-10)" title="Zoom Out">
-              <i class="fa-solid fa-minus"></i>
-            </button>
-            <input type="range" id="mobileZoomRange" min="50" max="300" value="100" step="1" oninput="setZoomPercent(this.value)" class="mob-ctrl-slider" title="Photo Zoom">
-            <button type="button" class="mob-ctrl-btn" onclick="stepZoom(10)" title="Zoom In">
-              <i class="fa-solid fa-plus"></i>
-            </button>
-            <span id="mobileZoomBadge" class="mob-ctrl-badge">100%</span>
-          </div>
-
-          <!-- Row 2: Vertical Move (ऊपर-नीचे) -->
-          <div class="mob-ctrl-row">
-            <span class="mob-ctrl-label"><i class="fa-solid fa-arrows-up-down text-indigo-600"></i> ऊपर-नीचे:</span>
-            <button type="button" class="mob-ctrl-btn" onclick="nudgeCropPan(0, -10)" title="Move Photo Up">
-              <i class="fa-solid fa-chevron-up"></i>
-            </button>
-            <input type="range" id="mobilePanYRange" min="-300" max="300" value="0" step="2" oninput="onCropPanSliderY(this.value)" class="mob-ctrl-slider" title="Move Photo Up/Down">
-            <button type="button" class="mob-ctrl-btn" onclick="nudgeCropPan(0, 10)" title="Move Photo Down">
-              <i class="fa-solid fa-chevron-down"></i>
-            </button>
-            <span id="mobilePanYBadge" class="mob-ctrl-badge">0px</span>
-          </div>
-
-          <!-- Row 3: Horizontal Move (बाएं-दाएं) -->
-          <div class="mob-ctrl-row">
-            <span class="mob-ctrl-label"><i class="fa-solid fa-arrows-left-right text-indigo-600"></i> बाएं-दाएं:</span>
-            <button type="button" class="mob-ctrl-btn" onclick="nudgeCropPan(-10, 0)" title="Move Photo Left">
-              <i class="fa-solid fa-chevron-left"></i>
-            </button>
-            <input type="range" id="mobilePanXRange" min="-300" max="300" value="0" step="2" oninput="onCropPanSliderX(this.value)" class="mob-ctrl-slider" title="Move Photo Left/Right">
-            <button type="button" class="mob-ctrl-btn" onclick="nudgeCropPan(10, 0)" title="Move Photo Right">
-              <i class="fa-solid fa-chevron-right"></i>
-            </button>
-            <span id="mobilePanXBadge" class="mob-ctrl-badge">0px</span>
-          </div>
-
-          <!-- Row 4: Quick Action Buttons (Center & Reset) -->
-          <div class="mob-ctrl-actions">
-            <button type="button" onclick="centerCropPhoto()" class="mob-action-btn-center" title="Center Photo">
-              <i class="fa-solid fa-crosshairs"></i> Center (बीच में लाएं)
-            </button>
-            <button type="button" onclick="resetZoom()" class="mob-action-btn-reset" title="Reset Zoom">
-              <i class="fa-solid fa-rotate-left"></i> Reset (रीसेट)
-            </button>
-          </div>
         </div>
     </div>
   </div>
@@ -2055,12 +1955,6 @@
       vProgress.style.height = pct + '%';
       vThumb.style.bottom = pct + '%';
     }
-
-    const mobBadge = document.getElementById('mobileZoomBadge');
-    if (mobBadge) mobBadge.textContent = Math.round(currentZoomPercent) + '%';
-    
-    const mobRange = document.getElementById('mobileZoomRange');
-    if (mobRange) mobRange.value = Math.round(currentZoomPercent);
   }
 
   function setZoomPercent(newPercent, preserveCenter = true) {
@@ -2072,10 +1966,9 @@
     const newScale = baseFitScale * (currentZoomPercent / 100);
 
     if (preserveCenter && oldScale > 0) {
-      const w_mm = getCropWidthMM();
-      const h_mm = getCropHeightMM();
-      const visualW = w_mm * 5;
-      const visualH = h_mm * 5;
+      const wrap = document.getElementById('cropWrapper');
+      const visualW = wrap ? (parseFloat(wrap.style.width) || 200) : 200;
+      const visualH = wrap ? (parseFloat(wrap.style.height) || 250) : 250;
       const cx = visualW / 2;
       const cy = visualH / 2;
       imgX = cx - (cx - imgX) * (newScale / oldScale);
@@ -2171,11 +2064,11 @@
     imgX = baseImgX + shift;
     const cropImg = document.getElementById('cropImg');
     if (cropImg) cropImg.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
-    ['cropPanXBadge', 'cropPanXBadgeCanvas', 'mobilePanXBadge'].forEach(id => {
+    ['cropPanXBadge', 'cropPanXBadgeCanvas'].forEach(id => {
       const b = document.getElementById(id);
       if (b) b.textContent = (shift >= 0 ? '+' : '') + Math.round(shift) + 'px';
     });
-    ['cropPanXSlider', 'cropPanXSliderCanvas', 'mobilePanXRange'].forEach(id => {
+    ['cropPanXSlider', 'cropPanXSliderCanvas'].forEach(id => {
       const s = document.getElementById(id);
       if (s && parseFloat(s.value) !== shift) s.value = shift;
     });
@@ -2186,19 +2079,19 @@
     imgY = baseImgY + shift;
     const cropImg = document.getElementById('cropImg');
     if (cropImg) cropImg.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
-    ['cropPanYBadge', 'cropPanYBadgeCanvas', 'mobilePanYBadge'].forEach(id => {
+    ['cropPanYBadge', 'cropPanYBadgeCanvas'].forEach(id => {
       const b = document.getElementById(id);
       if (b) b.textContent = (shift >= 0 ? '+' : '') + Math.round(shift) + 'px';
     });
-    ['cropPanYSlider', 'cropPanYSliderCanvas', 'mobilePanYRange'].forEach(id => {
+    ['cropPanYSlider', 'cropPanYSliderCanvas'].forEach(id => {
       const s = document.getElementById(id);
       if (s && parseFloat(s.value) !== shift) s.value = shift;
     });
   }
 
   function nudgeCropPan(dx, dy) {
-    const sX = document.getElementById('cropPanXSliderCanvas') || document.getElementById('cropPanXSlider') || document.getElementById('mobilePanXRange');
-    const sY = document.getElementById('cropPanYSliderCanvas') || document.getElementById('cropPanYSlider') || document.getElementById('mobilePanYRange');
+    const sX = document.getElementById('cropPanXSliderCanvas') || document.getElementById('cropPanXSlider');
+    const sY = document.getElementById('cropPanYSliderCanvas') || document.getElementById('cropPanYSlider');
     if (dx !== 0 && sX) {
       const cur = parseFloat(sX.value) || 0;
       onCropPanSliderX(cur + dx);
@@ -2220,30 +2113,30 @@
     baseImgY = imgY;
     const cropImg = document.getElementById('cropImg');
     if (cropImg) cropImg.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
-    ['cropPanXSlider', 'cropPanXSliderCanvas', 'cropPanYSlider', 'cropPanYSliderCanvas', 'mobilePanXRange', 'mobilePanYRange'].forEach(id => {
+    ['cropPanXSlider', 'cropPanXSliderCanvas', 'cropPanYSlider', 'cropPanYSliderCanvas'].forEach(id => {
       const s = document.getElementById(id);
       if (s) s.value = 0;
     });
-    ['cropPanXBadge', 'cropPanXBadgeCanvas', 'cropPanYBadge', 'cropPanYBadgeCanvas', 'mobilePanXBadge', 'mobilePanYBadge'].forEach(id => {
+    ['cropPanXBadge', 'cropPanXBadgeCanvas', 'cropPanYBadge', 'cropPanYBadgeCanvas'].forEach(id => {
       const b = document.getElementById(id);
       if (b) b.textContent = '0px';
     });
   }
 
   function syncAllPanBadgesAndSliders(shiftX, shiftY) {
-    ['cropPanXSlider', 'cropPanXSliderCanvas', 'mobilePanXRange'].forEach(id => {
+    ['cropPanXSlider', 'cropPanXSliderCanvas'].forEach(id => {
       const s = document.getElementById(id);
       if (s) s.value = shiftX;
     });
-    ['cropPanYSlider', 'cropPanYSliderCanvas', 'mobilePanYRange'].forEach(id => {
+    ['cropPanYSlider', 'cropPanYSliderCanvas'].forEach(id => {
       const s = document.getElementById(id);
       if (s) s.value = shiftY;
     });
-    ['cropPanXBadge', 'cropPanXBadgeCanvas', 'mobilePanXBadge'].forEach(id => {
+    ['cropPanXBadge', 'cropPanXBadgeCanvas'].forEach(id => {
       const b = document.getElementById(id);
       if (b) b.textContent = (shiftX >= 0 ? '+' : '') + shiftX + 'px';
     });
-    ['cropPanYBadge', 'cropPanYBadgeCanvas', 'mobilePanYBadge'].forEach(id => {
+    ['cropPanYBadge', 'cropPanYBadgeCanvas'].forEach(id => {
       const b = document.getElementById(id);
       if (b) b.textContent = (shiftY >= 0 ? '+' : '') + shiftY + 'px';
     });
@@ -2438,9 +2331,15 @@
 
     const wrap = document.getElementById('cropWrapper');
     if (!wrap) return;
-    // Scale for visual preview box
-    const visualW = w_mm * 5;
-    const visualH = h_mm * 5;
+    // Scale for visual preview box (auto-adapts on mobile screens to preserve room for side sliding controls)
+    const isMobile = window.innerWidth && window.innerWidth < 768;
+    const maxAllowedW = isMobile ? Math.min(220, window.innerWidth - 96) : 280;
+    let visualMultiplier = 5;
+    if (w_mm * visualMultiplier > maxAllowedW) {
+      visualMultiplier = maxAllowedW / w_mm;
+    }
+    const visualW = Math.round(w_mm * visualMultiplier);
+    const visualH = Math.round(h_mm * visualMultiplier);
     wrap.style.width = visualW + 'px';
     wrap.style.height = visualH + 'px';
 
@@ -2476,7 +2375,8 @@
     const ctx = c.getContext('2d');
     
     // Reverse engineer the visual scale to actual scale
-    const visualW = w_mm * 5;
+    const wrap = document.getElementById('cropWrapper');
+    const visualW = wrap ? (parseFloat(wrap.style.width) || (w_mm * 5)) : (w_mm * 5);
     const ratio = w / visualW;
     
     ctx.fillStyle = "#ffffff";
