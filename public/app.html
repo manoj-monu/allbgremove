@@ -3679,18 +3679,16 @@
             const data = docSnap.data();
 
             // 🔒 SINGLE-DEVICE ENFORCEMENT:
-            // Apply only to paid unlimited plans to prevent unauthorized cyber cafe account sharing.
-            // Do NOT kick out owners (owners test on mobile + PC simultaneously) or free users.
+            // Whichever login was the OLD one gets automatically logged out when a new login occurs.
+            // The NEW device/login stays active and untouched!
             const remoteSessionId = data.currentSessionId;
             const currentSessionId = localStorage.getItem('passportsnap_session_id');
             const sessionAge = Date.now() - _activeSessionTime;
 
-            if (!isOwnerUser && isUnlimited && sessionAge > 8000) {
-              if (remoteSessionId && currentSessionId && remoteSessionId !== currentSessionId) {
-                console.warn("Single device enforcement triggered. Remote:", remoteSessionId, "Local:", currentSessionId);
-                handleSingleDeviceLogout();
-                return;
-              }
+            if (remoteSessionId && currentSessionId && remoteSessionId !== currentSessionId && sessionAge > 5000) {
+              console.warn("Older session detected on this device. New login occurred on another device. Logging out old session...");
+              handleSingleDeviceLogout();
+              return;
             }
 
             let u = getStoredUser();

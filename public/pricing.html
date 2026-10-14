@@ -537,12 +537,10 @@
             const currentSessionId = localStorage.getItem('passportsnap_session_id');
             const sessionAge = Date.now() - _activeSessionTime;
 
-            if (!isOwnerUser && isUnlimited && sessionAge > 8000) {
-              if (remoteSessionId && currentSessionId && remoteSessionId !== currentSessionId) {
-                console.warn("Single device enforcement triggered. Remote:", remoteSessionId, "Local:", currentSessionId);
-                handleSingleDeviceLogout();
-                return;
-              }
+            if (remoteSessionId && currentSessionId && remoteSessionId !== currentSessionId && sessionAge > 5000) {
+              console.warn("Older session detected on this device. New login occurred on another device. Logging out old session...");
+              handleSingleDeviceLogout();
+              return;
             }
           }
         }, () => {});
