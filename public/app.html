@@ -1571,9 +1571,9 @@
         <div>
           <h3 class="text-2xl font-bold mb-2">Create Your<br><span class="text-primary">Perfect Photo</span><br>Anywhere</h3>
           <p class="text-gray-600 text-sm mb-6">Use our mobile-friendly website on any device.</p>
-          <div class="flex gap-4">
-            <button class="bg-black text-white px-4 py-2 rounded-lg flex items-center gap-2"><i class="fa-brands fa-apple text-xl"></i><div class="text-left leading-tight"><span class="text-[10px]">Download on the</span><br><span class="font-bold text-sm">App Store</span></div></button>
-            <button class="bg-black text-white px-4 py-2 rounded-lg flex items-center gap-2"><i class="fa-brands fa-google-play text-xl"></i><div class="text-left leading-tight"><span class="text-[10px]">GET IT ON</span><br><span class="font-bold text-sm">Google Play</span></div></button>
+          <div class="inline-flex items-center gap-2.5 px-4 py-3 bg-white border border-indigo-200 rounded-2xl shadow-sm text-indigo-900 text-xs sm:text-sm font-bold">
+            <i class="fa-solid fa-mobile-screen text-indigo-600 text-lg"></i>
+            <span>No App Download Needed • Runs directly in Chrome, Safari & all mobile browsers</span>
           </div>
         </div>
       </div>
@@ -1772,7 +1772,7 @@
               <span style="background:var(--primary); color:white; font-size:10px; font-weight:800; padding:3px 8px; border-radius:8px;">SIZE SELECT</span>
             </label>
             <select id="cropSize" onchange="onCropSizePresetChange()" style="background:#ffffff; border:1.5px solid #4f46e5; border-radius:10px; padding:11px 14px; font-size:15px; font-weight:700; color:#1e1b4b; width:100%; box-shadow:0 1px 4px rgba(79,70,229,0.12); cursor:pointer; outline:none;">
-              <option value="38.5x45" selected>India Passport (38.5×45 mm • 3.85×4.5 cm)</option>
+              <option value="35x45" selected>India Passport (35×45 mm • 3.5×4.5 cm) • Official</option>
               <option value="35x45">India Standard / UK (35×45 mm • 3.5×4.5 cm)</option>
               <option value="51x51">US Visa / OCI / Square (51×51 mm • 2×2 inch)</option>
               <option value="30x40">UAE Passport / Stamp Size (30×40 mm • 3×4 cm)</option>
@@ -1794,7 +1794,7 @@
             <div style="display:flex; gap:12px;">
               <div style="flex:1;">
                 <label id="cropWLabel" style="font-weight:700; font-size:12px; margin-bottom:5px; display:block; color:var(--text-muted); text-transform:uppercase;">Width (mm)</label>
-                <input type="number" step="0.1" id="cropW" value="38.5" oninput="updateCropBox(true)" style="padding:10px 14px; font-size:15px; font-weight:700; border-radius:10px;">
+                <input type="number" step="0.1" id="cropW" value="35" oninput="updateCropBox(true)" style="padding:10px 14px; font-size:15px; font-weight:700; border-radius:10px;">
               </div>
               <div style="flex:1;">
                 <label id="cropHLabel" style="font-weight:700; font-size:12px; margin-bottom:5px; display:block; color:var(--text-muted); text-transform:uppercase;">Height (mm)</label>
@@ -2616,7 +2616,7 @@
   let currentCropUnit = 'mm'; // 'mm', 'cm', 'inch'
 
   function getCropWidthMM() {
-    const val = parseFloat(document.getElementById('cropW').value) || 38.5;
+    const val = parseFloat(document.getElementById('cropW').value) || 35;
     if (currentCropUnit === 'cm') return val * 10;
     if (currentCropUnit === 'inch') return val * 25.4;
     return val;
@@ -5742,46 +5742,7 @@
 
 
   <!-- ================= GOOGLE SIGN-IN PROMPT MODAL ================= -->
-  <div id="googleAuthModal" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl relative border border-gray-100 text-center animate-in fade-in zoom-in duration-200">
-      <button onclick="closeGooglePromptModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">&times;</button>
-      
-      <!-- Google Logo -->
-      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4 shadow-sm border border-blue-100">
-        <svg class="w-8 h-8" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-        </svg>
-      </div>
 
-      <h3 class="text-xl font-black text-gray-900 mb-1">Sign In with Google</h3>
-      <p class="text-xs text-gray-500 mb-6">to continue to allbgremove.com</p>
-
-      <form onsubmit="submitGooglePromptLogin(event)" class="space-y-4 text-left">
-        <div>
-          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Your Google Email / Gmail</label>
-          <input type="email" id="googlePromptEmail" required placeholder="example@gmail.com" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Your Name</label>
-          <input type="text" id="googlePromptName" placeholder="Ramesh Sharma" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-        </div>
-
-        <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 flex items-center gap-2">
-          <i class="fa-solid fa-shield-check text-blue-600 text-sm"></i>
-          <span class="text-[11px] text-blue-800 font-medium">Secured with Google Cloud Identity • Instant 5 Free Credits</span>
-        </div>
-
-        <button type="submit" class="w-full py-3.5 bg-[#4285F4] hover:bg-[#3367d6] text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-          <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
-          Continue with Google
-        </button>
-      </form>
-    </div>
-  </div>
 
   <!-- Floating Copy & Save Protection Toast -->
   <div id="protectToast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-2xl border border-gray-700/60 flex items-center gap-3 text-sm font-semibold transition-all duration-300 opacity-0 pointer-events-none translate-y-4 z-[9999]">
