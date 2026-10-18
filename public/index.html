@@ -1686,6 +1686,8 @@
             <select id="paperSize" onchange="onPaperSizeChange()" style="background:#ffffff; border:1.5px solid #4f46e5; border-radius:10px; padding:10px 14px; font-size:14.5px; font-weight:700; color:#1e1b4b; width:100%; box-shadow:0 1px 4px rgba(79,70,229,0.12); cursor:pointer;">
               <option value="4x6P" selected>4x6 inch Portrait (102 x 152 mm) • Default Studio</option>
               <option value="4x6L">4x6 inch Landscape (152 x 102 mm)</option>
+              <option value="12x6L">12x6 inch Landscape (305 x 152 mm / 3600x1800) • 40 Photos Studio</option>
+              <option value="12x6P">6x12 inch Portrait (152 x 305 mm / 1800x3600) • 40 Photos Studio</option>
               <option value="A4P">A4 Portrait (210 x 297 mm)</option>
               <option value="A4L">A4 Landscape (297 x 210 mm)</option>
               <option value="5x7P">5x7 inch Portrait (127 x 178 mm)</option>
@@ -1706,6 +1708,7 @@
               <option value="6x5">Fit 30 Photos (6x5 • 6 Cols x 5 Rows)</option>
               <option value="8x4">Fit 32 Photos (8x4 • 8 Cols x 4 Rows)</option>
               <option value="6x6">Fit 36 Photos (6x6 • 6 Cols x 6 Rows)</option>
+              <option value="10x4">Fit 40 Photos (10x4 • 10 Cols x 4 Rows - 12x6 Studio Special)</option>
               <option value="8x5">Fit 40 Photos (8x5 • 8 Cols x 5 Rows)</option>
               <option value="4x2">Fit 8 Photos (4x2 / 2x4)</option>
               <option value="3x2">Fit 6 Photos (3x2 / 2x3)</option>
@@ -2826,6 +2829,7 @@
     { val: '6x5', cap: 30 },
     { val: '8x4', cap: 32 },
     { val: '6x6', cap: 36 },
+    { val: '10x4', cap: 40 },
     { val: '8x5', cap: 40 },
     { val: '8x6', cap: 48 },
     { val: '10x6', cap: 60 }
@@ -3054,6 +3058,8 @@
     else if(paperSize === 'A4L') { pW = 297 * MM_TO_PX; pH = 210 * MM_TO_PX; }
     else if(paperSize === '4x6L') { pW = 152 * MM_TO_PX; pH = 102 * MM_TO_PX; }
     else if(paperSize === '4x6P') { pW = 102 * MM_TO_PX; pH = 152 * MM_TO_PX; }
+    else if(paperSize === '12x6L') { pW = 304.8 * MM_TO_PX; pH = 152.4 * MM_TO_PX; }
+    else if(paperSize === '12x6P') { pW = 152.4 * MM_TO_PX; pH = 304.8 * MM_TO_PX; }
     else if(paperSize === '5x7L') { pW = 178 * MM_TO_PX; pH = 127 * MM_TO_PX; }
     else if(paperSize === '5x7P') { pW = 127 * MM_TO_PX; pH = 178 * MM_TO_PX; }
 
@@ -3152,7 +3158,20 @@
   }
 
   function onPaperSizeChange() {
-    const val = document.getElementById('gridLayout').value;
+    const paperSize = document.getElementById('paperSize').value;
+    const gridSelect = document.getElementById('gridLayout');
+    if (paperSize === '12x6L' || paperSize === '12x6P') {
+      if (gridSelect) {
+        gridSelect.value = '10x4';
+        onGridLayoutChange();
+        return;
+      }
+    } else if ((paperSize === '4x6P' || paperSize === '4x6L') && gridSelect && (gridSelect.value === '10x4' || gridSelect.value === '8x5')) {
+      gridSelect.value = '4x3';
+      onGridLayoutChange();
+      return;
+    }
+    const val = gridSelect ? gridSelect.value : '4x3';
     if (val === 'actual') {
        const m = getSheetMetrics();
        if (m) updateMaxPhotoCount(m.cols * m.rows, false);
@@ -3442,6 +3461,8 @@
     if(paperSize === 'A4L') cssPageSize = 'A4 landscape';
     if(paperSize === '4x6P') cssPageSize = '4in 6in';
     if(paperSize === '4x6L') cssPageSize = '6in 4in';
+    if(paperSize === '12x6L') cssPageSize = '12in 6in';
+    if(paperSize === '12x6P') cssPageSize = '6in 12in';
     if(paperSize === '5x7P') cssPageSize = '5in 7in';
     if(paperSize === '5x7L') cssPageSize = '7in 5in';
     
