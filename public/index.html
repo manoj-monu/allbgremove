@@ -317,6 +317,30 @@
   
   /* Photo Shield & Anti-Copy Protection */
   .canvas-container { position: relative; user-select: none !important; -webkit-user-select: none !important; }
+  .btn-compare-mode {
+    padding: 6px 11px;
+    font-size: 11.5px;
+    font-weight: 700;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-compare-mode:hover {
+    background: #f8fafc;
+    color: #1e293b;
+    border-color: #94a3b8;
+  }
+  .btn-compare-mode.active {
+    background: #eef2ff !important;
+    border: 1.5px solid #4f46e5 !important;
+    color: #4338ca !important;
+    font-weight: 800 !important;
+    box-shadow: 0 1px 4px rgba(79, 70, 229, 0.15);
+  }
+
   .photo-shield-overlay {
     position: absolute;
     top: 0;
@@ -1554,12 +1578,77 @@
           <button id="btnBgStep" class="btn btn-primary" style="padding:11px 26px; font-size:15px; font-weight:800; box-shadow:0 4px 15px rgba(79,70,229,0.35);" onclick="handleBgStepAction()">✨ AI Remove Background</button>
         </div>
       </div>
-      <div class="canvas-container">
-        <div style="position:relative; display:flex; max-width:100%; max-height:65vh;">
-          <canvas id="bgCanvas" style="max-height: 65vh; object-fit: contain;"></canvas>
-          <div id="scannerOverlay" class="scanner-overlay"><div class="scanner-line"></div></div>
-          <div class="photo-shield-overlay" id="bgShield" title="Protected photo preview" oncontextmenu="return false;" ondragstart="return false;"></div>
+      <div class="canvas-container" style="flex-direction:column; justify-content:center; align-items:center; gap:14px; position:relative;">
+        
+        <!-- Comparison Mode Toolbar (Appears automatically when BG is removed) -->
+        <div id="compareToolbar" style="display:none; width:100%; max-width:680px; align-items:center; justify-content:space-between; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:12px; padding:8px 12px; box-shadow:0 2px 8px rgba(0,0,0,0.04); flex-wrap:wrap; gap:8px;">
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <span style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-right:4px;">
+              <i class="fa-solid fa-code-compare text-primary mr-1"></i> VIEW:
+            </span>
+            <button type="button" id="btnModeSide" class="btn-compare-mode active" onclick="setCompareMode('side')" title="Side by side comparison">
+              👥 Side-by-Side (दोनों साथ)
+            </button>
+            <button type="button" id="btnModeSlider" class="btn-compare-mode" onclick="setCompareMode('slider')" title="Interactive Split Slider">
+              🌓 Split Slider (स्लाइडर)
+            </button>
+            <button type="button" id="btnModeAfter" class="btn-compare-mode" onclick="setCompareMode('after')" title="Only New Photo">
+              🖼️ After Only (नया फोटो)
+            </button>
+          </div>
+          <button type="button" id="btnHoldCompare" onmousedown="holdStartOriginal()" onmouseup="holdEndOriginal()" onmouseleave="holdEndOriginal()" ontouchstart="holdStartOriginal(event)" ontouchend="holdEndOriginal(event)" style="background:#f1f5f9; border:1.5px solid #cbd5e1; color:#1e293b; font-weight:800; font-size:11.5px; padding:6px 12px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:5px; box-shadow:0 1px 3px rgba(0,0,0,0.05); user-select:none;" title="Press & hold to temporarily view original photo">
+            <i class="fa-solid fa-eye text-indigo-600"></i> Hold: Original (दबाकर रखें)
+          </button>
         </div>
+
+        <!-- Mode 1 & 3: Standard / Side-by-Side Wrapper -->
+        <div id="compareSideWrapper" style="display:flex; align-items:flex-start; justify-content:center; gap:16px; max-width:100%; flex-wrap:wrap;">
+          <!-- BEFORE Card -->
+          <div id="beforeCard" style="display:none; flex-direction:column; align-items:center; gap:8px;">
+            <span style="font-size:11px; font-weight:800; color:#b91c1c; background:#fee2e2; border:1.5px solid #fca5a5; padding:3px 12px; border-radius:20px; box-shadow:0 1px 3px rgba(220,38,38,0.15);">
+              <i class="fa-solid fa-clock-rotate-left mr-1"></i> BEFORE (ओरिजिनल फोटो)
+            </span>
+            <div style="position:relative; display:flex; border-radius:14px; overflow:hidden; border:2px solid #e2e8f0; box-shadow:0 4px 16px rgba(0,0,0,0.08); background:#f8fafc;">
+              <canvas id="beforeCanvas" style="max-height:58vh; max-width:100%; object-fit:contain; display:block;"></canvas>
+            </div>
+          </div>
+
+          <!-- AFTER Card -->
+          <div id="afterCard" style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+            <span id="afterBadge" style="display:none; font-size:11px; font-weight:800; color:#047857; background:#ecfdf5; border:1.5px solid #6ee7b7; padding:3px 12px; border-radius:20px; box-shadow:0 1px 3px rgba(16,185,129,0.15);">
+              <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> AFTER (नया AI बैकग्राउंड)
+            </span>
+            <div style="position:relative; display:flex; border-radius:14px; overflow:hidden; border:2px solid #6366f1; box-shadow:0 4px 20px rgba(79,70,229,0.15);">
+              <canvas id="bgCanvas" style="max-height:58vh; max-width:100%; object-fit:contain; display:block;"></canvas>
+              <div id="scannerOverlay" class="scanner-overlay"><div class="scanner-line"></div></div>
+              <div class="photo-shield-overlay" id="bgShield" title="Protected photo preview" oncontextmenu="return false;" ondragstart="return false;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode 2: Interactive Split Slider Container -->
+        <div id="compareSliderWrapper" style="display:none; position:relative; max-width:100%; border-radius:14px; overflow:hidden; border:2px solid #4f46e5; box-shadow:0 6px 24px rgba(79,70,229,0.2); user-select:none; cursor:ew-resize;">
+          <!-- Bottom Canvas (AFTER) -->
+          <canvas id="sliderAfterCanvas" style="max-height:58vh; max-width:100%; object-fit:contain; display:block;"></canvas>
+          
+          <!-- Top Clipped Container (BEFORE) -->
+          <div id="sliderBeforeClip" style="position:absolute; top:0; left:0; height:100%; width:50%; overflow:hidden; border-right:2px solid #ffffff; box-shadow:2px 0 10px rgba(0,0,0,0.35);">
+            <canvas id="sliderBeforeCanvas" style="position:absolute; top:0; left:0; height:100%; max-height:58vh; max-width:none; display:block;"></canvas>
+            <span style="position:absolute; top:10px; left:10px; font-size:10px; font-weight:800; background:rgba(0,0,0,0.7); color:#ffffff; padding:2px 8px; border-radius:6px; backdrop-filter:blur(4px); pointer-events:none; z-index:5;">
+              BEFORE
+            </span>
+          </div>
+
+          <span style="position:absolute; top:10px; right:10px; font-size:10px; font-weight:800; background:rgba(16,185,129,0.85); color:#ffffff; padding:2px 8px; border-radius:6px; backdrop-filter:blur(4px); pointer-events:none; z-index:5;">
+            AFTER
+          </span>
+
+          <!-- Draggable Divider Handle -->
+          <div id="sliderHandle" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:38px; height:38px; border-radius:50%; background:#ffffff; border:2.5px solid #4f46e5; box-shadow:0 3px 12px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; color:#4f46e5; font-size:12px; font-weight:900; z-index:10; pointer-events:none;">
+            <i class="fa-solid fa-arrows-left-right"></i>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -2407,6 +2496,147 @@
 
   // 3. Background
   let isBgRemoved = false;
+  let currentCompareMode = 'side'; // 'side', 'slider', 'after'
+  let currentSliderPos = 50; // percentage
+  let isDraggingSlider = false;
+  let isHoldingOriginal = false;
+
+  function setCompareMode(mode) {
+    currentCompareMode = mode;
+    ['side', 'slider', 'after'].forEach(m => {
+      const btn = document.getElementById('btnMode' + m.charAt(0).toUpperCase() + m.slice(1));
+      if (btn) {
+        if (m === mode) btn.classList.add('active');
+        else btn.classList.remove('active');
+      }
+    });
+
+    const sideWrap = document.getElementById('compareSideWrapper');
+    const sliderWrap = document.getElementById('compareSliderWrapper');
+    const beforeCard = document.getElementById('beforeCard');
+    const afterBadge = document.getElementById('afterBadge');
+
+    if (mode === 'side') {
+      if (sideWrap) sideWrap.style.display = 'flex';
+      if (sliderWrap) sliderWrap.style.display = 'none';
+      if (beforeCard) beforeCard.style.display = 'flex';
+      if (afterBadge) afterBadge.style.display = 'inline-block';
+      drawBeforeCanvas();
+    } else if (mode === 'slider') {
+      if (sideWrap) sideWrap.style.display = 'none';
+      if (sliderWrap) sliderWrap.style.display = 'block';
+      updateSliderCompare();
+    } else if (mode === 'after') {
+      if (sideWrap) sideWrap.style.display = 'flex';
+      if (sliderWrap) sliderWrap.style.display = 'none';
+      if (beforeCard) beforeCard.style.display = 'none';
+      if (afterBadge) afterBadge.style.display = 'none';
+    }
+  }
+
+  function drawBeforeCanvas() {
+    const bc = document.getElementById('beforeCanvas');
+    if (!bc || !croppedImage || !croppedImage.width) return;
+    bc.width = croppedImage.width;
+    bc.height = croppedImage.height;
+    const ctx = bc.getContext('2d');
+    ctx.drawImage(croppedImage, 0, 0);
+    drawWatermark(ctx, bc.width, bc.height);
+  }
+
+  function updateSliderCompare() {
+    const afterC = document.getElementById('sliderAfterCanvas');
+    const beforeC = document.getElementById('sliderBeforeCanvas');
+    const bgC = document.getElementById('bgCanvas');
+    if (!afterC || !beforeC || !bgC || !croppedImage || !croppedImage.width) return;
+
+    afterC.width = bgC.width;
+    afterC.height = bgC.height;
+    const ctxA = afterC.getContext('2d');
+    ctxA.drawImage(bgC, 0, 0);
+
+    beforeC.width = bgC.width;
+    beforeC.height = bgC.height;
+    const ctxB = beforeC.getContext('2d');
+    ctxB.drawImage(croppedImage, 0, 0, bgC.width, bgC.height);
+    drawWatermark(ctxB, bgC.width, bgC.height);
+
+    syncSliderDivider(currentSliderPos);
+  }
+
+  function syncSliderDivider(pct) {
+    currentSliderPos = Math.max(5, Math.min(95, pct));
+    const clip = document.getElementById('sliderBeforeClip');
+    const handle = document.getElementById('sliderHandle');
+    const wrap = document.getElementById('compareSliderWrapper');
+    const beforeC = document.getElementById('sliderBeforeCanvas');
+    const afterC = document.getElementById('sliderAfterCanvas');
+
+    if (clip) clip.style.width = currentSliderPos + '%';
+    if (handle) handle.style.left = currentSliderPos + '%';
+    
+    if (wrap && beforeC && afterC) {
+      const displayW = afterC.clientWidth || wrap.clientWidth;
+      if (displayW > 0) {
+        beforeC.style.width = displayW + 'px';
+      }
+    }
+  }
+
+  function setupSliderDrag() {
+    const wrap = document.getElementById('compareSliderWrapper');
+    if (!wrap || wrap._sliderInit) return;
+    wrap._sliderInit = true;
+
+    function onMove(e) {
+      if (!isDraggingSlider && e.type !== 'mousemove' && e.type !== 'touchmove') return;
+      const rect = wrap.getBoundingClientRect();
+      const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+      if (clientX === undefined) return;
+      const x = clientX - rect.left;
+      const pct = (x / rect.width) * 100;
+      syncSliderDivider(pct);
+    }
+
+    wrap.addEventListener('mousedown', (e) => {
+      isDraggingSlider = true;
+      onMove(e);
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (isDraggingSlider) onMove(e);
+    });
+    window.addEventListener('mouseup', () => {
+      isDraggingSlider = false;
+    });
+
+    wrap.addEventListener('touchstart', (e) => {
+      isDraggingSlider = true;
+      onMove(e);
+    }, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      if (isDraggingSlider) onMove(e);
+    }, { passive: true });
+    window.addEventListener('touchend', () => {
+      isDraggingSlider = false;
+    });
+  }
+
+  function holdStartOriginal(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!isBgRemoved || !croppedImage || !croppedImage.width) return;
+    isHoldingOriginal = true;
+    const c = document.getElementById('bgCanvas');
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(croppedImage, 0, 0, c.width, c.height);
+    drawWatermark(ctx, c.width, c.height);
+  }
+
+  function holdEndOriginal(e) {
+    if (!isHoldingOriginal) return;
+    isHoldingOriginal = false;
+    applyBgColor();
+  }
 
   function resetBgState() {
     isBgRemoved = false;
@@ -2419,6 +2649,10 @@
     }
     const badge = document.getElementById('bgRemovedBadge');
     if (badge) badge.style.display = 'none';
+
+    const toolbar = document.getElementById('compareToolbar');
+    if (toolbar) toolbar.style.display = 'none';
+    setCompareMode('after');
   }
 
   function setBgRemovedSuccess() {
@@ -2432,6 +2666,12 @@
     }
     const badge = document.getElementById('bgRemovedBadge');
     if (badge) badge.style.display = 'flex';
+
+    // Show Before/After toolbar and set Side-by-Side as active comparison
+    const toolbar = document.getElementById('compareToolbar');
+    if (toolbar) toolbar.style.display = 'flex';
+    setCompareMode('side');
+    setupSliderDrag();
   }
 
   function handleBgStepAction() {
@@ -2444,6 +2684,7 @@
   }
 
   function initBgCanvas() {
+    drawBeforeCanvas();
     applyBgColor();
   }
 
@@ -2460,6 +2701,11 @@
     ctx.fillRect(0,0,c.width,c.height);
     ctx.drawImage(bgRemovedImage, 0, 0);
     drawWatermark(ctx, c.width, c.height);
+
+    drawBeforeCanvas();
+    if (currentCompareMode === 'slider') {
+      updateSliderCompare();
+    }
   }
 
   async function removeBgApi(forceRerun) {
