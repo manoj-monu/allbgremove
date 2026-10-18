@@ -2778,7 +2778,10 @@
       if (wInput) wInput.value = (w_mm / 25.4).toFixed(2);
       if (hInput) hInput.value = (h_mm / 25.4).toFixed(2);
     }
+    // When country size preset changes, reset scale to fit new aspect ratio & center
+    isResettingCrop = true;
     updateCropBox();
+    centerCropPhoto();
   }
 
   function updateCropBox(isManual) {
@@ -3407,14 +3410,31 @@
     applyAdjustments();
     finalImage.src = document.getElementById('adjCanvas').toDataURL('image/png');
     finalImage.onload = () => {
-      // Default to 4x6 Portrait (102x152 mm), 12 photos (4x3), Center position
       const pSize = document.getElementById('paperSize');
       if (pSize) pSize.value = '4x6P';
       const gLayout = document.getElementById('gridLayout');
-      if (gLayout) gLayout.value = '4x3';
       
-      updateMaxPhotoCount(12, false);
-      setPhotoCount(12);
+      const w_mm = getCropWidthMM();
+      const h_mm = getCropHeightMM();
+
+      // If photo is square (e.g. US 51x51mm or 50.8x50.8mm), a 3x4 grid causes huge empty vertical gaps
+      // 2x3 (6 photos) is the international standard for 2x2" on 4x6" paper
+      let defaultGrid = '4x3';
+      let defaultCount = 12;
+
+      if (w_mm >= 45 && h_mm >= 45) {
+        // Square or large photos (US Visa 51x51mm, Canada 50x70mm) -> 2x3 (6 photos) fits 4x6 paper perfectly
+        defaultGrid = '3x2';
+        defaultCount = 6;
+      } else {
+        // Standard passport (35x45mm) -> 12 photos (4x3) fits 4x6
+        defaultGrid = '4x3';
+        defaultCount = 12;
+      }
+
+      if (gLayout) gLayout.value = defaultGrid;
+      updateMaxPhotoCount(defaultCount, false);
+      setPhotoCount(defaultCount);
       setSheetPosition('center');
       goToStep(5);
     }
