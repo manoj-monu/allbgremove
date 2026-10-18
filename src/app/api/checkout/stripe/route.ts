@@ -29,7 +29,6 @@ export async function POST(request: NextRequest) {
     // Create Stripe Checkout Session
     const origin = request.headers.get('origin') || 'https://allbgremove.com';
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
       customer_email: userEmail,
       line_items: [
         {
