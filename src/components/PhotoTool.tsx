@@ -88,11 +88,11 @@ export default function PhotoTool({ initialSpec, allSpecs = [] }: PhotoToolProps
     reader.readAsDataURL(file);
   };
 
-  // In-Browser Client-Side Background Removal (Fallback canvas segmentation & brightness thresholding)
+  // Real AI Background Removal using /api/remove-bg (HF Space RMBG-1.4 model)
   const removeBackgroundInBrowser = async () => {
     if (!originalImageRef.current) return;
     setIsProcessing(true);
-    setProcessingStatus('Processing image locally in browser (Zero server transfer)...');
+    setProcessingStatus('AI removing background and detecting portrait contours...');
 
     try {
       const img = originalImageRef.current;
@@ -103,22 +103,48 @@ export default function PhotoTool({ initialSpec, allSpecs = [] }: PhotoToolProps
       if (!ctx) throw new Error('Canvas context unavailable');
 
       ctx.drawImage(img, 0, 0);
-      const imgData = ctx.getImageData(0, 0, offscreen.width, offscreen.height);
-      const data = imgData.data;
+      const blob = await new Promise<Blob | null>((resolve) => offscreen.toBlob(resolve, 'image/png'));
+      if (!blob) throw new Error('Could not convert canvas to image blob');
 
-      // Smart edge-aware color replacement for client-side privacy
-      // In production, ONNX Web / MediaPipe runs here. We emulate local pixel processing
-      // so user photos NEVER touch a server.
-      setProcessingStatus('Calibrating biometric lighting & background...');
-      await new Promise(r => setTimeout(r, 600));
+      const fd = new FormData();
+      fd.append('file', blob, 'photo.png');
 
-      processedCanvasRef.current = offscreen;
+      let res = await fetch('/api/remove-bg?enhance=false', {
+        method: 'POST',
+        body: fd,
+      });
+
+      if (!res.ok) {
+        // Fallback to direct backend if proxy fails
+        res = await fetch('https://manojkumarsh-allbgremove-api.hf.space/api/process-all?enhance=false', {
+          method: 'POST',
+          body: fd,
+          headers: {
+            'x-api-key': 'SUPER_SECRET_KEY_998877',
+          },
+        });
+      }
+
+      if (!res.ok) throw new Error('AI Background Removal service failed with status: ' + res.status);
+
+      const resBlob = await res.blob();
+      const cutUrl = URL.createObjectURL(resBlob);
+
+      const cutImg = new Image();
+      await new Promise((resolve, reject) => {
+        cutImg.onload = resolve;
+        cutImg.onerror = reject;
+        cutImg.src = cutUrl;
+      });
+
+      originalImageRef.current = cutImg;
       setBgRemoved(true);
-      renderPreview(img, true);
-      setProcessingStatus('Done! Background prepared to official specifications.');
+      renderPreview(cutImg, true);
+      setProcessingStatus('Background successfully removed! Color updated to spec.');
     } catch (err: any) {
-      console.error(err);
-      alert('Local background processing encountered an issue: ' + err.message);
+      console.error('BG removal error:', err);
+      alert('AI background removal error: ' + (err.message || 'Please try another photo.'));
+      setProcessingStatus('');
     } finally {
       setIsProcessing(false);
     }
