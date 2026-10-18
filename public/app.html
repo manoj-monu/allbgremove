@@ -1120,28 +1120,44 @@
             </div>
           </div>
           
-          <!-- Badges below showing Indian & Global Support -->
+          <!-- Badges below showing Indian & Global Support with Direct Links -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 mt-3 sm:mt-4 pb-1 text-center">
-            <div class="bg-indigo-50/60 p-1.5 sm:p-2 rounded-xl border border-indigo-100/60">
+            <a href="/india/passport-photo" class="bg-indigo-50/80 hover:bg-indigo-100 p-1.5 sm:p-2 rounded-xl border border-indigo-200 transition block group">
               <div class="text-sm sm:text-base mb-0.5">🇮🇳</div>
-              <span class="text-[10.5px] sm:text-[11px] font-bold text-gray-800 block">India Passport</span>
+              <span class="text-[10.5px] sm:text-[11px] font-bold text-gray-800 group-hover:text-indigo-600 block">India Passport</span>
               <span class="text-[9px] sm:text-[9.5px] text-gray-500">35×45mm</span>
-            </div>
-            <div class="bg-purple-50/60 p-1.5 sm:p-2 rounded-xl border border-purple-100/60">
+            </a>
+            <a href="/united-states/passport-photo" class="bg-purple-50/80 hover:bg-purple-100 p-1.5 sm:p-2 rounded-xl border border-purple-200 transition block group">
               <div class="text-sm sm:text-base mb-0.5">🇺🇸</div>
-              <span class="text-[10.5px] sm:text-[11px] font-bold text-gray-800 block">US Visa & OCI</span>
-              <span class="text-[9px] sm:text-[9.5px] text-gray-500">2×2 Inch</span>
-            </div>
-            <div class="bg-emerald-50/60 p-1.5 sm:p-2 rounded-xl border border-emerald-100/60">
+              <span class="text-[10.5px] sm:text-[11px] font-bold text-gray-800 group-hover:text-purple-600 block">US Passport/Visa</span>
+              <span class="text-[9px] sm:text-[9.5px] text-gray-500">51×51mm (2×2")</span>
+            </a>
+            <a href="/united-kingdom/passport-photo" class="bg-emerald-50/80 hover:bg-emerald-100 p-1.5 sm:p-2 rounded-xl border border-emerald-200 transition block group">
               <div class="text-sm sm:text-base mb-0.5">🇬🇧</div>
-              <span class="text-[10.5px] sm:text-[11px] font-bold text-gray-800 block">UK / Schengen</span>
-              <span class="text-[9px] sm:text-[9.5px] text-gray-500">35×45mm</span>
-            </div>
-            <div class="bg-amber-50/60 p-1.5 sm:p-2 rounded-xl border border-amber-100/60">
-              <div class="text-sm sm:text-base mb-0.5">🖨️</div>
-              <span class="text-[10.5px] sm:text-[11px] font-bold text-gray-800 block">Print Ready</span>
-              <span class="text-[9px] sm:text-[9.5px] text-gray-500">4×6 / A4</span>
-            </div>
+              <span class="text-[10.5px] sm:text-[11px] font-bold text-gray-800 group-hover:text-emerald-600 block">UK Passport</span>
+              <span class="text-[9px] sm:text-[9.5px] text-gray-500">35×45mm Grey</span>
+            </a>
+            <a href="/canada/passport-photo" class="bg-amber-50/80 hover:bg-amber-100 p-1.5 sm:p-2 rounded-xl border border-amber-200 transition block group">
+              <div class="text-sm sm:text-base mb-0.5">🇨🇦</div>
+              <span class="text-[10.5px] sm:text-[11px] font-bold text-gray-800 group-hover:text-amber-600 block">Canada Passport</span>
+              <span class="text-[9px] sm:text-[9.5px] text-gray-500">50×70mm</span>
+            </a>
+          </div>
+
+          <!-- Quick Country Links Ribbon -->
+          <div class="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-center gap-2 flex-wrap text-[11px]">
+            <span class="text-gray-400 font-semibold">More:</span>
+            <a href="/australia/passport-photo" class="text-indigo-600 hover:underline font-medium">🇦🇺 Australia</a>
+            <span class="text-gray-300">•</span>
+            <a href="/germany/passport-photo" class="text-indigo-600 hover:underline font-medium">🇩🇪 Schengen/Germany</a>
+            <span class="text-gray-300">•</span>
+            <a href="/uae/visa-photo" class="text-indigo-600 hover:underline font-medium">🇦🇪 UAE</a>
+            <span class="text-gray-300">•</span>
+            <a href="/france/passport-photo" class="text-indigo-600 hover:underline font-medium">🇫🇷 France</a>
+            <span class="text-gray-300">•</span>
+            <a href="/japan/passport-photo" class="text-indigo-600 hover:underline font-medium">🇯🇵 Japan</a>
+            <span class="text-gray-300">•</span>
+            <a href="/singapore/passport-photo" class="text-indigo-600 hover:underline font-medium">🇸🇬 Singapore</a>
           </div>
         </div>
         
@@ -1772,12 +1788,30 @@
               <span style="background:var(--primary); color:white; font-size:10px; font-weight:800; padding:3px 8px; border-radius:8px;">SIZE SELECT</span>
             </label>
             <select id="cropSize" onchange="onCropSizePresetChange()" style="background:#ffffff; border:1.5px solid #4f46e5; border-radius:10px; padding:11px 14px; font-size:15px; font-weight:700; color:#1e1b4b; width:100%; box-shadow:0 1px 4px rgba(79,70,229,0.12); cursor:pointer; outline:none;">
-              <option value="35x45" selected>India Passport (35×45 mm • 3.5×4.5 cm) • Official</option>
-              <option value="35x45">India Standard / UK (35×45 mm • 3.5×4.5 cm)</option>
-              <option value="51x51">US Visa / OCI / Square (51×51 mm • 2×2 inch)</option>
-              <option value="30x40">UAE Passport / Stamp Size (30×40 mm • 3×4 cm)</option>
-              <option value="50.8x50.8">2×2 Inch Photo (50.8×50.8 mm • 2×2 in)</option>
-              <option value="custom">Custom Size (Custom mm / cm / inch)</option>
+              <optgroup label="Popular Countries">
+                <option value="35x45" selected>🇮🇳 India Passport (35×45 mm • 3.5×4.5 cm)</option>
+                <option value="51x51">🇺🇸 US Passport / Visa DS-160 (51×51 mm • 2×2 inch)</option>
+                <option value="35x45">🇬🇧 United Kingdom Passport (35×45 mm • Light Grey)</option>
+                <option value="50x70">🇨🇦 Canada Passport (50×70 mm • White)</option>
+                <option value="35x45">🇦🇺 Australia Passport (35×45 mm • No Glasses)</option>
+                <option value="35x45">🇩🇪 Germany & Schengen (35×45 mm • Biometric)</option>
+                <option value="35x45">🇫🇷 France Passport (35×45 mm • Light Grey)</option>
+              </optgroup>
+              <optgroup label="Global & Gulf Countries">
+                <option value="43x55">🇦🇪 UAE Visa & Emirates ID (43×55 mm)</option>
+                <option value="40x60">🇸🇦 Saudi Arabia Visa / Umrah (40×60 mm)</option>
+                <option value="35x45">🇸🇬 Singapore Passport (35×45 mm)</option>
+                <option value="33x48">🇨🇳 China Visa (33×48 mm)</option>
+                <option value="35x45">🇯🇵 Japan Passport (35×45 mm)</option>
+                <option value="35x45">🇮🇪 Ireland Passport (35×45 mm)</option>
+                <option value="35x45">🇳🇿 New Zealand Passport (35×45 mm)</option>
+                <option value="50x70">🇧🇷 Brazil Passport (50×70 mm)</option>
+                <option value="30x40">🇦🇪 Stamp Size / Gulf ID (30×40 mm)</option>
+              </optgroup>
+              <optgroup label="Custom & Dimensions">
+                <option value="50.8x50.8">2×2 Inch Standard (50.8×50.8 mm)</option>
+                <option value="custom">Custom Size (Custom mm / cm / inch)</option>
+              </optgroup>
             </select>
           </div>
 
