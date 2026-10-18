@@ -3000,8 +3000,11 @@
     ctx.fillRect(0,0,w,h);
     ctx.drawImage(originalImage, imgX * ratio, imgY * ratio, originalImage.width * imgScale * ratio, originalImage.height * imgScale * ratio);
     
-    croppedImage.src = c.toDataURL('image/png');
-    await new Promise(r => { croppedImage.onload = r; });
+    await new Promise(r => {
+      croppedImage.onload = () => r();
+      croppedImage.onerror = () => r();
+      croppedImage.src = c.toDataURL('image/png');
+    });
 
     // Helper to render cutout into bgRemovedImage with the exact same crop transform
     function applyCutoutToBg(cutoutSource) {
@@ -3018,13 +3021,13 @@
         originalImage.height * imgScale * ratio
       );
       
-      bgRemovedImage.src = cutoutCanvas.toDataURL('image/png');
       bgRemovedImage.onload = () => {
         resetBgState();
         initBgCanvas();
         setBgRemovedSuccess();
         goToStep(3);
       };
+      bgRemovedImage.src = cutoutCanvas.toDataURL('image/png');
     }
 
     if (speculativeBgState.status === 'ready' && speculativeBgState.cutoutImg) {
@@ -3035,7 +3038,6 @@
 
     if (speculativeBgState.status === 'processing' && speculativeBgState.promise) {
       // In flight: proceed to Step 3 and show scanner overlay until the speculative task finishes
-      bgRemovedImage.src = croppedImage.src;
       bgRemovedImage.onload = () => {
         resetBgState();
         initBgCanvas();
@@ -3072,16 +3074,17 @@
           if (pText) pText.style.display = 'none';
         });
       };
+      bgRemovedImage.src = croppedImage.src;
       return;
     }
 
     // Default fallback (e.g. if prefetch errored)
-    bgRemovedImage.src = croppedImage.src;
     bgRemovedImage.onload = () => {
       resetBgState();
       initBgCanvas();
       goToStep(3);
     };
+    bgRemovedImage.src = croppedImage.src;
   }
 
   // 3. Background
