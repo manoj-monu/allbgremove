@@ -638,7 +638,7 @@ export default function PhotoTool({ initialSpec, allSpecs = [] }: PhotoToolProps
                 className="w-full py-2.5 rounded-xl font-medium text-xs bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-sm"
               >
                 {isProcessing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-                {bgRemoved ? 'Re-calibrate Background' : 'Auto-Remove Background (In-Browser)'}
+                {bgRemoved ? 'Re-run BiRefNet AI Removal' : 'Auto-Remove Background (BiRefNet Lite AI)'}
               </button>
             </div>
           )}
