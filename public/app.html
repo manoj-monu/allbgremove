@@ -939,15 +939,54 @@
           <span class="font-extrabold text-xl tracking-tight text-gray-900">allbgremove<span class="gradient-text">.com</span></span>
         </a>
 
-        <!-- Center Nav Links (Desktop) -->
-        <div class="hidden md:flex items-center gap-1 xl:gap-2">
-          <a href="#" class="px-3.5 py-1.5 rounded-full text-[13px] xl:text-sm font-bold bg-indigo-50 text-indigo-600 shadow-xs whitespace-nowrap transition">Home</a>
-          <a href="pricing.html" class="px-3.5 py-1.5 rounded-full text-[13px] xl:text-sm font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100/70 whitespace-nowrap transition">Pricing</a>
-          <a href="requirements.html" class="px-3.5 py-1.5 rounded-full text-[13px] xl:text-sm font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100/70 whitespace-nowrap transition">Photo Guide</a>
-          <a href="#tools" class="px-3.5 py-1.5 rounded-full text-[13px] xl:text-sm font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100/70 whitespace-nowrap transition">Tools</a>
-          <a href="blog.html" class="px-3.5 py-1.5 rounded-full text-[13px] xl:text-sm font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100/70 whitespace-nowrap transition">Blog</a>
-          <a href="about.html" class="px-3.5 py-1.5 rounded-full text-[13px] xl:text-sm font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100/70 whitespace-nowrap transition">About</a>
-          <a href="contact.html" class="px-3.5 py-1.5 rounded-full text-[13px] xl:text-sm font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100/70 whitespace-nowrap transition">Contact</a>
+        <!-- Center Nav Links (Desktop & Tablet) -->
+        <div style="display:flex; align-items:center; gap:8px;" class="nav-links-wrapper">
+          <a href="/" style="padding:6px 14px; border-radius:9999px; font-size:13px; font-weight:700; background:#eef2ff; color:#4f46e5; text-decoration:none; white-space:nowrap;">Home</a>
+          
+          <!-- Countries Dropdown -->
+          <div class="relative group" style="position:relative; display:inline-block;">
+            <button type="button" style="padding:6px 14px; border-radius:9999px; font-size:13px; font-weight:700; background:transparent; color:#374151; border:none; cursor:pointer; display:flex; align-items:center; gap:5px; white-space:nowrap;">
+              <span>🌍 Countries</span>
+              <i class="fa-solid fa-chevron-down" style="font-size:10px; color:#9ca3af;"></i>
+            </button>
+            <div class="absolute left-0 top-full pt-1.5 w-60 hidden group-hover:block hover:block z-50" style="position:absolute; left:0; top:100%; padding-top:6px; width:250px; z-index:9999;">
+              <div style="background:#ffffff; border-radius:16px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); border:1px solid #e5e7eb; padding:8px 0;">
+                <div style="padding:4px 16px; font-size:10px; font-weight:800; color:#9ca3af; text-transform:uppercase; letter-spacing:0.5px;">Popular Countries</div>
+                <a href="/india/passport-photo" style="display:flex; align-items:center; gap:8px; padding:7px 16px; font-size:12px; font-weight:700; color:#1f2937; text-decoration:none;" onmouseover="this.style.background='#eef2ff'" onmouseout="this.style.background='transparent'">
+                  <span>🇮🇳 India Passport (35x45mm)</span>
+                </a>
+                <a href="/united-states/passport-photo" style="display:flex; align-items:center; gap:8px; padding:7px 16px; font-size:12px; font-weight:700; color:#1f2937; text-decoration:none;" onmouseover="this.style.background='#eef2ff'" onmouseout="this.style.background='transparent'">
+                  <span>🇺🇸 US Passport / Visa (2x2")</span>
+                </a>
+                <a href="/united-kingdom/passport-photo" style="display:flex; align-items:center; gap:8px; padding:7px 16px; font-size:12px; font-weight:700; color:#1f2937; text-decoration:none;" onmouseover="this.style.background='#eef2ff'" onmouseout="this.style.background='transparent'">
+                  <span>🇬🇧 UK Passport (35x45mm)</span>
+                </a>
+                <a href="/canada/passport-photo" style="display:flex; align-items:center; gap:8px; padding:7px 16px; font-size:12px; font-weight:700; color:#1f2937; text-decoration:none;" onmouseover="this.style.background='#eef2ff'" onmouseout="this.style.background='transparent'">
+                  <span>🇨🇦 Canada Passport (50x70mm)</span>
+                </a>
+                <a href="/australia/passport-photo" style="display:flex; align-items:center; gap:8px; padding:7px 16px; font-size:12px; font-weight:700; color:#1f2937; text-decoration:none;" onmouseover="this.style.background='#eef2ff'" onmouseout="this.style.background='transparent'">
+                  <span>🇦🇺 Australia (35x45mm)</span>
+                </a>
+                <a href="/germany/passport-photo" style="display:flex; align-items:center; gap:8px; padding:7px 16px; font-size:12px; font-weight:700; color:#1f2937; text-decoration:none;" onmouseover="this.style.background='#eef2ff'" onmouseout="this.style.background='transparent'">
+                  <span>🇩🇪 Schengen / Germany (35x45mm)</span>
+                </a>
+                <a href="/uae/visa-photo" style="display:flex; align-items:center; gap:8px; padding:7px 16px; font-size:12px; font-weight:700; color:#1f2937; text-decoration:none;" onmouseover="this.style.background='#eef2ff'" onmouseout="this.style.background='transparent'">
+                  <span>🇦🇪 UAE Visa & ID (43x55mm)</span>
+                </a>
+                <div style="border-top:1px solid #f3f4f6; margin:6px 0;"></div>
+                <a href="requirements.html" style="display:flex; align-items:center; justify-content:space-between; padding:6px 16px; font-size:11px; font-weight:800; color:#4f46e5; text-decoration:none;">
+                  <span>View All 16+ Country Specs</span>
+                  <i class="fa-solid fa-arrow-right" style="font-size:10px;"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <a href="pricing.html" style="padding:6px 14px; border-radius:9999px; font-size:13px; font-weight:600; color:#4b5563; text-decoration:none; white-space:nowrap;">Pricing</a>
+          <a href="requirements.html" style="padding:6px 14px; border-radius:9999px; font-size:13px; font-weight:600; color:#4b5563; text-decoration:none; white-space:nowrap;">Photo Guide</a>
+          <a href="blog.html" style="padding:6px 14px; border-radius:9999px; font-size:13px; font-weight:600; color:#4b5563; text-decoration:none; white-space:nowrap;">Blog</a>
+          <a href="about.html" style="padding:6px 14px; border-radius:9999px; font-size:13px; font-weight:600; color:#4b5563; text-decoration:none; white-space:nowrap;">About</a>
+          <a href="contact.html" style="padding:6px 14px; border-radius:9999px; font-size:13px; font-weight:600; color:#4b5563; text-decoration:none; white-space:nowrap;">Contact</a>
         </div>
 
         <!-- Right Side Actions -->
