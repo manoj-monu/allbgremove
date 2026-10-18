@@ -1879,10 +1879,19 @@
           </div>
         </div>
 
+        <!-- AI Speculative Preload Status Badge -->
+        <div id="aiPreloadBadge" style="display:none; align-items:center; justify-content:space-between; gap:10px; background:linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08)); border:1.5px solid rgba(99,102,241,0.25); border-radius:12px; padding:10px 14px; margin-top:16px; font-size:13px; font-weight:700; color:#4f46e5; transition:all 0.3s ease;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span id="aiPreloadIcon"><i class="fa-solid fa-bolt fa-fade" style="color:#6366f1;"></i></span>
+            <span id="aiPreloadText">⚡ AI Background Removal & HD Face Enhancing in background...</span>
+          </div>
+          <span id="aiPreloadStatus" style="font-size:11px; text-transform:uppercase; letter-spacing:0.5px; background:rgba(99,102,241,0.15); padding:2px 8px; border-radius:6px; white-space:nowrap;">Processing</span>
+        </div>
+
         <!-- Navigation Footer -->
         <div class="nav-footer" style="margin-top:16px; padding-top:16px;">
           <button class="btn btn-outline" style="padding:10px 22px; font-size:14px; font-weight:700;" onclick="goToStep(1)">Back</button>
-          <button class="btn btn-primary" style="padding:10px 26px; font-size:15px; font-weight:800;" onclick="applyCropAndNext()">Crop & Next ➔</button>
+          <button id="cropNextBtn" class="btn btn-primary" style="padding:10px 26px; font-size:15px; font-weight:800;" onclick="applyCropAndNext()">Crop & Next ➔</button>
         </div>
       </div>
     </div>
@@ -2361,35 +2370,196 @@
     }, 30);
   }
 
-  // 1. Upload
-  function loadExample(url) {
+  // ==========================================
+  // SPECULATIVE AI PRE-FETCHING PIPELINE
+  // Starts background removal & enhancement immediately upon upload
+  // ==========================================
+  let speculativeBgState = {
+    sessionId: 0,
+    status: 'idle', // 'idle' | 'processing' | 'ready' | 'error'
+    cutoutImg: null, // Transparent PNG HTMLImageElement of full photo
+    promise: null,
+    error: null
+  };
+
+  function resetSpeculativeBg() {
+    speculativeBgState.sessionId++;
+    speculativeBgState.status = 'idle';
+    speculativeBgState.cutoutImg = null;
+    speculativeBgState.promise = null;
+    speculativeBgState.error = null;
+    
+    const badge = document.getElementById('aiPreloadBadge');
+    if (badge) badge.style.display = 'none';
+    const cropBtn = document.getElementById('cropNextBtn');
+    if (cropBtn) cropBtn.innerHTML = 'Crop & Next ➔';
+  }
+
+  async function startSpeculativeBgRemoval(sourceImg) {
+    const currentSession = ++speculativeBgState.sessionId;
+    speculativeBgState.status = 'processing';
+    
+    const badge = document.getElementById('aiPreloadBadge');
+    const badgeText = document.getElementById('aiPreloadText');
+    const badgeStatus = document.getElementById('aiPreloadStatus');
+    const cropBtn = document.getElementById('cropNextBtn');
+
+    if (badge && badgeText) {
+      badge.style.display = 'inline-flex';
+      badge.style.borderColor = 'rgba(99,102,241,0.25)';
+      badge.style.background = 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08))';
+      badge.style.color = '#4f46e5';
+      badgeText.innerHTML = '<i class="fa-solid fa-bolt fa-fade mr-1" style="color:#6366f1;"></i> ⚡ AI Background Removal & HD Face Enhancing in background...';
+      if (badgeStatus) {
+        badgeStatus.textContent = 'Processing';
+        badgeStatus.style.background = 'rgba(99,102,241,0.15)';
+        badgeStatus.style.color = '#4338ca';
+      }
+    }
+
+    speculativeBgState.promise = (async () => {
+      try {
+        const maxDim = 1600;
+        let w = sourceImg.naturalWidth || sourceImg.width;
+        let h = sourceImg.naturalHeight || sourceImg.height;
+        if (!w || !h) throw new Error("Invalid image dimensions");
+        
+        const scale = Math.min(1, maxDim / Math.max(w, h));
+        const targetW = Math.round(w * scale);
+        const targetH = Math.round(targetW * (h / w));
+        
+        const c = document.createElement('canvas');
+        c.width = targetW;
+        c.height = targetH;
+        const ctx = c.getContext('2d');
+        ctx.drawImage(sourceImg, 0, 0, targetW, targetH);
+        
+        const blob = await new Promise((res, rej) => {
+          c.toBlob(b => b ? res(b) : rej(new Error("Canvas blob error")), 'image/jpeg', 0.95);
+        });
+        
+        const fd = new FormData();
+        fd.append('file', blob, 'photo.jpg');
+        
+        const isEnhance = document.getElementById('doEnhance') ? document.getElementById('doEnhance').checked : true;
+        
+        let res;
+        try {
+          res = await fetch('/api/remove-bg?enhance=' + isEnhance, {
+            method: 'POST',
+            body: fd,
+            mode: 'cors',
+            headers: { 'Accept': 'image/png, */*', 'x-api-key': 'SUPER_SECRET_KEY_998877' }
+          });
+          if (!res.ok) throw new Error("API status: " + res.status);
+        } catch (err) {
+          console.warn("Proxy failed, falling back to direct Hugging Face Space:", err);
+          res = await fetch('https://manojkumarsh-allbgremove-api.hf.space/api/process-all?enhance=' + isEnhance, {
+            method: 'POST',
+            body: fd,
+            mode: 'cors',
+            headers: { 'Accept': 'image/png, */*', 'x-api-key': 'SUPER_SECRET_KEY_998877' }
+          });
+        }
+        
+        if (!res.ok) throw new Error("AI Backend returned " + res.status);
+        
+        const resBlob = await res.blob();
+        const cutoutUrl = URL.createObjectURL(resBlob);
+        
+        const img = new Image();
+        await new Promise((res, rej) => {
+          img.onload = () => res(img);
+          img.onerror = rej;
+          img.src = cutoutUrl;
+        });
+        
+        if (speculativeBgState.sessionId !== currentSession) {
+          return null; // Stale session, photo changed
+        }
+        
+        speculativeBgState.status = 'ready';
+        speculativeBgState.cutoutImg = img;
+        
+        if (badge && badgeText) {
+          badge.style.display = 'inline-flex';
+          badge.style.borderColor = 'rgba(16,185,129,0.35)';
+          badge.style.background = 'rgba(16,185,129,0.08)';
+          badge.style.color = '#059669';
+          badgeText.innerHTML = '<i class="fa-solid fa-circle-check text-success mr-1"></i> <strong>AI Ready!</strong> Background removed & face enhanced in background (0s wait).';
+          if (badgeStatus) {
+            badgeStatus.textContent = 'Instant Ready';
+            badgeStatus.style.background = 'rgba(16,185,129,0.18)';
+            badgeStatus.style.color = '#047857';
+          }
+        }
+        
+        if (cropBtn) {
+          cropBtn.innerHTML = 'Crop & Next ➔ <span style="font-size:12px; opacity:0.9; margin-left:4px;">✨ Instant</span>';
+        }
+        
+        return img;
+      } catch (err) {
+        console.warn("Speculative prefetch failed or timed out:", err);
+        if (speculativeBgState.sessionId === currentSession) {
+          speculativeBgState.status = 'error';
+          speculativeBgState.error = err;
+          if (badge) badge.style.display = 'none';
+        }
+        return null;
+      }
+    })();
+  }
+
+  // 1. Upload & Photo Loading
+  function handleUploadedFile(file) {
+    if (!file) return;
     document.getElementById('landing-page-container').style.display = 'none';
     document.getElementById('app-container').style.display = 'block';
     window.scrollTo(0,0);
-    originalImage.crossOrigin = "Anonymous";
-    originalImage.src = url;
-    originalImage.onload = () => {
-      setupCrop();
-      goToStep(2);
-    };
-  }
-
-  function handleUpload(e) {
-      document.getElementById('landing-page-container').style.display = 'none';
-      document.getElementById('app-container').style.display = 'block';
-      window.scrollTo(0,0);
-    const file = e.target.files[0];
-    if(!file) return;
+    resetSpeculativeBg();
     const reader = new FileReader();
     reader.onload = function(event) {
       originalImage.src = event.target.result;
       originalImage.onload = () => {
         setupCrop();
         goToStep(2);
-      }
+        startSpeculativeBgRemoval(originalImage);
+      };
     };
     reader.readAsDataURL(file);
   }
+
+  function loadExample(url) {
+    document.getElementById('landing-page-container').style.display = 'none';
+    document.getElementById('app-container').style.display = 'block';
+    window.scrollTo(0,0);
+    resetSpeculativeBg();
+    originalImage.crossOrigin = "Anonymous";
+    originalImage.src = url;
+    originalImage.onload = () => {
+      setupCrop();
+      goToStep(2);
+      startSpeculativeBgRemoval(originalImage);
+    };
+  }
+
+  function handleUpload(e) {
+    const file = e.target.files && e.target.files[0];
+    if (file) handleUploadedFile(file);
+  }
+
+  // Global drag-and-drop listener for seamless photo uploads
+  window.addEventListener('dragover', (e) => e.preventDefault());
+  window.addEventListener('drop', (e) => {
+    e.preventDefault();
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      if (file.type && file.type.startsWith('image/')) {
+        handleUploadedFile(file);
+      }
+    }
+  });
 
   // 2. Crop logic (Simplified for UI visualization)
   let drag = false, startX, startY, imgX=0, imgY=0, imgScale=1;
@@ -2827,7 +2997,7 @@
     updateZoomUI();
   }
 
-  function applyCropAndNext() {
+  async function applyCropAndNext() {
     // Render crop to a real canvas using precise mm dimensions
     const w_mm = getCropWidthMM();
     const h_mm = getCropHeightMM();
@@ -2847,14 +3017,87 @@
     ctx.drawImage(originalImage, imgX * ratio, imgY * ratio, originalImage.width * imgScale * ratio, originalImage.height * imgScale * ratio);
     
     croppedImage.src = c.toDataURL('image/png');
-    croppedImage.onload = () => {
-      bgRemovedImage.src = croppedImage.src; // Init bg removed as same
+    await new Promise(r => { croppedImage.onload = r; });
+
+    // Helper to render cutout into bgRemovedImage with the exact same crop transform
+    function applyCutoutToBg(cutoutSource) {
+      const cutoutCanvas = document.createElement('canvas');
+      cutoutCanvas.width = w;
+      cutoutCanvas.height = h;
+      const cCtx = cutoutCanvas.getContext('2d');
+      // Draw transparent cutout using identical coordinates
+      cCtx.drawImage(
+        cutoutSource,
+        imgX * ratio,
+        imgY * ratio,
+        originalImage.width * imgScale * ratio,
+        originalImage.height * imgScale * ratio
+      );
+      
+      bgRemovedImage.src = cutoutCanvas.toDataURL('image/png');
+      bgRemovedImage.onload = () => {
+        resetBgState();
+        initBgCanvas();
+        setBgRemovedSuccess();
+        goToStep(3);
+      };
+    }
+
+    if (speculativeBgState.status === 'ready' && speculativeBgState.cutoutImg) {
+      // PREFETCH IS ALREADY READY! 0 SECONDS WAIT!
+      applyCutoutToBg(speculativeBgState.cutoutImg);
+      return;
+    }
+
+    if (speculativeBgState.status === 'processing' && speculativeBgState.promise) {
+      // In flight: proceed to Step 3 and show scanner overlay until the speculative task finishes
+      bgRemovedImage.src = croppedImage.src;
       bgRemovedImage.onload = () => {
         resetBgState();
         initBgCanvas();
         goToStep(3);
-      }
+
+        const overlay = document.getElementById('scannerOverlay');
+        const pCont = document.getElementById('progressContainer');
+        const pText = document.getElementById('progressText');
+        const pb = document.getElementById('progressBar');
+        if (overlay) overlay.style.display = 'block';
+        if (pCont) pCont.style.display = 'block';
+        if (pText) pText.style.display = 'block';
+        if (pb) pb.style.width = '75%';
+        if (pText) pText.textContent = '⚡ Finishing AI Background Removal & HD Face Enhancing...';
+
+        speculativeBgState.promise.then(cutoutImg => {
+          if (cutoutImg) {
+            if (pb) pb.style.width = '100%';
+            if (pText) pText.textContent = '100% Complete!';
+            setTimeout(() => {
+              if (overlay) overlay.style.display = 'none';
+              if (pCont) pCont.style.display = 'none';
+              if (pText) pText.style.display = 'none';
+              applyCutoutToBg(cutoutImg);
+            }, 300);
+          } else {
+            if (overlay) overlay.style.display = 'none';
+            if (pCont) pCont.style.display = 'none';
+            if (pText) pText.style.display = 'none';
+          }
+        }).catch(() => {
+          if (overlay) overlay.style.display = 'none';
+          if (pCont) pCont.style.display = 'none';
+          if (pText) pText.style.display = 'none';
+        });
+      };
+      return;
     }
+
+    // Default fallback (e.g. if prefetch errored)
+    bgRemovedImage.src = croppedImage.src;
+    bgRemovedImage.onload = () => {
+      resetBgState();
+      initBgCanvas();
+      goToStep(3);
+    };
   }
 
   // 3. Background
