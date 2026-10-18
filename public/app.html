@@ -3717,18 +3717,32 @@
       const maxGrid = Math.max(parts[0], parts[1]);
       const minGrid = Math.min(parts[0], parts[1]);
       
-      if (availableW >= availableH) {
-         cols = maxGrid;
-         rows = minGrid;
+      const aspect = (finalImage && finalImage.width) ? (finalImage.width / finalImage.height) : (getCropWidthMM() / getCropHeightMM());
+
+      // If photo is wider than it is tall, or square/large, arrange cols and rows intelligently
+      if (aspect >= 0.9) {
+        // Square or wider (e.g. US 51x51mm, 2x2 inch)
+        if (availableW >= availableH) {
+          cols = maxGrid;
+          rows = minGrid;
+        } else {
+          // On portrait 4x6 sheet, 2 columns x 3 rows fits 6 photos of 2x2"
+          cols = minGrid;
+          rows = maxGrid;
+        }
       } else {
-         cols = minGrid;
-         rows = maxGrid;
+        if (availableW >= availableH) {
+          cols = maxGrid;
+          rows = minGrid;
+        } else {
+          cols = minGrid;
+          rows = maxGrid;
+        }
       }
       
       const cellW = (availableW - ((cols - 1) * photoMargin)) / cols;
       const cellH = (availableH - ((rows - 1) * photoMargin)) / rows;
       
-      const aspect = (finalImage && finalImage.width) ? (finalImage.width / finalImage.height) : (getCropWidthMM() / getCropHeightMM());
       let drawW = cellW;
       let drawH = drawW / aspect;
       if (drawH > cellH) {
