@@ -6,8 +6,45 @@ import Script from 'next/script'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Passport Photo Maker - Professional & Compliant',
-  description: 'Create perfect, compliant passport photos in seconds with AI background removal.',
+  title: 'Passport Size Photo Maker Online Free - AI Background Remover | allbgremove.com',
+  description: 'Create official biometric passport size photos online in 5 seconds. Free AI background removal, white & blue background changer, face enhancer, and print-ready 4x6, 12x6 (40 photos) & A4 sheets for Indian Passport, Visa, PAN Card & Govt Jobs.',
+  keywords: [
+    'passport size photo maker',
+    'create passport photo online free',
+    'indian passport photo size',
+    'all bg remove',
+    'remove background from photo',
+    'change photo background to white',
+    'change photo background to blue',
+    '35x45 mm photo maker',
+    'pan card photo size maker online',
+    'visa photo maker online',
+    'passport photo 4x6 sheet',
+    'passport photo 12x6 40 photos',
+    'passport photo a4 30 photos',
+    'sarkari job admit card photo',
+  ],
+  authors: [{ name: 'allbgremove.com' }],
+  metadataBase: new URL('https://allbgremove.com'),
+  alternates: {
+    canonical: 'https://allbgremove.com/',
+  },
+  openGraph: {
+    title: 'Passport Size Photo Maker Online Free - AI Background Remover | allbgremove.com',
+    description: 'Create official passport size photos online in 5 seconds with AI background removal and print sheets.',
+    url: 'https://allbgremove.com/',
+    siteName: 'allbgremove.com',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Passport Size Photo Maker Online Free - AI Background Remover | allbgremove.com',
+    description: 'Create official passport size photos online with AI background removal and print sheets.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 }
 
 export default function RootLayout({
