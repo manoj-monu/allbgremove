@@ -2147,7 +2147,9 @@
           <div class="form-group" style="margin-bottom:14px;">
             <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:6px;"><i class="fa-solid fa-table-cells text-primary mr-1"></i> Auto-Fit Grid (Scale to fit)</label>
             <select id="gridLayout" onchange="onGridLayoutChange()" style="font-weight:700;">
-              <option value="4x3" selected>Fit 12 Photos (3x4 Portrait / 4x3 • 12 Photos Default)</option>
+              <option value="actual">🎯 Actual Exact Size (Crop Step Ke Exact MM Me Print Hoga)</option>
+              <option value="4x3" selected>Fit 12 Photos (3x4 Portrait / 4x3 • 12 Photos Studio Fit)</option>
+              <option value="3x2">Fit 6 Photos (3x2 / 2x3 • 6 Photos)</option>
               <option value="5x3">Fit 15 Photos (5x3 • 5 Cols x 3 Rows - 4x6 Landscape Fit)</option>
               <option value="6x3">Fit 18 Photos (6x3 • 6 Cols x 3 Rows - Popular 4x6 Landscape)</option>
               <option value="4x4">Fit 16 Photos (4x4 • 4 Cols x 4 Rows)</option>
@@ -2160,10 +2162,8 @@
               <option value="10x4">Fit 40 Photos (10x4 • 10 Cols x 4 Rows - 12x6 Studio Special)</option>
               <option value="8x5">Fit 40 Photos (8x5 • 8 Cols x 5 Rows)</option>
               <option value="4x2">Fit 8 Photos (4x2 / 2x4)</option>
-              <option value="3x2">Fit 6 Photos (3x2 / 2x3)</option>
               <option value="2x2">Fit 4 Photos (2x2)</option>
               <option value="3x3">Fit 9 Photos (3x3)</option>
-              <option value="actual">Actual Size (From Crop Step)</option>
             </select>
           </div>
 
@@ -3417,22 +3417,30 @@
       const w_mm = getCropWidthMM();
       const h_mm = getCropHeightMM();
 
-      // If photo is square (e.g. US 51x51mm or 50.8x50.8mm), a 3x4 grid causes huge empty vertical gaps
-      // 2x3 (6 photos) is the international standard for 2x2" on 4x6" paper
-      let defaultGrid = '4x3';
-      let defaultCount = 12;
+      // Check if user selected Indian standard 35x45 or another country/custom size
+      const isIndianStandard = (Math.round(w_mm) === 35 && Math.round(h_mm) === 45);
 
-      if (w_mm >= 45 && h_mm >= 45) {
-        // Square or large photos (US Visa 51x51mm, Canada 50x70mm) -> 2x3 (6 photos) fits 4x6 paper perfectly
-        defaultGrid = '3x2';
-        defaultCount = 6;
-      } else {
-        // Standard passport (35x45mm) -> 12 photos (4x3) fits 4x6
+      let defaultGrid = 'actual';
+      let defaultCount = 6;
+
+      if (isIndianStandard) {
+        // India Passport (35x45mm) defaults to studio 12 photos fit
         defaultGrid = '4x3';
         defaultCount = 12;
+      } else {
+        // All other countries (US 51x51mm, Canada 50x70mm, Saudi 40x60mm, UAE 43x55mm, China 33x48mm)
+        // MUST print at the EXACT physical millimeter dimensions user selected!
+        defaultGrid = 'actual';
       }
 
       if (gLayout) gLayout.value = defaultGrid;
+
+      if (defaultGrid === 'actual') {
+        const m = getSheetMetrics();
+        const maxFit = m ? (m.cols * m.rows) : 6;
+        defaultCount = maxFit;
+      }
+
       updateMaxPhotoCount(defaultCount, false);
       setPhotoCount(defaultCount);
       setSheetPosition('center');
