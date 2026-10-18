@@ -45,6 +45,15 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: [
+      { url: '/favicon.png?v=2', type: 'image/png' },
+      { url: '/favicon.ico?v=2' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png?v=2' },
+    ],
+  },
 }
 
 export default function RootLayout({
