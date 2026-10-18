@@ -1078,14 +1078,14 @@
       
       <!-- Left Content -->
       <div>
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-primary text-xs sm:text-sm font-semibold mb-4 sm:mb-6 border border-indigo-100">
-          <i class="fa-solid fa-wand-magic-sparkles"></i> AI Powered • Fast • Secure
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs sm:text-sm font-bold mb-4 sm:mb-6 border border-emerald-200 shadow-sm">
+          <i class="fa-solid fa-wand-magic-sparkles text-emerald-600"></i> ✨ 100% Free • No Watermark • No Sign In Required
         </div>
         <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-4 sm:mb-6">
-          Create <span class="text-primary">Perfect</span><br>Passport Photos in Seconds
+          Free Online <span class="text-primary">Passport Photo</span><br>Maker in Seconds
         </h1>
         <p class="text-gray-600 text-sm sm:text-lg mb-6 sm:mb-8">
-          Upload your photo, let our AI do the magic! Get high-quality, passport size photos for passports, visas, ID cards and more. Simple, fast and professional.
+          Instant AI background removal & 300 DPI high-resolution download. 100% Free for single photos and printable 4×6 photo sheets with official biometric specifications.
         </p>
         
         <!-- Small Features -->
@@ -2106,9 +2106,7 @@
       <div class="canvas-container" style="position:relative; display:inline-flex; align-items:center; justify-content:center; max-height:65vh;">
         <canvas id="adjCanvas"></canvas>
         <div class="photo-shield-overlay" id="adjShield" title="Protected photo preview" oncontextmenu="return false;" ondragstart="return false;"></div>
-        <div id="watermarkWarningBadge" class="hidden" style="position:absolute; bottom:14px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); color:white; padding:7px 18px; border-radius:30px; font-size:12px; font-weight:700; backdrop-filter:blur(8px); box-shadow:0 8px 25px rgba(0,0,0,0.4); pointer-events:auto; cursor:pointer; border:1px solid rgba(255,255,255,0.2); z-index:25; white-space:nowrap; transition:all 0.2s;" onclick="openAuthModal('login', 'Watermark hatane ke liye Login karein')">
-          <i class="fa-solid fa-lock text-amber-400 mr-2"></i> Watermarked Preview • Click to Sign In & Unlock Clean HD
-        </div>
+        <div id="watermarkWarningBadge" style="display:none !important;"></div>
       </div>
     </div>
   </div>
@@ -3474,14 +3472,7 @@
   }
 
   function downloadImage(canvasId, filename) {
-    const user = getStoredUser();
-    if (!user) {
-      showLoginRequiredModal('Please Sign In or Create an Account to download clean, watermark-free passport photos.');
-      return;
-    }
-    if (!deductCredit()) return;
-
-    // Ensure adjCanvas is 100% clean without any canvas-baked watermark on download
+    // 100% Free - Clean, instant HD download for all users without login or payment
     if (canvasId === 'adjCanvas' && typeof bgRemovedImage !== 'undefined' && bgRemovedImage) {
       const b = document.getElementById('slB').value;
       const cVal = document.getElementById('slC').value;
@@ -3498,7 +3489,7 @@
     const c = document.getElementById(canvasId);
     
     const isUltra = (currentExportQuality === 'ultra');
-    const jpegQuality = isUltra ? 1.0 : 0.85;
+    const jpegQuality = isUltra ? 1.0 : 0.88;
     const dataUrl = c.toDataURL('image/jpeg', jpegQuality);
     const blob = dataURLtoBlob(dataUrl);
     const url = URL.createObjectURL(blob);
@@ -3513,77 +3504,15 @@
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    
+    showProtectedToast('✅ 100% Free HD Photo Downloaded Successfully!');
   }
 
-  // ================= WATERMARK ENGINE (bina login ke 4-5 jagah watermark) =================
+  // ================= WATERMARK ENGINE (100% Free - Disabled) =================
   function drawWatermark(ctx, w, h) {
-    const user = getStoredUser();
     const warnBadge = document.getElementById('watermarkWarningBadge');
-    
-    if (user) {
-      if (warnBadge) warnBadge.classList.add('hidden');
-      return; // Login hone par photo 100% clean bina kisi watermark ke rahegi!
-    }
-
-    if (warnBadge) warnBadge.classList.remove('hidden');
-
-    ctx.save();
-    
-    // Resolution-aware proportional font size
-    const fontSize = Math.max(14, Math.min(32, Math.round(w * 0.072)));
-    ctx.font = `800 ${fontSize}px 'Plus Jakarta Sans', Arial, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    
-    // 5 Strategic distributed positions across the portrait photo
-    const spots = [
-      { x: w * 0.28, y: h * 0.20, rot: -0.35 },  // 1. Top-Left (Head / Hair)
-      { x: w * 0.74, y: h * 0.32, rot: -0.35 },  // 2. Top-Right (Right side / Ear)
-      { x: w * 0.50, y: h * 0.52, rot: -0.35 },  // 3. Center (Neck / Lower face)
-      { x: w * 0.28, y: h * 0.74, rot: -0.35 },  // 4. Bottom-Left (Chest / Left shoulder)
-      { x: w * 0.74, y: h * 0.84, rot: -0.35 }   // 5. Bottom-Right (Right shoulder / Bottom)
-    ];
-
-    spots.forEach(spot => {
-      ctx.save();
-      ctx.translate(spot.x, spot.y);
-      ctx.rotate(spot.rot);
-
-      const text = 'allbgremove.com';
-      const metrics = ctx.measureText(text);
-      const tw = metrics.width;
-      const padX = Math.round(fontSize * 0.45);
-      const padY = Math.round(fontSize * 0.25);
-      const boxW = tw + (padX * 2);
-      const boxH = fontSize + (padY * 2);
-
-      // Semi-transparent dark pill background for guaranteed contrast on any background
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.60)';
-      ctx.beginPath();
-      if (ctx.roundRect) {
-        ctx.roundRect(-boxW / 2, -boxH / 2, boxW, boxH, 8);
-      } else {
-        ctx.rect(-boxW / 2, -boxH / 2, boxW, boxH);
-      }
-      ctx.fill();
-
-      // Border on pill
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      // High-contrast bright white text with drop shadow
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
-      ctx.shadowBlur = 6;
-      ctx.shadowOffsetX = 1;
-      ctx.shadowOffsetY = 1;
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText(text, 0, 0);
-
-      ctx.restore();
-    });
-
-    ctx.restore();
+    if (warnBadge) warnBadge.style.display = 'none';
+    return; // 100% Free - No watermark ever!
   }
 
   // 4. Adjustments
@@ -4241,76 +4170,14 @@
   }
 
   function isUserUnlimited(u) {
-    if (!u) return false;
-    const email = (u.email || '').toLowerCase().trim();
-    // 1. Authorized studio owners (Lifetime Unlimited)
-    const authorizedOwners = ['passportphoto2026@gmail.com', 'manoj.watkar61@gmail.com', 'monusharma847224@gmail.com'];
-    if (authorizedOwners.includes(email) || email.includes('manoj.watkar') || email.includes('monusharma847224') || email.includes('passportphoto2026')) {
-      return true;
-    }
-
-    // 2. Approved in Firestore cloud registry
-    if (window._isApprovedUnlimitedUser === true) return true;
-
-    // 3. User object has active unlimited plan and valid expiry
-    if (u.isUnlimited === true && (u.credits >= 9999 || (u.plan && u.plan.toLowerCase().includes('unlimited')))) {
-      if (!u.planExpires || u.planExpires > Date.now()) {
-        return true;
-      }
-    }
-
-    // 4. Cryptographically signed server activation token
-    if (u.activationToken && typeof u.activationToken === 'string' && u.activationToken.includes('.')) {
-      try {
-        const payloadB64 = u.activationToken.split('.')[0];
-        const payload = JSON.parse(atob(payloadB64));
-        if (payload.email && payload.email.toLowerCase().trim() === email && payload.isUnlimited === true) {
-          if (!payload.planExpires || payload.planExpires > Date.now()) {
-            return true;
-          }
-        }
-      } catch(e) {}
-    }
-
-    return false;
+    return true; // 100% Free - Everyone has Unlimited Access!
   }
 
   function deductCredit() {
-    let user = getStoredUser();
-    if (!user) {
-      showLoginRequiredModal('Please Sign In or Create an Account to download your official passport photo print sheet.');
-      return false;
-    }
-
-    // 🔒 UNLIMITED APPROVED USERS & STUDIO OWNERS: NEVER DEDUCT CREDITS, NEVER ASK FOR RECHARGE!
-    if (isUserUnlimited(user)) {
-      if (!user.isUnlimited || user.credits < 9999) {
-        user.isUnlimited = true;
-        user.credits = 9999;
-        setStoredUser(user);
-      }
-      return true;
-    }
-
-    if (user.credits <= 0) {
-      showZeroCreditsModal();
-      return false;
-    }
-    user.credits -= 1;
-    setStoredUser(user);
-    if (fbDb && fbAuth && fbAuth.currentUser) {
-      try {
-        fbDb.collection('users').doc(fbAuth.currentUser.uid).update({
-          credits: firebase.firestore.FieldValue.increment(-1)
-        }).catch(e => console.warn("Credit sync:", e));
-      } catch(e) {}
-    }
-    return true;
+    return true; // 100% Free - Never deduct any credits!
   }
 
   function downloadSheet() {
-      if (!deductCredit()) return;
-
       const isUltra = (currentExportQuality === 'ultra');
       const scaleMultiplier = isUltra ? 2 : 1; // 2x resolution = 600 DPI Studio Lab Quality!
 
@@ -4332,11 +4199,10 @@
       
       // Restore ruler on preview canvas at 1x
       updatePrintLayout(true, 1);
+      showProtectedToast('✅ 100% Free Print Sheet Downloaded Successfully!');
   }
   
   function printSheet() {
-    if (!deductCredit()) return;
-
     // Re-render WITHOUT ruler for the print dataUrl
     updatePrintLayout(false);
     
