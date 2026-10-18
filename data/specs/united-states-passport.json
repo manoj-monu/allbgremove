@@ -1,0 +1,37 @@
+{
+  "country": "United States",
+  "countryCode": "US",
+  "countrySlug": "united-states",
+  "docType": "passport",
+  "docTypeSlug": "passport",
+  "docTitle": "United States Passport Photo",
+  "widthMm": 51,
+  "heightMm": 51,
+  "dpi": 300,
+  "minPx": {
+    "width": 600,
+    "height": 600
+  },
+  "maxPx": {
+    "width": 1200,
+    "height": 1200
+  },
+  "maxFileKB": 240,
+  "fileFormat": [
+    "image/jpeg"
+  ],
+  "headHeightMinMm": 25,
+  "headHeightMaxMm": 35,
+  "eyeLineFromBottomMm": 28,
+  "backgroundColor": "#FFFFFF",
+  "notes": {
+    "glasses": "Eyeglasses are strictly forbidden unless a signed medical waiver from a doctor is provided.",
+    "smile": "Neutral facial expression or natural smile, with both eyes open and mouth closed.",
+    "ears": "Ears need not be visible, but hairline and facial edges must not be obscured by hair or headwear.",
+    "shadows": "Shadows on the face or behind the head on the background are not acceptable.",
+    "babyRules": "No other person or hands in photo. Baby may lie on a plain white sheet or sit in a car seat covered with a white sheet."
+  },
+  "sourceUrl": "https://travel.state.gov/content/travel/en/passports/how-apply/photos.html",
+  "lastVerified": "2026-10-18",
+  "verified": true
+}

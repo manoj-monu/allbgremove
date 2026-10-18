@@ -1,0 +1,37 @@
+{
+  "country": "India",
+  "countryCode": "IN",
+  "countrySlug": "india",
+  "docType": "passport",
+  "docTypeSlug": "passport",
+  "docTitle": "India Passport Photo",
+  "widthMm": 35,
+  "heightMm": 45,
+  "dpi": 300,
+  "minPx": {
+    "width": 600,
+    "height": 600
+  },
+  "maxPx": {
+    "width": 1200,
+    "height": 1200
+  },
+  "maxFileKB": 300,
+  "fileFormat": [
+    "image/jpeg"
+  ],
+  "headHeightMinMm": 25,
+  "headHeightMaxMm": 35,
+  "eyeLineFromBottomMm": 24,
+  "backgroundColor": "#FFFFFF",
+  "notes": {
+    "glasses": "Thick frames, dark glasses, tinted lenses strictly prohibited. Clear lenses permitted if eyes fully visible without reflections.",
+    "smile": "Natural neutral expression, mouth firmly closed, facing camera straight-on.",
+    "ears": "Both ears and full front facial oval should ideally be visible.",
+    "shadows": "No shadows on face, neck, or white background.",
+    "babyRules": "For babies, neutral background, eyes open, no pacifiers, toys, or parent hands visible."
+  },
+  "sourceUrl": "https://www.passportindia.gov.in/AppOnlineProject/online/photoSpecNew",
+  "lastVerified": "2026-10-18",
+  "verified": true
+}

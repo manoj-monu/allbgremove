@@ -1,0 +1,37 @@
+{
+  "country": "Canada",
+  "countryCode": "CA",
+  "countrySlug": "canada",
+  "docType": "passport",
+  "docTypeSlug": "passport",
+  "docTitle": "Canada Passport Photo",
+  "widthMm": 50,
+  "heightMm": 70,
+  "dpi": 300,
+  "minPx": {
+    "width": 590,
+    "height": 826
+  },
+  "maxPx": {
+    "width": 1200,
+    "height": 1680
+  },
+  "maxFileKB": 4096,
+  "fileFormat": [
+    "image/jpeg"
+  ],
+  "headHeightMinMm": 31,
+  "headHeightMaxMm": 36,
+  "eyeLineFromBottomMm": 39,
+  "backgroundColor": "#FFFFFF",
+  "notes": {
+    "glasses": "Prescription glasses may be worn as long as eyes are clearly visible and there is no glare. Sunglasses or tinted glasses forbidden.",
+    "smile": "Neutral facial expression with mouth closed and eyes open.",
+    "ears": "Ears do not need to be shown, but face edge and hair line must not cast shadows or block features.",
+    "shadows": "Uniform lighting without glare, flash reflections, or harsh shadows.",
+    "babyRules": "Newborns may be photographed in a car seat covered with a white sheet. No parent hands or shadows visible."
+  },
+  "sourceUrl": "https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-passports/photos.html",
+  "lastVerified": "2026-10-18",
+  "verified": true
+}

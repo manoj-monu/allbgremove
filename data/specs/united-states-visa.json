@@ -1,0 +1,37 @@
+{
+  "country": "United States",
+  "countryCode": "US",
+  "countrySlug": "united-states",
+  "docType": "visa",
+  "docTypeSlug": "visa",
+  "docTitle": "United States Visa Photo (DS-160)",
+  "widthMm": 51,
+  "heightMm": 51,
+  "dpi": 300,
+  "minPx": {
+    "width": 600,
+    "height": 600
+  },
+  "maxPx": {
+    "width": 1200,
+    "height": 1200
+  },
+  "maxFileKB": 240,
+  "fileFormat": [
+    "image/jpeg"
+  ],
+  "headHeightMinMm": 25,
+  "headHeightMaxMm": 35,
+  "eyeLineFromBottomMm": 28,
+  "backgroundColor": "#FFFFFF",
+  "notes": {
+    "glasses": "Eyeglasses strictly forbidden. Must be taken within the last 6 months.",
+    "smile": "Neutral facial expression with both eyes open directly facing camera.",
+    "ears": "Full face visible without shadows or hair obstructing eyes or eyebrows.",
+    "shadows": "Even lighting across face and background, no harsh shadows.",
+    "babyRules": "Infants eyes must be open. Ensure no toys, pacifiers, or supporting hands appear."
+  },
+  "sourceUrl": "https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/photos.html",
+  "lastVerified": "2026-10-18",
+  "verified": true
+}

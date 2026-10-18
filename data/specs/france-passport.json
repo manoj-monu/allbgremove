@@ -1,0 +1,37 @@
+{
+  "country": "France",
+  "countryCode": "FR",
+  "countrySlug": "france",
+  "docType": "passport",
+  "docTypeSlug": "passport",
+  "docTitle": "France Biometric Passport Photo",
+  "widthMm": 35,
+  "heightMm": 45,
+  "dpi": 300,
+  "minPx": {
+    "width": 413,
+    "height": 531
+  },
+  "maxPx": {
+    "width": 1200,
+    "height": 1600
+  },
+  "maxFileKB": 2048,
+  "fileFormat": [
+    "image/jpeg"
+  ],
+  "headHeightMinMm": 32,
+  "headHeightMaxMm": 36,
+  "eyeLineFromBottomMm": 26,
+  "backgroundColor": "#E5E7EB",
+  "notes": {
+    "glasses": "Thick frames forbidden. Must not reflect flash. Tinted glasses forbidden.",
+    "smile": "Neutral expression, mouth closed, direct gaze, no teeth shown.",
+    "ears": "Head bare without accessories. Hair must not conceal face or forehead.",
+    "shadows": "Strictly even light, no shadow on background or cheeks.",
+    "babyRules": "Infants: eyes must be open, head straight, no pacifiers, toys or visible parent hands."
+  },
+  "sourceUrl": "https://www.service-public.fr/particuliers/vosdroits/F10619",
+  "lastVerified": "2026-10-18",
+  "verified": true
+}

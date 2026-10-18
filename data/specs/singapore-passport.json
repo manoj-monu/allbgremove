@@ -1,0 +1,37 @@
+{
+  "country": "Singapore",
+  "countryCode": "SG",
+  "countrySlug": "singapore",
+  "docType": "passport",
+  "docTypeSlug": "passport",
+  "docTitle": "Singapore Passport Photo",
+  "widthMm": 35,
+  "heightMm": 45,
+  "dpi": 300,
+  "minPx": {
+    "width": 400,
+    "height": 514
+  },
+  "maxPx": {
+    "width": 1200,
+    "height": 1600
+  },
+  "maxFileKB": 2048,
+  "fileFormat": [
+    "image/jpeg"
+  ],
+  "headHeightMinMm": 25,
+  "headHeightMaxMm": 35,
+  "eyeLineFromBottomMm": 25,
+  "backgroundColor": "#FFFFFF",
+  "notes": {
+    "glasses": "Glasses must not cause glare or obscure eyes. Tinted lenses not allowed.",
+    "smile": "Neutral facial expression with mouth closed and eyes open looking straight.",
+    "ears": "Eyebrows and eyes must not be covered by hair or headgear.",
+    "shadows": "Even lighting with sharp focus and no shadow on face or plain white background.",
+    "babyRules": "Infants: eyes must be open, looking towards camera. No support hands or props visible."
+  },
+  "sourceUrl": "https://www.ica.gov.sg/photo-guidelines",
+  "lastVerified": "2026-10-18",
+  "verified": true
+}

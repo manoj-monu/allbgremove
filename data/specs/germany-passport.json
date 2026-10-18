@@ -1,0 +1,37 @@
+{
+  "country": "Germany",
+  "countryCode": "DE",
+  "countrySlug": "germany",
+  "docType": "passport",
+  "docTypeSlug": "passport",
+  "docTitle": "Germany & Schengen Biometric Passport Photo",
+  "widthMm": 35,
+  "heightMm": 45,
+  "dpi": 300,
+  "minPx": {
+    "width": 413,
+    "height": 531
+  },
+  "maxPx": {
+    "width": 1200,
+    "height": 1600
+  },
+  "maxFileKB": 2048,
+  "fileFormat": [
+    "image/jpeg"
+  ],
+  "headHeightMinMm": 32,
+  "headHeightMaxMm": 36,
+  "eyeLineFromBottomMm": 26,
+  "backgroundColor": "#E5E7EB",
+  "notes": {
+    "glasses": "Eyes must not be covered by frame; no reflections or tinted glasses allowed.",
+    "smile": "Strict neutral facial expression, mouth closed, facing camera centered.",
+    "ears": "Ears do not strictly have to be visible, but face contour from chin to hairline must be visible.",
+    "shadows": "Even illumination, no shadow behind ears, chin, or background.",
+    "babyRules": "Children aged 5 and under may have slight deviations. For infants under 1 year, head doesn't need to be straight or eyes open."
+  },
+  "sourceUrl": "https://www.bmi.bund.de/SharedDocs/downloads/DE/veroeffentlichungen/themen/moderne-verwaltung/ausweise/fotomustertabelle.pdf",
+  "lastVerified": "2026-10-18",
+  "verified": true
+}

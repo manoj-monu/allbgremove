@@ -1,0 +1,37 @@
+{
+  "country": "Australia",
+  "countryCode": "AU",
+  "countrySlug": "australia",
+  "docType": "passport",
+  "docTypeSlug": "passport",
+  "docTitle": "Australia Passport Photo",
+  "widthMm": 35,
+  "heightMm": 45,
+  "dpi": 300,
+  "minPx": {
+    "width": 600,
+    "height": 800
+  },
+  "maxPx": {
+    "width": 1200,
+    "height": 1600
+  },
+  "maxFileKB": 4096,
+  "fileFormat": [
+    "image/jpeg"
+  ],
+  "headHeightMinMm": 32,
+  "headHeightMaxMm": 36,
+  "eyeLineFromBottomMm": 25,
+  "backgroundColor": "#FFFFFF",
+  "notes": {
+    "glasses": "Glasses are not allowed in Australian passport photos since 2018, even with prescription, unless medical certificate provided.",
+    "smile": "Neutral expression, mouth closed, looking straight at the camera.",
+    "ears": "Edges of face must be visible. Head coverings allowed for religious reasons only.",
+    "shadows": "Even lighting with no shadows behind head or under chin.",
+    "babyRules": "Infants under 3: mouth can be open. Under 1: eyes can be closed. No other person or support visible."
+  },
+  "sourceUrl": "https://www.passports.gov.au/how-to-apply/photo-requirements",
+  "lastVerified": "2026-10-18",
+  "verified": true
+}

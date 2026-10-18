@@ -1,0 +1,37 @@
+{
+  "country": "Brazil",
+  "countryCode": "BR",
+  "countrySlug": "brazil",
+  "docType": "passport",
+  "docTypeSlug": "passport",
+  "docTitle": "Brazil Passport Photo",
+  "widthMm": 50,
+  "heightMm": 70,
+  "dpi": 300,
+  "minPx": {
+    "width": 590,
+    "height": 826
+  },
+  "maxPx": {
+    "width": 1200,
+    "height": 1680
+  },
+  "maxFileKB": 2048,
+  "fileFormat": [
+    "image/jpeg"
+  ],
+  "headHeightMinMm": 31,
+  "headHeightMaxMm": 36,
+  "eyeLineFromBottomMm": 38,
+  "backgroundColor": "#FFFFFF",
+  "notes": {
+    "glasses": "Dark or reflective lenses not allowed. Eyes must be fully visible.",
+    "smile": "Neutral expression with closed lips.",
+    "ears": "Ears should ideally be visible to verify facial proportions.",
+    "shadows": "Even white background without shadows or gradients.",
+    "babyRules": "Babies must face front with eyes visible. No foreign objects."
+  },
+  "sourceUrl": "https://www.gov.br/pf/pt-br/assuntos/passaporte/ajuda/duvidas/foto/foto-especificacoes",
+  "lastVerified": "2026-10-18",
+  "verified": true
+}

@@ -1,0 +1,37 @@
+{
+  "country": "New Zealand",
+  "countryCode": "NZ",
+  "countrySlug": "new-zealand",
+  "docType": "passport",
+  "docTypeSlug": "passport",
+  "docTitle": "New Zealand Passport Photo",
+  "widthMm": 35,
+  "heightMm": 45,
+  "dpi": 300,
+  "minPx": {
+    "width": 900,
+    "height": 1200
+  },
+  "maxPx": {
+    "width": 3000,
+    "height": 4000
+  },
+  "maxFileKB": 10240,
+  "fileFormat": [
+    "image/jpeg"
+  ],
+  "headHeightMinMm": 28,
+  "headHeightMaxMm": 36,
+  "eyeLineFromBottomMm": 25,
+  "backgroundColor": "#E5E7EB",
+  "notes": {
+    "glasses": "Glasses are strongly discouraged and rejected if glare exists or frames obscure eyes.",
+    "smile": "Neutral expression with mouth closed and eyes open looking directly at lens.",
+    "ears": "Face completely visible, hair held back off face.",
+    "shadows": "Even illumination, no background shadowing.",
+    "babyRules": "For children under 3, mouth may be open. No visible hands or objects."
+  },
+  "sourceUrl": "https://www.passports.govt.nz/passport-photos/passport-photo-requirements/",
+  "lastVerified": "2026-10-18",
+  "verified": true
+}

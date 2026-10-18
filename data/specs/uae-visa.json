@@ -1,0 +1,37 @@
+{
+  "country": "United Arab Emirates",
+  "countryCode": "AE",
+  "countrySlug": "uae",
+  "docType": "visa",
+  "docTypeSlug": "visa",
+  "docTitle": "UAE Visa & Emirates ID Photo",
+  "widthMm": 43,
+  "heightMm": 55,
+  "dpi": 300,
+  "minPx": {
+    "width": 508,
+    "height": 650
+  },
+  "maxPx": {
+    "width": 1000,
+    "height": 1300
+  },
+  "maxFileKB": 500,
+  "fileFormat": [
+    "image/jpeg"
+  ],
+  "headHeightMinMm": 32,
+  "headHeightMaxMm": 38,
+  "eyeLineFromBottomMm": 30,
+  "backgroundColor": "#FFFFFF",
+  "notes": {
+    "glasses": "Glasses should be avoided if possible; no glare, reflections, or tinted lenses.",
+    "smile": "Neutral expression, mouth closed, looking straight into lens.",
+    "ears": "Ears and hairline should be unobstructed unless wearing traditional religious head covering.",
+    "shadows": "Even studio lighting without backdrop shadow.",
+    "babyRules": "Babies must be photographed against clean white background without toys or visible parent hands."
+  },
+  "sourceUrl": "https://icp.gov.ae/en/services/priority-services/passport-and-id-card-photo-specifications/",
+  "lastVerified": "2026-10-18",
+  "verified": true
+}

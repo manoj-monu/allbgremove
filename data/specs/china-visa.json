@@ -1,0 +1,37 @@
+{
+  "country": "China",
+  "countryCode": "CN",
+  "countrySlug": "china",
+  "docType": "visa",
+  "docTypeSlug": "visa",
+  "docTitle": "China Visa Photo",
+  "widthMm": 33,
+  "heightMm": 48,
+  "dpi": 300,
+  "minPx": {
+    "width": 354,
+    "height": 472
+  },
+  "maxPx": {
+    "width": 420,
+    "height": 560
+  },
+  "maxFileKB": 120,
+  "fileFormat": [
+    "image/jpeg"
+  ],
+  "headHeightMinMm": 28,
+  "headHeightMaxMm": 33,
+  "eyeLineFromBottomMm": 25,
+  "backgroundColor": "#FFFFFF",
+  "notes": {
+    "glasses": "Eyeglasses allowed only if frames are thin and lenses completely transparent. No heavy frames or jewelry.",
+    "smile": "Neutral expression with eyes looking straight ahead and lips naturally closed.",
+    "ears": "Ears and forehead MUST be clearly visible. Hair must not cover eyebrows or ears.",
+    "shadows": "No shadows anywhere on the face, contours, or backdrop.",
+    "babyRules": "Infant must be positioned facing camera with both ears and eyes visible, neutral background."
+  },
+  "sourceUrl": "http://cs.mfa.gov.cn/wgrlh/lhqz/cjbg/201611/t20161125_1002364.shtml",
+  "lastVerified": "2026-10-18",
+  "verified": true
+}

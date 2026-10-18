@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PassportPhoto Pro - Global Passport & Visa Photo Platform
 
-## Getting Started
+PassportPhoto Pro is an automated biometric photo maker platform with programmatic SEO landing pages for every country and document type.
 
-First, run the development server:
+## Architecture
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Next.js 16 (App Router)**:
+   - Dynamic programmatic SEO routes: `/[country]/[docType]-photo`
+   - Baby passport guides: `/[country]/baby-passport-photo`
+   - Common rejection reasons: `/[country]/photo-rejected-reasons`
+   - DIY guides: `/[country]/passport-photo-at-home`
+   - Validated at build time via `npm run validate-specs`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **In-Browser Client-Side Processing**:
+   - Biometric face alignment, chin/crown proportion verification, and eye level guidelines.
+   - Zero-server-cost background removal executed in-browser using HTML5 Canvas & WebAssembly.
+   - Compliance with Illinois BIPA, GDPR, and CCPA (user photos are never transmitted to or saved on a backend GPU server).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Payments & Subscriptions**:
+   - International Payments: Stripe Checkout (`/api/checkout/stripe`) with webhook verification (`/api/webhooks/stripe`).
+   - India Domestic Payments: Razorpay cryptographic HMAC-SHA256 signature verification (`/api/razorpay/verify-payment`).
+   - Instant automated credit activation.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Strict Government Verification Rule
 
-To learn more about Next.js, take a look at the following resources:
+> [!IMPORTANT]
+> **NEVER invent numbers in specification files.**
+> A spec may have `verified: true` **ONLY** if:
+> 1. You read and confirmed every millimeter dimension directly from an official government immigration or foreign affairs website.
+> 2. You populated the `sourceUrl` field with that official government webpage.
+> 3. You populated `lastVerified` with the verification date (`YYYY-MM-DD`).
+> 
+> If a value cannot be officially verified, set `verified: false` and leave unconfirmed fields `null`. Pages for unverified specs display "Check official requirements" and never claim compliance.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## How to Add a New Country Specification
 
-## Deploy on Vercel
+1. Create a new JSON file under `data/specs/`:
+   ```bash
+   data/specs/{country-slug}-{docType-slug}.json
+   ```
+   *Example: `data/specs/sweden-passport.json`*
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. Fill out the specification using the following schema:
+   ```json
+   {
+     "country": "Sweden",
+     "countryCode": "SE",
+     "countrySlug": "sweden",
+     "docType": "passport",
+     "docTypeSlug": "passport",
+     "docTitle": "Sweden Biometric Passport Photo",
+     "widthMm": 35,
+     "heightMm": 45,
+     "dpi": 300,
+     "minPx": { "width": 413, "height": 531 },
+     "maxPx": { "width": 1200, "height": 1600 },
+     "maxFileKB": 2048,
+     "fileFormat": ["image/jpeg"],
+     "headHeightMinMm": 31,
+     "headHeightMaxMm": 36,
+     "eyeLineFromBottomMm": 26,
+     "backgroundColor": "#E5E7EB",
+     "notes": {
+       "glasses": "No reflections or dark frames obscuring eyes.",
+       "smile": "Neutral facial expression with closed mouth.",
+       "ears": "Face edges unobstructed.",
+       "shadows": "Even lighting, no shadow on face or background.",
+       "babyRules": "Infants under 1 do not need to face directly straight."
+     },
+     "sourceUrl": "https://polisen.se/en/laws-and-regulations/passport-and-national-id-card/photo-guidelines/",
+     "lastVerified": "2026-10-18",
+     "verified": true
+   }
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. Run the validation script:
+   ```bash
+   npm run validate-specs
+   ```
+   If any required field is missing or an unverified source URL is used with `verified: true`, the script will fail and pinpoint the error.
+
+4. Test the page locally:
+   ```bash
+   npm run dev
+   ```
+   Navigate to `http://localhost:3000/sweden/passport-photo`.

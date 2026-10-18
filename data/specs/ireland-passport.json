@@ -1,0 +1,37 @@
+{
+  "country": "Ireland",
+  "countryCode": "IE",
+  "countrySlug": "ireland",
+  "docType": "passport",
+  "docTypeSlug": "passport",
+  "docTitle": "Ireland Passport Photo",
+  "widthMm": 35,
+  "heightMm": 45,
+  "dpi": 300,
+  "minPx": {
+    "width": 715,
+    "height": 951
+  },
+  "maxPx": {
+    "width": 1500,
+    "height": 2000
+  },
+  "maxFileKB": 9216,
+  "fileFormat": [
+    "image/jpeg"
+  ],
+  "headHeightMinMm": 32,
+  "headHeightMaxMm": 36,
+  "eyeLineFromBottomMm": 26,
+  "backgroundColor": "#E5E7EB",
+  "notes": {
+    "glasses": "Prescription glasses allowed only if no glare, reflection, or frames covering eyes. Sunglasses forbidden.",
+    "smile": "Neutral facial expression, closed mouth, eyes directed at camera.",
+    "ears": "Hair should be tucked behind ears or away from face so facial edges are clearly distinct.",
+    "shadows": "No shadows on face, background, or shoulders.",
+    "babyRules": "Babies under one year old do not need to keep their eyes open, but must be supported invisibly."
+  },
+  "sourceUrl": "https://www.ireland.ie/en/dfa/passports/photo-guidelines/",
+  "lastVerified": "2026-10-18",
+  "verified": true
+}

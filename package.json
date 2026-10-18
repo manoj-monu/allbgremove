@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "validate-specs": "node scripts/validate-specs.mjs",
+    "build": "node scripts/validate-specs.mjs && next build",
     "start": "next start",
     "lint": "eslint"
   },
@@ -16,7 +17,8 @@
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "react-easy-crop": "^5.5.7"
+    "react-easy-crop": "^5.5.7",
+    "stripe": "^23.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",

@@ -1,0 +1,37 @@
+{
+  "country": "Saudi Arabia",
+  "countryCode": "SA",
+  "countrySlug": "saudi-arabia",
+  "docType": "visa",
+  "docTypeSlug": "visa",
+  "docTitle": "Saudi Arabia Visa & Umrah/Hajj Photo",
+  "widthMm": 40,
+  "heightMm": 60,
+  "dpi": 300,
+  "minPx": {
+    "width": 472,
+    "height": 708
+  },
+  "maxPx": {
+    "width": 1000,
+    "height": 1500
+  },
+  "maxFileKB": 200,
+  "fileFormat": [
+    "image/jpeg"
+  ],
+  "headHeightMinMm": 32,
+  "headHeightMaxMm": 40,
+  "eyeLineFromBottomMm": 32,
+  "backgroundColor": "#FFFFFF",
+  "notes": {
+    "glasses": "No sunglasses or reflective glasses. Clear glasses permitted if eyes unobscured.",
+    "smile": "Neutral face, closed mouth, facing camera squarely.",
+    "ears": "Traditional headwear allowed provided full face from forehead to chin is unobstructed.",
+    "shadows": "Crisp white background without casting shadows.",
+    "babyRules": "Baby photo must show upright head and open eyes against white backdrop."
+  },
+  "sourceUrl": "https://visa.visitsaudi.com/Home/TermsConditions",
+  "lastVerified": "2026-10-18",
+  "verified": true
+}
