@@ -964,11 +964,11 @@
   <!-- Canva-Style Global Header -->
   <nav class="fixed top-0 left-0 right-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs">
     <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-[68px] gap-4">
+      <div class="flex items-center justify-between h-[56px] sm:h-[60px] gap-4">
         
         <!-- Left: Canva-Style Gradient Logo -->
         <a href="index.html" onclick="showLandingPage(); return false;" class="flex items-center gap-2.5 shrink-0 group">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#7d2ae8] via-[#00c4cc] to-[#ff007a] flex items-center justify-center text-white shadow-md shadow-purple-200 group-hover:scale-105 transition duration-300">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#7d2ae8] via-[#00c4cc] to-[#ff007a] flex items-center justify-center text-white shadow-md shadow-purple-200 group-hover:scale-105 transition duration-300">
             <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
           </div>
           <div class="flex flex-col text-left">
@@ -1055,7 +1055,7 @@
   <div id="landing-page-container" class="font-['Plus_Jakarta_Sans',sans-serif] bg-[#f8f9fa] text-[#0e1318]">
     
     <!-- Hero Banner (Canva's Signature "What will you create today?") -->
-    <section class="pt-24 sm:pt-28 pb-12 sm:pb-16 bg-gradient-to-b from-[#f3e8ff]/40 via-white to-[#f8f9fa] relative overflow-hidden">
+    <section class="pt-16 sm:pt-20 pb-6 sm:pb-8 bg-gradient-to-b from-[#f3e8ff]/40 via-white to-[#f8f9fa] relative overflow-hidden">
       
       <!-- Canva Decorative Soft Color Blobs -->
       <div class="absolute -top-20 -left-20 w-96 h-96 bg-[#00c4cc]/15 rounded-full blur-3xl pointer-events-none"></div>
@@ -1065,107 +1065,78 @@
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         
         <!-- Canva Greeting Pill -->
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-purple-200 text-[#7d2ae8] text-xs sm:text-sm font-extrabold mb-5 shadow-xs">
-          <span class="w-2 h-2 rounded-full bg-gradient-to-r from-[#7d2ae8] to-[#00c4cc] animate-pulse"></span>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-purple-200 text-[#7d2ae8] text-[11px] sm:text-xs font-extrabold mb-2 shadow-xs">
+          <span class="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-[#7d2ae8] to-[#00c4cc] animate-pulse"></span>
           <span>A powerful photo studio designed for everyone</span>
         </div>
 
         <!-- Canva Headline: "What will you create today?" -->
-        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-[#0e1318] leading-[1.15] tracking-tight mb-4">
-          What photo will you<br>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#7d2ae8] via-[#8b3dff] to-[#00c4cc]">design today?</span>
+        <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black text-[#0e1318] leading-[1.15] tracking-tight mb-1.5">
+          What photo will you <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#7d2ae8] via-[#8b3dff] to-[#00c4cc]">design today?</span>
         </h1>
         
-        <p class="text-slate-600 text-sm sm:text-lg max-w-2xl mx-auto mb-8 font-normal leading-relaxed">
+        <p class="text-slate-600 text-xs sm:text-sm max-w-xl mx-auto mb-3 font-normal leading-relaxed">
           Remove background, crop to official passport sizes (35×45mm), and download ready-to-print 4×6" and A4 sheets in 5 seconds.
         </p>
 
-        <!-- Canva Quick Category Pills Carousel -->
-        <div class="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none px-2">
-          
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-purple-50 border border-slate-200 hover:border-purple-300 text-slate-800 hover:text-[#7d2ae8] text-xs sm:text-sm font-bold shadow-xs whitespace-nowrap transition cursor-pointer">
-            <span class="w-6 h-6 rounded-full bg-purple-100 text-[#7d2ae8] flex items-center justify-center text-xs"><i class="fa-solid fa-id-card"></i></span>
-            <span>Indian Passport (35×45mm)</span>
+        <!-- 1-Click Quick Preset & Category Chips -->
+        <div class="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap mb-3.5 px-2">
+          <button type="button" onclick="selectQuickPreset('4x6_3')" class="px-3 py-1 rounded-full bg-white hover:bg-purple-50 border border-purple-200 text-[#7d2ae8] text-xs font-bold shadow-xs hover:shadow-md transition flex items-center gap-1.5 cursor-pointer">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#7d2ae8]"></span>
+            <span>🇮🇳 Indian Passport (35×45mm)</span>
           </button>
-
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-cyan-50 border border-slate-200 hover:border-cyan-300 text-slate-800 hover:text-[#00c4cc] text-xs sm:text-sm font-bold shadow-xs whitespace-nowrap transition cursor-pointer">
-            <span class="w-6 h-6 rounded-full bg-cyan-100 text-[#00c4cc] flex items-center justify-center text-xs"><i class="fa-solid fa-scissors"></i></span>
-            <span>Remove Background</span>
+          <button type="button" onclick="selectQuickPreset('4x6_3')" class="px-3 py-1 rounded-full bg-white hover:bg-purple-50 border border-purple-200 text-[#7d2ae8] text-xs font-bold shadow-xs hover:shadow-md transition flex items-center gap-1.5 cursor-pointer">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#8b3dff]"></span>
+            <span>🖨 3 Photos (4×6)</span>
           </button>
-
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-800 hover:text-emerald-600 text-xs sm:text-sm font-bold shadow-xs whitespace-nowrap transition cursor-pointer">
-            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs"><i class="fa-solid fa-print"></i></span>
-            <span>4×6 Print Sheet</span>
+          <button type="button" onclick="selectQuickPreset('4x6_6')" class="px-3 py-1 rounded-full bg-white hover:bg-purple-50 border border-purple-200 text-[#7d2ae8] text-xs font-bold shadow-xs hover:shadow-md transition flex items-center gap-1.5 cursor-pointer">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#8b3dff]"></span>
+            <span>🖨 6 Photos (4×6)</span>
           </button>
-
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-pink-50 border border-slate-200 hover:border-pink-300 text-slate-800 hover:text-pink-600 text-xs sm:text-sm font-bold shadow-xs whitespace-nowrap transition cursor-pointer">
-            <span class="w-6 h-6 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center text-xs"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
-            <span>A4 30-Photo Sheet</span>
+          <button type="button" onclick="selectQuickPreset('a4_30')" class="px-3 py-1 rounded-full bg-white hover:bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold shadow-xs hover:shadow-md transition flex items-center gap-1.5 cursor-pointer">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span>📄 30 Photos (A4)</span>
           </button>
-
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-slate-800 hover:text-amber-600 text-xs sm:text-sm font-bold shadow-xs whitespace-nowrap transition cursor-pointer">
-            <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs"><i class="fa-solid fa-flag-usa"></i></span>
-            <span>US Visa (2×2")</span>
-          </button>
-
-        </div>
-
-        
-        <!-- 1-Click Quick Preset Chips for Cyber Cafes & CSC Centers -->
-        <div class="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-5">
-          <button type="button" onclick="selectQuickPreset('4x6_3')" class="px-3.5 py-1.5 rounded-full bg-white hover:bg-purple-50 border border-purple-200 text-[#7d2ae8] text-xs font-bold shadow-xs hover:shadow-md transition flex items-center gap-1.5 cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-[#7d2ae8]"></span>
-            <span>🇮🇳 3 Photos (4x6 Sheet)</span>
-          </button>
-          <button type="button" onclick="selectQuickPreset('4x6_6')" class="px-3.5 py-1.5 rounded-full bg-white hover:bg-purple-50 border border-purple-200 text-[#7d2ae8] text-xs font-bold shadow-xs hover:shadow-md transition flex items-center gap-1.5 cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-[#8b3dff]"></span>
-            <span>🇮🇳 6 Photos (4x6 Sheet)</span>
-          </button>
-          <button type="button" onclick="selectQuickPreset('a4_30')" class="px-3.5 py-1.5 rounded-full bg-white hover:bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold shadow-xs hover:shadow-md transition flex items-center gap-1.5 cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span>📄 30 Photos (A4 Sheet)</span>
-          </button>
-          <button type="button" onclick="selectQuickPreset('bg_only')" class="px-3.5 py-1.5 rounded-full bg-white hover:bg-cyan-50 border border-cyan-200 text-[#00c4cc] text-xs font-bold shadow-xs hover:shadow-md transition flex items-center gap-1.5 cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-[#00c4cc]"></span>
-            <span>✂ 1-Click Cutout Only</span>
+          <button type="button" onclick="selectQuickPreset('bg_only')" class="px-3 py-1 rounded-full bg-white hover:bg-cyan-50 border border-cyan-200 text-[#00c4cc] text-xs font-bold shadow-xs hover:shadow-md transition flex items-center gap-1.5 cursor-pointer">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#00c4cc]"></span>
+            <span>✂ 1-Click Cutout</span>
           </button>
         </div>
 
         <!-- Canva Large Creative Studio Card (Dropzone & Action Box) -->
-
-        <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-200/80 max-w-3xl mx-auto relative group">
+        <div class="bg-white rounded-3xl p-4 sm:p-5 shadow-xl border border-slate-200/90 max-w-2xl mx-auto relative group">
           
-          <div onclick="document.getElementById('fileIn').click()" class="border-2 border-dashed border-purple-300 hover:border-[#7d2ae8] bg-gradient-to-b from-purple-50/30 to-white hover:bg-purple-50/60 rounded-2xl p-8 sm:p-12 text-center transition duration-300 cursor-pointer">
+          <div onclick="document.getElementById('fileIn').click()" class="border-2 border-dashed border-purple-300 hover:border-[#7d2ae8] bg-gradient-to-b from-purple-50/30 to-white hover:bg-purple-50/60 rounded-2xl p-4 sm:p-6 text-center transition duration-300 cursor-pointer">
             
-            <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-3xl bg-gradient-to-tr from-[#7d2ae8] via-[#8b3dff] to-[#00c4cc] text-white flex items-center justify-center text-2xl sm:text-3xl shadow-xl shadow-purple-200 group-hover:scale-105 transition duration-300">
+            <div class="w-12 h-12 mx-auto mb-2 rounded-2xl bg-gradient-to-tr from-[#7d2ae8] via-[#8b3dff] to-[#00c4cc] text-white flex items-center justify-center text-xl shadow-md shadow-purple-200 group-hover:scale-105 transition duration-300">
               <i class="fa-solid fa-cloud-arrow-up"></i>
             </div>
 
-            <button class="bg-gradient-to-r from-[#7d2ae8] via-[#8b3dff] to-[#00c4cc] hover:opacity-95 text-white font-black py-4 px-8 sm:px-10 rounded-2xl shadow-lg shadow-purple-200 text-base sm:text-lg flex items-center gap-3 mx-auto mb-3 transition">
+            <button type="button" class="bg-gradient-to-r from-[#7d2ae8] via-[#8b3dff] to-[#00c4cc] hover:opacity-95 text-white font-black py-2.5 px-7 sm:px-9 rounded-xl shadow-md shadow-purple-200 text-sm sm:text-base flex items-center gap-2.5 mx-auto mb-1.5 transition">
               <span>Upload your photo</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
 
-            <p class="text-xs sm:text-sm text-slate-600 font-semibold mb-1">
+            <p class="text-xs text-slate-600 font-semibold mb-0.5">
               Drag &amp; drop any photo here, or browse from your device
             </p>
-            <p class="text-[11px] sm:text-xs text-slate-400">
+            <p class="text-[11px] text-slate-400">
               Supports JPG, PNG, WEBP • 100% Free • No Watermark
             </p>
 
             <!-- 1-Click Try Samples -->
-            <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-center gap-2 sm:gap-3 flex-wrap" onclick="event.stopPropagation()">
-              <span class="text-xs font-bold text-slate-500">Or try a sample photo:</span>
-              <button onclick="loadExample('assets/example1.jpg')" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-purple-100 text-slate-700 hover:text-[#7d2ae8] font-bold text-xs transition">
-                <img src="assets/example1.jpg" class="w-4 h-4 rounded-full object-cover">
+            <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-center gap-2 sm:gap-3 flex-wrap" onclick="event.stopPropagation()">
+              <span class="text-[11px] font-bold text-slate-500">Or try a sample photo:</span>
+              <button type="button" onclick="loadExample('assets/example1.jpg')" class="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-purple-100 text-slate-700 hover:text-[#7d2ae8] font-bold text-[11px] transition">
+                <img src="assets/example1.jpg" class="w-3.5 h-3.5 rounded-full object-cover">
                 <span>Passport</span>
               </button>
-              <button onclick="loadExample('assets/example2.jpg')" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-purple-100 text-slate-700 hover:text-[#7d2ae8] font-bold text-xs transition">
-                <img src="assets/example2.jpg" class="w-4 h-4 rounded-full object-cover">
+              <button type="button" onclick="loadExample('assets/example2.jpg')" class="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-purple-100 text-slate-700 hover:text-[#7d2ae8] font-bold text-[11px] transition">
+                <img src="assets/example2.jpg" class="w-3.5 h-3.5 rounded-full object-cover">
                 <span>Visa</span>
               </button>
-              <button onclick="loadExample('assets/example3.jpg')" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-purple-100 text-slate-700 hover:text-[#7d2ae8] font-bold text-xs transition">
-                <img src="assets/example3.jpg" class="w-4 h-4 rounded-full object-cover">
+              <button type="button" onclick="loadExample('assets/example3.jpg')" class="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-purple-100 text-slate-700 hover:text-[#7d2ae8] font-bold text-[11px] transition">
+                <img src="assets/example3.jpg" class="w-3.5 h-3.5 rounded-full object-cover">
                 <span>ID Card</span>
               </button>
             </div>
@@ -1173,8 +1144,8 @@
           </div>
 
           <!-- Micro Trust Line -->
-          <div class="mt-4 flex items-center justify-between text-[11px] text-slate-400 px-2">
-            <span><i class="fa-solid fa-shield-halved text-emerald-500 mr-1"></i> Private &amp; Secure • Biometrics encrypted • Auto-deleted</span>
+          <div class="mt-2.5 flex items-center justify-between text-[11px] text-slate-400 px-1">
+            <span><i class="fa-solid fa-shield-halved text-emerald-500 mr-1"></i> Private &amp; Secure • Biometrics encrypted</span>
             <span>Direct 300 DPI Lab Print Quality</span>
           </div>
 
