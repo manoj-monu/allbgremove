@@ -1927,48 +1927,49 @@
           <button id="btnBgStep" class="btn btn-primary" style="padding:11px 26px; font-size:15px; font-weight:800; box-shadow:0 4px 15px rgba(79,70,229,0.35);" onclick="handleBgStepAction()">✨ AI Remove Background</button>
         </div>
       </div>
-      <div class="canvas-container" style="flex-direction:column; justify-content:center; align-items:center; gap:14px; position:relative;">
+      <div class="canvas-container" style="flex-direction:column; justify-content:flex-start; align-items:center; gap:8px; position:relative; padding-top:10px;">
         
-        <!-- Comparison Mode Toolbar (Appears automatically when BG is removed) -->
-        <div id="compareToolbar" style="display:none; width:100%; max-width:680px; align-items:center; justify-content:space-between; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:12px; padding:8px 12px; box-shadow:0 2px 8px rgba(0,0,0,0.04); flex-wrap:wrap; gap:8px;">
-          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-            <span style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-right:4px;">
-              <i class="fa-solid fa-code-compare text-primary mr-1"></i> VIEW:
-            </span>
-            <button type="button" id="btnModeSide" class="btn-compare-mode active" onclick="setCompareMode('side')" title="Side by side comparison">
-              👥 Side-by-Side (दोनों साथ)
-            </button>
-            <button type="button" id="btnModeSlider" class="btn-compare-mode" onclick="setCompareMode('slider')" title="Interactive Split Slider">
-              🌓 Split Slider (स्लाइडर)
-            </button>
-            <button type="button" id="btnModeAfter" class="btn-compare-mode" onclick="setCompareMode('after')" title="Only New Photo">
-              🖼️ After Only (नया फोटो)
-            </button>
-          </div>
-          <button type="button" id="btnHoldCompare" onmousedown="holdStartOriginal()" onmouseup="holdEndOriginal()" onmouseleave="holdEndOriginal()" ontouchstart="holdStartOriginal(event)" ontouchend="holdEndOriginal(event)" style="background:#f1f5f9; border:1.5px solid #cbd5e1; color:#1e293b; font-weight:800; font-size:11.5px; padding:6px 12px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:5px; box-shadow:0 1px 3px rgba(0,0,0,0.05); user-select:none;" title="Press & hold to temporarily view original photo">
-            <i class="fa-solid fa-eye text-indigo-600"></i> Hold: Original (दबाकर रखें)
+        <!-- Comparison Mode Toolbar (All Options In Single Sleek Line) -->
+        <div id="compareToolbar" style="display:none; align-items:center; justify-content:center; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:30px; padding:4px 12px; box-shadow:0 2px 10px rgba(0,0,0,0.06); flex-wrap:nowrap; white-space:nowrap; gap:6px;">
+          <span style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; display:inline-flex; align-items:center; gap:4px; margin-right:2px;">
+            <i class="fa-solid fa-code-compare text-primary"></i> VIEW:
+          </span>
+          <button type="button" id="btnModeSide" class="btn-compare-mode active" onclick="setCompareMode('side')" title="Side by side comparison" style="padding:4px 10px; font-size:11.5px; border-radius:16px; white-space:nowrap;">
+            👥 Side-by-Side
+          </button>
+          <button type="button" id="btnModeSlider" class="btn-compare-mode" onclick="setCompareMode('slider')" title="Interactive Split Slider" style="padding:4px 10px; font-size:11.5px; border-radius:16px; white-space:nowrap;">
+            🌓 Split Slider
+          </button>
+          <button type="button" id="btnModeAfter" class="btn-compare-mode" onclick="setCompareMode('after')" title="Only New Photo" style="padding:4px 10px; font-size:11.5px; border-radius:16px; white-space:nowrap;">
+            🖼️ After Only
+          </button>
+          
+          <span style="height:14px; width:1px; background:#cbd5e1; margin:0 2px;"></span>
+
+          <button type="button" id="btnHoldCompare" onmousedown="holdStartOriginal()" onmouseup="holdEndOriginal()" onmouseleave="holdEndOriginal()" ontouchstart="holdStartOriginal(event)" ontouchend="holdEndOriginal(event)" style="background:#f1f5f9; border:1px solid #cbd5e1; color:#1e293b; font-weight:800; font-size:11px; padding:4px 10px; border-radius:16px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(0,0,0,0.05); user-select:none; white-space:nowrap;" title="Press & hold to temporarily view original photo">
+            <i class="fa-solid fa-eye text-indigo-600"></i> Hold: Original
           </button>
         </div>
 
         <!-- Mode 1 & 3: Standard / Side-by-Side Wrapper -->
-        <div id="compareSideWrapper" style="display:flex; align-items:flex-start; justify-content:center; gap:16px; max-width:100%; flex-wrap:wrap;">
+        <div id="compareSideWrapper" style="display:flex; align-items:flex-start; justify-content:center; gap:12px; max-width:100%; flex-wrap:wrap;">
           <!-- BEFORE Card -->
-          <div id="beforeCard" style="display:none; flex-direction:column; align-items:center; gap:8px;">
-            <span style="font-size:11px; font-weight:800; color:#b91c1c; background:#fee2e2; border:1.5px solid #fca5a5; padding:3px 12px; border-radius:20px; box-shadow:0 1px 3px rgba(220,38,38,0.15);">
-              <i class="fa-solid fa-clock-rotate-left mr-1"></i> BEFORE (ओरिजिनल फोटो)
+          <div id="beforeCard" style="display:none; flex-direction:column; align-items:center; gap:4px;">
+            <span style="font-size:10px; font-weight:800; color:#b91c1c; background:#fee2e2; border:1px solid #fca5a5; padding:2px 10px; border-radius:14px; box-shadow:0 1px 2px rgba(220,38,38,0.1); text-transform:uppercase;">
+              <i class="fa-solid fa-clock-rotate-left mr-1"></i> BEFORE
             </span>
-            <div style="position:relative; display:flex; border-radius:14px; overflow:hidden; border:2px solid #e2e8f0; box-shadow:0 4px 16px rgba(0,0,0,0.08); background:#f8fafc;">
-              <canvas id="beforeCanvas" style="max-height:58vh; max-width:100%; object-fit:contain; display:block;"></canvas>
+            <div style="position:relative; display:flex; border-radius:12px; overflow:hidden; border:2px solid #e2e8f0; box-shadow:0 4px 16px rgba(0,0,0,0.08); background:#f8fafc;">
+              <canvas id="beforeCanvas" style="max-height:65vh; max-width:100%; object-fit:contain; display:block;"></canvas>
             </div>
           </div>
 
           <!-- AFTER Card -->
-          <div id="afterCard" style="display:flex; flex-direction:column; align-items:center; gap:8px;">
-            <span id="afterBadge" style="display:none; font-size:11px; font-weight:800; color:#047857; background:#ecfdf5; border:1.5px solid #6ee7b7; padding:3px 12px; border-radius:20px; box-shadow:0 1px 3px rgba(16,185,129,0.15);">
-              <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> AFTER (नया AI बैकग्राउंड)
+          <div id="afterCard" style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+            <span id="afterBadge" style="display:none; font-size:10px; font-weight:800; color:#047857; background:#ecfdf5; border:1px solid #6ee7b7; padding:2px 10px; border-radius:14px; box-shadow:0 1px 2px rgba(16,185,129,0.1); text-transform:uppercase;">
+              <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> AFTER (AI BG)
             </span>
-            <div style="position:relative; display:flex; border-radius:14px; overflow:hidden; border:2px solid #6366f1; box-shadow:0 4px 20px rgba(79,70,229,0.15);">
-              <canvas id="bgCanvas" style="max-height:58vh; max-width:100%; object-fit:contain; display:block;"></canvas>
+            <div style="position:relative; display:flex; border-radius:12px; overflow:hidden; border:2px solid #6366f1; box-shadow:0 4px 20px rgba(79,70,229,0.15);">
+              <canvas id="bgCanvas" style="max-height:65vh; max-width:100%; object-fit:contain; display:block;"></canvas>
               <div id="scannerOverlay" class="scanner-overlay"><div class="scanner-line"></div></div>
               <div class="photo-shield-overlay" id="bgShield" title="Protected photo preview" oncontextmenu="return false;" ondragstart="return false;"></div>
             </div>
@@ -1978,11 +1979,11 @@
         <!-- Mode 2: Interactive Split Slider Container -->
         <div id="compareSliderWrapper" style="display:none; position:relative; max-width:100%; border-radius:14px; overflow:hidden; border:2px solid #4f46e5; box-shadow:0 6px 24px rgba(79,70,229,0.2); user-select:none; cursor:ew-resize;">
           <!-- Bottom Canvas (AFTER) -->
-          <canvas id="sliderAfterCanvas" style="max-height:58vh; max-width:100%; object-fit:contain; display:block;"></canvas>
+          <canvas id="sliderAfterCanvas" style="max-height:65vh; max-width:100%; object-fit:contain; display:block;"></canvas>
           
           <!-- Top Clipped Container (BEFORE) -->
           <div id="sliderBeforeClip" style="position:absolute; top:0; left:0; height:100%; width:50%; overflow:hidden; border-right:2px solid #ffffff; box-shadow:2px 0 10px rgba(0,0,0,0.35);">
-            <canvas id="sliderBeforeCanvas" style="position:absolute; top:0; left:0; height:100%; max-height:58vh; max-width:none; display:block;"></canvas>
+            <canvas id="sliderBeforeCanvas" style="position:absolute; top:0; left:0; height:100%; max-height:65vh; max-width:none; display:block;"></canvas>
             <span style="position:absolute; top:10px; left:10px; font-size:10px; font-weight:800; background:rgba(0,0,0,0.7); color:#ffffff; padding:2px 8px; border-radius:6px; backdrop-filter:blur(4px); pointer-events:none; z-index:5;">
               BEFORE
             </span>
