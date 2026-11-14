@@ -2374,7 +2374,7 @@
               <option value="5x4">Fit 20 Photos (5x4 • 5 Cols x 4 Rows)</option>
               <option value="6x4">Fit 24 Photos (6x4 • 6 Cols x 4 Rows - High Density)</option>
               <option value="7x4">Fit 28 Photos (7x4 • 7 Cols x 4 Rows)</option>
-              <option value="6x5">Fit 30 Photos (6x5 • 6 Cols x 5 Rows)</option>
+              <option value="6x5">Fit 30 Photos (5 Cols x 6 Rows • A4 30 Photos Studio)</option>
               <option value="8x4">Fit 32 Photos (8x4 • 8 Cols x 4 Rows)</option>
               <option value="6x6">Fit 36 Photos (6x6 • 6 Cols x 6 Rows)</option>
               <option value="10x4">Fit 40 Photos (10x4 • 10 Cols x 4 Rows - 12x6 Studio Special)</option>
@@ -3829,19 +3829,25 @@
 
       // Check if user selected Indian standard 35x45 or another country/custom size
       const isIndianStandard = (Math.round(w_mm) === 35 && Math.round(h_mm) === 45);
+      const paperVal = pSize ? pSize.value : '4x6P';
 
       let defaultGrid = 'actual';
-      let maxCount = 6;
+      let maxCount = 12;
       let defaultCount = 3;
 
-      if (isIndianStandard) {
-        // India Passport (35x45mm) defaults to studio 12 photos fit, with 3 photos default
+      if (paperVal === 'A4P') {
+        defaultGrid = '6x5';
+        maxCount = 30;
+        defaultCount = 5;
+      } else if (paperVal === 'A4L') {
+        defaultGrid = '8x4';
+        maxCount = 32;
+        defaultCount = 8;
+      } else if (isIndianStandard) {
         defaultGrid = '4x3';
         maxCount = 12;
         defaultCount = 3;
       } else {
-        // All other countries (US 51x51mm, Canada 50x70mm, Saudi 40x60mm, UAE 43x55mm, China 33x48mm)
-        // MUST print at the EXACT physical millimeter dimensions user selected!
         defaultGrid = 'actual';
       }
 
@@ -3850,7 +3856,7 @@
       if (defaultGrid === 'actual') {
         const m = getSheetMetrics();
         maxCount = m ? (m.cols * m.rows) : 6;
-        defaultCount = Math.min(3, maxCount);
+        defaultCount = (paperVal === 'A4P') ? Math.min(5, maxCount) : Math.min(3, maxCount);
       }
 
       updateMaxPhotoCount(maxCount, false);
@@ -3892,23 +3898,23 @@
     } else if (maxCount <= 8) {
       presets = [2, 4, 6, maxCount];
     } else if (maxCount <= 12) {
-      presets = [3, 6, 9, maxCount];
+      presets = [3, 6, 9, maxCount]; // 4x6 Sheet (3, 6, 9, 12)
     } else if (maxCount === 15) {
-      presets = [3, 6, 9, maxCount];
+      presets = [5, 10, 15];
     } else if (maxCount <= 16) {
       presets = [4, 8, 12, maxCount];
     } else if (maxCount === 18) {
-      presets = [3, 6, 12, maxCount];
+      presets = [6, 12, 18];
     } else if (maxCount <= 20) {
-      presets = [4, 8, 12, maxCount];
+      presets = [5, 10, 15, maxCount];
     } else if (maxCount <= 24) {
-      presets = [4, 8, 12, maxCount];
+      presets = [6, 12, 18, maxCount];
     } else if (maxCount <= 28) {
-      presets = [3, 6, 12, maxCount];
+      presets = [7, 14, 21, maxCount];
     } else if (maxCount <= 30) {
-      presets = [3, 6, 12, maxCount];
+      presets = [5, 10, 15, maxCount]; // A4 Sheet (5 cols x 6 rows: 5 in top line, 10, 15, 30 full page)
     } else if (maxCount <= 32) {
-      presets = [4, 8, 16, maxCount];
+      presets = [8, 16, 24, maxCount]; // A4 Landscape (8 in top line, 16, 24, 32)
     } else if (maxCount <= 36) {
       presets = [9, 18, 27, maxCount];
     } else if (maxCount <= 40) {
@@ -4021,7 +4027,9 @@ function setPhotoCount(count) {
     // Update count display badge
     const badge = document.getElementById('photoCountDisplay');
     if (badge) {
-      badge.textContent = (num === 3) ? '✓ 3 Photos (Default)' : `✓ ${num} Photos`;
+      const pSizeVal = document.getElementById('paperSize') ? document.getElementById('paperSize').value : '4x6P';
+      const isDefault = (pSizeVal === 'A4P' && num === 5) || (pSizeVal !== 'A4P' && num === 3);
+      badge.textContent = isDefault ? `✓ ${num} Photos (Default)` : `✓ ${num} Photos`;
     }
     
     // Update preset buttons active state
@@ -4238,17 +4246,56 @@ function setPhotoCount(count) {
   function onPaperSizeChange() {
     const paperSize = document.getElementById('paperSize').value;
     const gridSelect = document.getElementById('gridLayout');
-    if (paperSize === '12x6L' || paperSize === '12x6P') {
-      if (gridSelect) {
-        gridSelect.value = '10x4';
-        onGridLayoutChange();
-        return;
-      }
-    } else if ((paperSize === '4x6P' || paperSize === '4x6L') && gridSelect && (gridSelect.value === '10x4' || gridSelect.value === '8x5')) {
-      gridSelect.value = '4x3';
-      onGridLayoutChange();
+    
+    if (paperSize === 'A4P') {
+      // A4 Portrait: 5 columns x 6 rows = 30 photos! (5 pieces in top row, 30 on full page)
+      if (gridSelect) gridSelect.value = '6x5';
+      updateMaxPhotoCount(30, false);
+      setPhotoCount(5); // Default 5 photos for A4 (1 full line)
+      isCustomOffset = false;
+      centerPhotosOnSheet();
+      return;
+    } else if (paperSize === 'A4L') {
+      // A4 Landscape: 8 columns x 4 rows = 32 photos! (8 pieces in top row)
+      if (gridSelect) gridSelect.value = '8x4';
+      updateMaxPhotoCount(32, false);
+      setPhotoCount(8);
+      isCustomOffset = false;
+      centerPhotosOnSheet();
+      return;
+    } else if (paperSize === '4x6P') {
+      // 4x6 Portrait: 3 columns x 4 rows = 12 photos! (3 pieces in top row, 12 on full page)
+      if (gridSelect) gridSelect.value = '4x3';
+      updateMaxPhotoCount(12, false);
+      setPhotoCount(3); // Default 3 photos for 4x6 (1 full line)
+      isCustomOffset = false;
+      centerPhotosOnSheet();
+      return;
+    } else if (paperSize === '4x6L') {
+      // 4x6 Landscape: 4 columns x 3 rows = 12 photos!
+      if (gridSelect) gridSelect.value = '4x3';
+      updateMaxPhotoCount(12, false);
+      setPhotoCount(4);
+      isCustomOffset = false;
+      centerPhotosOnSheet();
+      return;
+    } else if (paperSize === '12x6L' || paperSize === '12x6P') {
+      // 12x6 Studio Special: 10 columns x 4 rows = 40 photos!
+      if (gridSelect) gridSelect.value = '10x4';
+      updateMaxPhotoCount(40, false);
+      setPhotoCount(10);
+      isCustomOffset = false;
+      centerPhotosOnSheet();
+      return;
+    } else if (paperSize === '5x7P') {
+      if (gridSelect) gridSelect.value = '5x4';
+      updateMaxPhotoCount(20, false);
+      setPhotoCount(4);
+      isCustomOffset = false;
+      centerPhotosOnSheet();
       return;
     }
+    
     const val = gridSelect ? gridSelect.value : '4x3';
     if (val === 'actual') {
        const m = getSheetMetrics();
