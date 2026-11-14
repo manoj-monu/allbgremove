@@ -958,960 +958,474 @@
 
 
 
-  <!-- Navbar (Dark Neon Studio Theme matching Image 2) -->
-  <nav class="fixed top-0 left-0 right-0 w-full z-50 bg-[#0d0720]/95 backdrop-blur-md border-b border-purple-500/20 shadow-[0_4px_25px_rgba(0,0,0,0.5)]">
-    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-[72px] gap-4">
+  
+  
+  <!-- Canva-Style Global Header -->
+  <nav class="fixed top-0 left-0 right-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-[68px] gap-4">
         
-        <!-- Logo -->
+        <!-- Left: Canva-Style Gradient Logo -->
         <a href="index.html" onclick="showLandingPage(); return false;" class="flex items-center gap-2.5 shrink-0 group">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-fuchsia-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-purple-500/40 group-hover:scale-105 transition">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#7d2ae8] via-[#00c4cc] to-[#ff007a] flex items-center justify-center text-white shadow-md shadow-purple-200 group-hover:scale-105 transition duration-300">
             <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
           </div>
           <div class="flex flex-col text-left">
-            <span class="font-extrabold text-xl tracking-tight text-white leading-none">AllBG<span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400">Remove.com</span></span>
-            <span class="text-[9.5px] font-bold text-purple-300/80 tracking-wider uppercase mt-0.5">AI Photo Editing Studio</span>
+            <span class="font-black text-2xl tracking-tight text-[#0e1318] leading-none">AllBG<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#7d2ae8] to-[#00c4cc]">Remove</span></span>
+            <span class="text-[9.5px] font-bold text-slate-400 tracking-wider uppercase mt-0.5">Photo &amp; Passport Studio</span>
           </div>
         </a>
 
-        <!-- Center Nav Links (Desktop) -->
-        <div class="hidden lg:flex items-center gap-1 xl:gap-2">
+        <!-- Center: Canva Navigation Tabs -->
+        <div class="hidden lg:flex items-center gap-1">
+          <a href="#" onclick="showLandingPage(); return false;" class="px-4 py-2 rounded-xl text-sm font-bold text-[#7d2ae8] bg-purple-50 transition">Home</a>
+          
           <div class="relative group">
-            <button class="px-3.5 py-1.5 rounded-full text-[13px] font-bold text-gray-300 hover:text-white hover:bg-white/10 transition flex items-center gap-1.5">
-              <span>AI Tools</span>
-              <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 group-hover:text-white transition"></i>
+            <button class="px-4 py-2 rounded-xl text-sm font-bold text-slate-700 hover:text-[#7d2ae8] hover:bg-slate-50 transition flex items-center gap-1.5 cursor-pointer">
+              <span>Photo Tools</span>
+              <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-hover:text-[#7d2ae8] transition"></i>
             </button>
-            <div class="absolute left-0 top-full pt-2 w-56 hidden group-hover:block transition z-50">
-              <div class="bg-[#150d2c] rounded-2xl shadow-2xl border border-purple-500/25 p-2 backdrop-blur-xl">
-                <a href="#tools" class="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-gray-300 hover:text-white hover:bg-purple-600/20 rounded-xl transition">
-                  <i class="fa-solid fa-scissors text-pink-400 w-4"></i> Background Remover
+            <div class="absolute left-0 top-full pt-2 w-64 hidden group-hover:block transition z-50">
+              <div class="bg-white rounded-2xl shadow-xl border border-slate-200/80 p-2">
+                <a href="#templates" class="flex items-center gap-3 px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-[#7d2ae8] hover:bg-purple-50 rounded-xl transition">
+                  <div class="w-8 h-8 rounded-lg bg-purple-100 text-[#7d2ae8] flex items-center justify-center shrink-0"><i class="fa-solid fa-id-card"></i></div>
+                  <div><div>Passport Photo Maker</div><div class="text-[10px] text-slate-400 font-normal">35x45mm &amp; 2x2" sizes</div></div>
                 </a>
-                <a href="#tools" class="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-gray-300 hover:text-white hover:bg-purple-600/20 rounded-xl transition">
-                  <i class="fa-solid fa-id-card text-purple-400 w-4"></i> Passport Photo Maker
+                <a href="#templates" class="flex items-center gap-3 px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-[#00c4cc] hover:bg-cyan-50 rounded-xl transition">
+                  <div class="w-8 h-8 rounded-lg bg-cyan-100 text-[#00c4cc] flex items-center justify-center shrink-0"><i class="fa-solid fa-scissors"></i></div>
+                  <div><div>Background Remover</div><div class="text-[10px] text-slate-400 font-normal">1-Click cutout</div></div>
                 </a>
-                <a href="#tools" class="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-gray-300 hover:text-white hover:bg-purple-600/20 rounded-xl transition">
-                  <i class="fa-solid fa-wand-magic-sparkles text-pink-400 w-4"></i> AI Photo Enhancer
+                <a href="#templates" class="flex items-center gap-3 px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition">
+                  <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-print"></i></div>
+                  <div><div>4x6 &amp; A4 Print Sheets</div><div class="text-[10px] text-slate-400 font-normal">3, 6, 12 &amp; 30 photos</div></div>
                 </a>
-                <a href="#tools" class="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-gray-300 hover:text-white hover:bg-purple-600/20 rounded-xl transition">
-                  <i class="fa-solid fa-image text-cyan-400 w-4"></i> Change Background
+                <a href="#templates" class="flex items-center gap-3 px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-pink-600 hover:bg-pink-50 rounded-xl transition">
+                  <div class="w-8 h-8 rounded-lg bg-pink-100 text-pink-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-sparkles"></i></div>
+                  <div><div>AI Face Retouch</div><div class="text-[10px] text-slate-400 font-normal">Auto lighting &amp; sharp</div></div>
                 </a>
               </div>
             </div>
           </div>
 
-          <a href="#" onclick="document.getElementById('fileIn').click(); return false;" class="px-3.5 py-1.5 rounded-full text-[13px] font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition">Passport Photo</a>
-          
-          <a href="#" onclick="document.getElementById('fileIn').click(); return false;" class="px-3.5 py-1.5 rounded-full text-[13px] font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition flex items-center gap-1.5">
-            <span>Photo Editor</span>
-            <span class="px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-md bg-purple-600 text-white shadow-xs">New</span>
-          </a>
-
-          <a href="#pricing" class="px-3.5 py-1.5 rounded-full text-[13px] font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition">Pricing</a>
-          <a href="blog.html" class="px-3.5 py-1.5 rounded-full text-[13px] font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition">Blog</a>
-          <a href="#faq" class="px-3.5 py-1.5 rounded-full text-[13px] font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition">Help</a>
+          <a href="#templates" class="px-4 py-2 rounded-xl text-sm font-bold text-slate-700 hover:text-[#7d2ae8] hover:bg-slate-50 transition">Templates</a>
+          <a href="pricing.html" class="px-4 py-2 rounded-xl text-sm font-bold text-slate-700 hover:text-[#7d2ae8] hover:bg-slate-50 transition">Pricing (₹)</a>
+          <a href="requirements.html" class="px-4 py-2 rounded-xl text-sm font-bold text-slate-700 hover:text-[#7d2ae8] hover:bg-slate-50 transition">Photo Guide</a>
         </div>
 
-        <!-- Right Side Actions -->
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0" id="navAuthContainer">
+        <!-- Right: Canva Purple Primary CTA Button -->
+        <div class="flex items-center gap-3 shrink-0" id="navAuthContainer">
           
-          <!-- Language Selector -->
-          <div class="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold text-gray-300 hover:text-white bg-white/5 border border-white/10 transition cursor-pointer">
-            <i class="fa-solid fa-globe text-purple-400 text-xs"></i>
-            <span>EN</span>
-            <i class="fa-solid fa-chevron-down text-[9px] text-gray-400"></i>
-          </div>
-
-          <!-- Logged Out -->
-          <div id="navLoggedOut" class="flex items-center gap-1.5 sm:gap-2.5">
-            <button onclick="openAuthModal('login')" class="px-3 sm:px-4 py-1.5 sm:py-2 text-xs xl:text-sm font-bold text-gray-300 hover:text-white hover:bg-white/10 rounded-full transition whitespace-nowrap cursor-pointer">Login</button>
-            <button onclick="document.getElementById('fileIn').click()" class="px-3.5 sm:px-5 py-1.5 sm:py-2 text-xs xl:text-sm font-extrabold text-white bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-full shadow-[0_0_20px_rgba(217,70,239,0.4)] hover:shadow-[0_0_30px_rgba(217,70,239,0.6)] transition whitespace-nowrap cursor-pointer flex items-center gap-1.5">
-              <i class="fa-solid fa-bolt text-xs"></i>
-              <span>Get Started Free</span>
+          <div id="navLoggedOut" class="flex items-center gap-2 sm:gap-3">
+            <button onclick="openAuthModal('login')" class="px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold text-slate-700 hover:text-[#7d2ae8] hover:bg-slate-100 rounded-xl transition cursor-pointer">Log in</button>
+            <button onclick="document.getElementById('fileIn').click()" class="px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-extrabold text-white bg-gradient-to-r from-[#7d2ae8] via-[#8b3dff] to-[#00c4cc] hover:opacity-95 rounded-xl shadow-md shadow-purple-200 transition cursor-pointer flex items-center gap-2">
+              <i class="fa-solid fa-plus text-xs"></i>
+              <span>Create a photo</span>
             </button>
           </div>
 
-          <!-- Logged In -->
-          <div id="navLoggedIn" class="hidden items-center gap-1.5 sm:gap-2.5">
-            <!-- Wallet Credits Button -->
-            <button onclick="openRechargeModal()" class="flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-amber-500/20 to-purple-500/20 border border-amber-400/40 pl-2 sm:pl-3 pr-1 sm:pr-1.5 py-1 rounded-full text-xs font-bold text-white transition shadow-xs shrink-0 cursor-pointer" title="Click to recharge credits">
-              <i class="fa-solid fa-coins text-amber-400 text-xs"></i>
-              <span class="whitespace-nowrap"><span id="navCreditsCount" class="text-pink-400 font-black">5</span><span class="hidden sm:inline"> Credits</span></span>
-              <span class="bg-purple-600 hover:bg-purple-500 text-white text-[10px] sm:text-[11px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full shadow-xs whitespace-nowrap">+<span class="hidden xs:inline"> Recharge</span></span>
+          <div id="navLoggedIn" class="hidden items-center gap-2">
+            <button onclick="openRechargeModal()" class="flex items-center gap-2 bg-purple-50 border border-purple-200 pl-3 pr-2 py-1 rounded-xl text-xs font-bold text-[#7d2ae8] cursor-pointer">
+              <i class="fa-solid fa-coins text-amber-500"></i>
+              <span><span id="navCreditsCount" class="font-black">5</span> Credits</span>
+              <span class="bg-[#7d2ae8] text-white text-[10px] px-2 py-0.5 rounded-lg">+ Add</span>
             </button>
-
-            <!-- User Profile Dropdown Button -->
-            <div class="relative group" id="userMenuWrapper" onmouseenter="showUserDropdown()" onmouseleave="hideUserDropdown()">
-              <button id="navUserMenuBtn" onclick="toggleUserDropdown(event)" class="flex items-center gap-1.5 sm:gap-2 py-1 px-2 sm:px-2.5 rounded-full hover:bg-white/10 transition cursor-pointer border border-purple-500/30 bg-[#150d2c] shadow-xs text-white">
-                <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 text-white font-black flex items-center justify-center text-xs shadow-xs shrink-0 overflow-hidden" id="navUserAvatar">
-                  U
-                </div>
-                <span class="text-xs font-bold text-white max-w-[110px] md:max-w-[130px] truncate whitespace-nowrap hidden sm:inline" id="navUserName">Studio User</span>
-                <i class="fa-solid fa-chevron-down text-[9px] text-gray-400"></i>
-              </button>
-              
-              <!-- Dropdown Menu -->
-              <div id="userProfileDropdown" class="absolute right-0 top-full pt-2 w-64 hidden group-hover:block transition z-50">
-                <div class="bg-[#150d2c] rounded-2xl shadow-2xl border border-purple-500/30 py-2 backdrop-blur-xl">
-                  <div class="px-4 py-3 border-b border-purple-500/20 bg-purple-950/40">
-                    <p class="text-[10px] uppercase tracking-wider text-purple-300 font-bold">Studio Account</p>
-                    <p class="text-sm font-bold text-white truncate" id="navUserEmail">user@example.com</p>
-                  </div>
-                  <a href="#" onclick="openRechargeModal(); hideUserDropdown(); return false;" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-gray-300 hover:bg-purple-600/20 hover:text-white transition">
-                    <i class="fa-solid fa-bolt text-amber-400 w-4"></i> Recharge Wallet
-                  </a>
-                  <a href="#" onclick="openTxnHistoryModal(); hideUserDropdown(); return false;" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-gray-300 hover:bg-purple-600/20 hover:text-white transition">
-                    <i class="fa-solid fa-receipt text-purple-400 w-4"></i> Payment History
-                  </a>
-                  <a href="pricing.html" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-gray-300 hover:bg-purple-600/20 hover:text-white transition">
-                    <i class="fa-solid fa-tags text-pink-400 w-4"></i> View Plans &amp; Pricing
-                  </a>
-
-                  <div class="border-t border-purple-500/20 mt-1 pt-1">
-                    <button type="button" onclick="handleLogout(event)" class="w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-red-400 hover:bg-red-500/20 transition cursor-pointer">
-                      <i class="fa-solid fa-arrow-right-from-bracket w-4"></i> Sign Out
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Direct 1-Click Logout Button -->
-            <button type="button" onclick="handleLogout(event)" class="hidden sm:flex px-3 py-1.5 text-xs font-bold text-red-400 hover:text-red-300 bg-red-950/40 hover:bg-red-900/40 border border-red-500/30 rounded-full transition items-center gap-1.5 cursor-pointer shadow-xs shrink-0 whitespace-nowrap" title="Sign Out">
-              <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
-              <span>Logout</span>
-            </button>
+            <button type="button" onclick="handleLogout(event)" class="px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50 border border-red-200 rounded-xl transition cursor-pointer">Logout</button>
           </div>
 
-          <!-- Mobile Hamburger Button -->
-          <button id="mobileNavToggleBtn" onclick="toggleMobileNav()" class="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 border border-white/10 transition cursor-pointer shrink-0" aria-label="Toggle Menu">
-            <i class="fa-solid fa-bars text-sm" id="mobileNavIcon"></i>
+          <button id="mobileNavToggleBtn" onclick="toggleMobileNav()" class="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center text-slate-700 hover:bg-slate-100 border border-slate-200 transition cursor-pointer">
+            <i class="fa-solid fa-bars text-sm"></i>
           </button>
         </div>
+
       </div>
 
-      <!-- Mobile Dropdown Menu -->
-      <div id="mobileNavMenu" class="hidden lg:hidden border-t border-purple-500/20 py-3 bg-[#0d0720]/95 backdrop-blur-xl rounded-b-2xl shadow-2xl px-2 space-y-1">
-        <a href="index.html" onclick="showLandingPage(); return false;" class="block px-4 py-2 text-sm font-bold text-pink-400 bg-purple-900/30 rounded-xl">Home</a>
-        <a href="#tools" class="block px-4 py-2 text-sm font-semibold text-gray-300 hover:bg-white/5 rounded-xl">AI Tools</a>
-        <a href="#" onclick="document.getElementById('fileIn').click(); return false;" class="block px-4 py-2 text-sm font-semibold text-gray-300 hover:bg-white/5 rounded-xl">Passport Photo</a>
-        <a href="#pricing" class="block px-4 py-2 text-sm font-semibold text-gray-300 hover:bg-white/5 rounded-xl">Pricing</a>
-        <a href="blog.html" class="block px-4 py-2 text-sm font-semibold text-gray-300 hover:bg-white/5 rounded-xl">Blog</a>
-        <a href="#faq" class="block px-4 py-2 text-sm font-semibold text-gray-300 hover:bg-white/5 rounded-xl">Help &amp; FAQ</a>
+      <!-- Mobile Menu -->
+      <div id="mobileNavMenu" class="hidden lg:hidden border-t border-slate-100 py-3 bg-white/95 backdrop-blur-md rounded-b-2xl shadow-xl px-2 space-y-1">
+        <a href="#" class="block px-4 py-2 text-sm font-bold text-[#7d2ae8] bg-purple-50 rounded-xl">Home</a>
+        <a href="#templates" class="block px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl">Templates</a>
+        <a href="pricing.html" class="block px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl">Pricing (₹)</a>
+        <a href="requirements.html" class="block px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl">Photo Guide</a>
       </div>
+
     </div>
   </nav>
 
-  <!-- Complete Landing Page Container (Dark Neon SaaS UI matching Image 2) -->
-  <div id="landing-page-container" class="landing-dark-theme font-['Plus_Jakarta_Sans',sans-serif]">
+  <!-- Complete Canva-Style Landing Page -->
+  <div id="landing-page-container" class="font-['Plus_Jakarta_Sans',sans-serif] bg-[#f8f9fa] text-[#0e1318]">
     
-    <!-- Hero Section -->
-    <section class="relative pt-28 sm:pt-36 pb-16 sm:pb-24 overflow-hidden">
-      <!-- Ambient Lighting -->
-      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] bg-gradient-to-r from-purple-600/25 via-fuchsia-600/20 to-pink-600/25 blur-[120px] pointer-events-none rounded-full"></div>
-      <div class="absolute top-20 right-10 w-[350px] h-[350px] bg-pink-500/15 blur-[100px] pointer-events-none rounded-full"></div>
-      <div class="absolute bottom-10 left-10 w-[300px] h-[300px] bg-purple-600/15 blur-[100px] pointer-events-none rounded-full"></div>
+    <!-- Hero Banner (Canva's Signature "What will you create today?") -->
+    <section class="pt-24 sm:pt-28 pb-12 sm:pb-16 bg-gradient-to-b from-[#f3e8ff]/40 via-white to-[#f8f9fa] relative overflow-hidden">
+      
+      <!-- Canva Decorative Soft Color Blobs -->
+      <div class="absolute -top-20 -left-20 w-96 h-96 bg-[#00c4cc]/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute top-10 right-0 w-96 h-96 bg-[#ff007a]/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute top-40 left-1/2 -translate-x-1/2 w-[600px] h-60 bg-[#7d2ae8]/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        
+        <!-- Canva Greeting Pill -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-purple-200 text-[#7d2ae8] text-xs sm:text-sm font-extrabold mb-5 shadow-xs">
+          <span class="w-2 h-2 rounded-full bg-gradient-to-r from-[#7d2ae8] to-[#00c4cc] animate-pulse"></span>
+          <span>A powerful photo studio designed for everyone</span>
+        </div>
+
+        <!-- Canva Headline: "What will you create today?" -->
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-[#0e1318] leading-[1.15] tracking-tight mb-4">
+          What photo will you<br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#7d2ae8] via-[#8b3dff] to-[#00c4cc]">design today?</span>
+        </h1>
+        
+        <p class="text-slate-600 text-sm sm:text-lg max-w-2xl mx-auto mb-8 font-normal leading-relaxed">
+          Remove background, crop to official passport sizes (35×45mm), and download ready-to-print 4×6" and A4 sheets in 5 seconds.
+        </p>
+
+        <!-- Canva Quick Category Pills Carousel -->
+        <div class="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none px-2">
           
-          <!-- Left Column: Title & CTAs (5.5 cols) -->
-          <div class="lg:col-span-5 text-left">
-            <!-- Top Pill -->
-            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-950/60 border border-purple-500/40 text-purple-300 text-xs sm:text-sm font-bold mb-5 shadow-[0_0_15px_rgba(168,85,247,0.2)] backdrop-blur-md">
-              <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i>
-              <span>AI Photo Editing Studio</span>
+          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-purple-50 border border-slate-200 hover:border-purple-300 text-slate-800 hover:text-[#7d2ae8] text-xs sm:text-sm font-bold shadow-xs whitespace-nowrap transition cursor-pointer">
+            <span class="w-6 h-6 rounded-full bg-purple-100 text-[#7d2ae8] flex items-center justify-center text-xs"><i class="fa-solid fa-id-card"></i></span>
+            <span>Indian Passport (35×45mm)</span>
+          </button>
+
+          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-cyan-50 border border-slate-200 hover:border-cyan-300 text-slate-800 hover:text-[#00c4cc] text-xs sm:text-sm font-bold shadow-xs whitespace-nowrap transition cursor-pointer">
+            <span class="w-6 h-6 rounded-full bg-cyan-100 text-[#00c4cc] flex items-center justify-center text-xs"><i class="fa-solid fa-scissors"></i></span>
+            <span>Remove Background</span>
+          </button>
+
+          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-800 hover:text-emerald-600 text-xs sm:text-sm font-bold shadow-xs whitespace-nowrap transition cursor-pointer">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs"><i class="fa-solid fa-print"></i></span>
+            <span>4×6 Print Sheet</span>
+          </button>
+
+          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-pink-50 border border-slate-200 hover:border-pink-300 text-slate-800 hover:text-pink-600 text-xs sm:text-sm font-bold shadow-xs whitespace-nowrap transition cursor-pointer">
+            <span class="w-6 h-6 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center text-xs"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+            <span>A4 30-Photo Sheet</span>
+          </button>
+
+          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-slate-800 hover:text-amber-600 text-xs sm:text-sm font-bold shadow-xs whitespace-nowrap transition cursor-pointer">
+            <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs"><i class="fa-solid fa-flag-usa"></i></span>
+            <span>US Visa (2×2")</span>
+          </button>
+
+        </div>
+
+        <!-- Canva Large Creative Studio Card (Dropzone & Action Box) -->
+        <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-200/80 max-w-3xl mx-auto relative group">
+          
+          <div onclick="document.getElementById('fileIn').click()" class="border-2 border-dashed border-purple-300 hover:border-[#7d2ae8] bg-gradient-to-b from-purple-50/30 to-white hover:bg-purple-50/60 rounded-2xl p-8 sm:p-12 text-center transition duration-300 cursor-pointer">
+            
+            <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-3xl bg-gradient-to-tr from-[#7d2ae8] via-[#8b3dff] to-[#00c4cc] text-white flex items-center justify-center text-2xl sm:text-3xl shadow-xl shadow-purple-200 group-hover:scale-105 transition duration-300">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
             </div>
 
-            <!-- Headline -->
-            <h1 class="text-3xl sm:text-5xl lg:text-[44px] xl:text-[52px] font-black text-white leading-[1.12] tracking-tight mb-5">
-              Remove Background,<br>
-              Edit &amp; Create<br>
-              <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400">Professional Photos</span>
-            </h1>
+            <button class="bg-gradient-to-r from-[#7d2ae8] via-[#8b3dff] to-[#00c4cc] hover:opacity-95 text-white font-black py-4 px-8 sm:px-10 rounded-2xl shadow-lg shadow-purple-200 text-base sm:text-lg flex items-center gap-3 mx-auto mb-3 transition">
+              <span>Upload your photo</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
 
-            <!-- Subtitle -->
-            <p class="text-gray-300 text-sm sm:text-base leading-relaxed mb-6 max-w-xl font-normal">
-              All-in-one AI photo editing platform to remove background, make passport photos, enhance image quality, and edit photos like a pro — online, free and in seconds.
+            <p class="text-xs sm:text-sm text-slate-600 font-semibold mb-1">
+              Drag &amp; drop any photo here, or browse from your device
+            </p>
+            <p class="text-[11px] sm:text-xs text-slate-400">
+              Supports JPG, PNG, WEBP • 100% Free • No Watermark
             </p>
 
-            <!-- Trust Badges -->
-            <div class="flex flex-wrap items-center gap-3 sm:gap-4 mb-7 text-xs sm:text-sm text-gray-300 font-semibold">
-              <div class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400"></i> 100% Free Start</div>
-              <div class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400"></i> No Watermark</div>
-              <div class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400"></i> No Sign Up Required</div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex flex-wrap items-center gap-3.5 mb-6">
-              <button onclick="document.getElementById('fileIn').click()" class="bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:from-purple-500 hover:via-fuchsia-500 hover:to-pink-500 text-white font-extrabold text-sm sm:text-base px-6 sm:px-8 py-3.5 rounded-xl shadow-[0_0_25px_rgba(217,70,239,0.45)] hover:shadow-[0_0_35px_rgba(217,70,239,0.65)] hover:scale-[1.02] active:scale-[0.98] transition flex items-center gap-2.5 cursor-pointer">
-                <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
-                <span>Upload Your Photo</span>
-                <i class="fa-solid fa-arrow-right text-xs ml-1"></i>
+            <!-- 1-Click Try Samples -->
+            <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-center gap-2 sm:gap-3 flex-wrap" onclick="event.stopPropagation()">
+              <span class="text-xs font-bold text-slate-500">Or try a sample photo:</span>
+              <button onclick="loadExample('assets/example1.jpg')" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-purple-100 text-slate-700 hover:text-[#7d2ae8] font-bold text-xs transition">
+                <img src="assets/example1.jpg" class="w-4 h-4 rounded-full object-cover">
+                <span>Passport</span>
               </button>
-              
-              <button onclick="openDemoModal()" class="bg-white/5 hover:bg-white/10 text-white font-bold text-sm sm:text-base px-5 sm:px-6 py-3.5 rounded-xl border border-white/15 hover:border-white/30 backdrop-blur-md transition flex items-center gap-2 cursor-pointer">
-                <i class="fa-solid fa-circle-play text-pink-400 text-base"></i>
-                <span>Watch Demo</span>
+              <button onclick="loadExample('assets/example2.jpg')" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-purple-100 text-slate-700 hover:text-[#7d2ae8] font-bold text-xs transition">
+                <img src="assets/example2.jpg" class="w-4 h-4 rounded-full object-cover">
+                <span>Visa</span>
+              </button>
+              <button onclick="loadExample('assets/example3.jpg')" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-purple-100 text-slate-700 hover:text-[#7d2ae8] font-bold text-xs transition">
+                <img src="assets/example3.jpg" class="w-4 h-4 rounded-full object-cover">
+                <span>ID Card</span>
               </button>
             </div>
 
-            <!-- Hand drawn curve arrow & text -->
-            <div class="hidden sm:flex items-center gap-2 text-pink-400 text-xs sm:text-sm font-bold pl-2">
-              <span>Remove Background in 1 Click</span>
-              <svg class="w-10 h-6 text-pink-400" viewBox="0 0 50 25" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 20 Q 25 5, 45 15 M 40 8 L 46 15 L 38 18"/></svg>
-            </div>
           </div>
 
-          <!-- Center & Right Hero Visuals (7 cols) -->
-          <div class="lg:col-span-7 flex flex-col md:flex-row items-center justify-center gap-5">
-            
-            <!-- Center: Glowing Before/After Image Card -->
-            <div class="relative w-full max-w-[420px] rounded-3xl p-1 bg-gradient-to-tr from-purple-600/40 via-fuchsia-500/30 to-pink-600/40 shadow-[0_0_50px_rgba(168,85,247,0.35)] group cursor-pointer" onclick="document.getElementById('fileIn').click()">
-              <div class="relative rounded-[22px] overflow-hidden bg-gray-900 border border-purple-500/30">
-                <img src="assets/landing/hero_model.png?v=2" alt="Before and After AI Background Removal" class="w-full h-auto object-cover display-block transform group-hover:scale-[1.02] transition duration-500">
-                <div class="absolute inset-0 bg-gradient-to-t from-purple-950/40 via-transparent to-transparent pointer-events-none"></div>
-              </div>
-            </div>
-
-            <!-- Right: Floating Vertical Feature Stack (5 dark glass buttons) -->
-            <div class="flex flex-col gap-2.5 w-full md:w-[210px] shrink-0">
-              
-              <div onclick="document.getElementById('fileIn').click()" class="flex items-center gap-3 p-3 rounded-xl bg-[#150d2c]/85 hover:bg-[#1f1442] border border-purple-500/25 hover:border-purple-500/60 backdrop-blur-md transition cursor-pointer group shadow-lg">
-                <div class="w-8 h-8 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
-                  <i class="fa-solid fa-scissors text-sm"></i>
-                </div>
-                <div class="text-left leading-tight">
-                  <div class="text-xs font-bold text-white group-hover:text-pink-300 transition">Remove Background</div>
-                </div>
-              </div>
-
-              <div onclick="document.getElementById('fileIn').click()" class="flex items-center gap-3 p-3 rounded-xl bg-[#150d2c]/85 hover:bg-[#1f1442] border border-purple-500/25 hover:border-purple-500/60 backdrop-blur-md transition cursor-pointer group shadow-lg">
-                <div class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
-                  <i class="fa-solid fa-image text-sm"></i>
-                </div>
-                <div class="text-left leading-tight">
-                  <div class="text-xs font-bold text-white group-hover:text-cyan-300 transition">Change Background</div>
-                </div>
-              </div>
-
-              <div onclick="document.getElementById('fileIn').click()" class="flex items-center gap-3 p-3 rounded-xl bg-[#150d2c]/85 hover:bg-[#1f1442] border border-purple-500/25 hover:border-purple-500/60 backdrop-blur-md transition cursor-pointer group shadow-lg">
-                <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
-                  <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
-                </div>
-                <div class="text-left leading-tight">
-                  <div class="text-xs font-bold text-white group-hover:text-purple-300 transition">AI Enhance (HD)</div>
-                </div>
-              </div>
-
-              <div onclick="document.getElementById('fileIn').click()" class="flex items-center gap-3 p-3 rounded-xl bg-[#150d2c]/85 hover:bg-[#1f1442] border border-purple-500/25 hover:border-purple-500/60 backdrop-blur-md transition cursor-pointer group shadow-lg">
-                <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
-                  <i class="fa-solid fa-id-card text-sm"></i>
-                </div>
-                <div class="text-left leading-tight">
-                  <div class="text-xs font-bold text-white group-hover:text-indigo-300 transition">Passport Photo</div>
-                  <div class="text-[10px] text-gray-400">2x2, 4x6, A4</div>
-                </div>
-              </div>
-
-              <div onclick="document.getElementById('fileIn').click()" class="flex items-center gap-3 p-3 rounded-xl bg-[#150d2c]/85 hover:bg-[#1f1442] border border-purple-500/25 hover:border-purple-500/60 backdrop-blur-md transition cursor-pointer group shadow-lg">
-                <div class="w-8 h-8 rounded-lg bg-fuchsia-500/20 text-fuchsia-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
-                  <i class="fa-solid fa-cubes text-sm"></i>
-                </div>
-                <div class="text-left leading-tight">
-                  <div class="text-xs font-bold text-white group-hover:text-fuchsia-300 transition">More AI Tools</div>
-                  <div class="text-[10px] text-gray-400">(10+ Tools)</div>
-                </div>
-              </div>
-
-            </div>
-
+          <!-- Micro Trust Line -->
+          <div class="mt-4 flex items-center justify-between text-[11px] text-slate-400 px-2">
+            <span><i class="fa-solid fa-shield-halved text-emerald-500 mr-1"></i> Private &amp; Secure • Biometrics encrypted • Auto-deleted</span>
+            <span>Direct 300 DPI Lab Print Quality</span>
           </div>
 
         </div>
+
       </div>
     </section>
 
-    <!-- Tool Category Quick Shelf (Horizontal Nav Dock) -->
-    <section class="py-4 relative z-20">
-      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-start lg:justify-center gap-2 overflow-x-auto py-2.5 px-3 rounded-2xl bg-[#130b29]/90 border border-purple-500/25 backdrop-blur-xl shadow-xl scrollbar-none">
-          
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-[0_0_15px_rgba(217,70,239,0.35)] cursor-pointer">
-            <i class="fa-solid fa-scissors"></i> Background Remover
+    <!-- Canva-Style "Popular Templates" Asymmetric Card Grid -->
+    <section id="templates" class="py-14 sm:py-20 bg-white border-t border-slate-200/80">
+      <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="flex items-end justify-between mb-8">
+          <div>
+            <span class="text-xs font-black uppercase tracking-wider text-[#7d2ae8]">Pre-Made Templates</span>
+            <h2 class="text-2xl sm:text-4xl font-black text-[#0e1318] tracking-tight mt-1">
+              Start with a ready template
+            </h2>
+          </div>
+          <button onclick="document.getElementById('fileIn').click()" class="text-xs sm:text-sm font-bold text-[#7d2ae8] hover:underline flex items-center gap-1">
+            <span>Explore all formats</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
           </button>
-
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition cursor-pointer">
-            <i class="fa-solid fa-id-card text-purple-400"></i> Passport Photo
-          </button>
-
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition cursor-pointer">
-            <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> AI Enhance HD
-          </button>
-
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition cursor-pointer">
-            <i class="fa-solid fa-image text-cyan-400"></i> Change Background
-          </button>
-
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition cursor-pointer">
-            <i class="fa-solid fa-layer-group text-blue-400"></i> Photo Editor (Pro)
-          </button>
-
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition cursor-pointer">
-            <i class="fa-solid fa-crop-simple text-amber-400"></i> Resize &amp; Crop
-          </button>
-
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition cursor-pointer">
-            <i class="fa-solid fa-address-card text-emerald-400"></i> Aadhaar / PAN Photo
-          </button>
-
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition cursor-pointer">
-            <i class="fa-solid fa-print text-indigo-400"></i> 4x6 Print Layout
-          </button>
-
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition cursor-pointer">
-            <i class="fa-solid fa-sparkles text-rose-400"></i> AI Retouch Face
-          </button>
-
-          <button onclick="document.getElementById('fileIn').click()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition cursor-pointer">
-            <i class="fa-solid fa-ellipsis"></i> More Tools
-          </button>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- Featured Spotlight Duo Cards -->
-    <section class="py-12 relative z-10">
-      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          <!-- Card 1: Photo Editor Pro -->
-          <div class="rounded-3xl p-6 sm:p-8 bg-[#130b29]/90 border border-purple-500/25 backdrop-blur-xl relative overflow-hidden group hover:border-purple-500/50 transition duration-300 flex flex-col justify-between">
-            <div class="relative z-10">
-              <div class="flex items-center gap-2 text-purple-400 font-extrabold text-sm mb-2">
-                <i class="fa-solid fa-layer-group"></i> Professional Photo Editor
-              </div>
-              <h3 class="text-xl sm:text-2xl font-black text-white mb-2.5">Professional Photo Editor</h3>
-              <p class="text-gray-300 text-xs sm:text-sm leading-relaxed mb-5 max-w-md">
-                Edit, layer, crop, add text, apply filters and more — a powerful editor like Photoshop, right in your browser.
-              </p>
-              <button onclick="document.getElementById('fileIn').click()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-extrabold text-xs sm:text-sm shadow-[0_0_20px_rgba(217,70,239,0.35)] hover:shadow-[0_0_30px_rgba(217,70,239,0.5)] transition cursor-pointer">
-                <span>Open Photo Editor</span> <i class="fa-solid fa-arrow-right text-xs"></i>
-              </button>
-            </div>
-            <div class="mt-6 rounded-2xl overflow-hidden border border-purple-500/30 shadow-2xl relative cursor-pointer" onclick="document.getElementById('fileIn').click()">
-              <img src="assets/landing/spotlight_editor.png?v=2" alt="Photo Editor UI Preview" class="w-full h-auto object-cover transform group-hover:scale-[1.02] transition duration-500">
-            </div>
-          </div>
-
-          <!-- Card 2: Passport & Visa Photo Maker -->
-          <div class="rounded-3xl p-6 sm:p-8 bg-[#130b29]/90 border border-purple-500/25 backdrop-blur-xl relative overflow-hidden group hover:border-purple-500/50 transition duration-300 flex flex-col justify-between">
-            <div class="relative z-10">
-              <div class="flex items-center gap-2 text-pink-400 font-extrabold text-sm mb-2">
-                <i class="fa-solid fa-id-card"></i> Passport &amp; Visa Photo Maker
-              </div>
-              <h3 class="text-xl sm:text-2xl font-black text-white mb-2.5">Passport &amp; Visa Photo Maker</h3>
-              <p class="text-gray-300 text-xs sm:text-sm leading-relaxed mb-5 max-w-md">
-                Create official passport, visa, ID, Aadhaar and PAN photos with correct size, background and print layout.
-              </p>
-              <button onclick="document.getElementById('fileIn').click()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white font-extrabold text-xs sm:text-sm shadow-[0_0_20px_rgba(217,70,239,0.35)] hover:shadow-[0_0_30px_rgba(217,70,239,0.5)] transition cursor-pointer">
-                <span>Make Passport Photo</span> <i class="fa-solid fa-arrow-right text-xs"></i>
-              </button>
-            </div>
-            <div class="mt-6 rounded-2xl overflow-hidden border border-purple-500/30 shadow-2xl relative cursor-pointer" onclick="document.getElementById('fileIn').click()">
-              <img src="assets/landing/spotlight_passport.png?v=2" alt="Passport Maker Sheet Preview" class="w-full h-auto object-cover transform group-hover:scale-[1.02] transition duration-500">
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- Explore Powerful AI Photo Tools (10 Cards Grid) -->
-    <section id="tools" class="py-16 relative z-10">
-      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-2xl sm:text-4xl font-black text-white mb-3">
-          Explore Powerful <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400">AI Photo Tools</span>
-        </h2>
-        <p class="text-gray-400 text-xs sm:text-base max-w-2xl mx-auto mb-10">
-          Everything you need to edit, enhance and create professional photos online.
-        </p>
-
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          
-          <!-- Tool 1: Remove Background -->
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-4 bg-[#140c2b]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer text-left flex flex-col justify-between">
-            <div class="rounded-xl overflow-hidden mb-3 border border-purple-500/20 bg-black/40">
-              <img src="assets/landing/tool_bg_remove.png?v=2" alt="Remove Background" class="w-full h-24 object-cover group-hover:scale-105 transition duration-300">
-            </div>
-            <div class="flex items-center justify-between mb-1">
-              <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-pink-300 transition flex items-center gap-1.5"><i class="fa-solid fa-scissors text-pink-400 text-xs"></i> Remove Background</h4>
-              <i class="fa-solid fa-arrow-right text-gray-500 text-xs group-hover:text-pink-400 transition"></i>
-            </div>
-            <p class="text-[11px] text-gray-400 leading-tight">Remove background instantly with AI.</p>
-          </div>
-
-          <!-- Tool 2: Change Background -->
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-4 bg-[#140c2b]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer text-left flex flex-col justify-between">
-            <div class="rounded-xl overflow-hidden mb-3 border border-purple-500/20 bg-black/40">
-              <img src="assets/landing/tool_change_bg.png?v=2" alt="Change Background" class="w-full h-24 object-cover group-hover:scale-105 transition duration-300">
-            </div>
-            <div class="flex items-center justify-between mb-1">
-              <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-cyan-300 transition flex items-center gap-1.5"><i class="fa-solid fa-image text-cyan-400 text-xs"></i> Change Background</h4>
-              <i class="fa-solid fa-arrow-right text-gray-500 text-xs group-hover:text-cyan-400 transition"></i>
-            </div>
-            <p class="text-[11px] text-gray-400 leading-tight">Replace with white, color or custom image.</p>
-          </div>
-
-          <!-- Tool 3: AI Enhance HD -->
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-4 bg-[#140c2b]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer text-left flex flex-col justify-between">
-            <div class="rounded-xl overflow-hidden mb-3 border border-purple-500/20 bg-black/40">
-              <img src="assets/landing/tool_enhance.png?v=2" alt="AI Enhance HD" class="w-full h-24 object-cover group-hover:scale-105 transition duration-300">
-            </div>
-            <div class="flex items-center justify-between mb-1">
-              <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-purple-300 transition flex items-center gap-1.5"><i class="fa-solid fa-wand-magic-sparkles text-purple-400 text-xs"></i> AI Enhance (HD)</h4>
-              <i class="fa-solid fa-arrow-right text-gray-500 text-xs group-hover:text-purple-400 transition"></i>
-            </div>
-            <p class="text-[11px] text-gray-400 leading-tight">Restore and improve photo quality.</p>
-          </div>
-
-          <!-- Tool 4: Resize & Crop -->
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-4 bg-[#140c2b]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer text-left flex flex-col justify-between">
-            <div class="rounded-xl overflow-hidden mb-3 border border-purple-500/20 bg-black/40">
-              <img src="assets/landing/tool_crop.png?v=2" alt="Resize & Crop" class="w-full h-24 object-cover group-hover:scale-105 transition duration-300">
-            </div>
-            <div class="flex items-center justify-between mb-1">
-              <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-amber-300 transition flex items-center gap-1.5"><i class="fa-solid fa-crop-simple text-amber-400 text-xs"></i> Resize &amp; Crop</h4>
-              <i class="fa-solid fa-arrow-right text-gray-500 text-xs group-hover:text-amber-400 transition"></i>
-            </div>
-            <p class="text-[11px] text-gray-400 leading-tight">Crop, resize and set custom dimensions.</p>
-          </div>
-
-          <!-- Tool 5: AI Retouch Face -->
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-4 bg-[#140c2b]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer text-left flex flex-col justify-between">
-            <div class="rounded-xl overflow-hidden mb-3 border border-purple-500/20 bg-black/40">
-              <img src="assets/landing/tool_retouch.png?v=2" alt="AI Retouch Face" class="w-full h-24 object-cover group-hover:scale-105 transition duration-300">
-            </div>
-            <div class="flex items-center justify-between mb-1">
-              <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-rose-300 transition flex items-center gap-1.5"><i class="fa-solid fa-sparkles text-rose-400 text-xs"></i> AI Retouch Face</h4>
-              <i class="fa-solid fa-arrow-right text-gray-500 text-xs group-hover:text-rose-400 transition"></i>
-            </div>
-            <p class="text-[11px] text-gray-400 leading-tight">Remove blemishes, smooth skin and more.</p>
-          </div>
-
-          <!-- Tool 6: Aadhaar / PAN Photo -->
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-4 bg-[#140c2b]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer text-left flex flex-col justify-between">
-            <div class="rounded-xl overflow-hidden mb-3 border border-purple-500/20 bg-black/40">
-              <img src="assets/landing/tool_aadhaar.png?v=2" alt="Aadhaar PAN Photo" class="w-full h-24 object-cover group-hover:scale-105 transition duration-300">
-            </div>
-            <div class="flex items-center justify-between mb-1">
-              <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-emerald-300 transition flex items-center gap-1.5"><i class="fa-solid fa-address-card text-emerald-400 text-xs"></i> Aadhaar / PAN Photo</h4>
-              <i class="fa-solid fa-arrow-right text-gray-500 text-xs group-hover:text-emerald-400 transition"></i>
-            </div>
-            <p class="text-[11px] text-gray-400 leading-tight">Create perfect ID photos for Indian documents.</p>
-          </div>
-
-          <!-- Tool 7: 4x6 Print Layout -->
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-4 bg-[#140c2b]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer text-left flex flex-col justify-between">
-            <div class="rounded-xl overflow-hidden mb-3 border border-purple-500/20 bg-black/40">
-              <img src="assets/landing/tool_print.png?v=2" alt="4x6 Print Layout" class="w-full h-24 object-cover group-hover:scale-105 transition duration-300">
-            </div>
-            <div class="flex items-center justify-between mb-1">
-              <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-indigo-300 transition flex items-center gap-1.5"><i class="fa-solid fa-print text-indigo-400 text-xs"></i> 4x6 Print Layout</h4>
-              <i class="fa-solid fa-arrow-right text-gray-500 text-xs group-hover:text-indigo-400 transition"></i>
-            </div>
-            <p class="text-[11px] text-gray-400 leading-tight">Generate print-ready 4x6 or A4 sheets.</p>
-          </div>
-
-          <!-- Tool 8: Object Eraser -->
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-4 bg-[#140c2b]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer text-left flex flex-col justify-between">
-            <div class="rounded-xl overflow-hidden mb-3 border border-purple-500/20 bg-black/40">
-              <img src="assets/landing/tool_eraser.png?v=2" alt="Object Eraser" class="w-full h-24 object-cover group-hover:scale-105 transition duration-300">
-            </div>
-            <div class="flex items-center justify-between mb-1">
-              <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-fuchsia-300 transition flex items-center gap-1.5"><i class="fa-solid fa-eraser text-fuchsia-400 text-xs"></i> Object Eraser</h4>
-              <i class="fa-solid fa-arrow-right text-gray-500 text-xs group-hover:text-fuchsia-400 transition"></i>
-            </div>
-            <p class="text-[11px] text-gray-400 leading-tight">Remove unwanted objects from photos.</p>
-          </div>
-
-          <!-- Tool 9: Photo Compressor -->
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-4 bg-[#140c2b]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer text-left flex flex-col justify-between">
-            <div class="rounded-xl overflow-hidden mb-3 border border-purple-500/20 bg-black/40">
-              <img src="assets/landing/tool_compress.png?v=2" alt="Photo Compressor" class="w-full h-24 object-cover group-hover:scale-105 transition duration-300">
-            </div>
-            <div class="flex items-center justify-between mb-1">
-              <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-blue-300 transition flex items-center gap-1.5"><i class="fa-solid fa-file-zipper text-blue-400 text-xs"></i> Photo Compressor</h4>
-              <i class="fa-solid fa-arrow-right text-gray-500 text-xs group-hover:text-blue-400 transition"></i>
-            </div>
-            <p class="text-[11px] text-gray-400 leading-tight">Reduce image size without losing quality.</p>
-          </div>
-
-          <!-- Tool 10: More AI Tools -->
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-4 bg-[#140c2b]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer text-left flex flex-col justify-between">
-            <div class="rounded-xl overflow-hidden mb-3 border border-purple-500/20 bg-black/40">
-              <img src="assets/landing/tool_more.png?v=2" alt="More AI Tools" class="w-full h-24 object-cover group-hover:scale-105 transition duration-300">
-            </div>
-            <div class="flex items-center justify-between mb-1">
-              <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-pink-300 transition flex items-center gap-1.5"><i class="fa-solid fa-cubes text-pink-400 text-xs"></i> More AI Tools</h4>
-              <i class="fa-solid fa-arrow-right text-gray-500 text-xs group-hover:text-pink-400 transition"></i>
-            </div>
-            <p class="text-[11px] text-gray-400 leading-tight">Access 10+ professional AI photo tools.</p>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- How It Works (3 Simple Steps) -->
-    <section class="py-14 relative z-10 border-t border-purple-500/15">
-      <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div class="text-pink-400 text-xs sm:text-sm font-extrabold uppercase tracking-wider mb-2">Explore Professional Photos in 3 Simple Steps</div>
-        <h2 class="text-2xl sm:text-4xl font-black text-white mb-10">How It Works</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-          
-          <!-- Step 1 -->
-          <div class="rounded-2xl p-6 bg-[#130b29]/80 border border-purple-500/20 text-center flex flex-col items-center">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-600 text-white font-black text-xl flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(217,70,239,0.35)]">
-              1
-            </div>
-            <h4 class="text-base sm:text-lg font-bold text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-cloud-arrow-up text-pink-400"></i> Upload Photo</h4>
-            <p class="text-xs sm:text-sm text-gray-400">Choose or drag &amp; drop your image.</p>
-          </div>
-
-          <!-- Step 2 -->
-          <div class="rounded-2xl p-6 bg-[#130b29]/80 border border-purple-500/20 text-center flex flex-col items-center">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-fuchsia-600 to-purple-600 text-white font-black text-xl flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(217,70,239,0.35)]">
-              2
-            </div>
-            <h4 class="text-base sm:text-lg font-bold text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles text-fuchsia-400"></i> AI Processing</h4>
-            <p class="text-xs sm:text-sm text-gray-400">Our AI edits your photo in seconds.</p>
-          </div>
-
-          <!-- Step 3 -->
-          <div class="rounded-2xl p-6 bg-[#130b29]/80 border border-purple-500/20 text-center flex flex-col items-center">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-600 to-purple-600 text-white font-black text-xl flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(217,70,239,0.35)]">
-              3
-            </div>
-            <h4 class="text-base sm:text-lg font-bold text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-cloud-arrow-down text-purple-400"></i> Download</h4>
-            <p class="text-xs sm:text-sm text-gray-400">Get high-quality, ready-to-use photos.</p>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- Perfect For Every Need -->
-    <section class="py-14 relative z-10 border-t border-purple-500/15">
-      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-2xl sm:text-4xl font-black text-white mb-2">
-          Perfect For <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400">Every Need</span>
-        </h2>
-        <p class="text-gray-400 text-xs sm:text-sm max-w-xl mx-auto mb-8">
-          From personal use to professional work — our tools fit all your photo editing needs.
-        </p>
-
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3.5">
-          
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-3 bg-[#130b29]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer flex flex-col items-center">
-            <div class="w-full h-20 rounded-xl overflow-hidden mb-2.5 bg-black/30 border border-purple-500/20">
-              <img src="assets/landing/use_passport.png?v=2" alt="Passport & Visa" class="w-full h-full object-cover group-hover:scale-105 transition">
-            </div>
-            <span class="text-xs font-bold text-white group-hover:text-pink-300 transition">Passport &amp; Visa</span>
-          </div>
-
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-3 bg-[#130b29]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer flex flex-col items-center">
-            <div class="w-full h-20 rounded-xl overflow-hidden mb-2.5 bg-black/30 border border-purple-500/20">
-              <img src="assets/landing/use_id_card.png?v=2" alt="ID Documents" class="w-full h-full object-cover group-hover:scale-105 transition">
-            </div>
-            <span class="text-xs font-bold text-white group-hover:text-pink-300 transition">ID Documents</span>
-          </div>
-
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-3 bg-[#130b29]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer flex flex-col items-center">
-            <div class="w-full h-20 rounded-xl overflow-hidden mb-2.5 bg-black/30 border border-purple-500/20">
-              <img src="assets/landing/use_ecommerce.png?v=2" alt="E-commerce" class="w-full h-full object-cover group-hover:scale-105 transition">
-            </div>
-            <span class="text-xs font-bold text-white group-hover:text-pink-300 transition">E-commerce</span>
-          </div>
-
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-3 bg-[#130b29]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer flex flex-col items-center">
-            <div class="w-full h-20 rounded-xl overflow-hidden mb-2.5 bg-black/30 border border-purple-500/20">
-              <img src="assets/landing/use_social.png?v=2" alt="Social Media" class="w-full h-full object-cover group-hover:scale-105 transition">
-            </div>
-            <span class="text-xs font-bold text-white group-hover:text-pink-300 transition">Social Media</span>
-          </div>
-
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-3 bg-[#130b29]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer flex flex-col items-center">
-            <div class="w-full h-20 rounded-xl overflow-hidden mb-2.5 bg-black/30 border border-purple-500/20">
-              <img src="assets/landing/use_business.png?v=2" alt="Business & Resume" class="w-full h-full object-cover group-hover:scale-105 transition">
-            </div>
-            <span class="text-xs font-bold text-white group-hover:text-pink-300 transition">Business &amp; Resume</span>
-          </div>
-
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-3 bg-[#130b29]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer flex flex-col items-center">
-            <div class="w-full h-20 rounded-xl overflow-hidden mb-2.5 bg-black/30 border border-purple-500/20">
-              <img src="assets/landing/use_product.png?v=2" alt="Product Photos" class="w-full h-full object-cover group-hover:scale-105 transition">
-            </div>
-            <span class="text-xs font-bold text-white group-hover:text-pink-300 transition">Product Photos</span>
-          </div>
-
-          <div onclick="document.getElementById('fileIn').click()" class="rounded-2xl p-3 bg-[#130b29]/80 border border-purple-500/20 hover:border-purple-500/60 transition group cursor-pointer flex flex-col items-center">
-            <div class="w-full h-20 rounded-xl overflow-hidden mb-2.5 bg-black/30 border border-purple-500/20">
-              <img src="assets/landing/use_personal.png?v=2" alt="Personal Use" class="w-full h-full object-cover group-hover:scale-105 transition">
-            </div>
-            <span class="text-xs font-bold text-white group-hover:text-pink-300 transition">Personal Use</span>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- Simple & Affordable Pricing -->
-    <section id="pricing" class="py-16 relative z-10 border-t border-purple-500/15">
-      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-          <h2 class="text-2xl sm:text-4xl font-black text-white mb-2">
-            Simple &amp; Affordable <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400">Pricing</span>
-          </h2>
-          <p class="text-gray-400 text-xs sm:text-base max-w-xl mx-auto">
-            Choose a plan that fits your needs. Start free, upgrade anytime.
-          </p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           
-          <!-- Free Plan -->
-          <div class="rounded-3xl p-6 bg-[#130b29]/80 border border-purple-500/20 backdrop-blur-xl flex flex-col justify-between">
+          <!-- Template Card 1 -->
+          <div onclick="document.getElementById('fileIn').click()" class="bg-[#f8f9fa] hover:bg-white rounded-3xl p-5 border border-slate-200/80 hover:border-purple-300 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-300 cursor-pointer group flex flex-col justify-between">
             <div>
-              <h4 class="text-lg font-bold text-white mb-1">Free Plan</h4>
-              <div class="text-3xl font-black text-white my-3">₹0 <span class="text-xs font-normal text-gray-400">/ forever</span></div>
-              <ul class="space-y-2.5 text-xs text-gray-300 mb-6">
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> 5 photo edits per day</li>
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Background removal</li>
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Basic photo tools</li>
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Standard quality download</li>
+              <div class="rounded-2xl overflow-hidden bg-white border border-slate-200 mb-4 p-2 shadow-xs">
+                <img src="assets/passport_sheet_hero.jpg" class="w-full h-40 object-cover rounded-xl group-hover:scale-105 transition duration-500" alt="Indian Passport Sheet">
+              </div>
+              <div class="inline-block px-2.5 py-0.5 rounded-full bg-purple-100 text-[#7d2ae8] text-[10px] font-black uppercase mb-2">Most Popular</div>
+              <h3 class="font-extrabold text-base text-slate-900 mb-1 group-hover:text-[#7d2ae8] transition">Indian Passport (35×45mm)</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Official biometric dimensions with white background and print-ready sheet.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs font-bold text-[#7d2ae8]">
+              <span>Use this template</span>
+              <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+          </div>
+
+          <!-- Template Card 2 -->
+          <div onclick="document.getElementById('fileIn').click()" class="bg-[#f8f9fa] hover:bg-white rounded-3xl p-5 border border-slate-200/80 hover:border-purple-300 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-300 cursor-pointer group flex flex-col justify-between">
+            <div>
+              <div class="rounded-2xl overflow-hidden bg-white border border-slate-200 mb-4 p-2 shadow-xs">
+                <img src="assets/landing/hero_model_hd.png" class="w-full h-40 object-cover rounded-xl group-hover:scale-105 transition duration-500" alt="AI Cutout">
+              </div>
+              <div class="inline-block px-2.5 py-0.5 rounded-full bg-cyan-100 text-[#00c4cc] text-[10px] font-black uppercase mb-2">1-Click AI</div>
+              <h3 class="font-extrabold text-base text-slate-900 mb-1 group-hover:text-[#7d2ae8] transition">Instant Background Eraser</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Automatically cuts out the subject and replaces it with pure white or studio blue.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs font-bold text-[#7d2ae8]">
+              <span>Remove background</span>
+              <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+          </div>
+
+          <!-- Template Card 3 -->
+          <div onclick="document.getElementById('fileIn').click()" class="bg-[#f8f9fa] hover:bg-white rounded-3xl p-5 border border-slate-200/80 hover:border-purple-300 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-300 cursor-pointer group flex flex-col justify-between">
+            <div>
+              <div class="rounded-2xl overflow-hidden bg-white border border-slate-200 mb-4 p-2 shadow-xs flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50 h-40">
+                <div class="grid grid-cols-3 gap-1.5 p-2 bg-white rounded-xl shadow-md border border-slate-200">
+                  <div class="w-7 h-9 bg-blue-100 rounded-sm"></div>
+                  <div class="w-7 h-9 bg-blue-100 rounded-sm"></div>
+                  <div class="w-7 h-9 bg-blue-100 rounded-sm"></div>
+                  <div class="w-7 h-9 bg-blue-100 rounded-sm"></div>
+                  <div class="w-7 h-9 bg-blue-100 rounded-sm"></div>
+                  <div class="w-7 h-9 bg-blue-100 rounded-sm"></div>
+                </div>
+              </div>
+              <div class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase mb-2">Print Ready</div>
+              <h3 class="font-extrabold text-base text-slate-900 mb-1 group-hover:text-[#7d2ae8] transition">4×6" Print Sheet (3, 6, 12)</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Fit multiple photos on standard photo studio paper with clear cutting border guides.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs font-bold text-[#7d2ae8]">
+              <span>Create 4x6 sheet</span>
+              <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+          </div>
+
+          <!-- Template Card 4 -->
+          <div onclick="document.getElementById('fileIn').click()" class="bg-[#f8f9fa] hover:bg-white rounded-3xl p-5 border border-slate-200/80 hover:border-purple-300 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-300 cursor-pointer group flex flex-col justify-between">
+            <div>
+              <div class="rounded-2xl overflow-hidden bg-white border border-slate-200 mb-4 p-2 shadow-xs flex items-center justify-center bg-gradient-to-br from-pink-50 to-amber-50 h-40">
+                <div class="grid grid-cols-5 gap-1 p-2 bg-white rounded-xl shadow-md border border-slate-200">
+                  <div class="w-4 h-5 bg-purple-100 rounded-xs"></div>
+                  <div class="w-4 h-5 bg-purple-100 rounded-xs"></div>
+                  <div class="w-4 h-5 bg-purple-100 rounded-xs"></div>
+                  <div class="w-4 h-5 bg-purple-100 rounded-xs"></div>
+                  <div class="w-4 h-5 bg-purple-100 rounded-xs"></div>
+                  <div class="w-4 h-5 bg-purple-100 rounded-xs"></div>
+                  <div class="w-4 h-5 bg-purple-100 rounded-xs"></div>
+                  <div class="w-4 h-5 bg-purple-100 rounded-xs"></div>
+                  <div class="w-4 h-5 bg-purple-100 rounded-xs"></div>
+                  <div class="w-4 h-5 bg-purple-100 rounded-xs"></div>
+                </div>
+              </div>
+              <div class="inline-block px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-700 text-[10px] font-black uppercase mb-2">High Volume</div>
+              <h3 class="font-extrabold text-base text-slate-900 mb-1 group-hover:text-[#7d2ae8] transition">A4 Full Sheet (30 Photos)</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                5 columns in the top row and 30 total photos capacity on standard A4 photo paper.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs font-bold text-[#7d2ae8]">
+              <span>Create A4 sheet</span>
+              <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Canva-Style 3 Core Value Props ("Why you'll love it") -->
+    <section class="py-16 sm:py-20 bg-[#f8f9fa]">
+      <div class="max-w-5xl mx-auto px-4 text-center">
+        
+        <h2 class="text-2xl sm:text-4xl font-black text-[#0e1318] mb-3">
+          Designed for speed, built for precision
+        </h2>
+        <p class="text-slate-500 text-sm max-w-xl mx-auto mb-12">
+          From individual users to busy cyber cafes and photo studios across India.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+          
+          <div class="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#7d2ae8] to-purple-400 text-white flex items-center justify-center text-xl mb-5 shadow-md shadow-purple-100">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+            <h3 class="text-lg font-black text-slate-900 mb-2">Instant 5-Second Flow</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Upload any photo and let our AI handle background removal, cropping, and lighting in seconds.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#00c4cc] to-teal-400 text-white flex items-center justify-center text-xl mb-5 shadow-md shadow-cyan-100">
+              <i class="fa-solid fa-certificate"></i>
+            </div>
+            <h3 class="text-lg font-black text-slate-900 mb-2">100% Biometric Compliant</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Strict compliance with Indian Passport, US Visa, PAN Card, and Govt exam specifications.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#ff007a] to-pink-400 text-white flex items-center justify-center text-xl mb-5 shadow-md shadow-pink-100">
+              <i class="fa-solid fa-print"></i>
+            </div>
+            <h3 class="text-lg font-black text-slate-900 mb-2">Lab Quality 300 &amp; 600 DPI</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Download razor-sharp JPG and print sheets that never pixelate on Canon, Epson, or HP printers.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Canva-Style Pricing (INR ₹) -->
+    <section id="pricing" class="py-16 bg-white border-t border-slate-200/80">
+      <div class="max-w-5xl mx-auto px-4 text-center">
+        
+        <span class="text-xs font-black uppercase tracking-wider text-[#7d2ae8]">Simple &amp; Transparent</span>
+        <h2 class="text-2xl sm:text-4xl font-black text-[#0e1318] mb-3 mt-1">
+          Pick the right plan for you
+        </h2>
+        <p class="text-slate-500 text-xs sm:text-sm max-w-md mx-auto mb-10">
+          Start 100% free with no credit card required. Upgrade anytime for unlimited studio access.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left items-stretch">
+          
+          <!-- Free -->
+          <div class="bg-[#f8f9fa] rounded-3xl p-7 border border-slate-200 flex flex-col justify-between">
+            <div>
+              <h3 class="text-base font-black text-slate-900 mb-1">Free Forever</h3>
+              <p class="text-xs text-slate-500 mb-4">For individuals &amp; single photos</p>
+              <div class="text-3xl font-black text-slate-900 mb-6">₹0 <span class="text-xs text-slate-400 font-normal">/ month</span></div>
+              <ul class="space-y-2.5 text-xs text-slate-600 mb-6">
+                <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Free single photo downloads</li>
+                <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i> 35x45mm &amp; 2x2" auto-crop</li>
+                <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i> White &amp; Blue background changer</li>
+                <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i> No watermark overlays</li>
               </ul>
             </div>
-            <button onclick="document.getElementById('fileIn').click()" class="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition cursor-pointer">
-              Get Started Free
+            <button onclick="document.getElementById('fileIn').click()" class="w-full py-2.5 text-center text-slate-800 font-bold text-xs rounded-xl border border-slate-300 hover:bg-white transition cursor-pointer">
+              Get started free
             </button>
           </div>
 
-          <!-- Pro Plan (Most Popular Highlighted) -->
-          <div class="rounded-3xl p-6 bg-gradient-to-b from-[#1f103d] to-[#140b29] border-2 border-purple-500 shadow-[0_0_35px_rgba(168,85,247,0.35)] relative flex flex-col justify-between">
-            <div class="absolute -top-3.5 right-6 px-3 py-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-black uppercase tracking-wider shadow-md">
+          <!-- Studio Pro -->
+          <div class="bg-white rounded-3xl p-7 border-2 border-[#7d2ae8] shadow-xl relative flex flex-col justify-between">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#7d2ae8] to-[#00c4cc] text-white text-[10px] font-black uppercase tracking-wider py-1 px-3 rounded-full shadow-xs">
               Most Popular
             </div>
             <div>
-              <div class="flex items-center gap-2 text-pink-400 font-bold text-sm mb-1">
-                <i class="fa-solid fa-crown text-amber-400"></i> Pro Plan
-              </div>
-              <div class="text-3xl font-black text-white my-3">₹99 <span class="text-xs font-normal text-gray-400">/ month</span></div>
-              <ul class="space-y-2.5 text-xs text-gray-200 mb-6 font-medium">
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-pink-400 font-bold"></i> Unlimited photo edits</li>
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-pink-400 font-bold"></i> High-quality (HD) download</li>
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-pink-400 font-bold"></i> All premium AI tools</li>
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-pink-400 font-bold"></i> No watermark</li>
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-pink-400 font-bold"></i> Priority processing</li>
+              <h3 class="text-base font-black text-slate-900 mb-1">Studio Pro</h3>
+              <p class="text-xs text-slate-500 mb-4">For CSC centers &amp; cyber cafes</p>
+              <div class="text-3xl font-black text-[#7d2ae8] mb-6">₹99 <span class="text-xs text-slate-400 font-normal">/ month</span></div>
+              <ul class="space-y-2.5 text-xs text-slate-700 mb-6 font-medium">
+                <li><i class="fa-solid fa-circle-check text-[#7d2ae8] mr-2"></i> Unlimited 4x6 &amp; A4 print sheets</li>
+                <li><i class="fa-solid fa-circle-check text-[#7d2ae8] mr-2"></i> Ultra HD 600 DPI downloads</li>
+                <li><i class="fa-solid fa-circle-check text-[#7d2ae8] mr-2"></i> 1-Click AI Face Enhance &amp; Retouch</li>
+                <li><i class="fa-solid fa-circle-check text-[#7d2ae8] mr-2"></i> Priority server processing</li>
               </ul>
             </div>
-            <button onclick="window.location.href='pricing.html'" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 text-white font-extrabold text-sm shadow-[0_0_20px_rgba(217,70,239,0.4)] hover:shadow-[0_0_30px_rgba(217,70,239,0.6)] hover:scale-[1.02] transition cursor-pointer">
-              Upgrade to Pro (₹99) ➔
-            </button>
+            <a href="pricing.html" class="w-full py-2.5 text-center text-white font-extrabold text-xs rounded-xl bg-gradient-to-r from-[#7d2ae8] to-[#00c4cc] shadow-md hover:opacity-95 transition cursor-pointer">
+              Upgrade to Pro (₹99)
+            </a>
           </div>
 
           <!-- Annual Plan -->
-          <div class="rounded-3xl p-6 bg-[#130b29]/80 border border-purple-500/20 backdrop-blur-xl flex flex-col justify-between relative">
-            <div class="absolute -top-3.5 right-6 px-3 py-1 rounded-full bg-pink-600/80 text-white text-[10px] font-black uppercase tracking-wider">
-              Save 50%
-            </div>
+          <div class="bg-[#f8f9fa] rounded-3xl p-7 border border-slate-200 flex flex-col justify-between">
             <div>
-              <h4 class="text-lg font-bold text-white mb-1">Annual Plan</h4>
-              <div class="text-3xl font-black text-white my-3">₹999 <span class="text-xs font-normal text-gray-400">/ year</span></div>
-              <ul class="space-y-2.5 text-xs text-gray-300 mb-6">
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Everything in Pro Plan</li>
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Save 50% (Only ₹83/month)</li>
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Best value for regular users</li>
+              <div class="inline-block px-2 py-0.5 rounded-md bg-purple-100 text-[#7d2ae8] text-[9.5px] font-black uppercase mb-2">Save 50%</div>
+              <h3 class="text-base font-black text-slate-900 mb-1">Annual Studio</h3>
+              <p class="text-xs text-slate-500 mb-4">Full year uninterrupted access</p>
+              <div class="text-3xl font-black text-slate-900 mb-6">₹999 <span class="text-xs text-slate-400 font-normal">/ year</span></div>
+              <ul class="space-y-2.5 text-xs text-slate-600 mb-6">
+                <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Everything in Pro included</li>
+                <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i> VIP WhatsApp &amp; Email support</li>
+                <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Commercial printing rights</li>
               </ul>
             </div>
-            <button onclick="window.location.href='pricing.html'" class="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition cursor-pointer">Get Annual Plan (₹999) ➔</button>
-          </div>
-
-          <!-- Right Feature Column -->
-          <div class="rounded-3xl p-6 bg-[#130b29]/60 border border-purple-500/20 flex flex-col justify-center gap-4 text-left">
-            <div class="flex items-start gap-3">
-              <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-bolt text-sm"></i></div>
-              <div>
-                <div class="text-xs font-bold text-white">Fast Processing</div>
-                <div class="text-[11px] text-gray-400">Get results in seconds.</div>
-              </div>
-            </div>
-            <div class="flex items-start gap-3">
-              <div class="w-8 h-8 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-shield-halved text-sm"></i></div>
-              <div>
-                <div class="text-xs font-bold text-white">Secure &amp; Private</div>
-                <div class="text-[11px] text-gray-400">Photos safe and auto-deleted.</div>
-              </div>
-            </div>
-            <div class="flex items-start gap-3">
-              <div class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-ban text-sm"></i></div>
-              <div>
-                <div class="text-xs font-bold text-white">No Watermark</div>
-                <div class="text-[11px] text-gray-400">Clean, professional results.</div>
-              </div>
-            </div>
-            <div class="flex items-start gap-3">
-              <div class="w-8 h-8 rounded-lg bg-fuchsia-500/20 text-fuchsia-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-headset text-sm"></i></div>
-              <div>
-                <div class="text-xs font-bold text-white">Priority Support</div>
-                <div class="text-[11px] text-gray-400">Get help whenever you need it.</div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- Loved by Thousands of Users -->
-    <section class="py-14 relative z-10 border-t border-purple-500/15">
-      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-2xl sm:text-3xl font-black text-white mb-2">
-          Loved by <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400">Thousands of Users</span>
-        </h2>
-        <p class="text-gray-400 text-xs sm:text-sm max-w-xl mx-auto mb-8">
-          See what our users say about AllBGRemove.com.
-        </p>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          
-          <div class="rounded-2xl p-5 bg-[#130b29]/80 border border-purple-500/20 text-left flex flex-col justify-between">
-            <p class="text-xs sm:text-sm text-gray-300 leading-relaxed mb-4">
-              "Super easy and fast! I removed background and created my passport photo in minutes."
-            </p>
-            <div class="flex items-center gap-3">
-              <img src="assets/avatar1.jpg" alt="Rahul Verma" class="w-9 h-9 rounded-full object-cover border border-purple-500/40">
-              <div>
-                <div class="text-xs font-bold text-white">Rahul Verma</div>
-                <div class="text-amber-400 text-[10px]"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="rounded-2xl p-5 bg-[#130b29]/80 border border-purple-500/20 text-left flex flex-col justify-between">
-            <p class="text-xs sm:text-sm text-gray-300 leading-relaxed mb-4">
-              "The photo quality is amazing, and the tools are very easy to use. Highly recommended!"
-            </p>
-            <div class="flex items-center gap-3">
-              <img src="assets/avatar2.jpg" alt="Priya Singh" class="w-9 h-9 rounded-full object-cover border border-purple-500/40">
-              <div>
-                <div class="text-xs font-bold text-white">Priya Singh</div>
-                <div class="text-amber-400 text-[10px]"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="rounded-2xl p-5 bg-[#130b29]/80 border border-purple-500/20 text-left flex flex-col justify-between">
-            <p class="text-xs sm:text-sm text-gray-300 leading-relaxed mb-4">
-              "Best online photo editor! Much better than other tools and completely free to start."
-            </p>
-            <div class="flex items-center gap-3">
-              <img src="assets/avatar3.jpg" alt="Amit Kumar" class="w-9 h-9 rounded-full object-cover border border-purple-500/40">
-              <div>
-                <div class="text-xs font-bold text-white">Amit Kumar</div>
-                <div class="text-amber-400 text-[10px]"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- Frequently Asked Questions -->
-    <section id="faq" class="py-14 relative z-10 border-t border-purple-500/15">
-      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col sm:flex-row items-center justify-between mb-8">
-          <div class="text-left">
-            <h2 class="text-2xl sm:text-3xl font-black text-white mb-1">Frequently Asked Questions</h2>
-            <p class="text-gray-400 text-xs sm:text-sm">Have questions? We've got answers.</p>
-          </div>
-          <a href="contact.html" class="text-pink-400 hover:text-pink-300 text-xs sm:text-sm font-bold mt-2 sm:mt-0 transition flex items-center gap-1">
-            <span>View All FAQs</span> <i class="fa-solid fa-arrow-right text-xs"></i>
-          </a>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
-          <div class="rounded-2xl p-4 bg-[#130b29]/80 border border-purple-500/20 cursor-pointer hover:border-purple-500/50 transition" onclick="toggleFaq(this)">
-            <div class="flex items-center justify-between font-bold text-xs sm:text-sm text-white">
-              <span>Is AllBGRemove.com really free?</span>
-              <i class="fa-solid fa-chevron-down text-purple-400 transition transform"></i>
-            </div>
-            <div class="faq-ans text-xs text-gray-300 mt-2 leading-relaxed hidden">
-              Yes! You can remove backgrounds, edit lighting, and download passport size sheets 100% free with no watermark.
-            </div>
-          </div>
-
-          <div class="rounded-2xl p-4 bg-[#130b29]/80 border border-purple-500/20 cursor-pointer hover:border-purple-500/50 transition" onclick="toggleFaq(this)">
-            <div class="flex items-center justify-between font-bold text-xs sm:text-sm text-white">
-              <span>Can I use it for passport and visa photos?</span>
-              <i class="fa-solid fa-chevron-down text-purple-400 transition transform"></i>
-            </div>
-            <div class="faq-ans text-xs text-gray-300 mt-2 leading-relaxed hidden">
-              Absolutely. Our tools support official sizes for India (Passport, PAN, Aadhaar), US Visa (2x2 inch), UK, Schengen, and 140+ countries with biometric standards.
-            </div>
-          </div>
-
-          <div class="rounded-2xl p-4 bg-[#130b29]/80 border border-purple-500/20 cursor-pointer hover:border-purple-500/50 transition" onclick="toggleFaq(this)">
-            <div class="flex items-center justify-between font-bold text-xs sm:text-sm text-white">
-              <span>Do I need to create an account?</span>
-              <i class="fa-solid fa-chevron-down text-purple-400 transition transform"></i>
-            </div>
-            <div class="faq-ans text-xs text-gray-300 mt-2 leading-relaxed hidden">
-              No sign up is required to start! You can immediately upload, crop, remove background and download.
-            </div>
-          </div>
-
-          <div class="rounded-2xl p-4 bg-[#130b29]/80 border border-purple-500/20 cursor-pointer hover:border-purple-500/50 transition" onclick="toggleFaq(this)">
-            <div class="flex items-center justify-between font-bold text-xs sm:text-sm text-white">
-              <span>What image formats are supported?</span>
-              <i class="fa-solid fa-chevron-down text-purple-400 transition transform"></i>
-            </div>
-            <div class="faq-ans text-xs text-gray-300 mt-2 leading-relaxed hidden">
-              We support all popular formats including JPG, JPEG, PNG, and WEBP up to 10MB.
-            </div>
-          </div>
-
-          <div class="rounded-2xl p-4 bg-[#130b29]/80 border border-purple-500/20 cursor-pointer hover:border-purple-500/50 transition" onclick="toggleFaq(this)">
-            <div class="flex items-center justify-between font-bold text-xs sm:text-sm text-white">
-              <span>Will my photos be stored on your server?</span>
-              <i class="fa-solid fa-chevron-down text-purple-400 transition transform"></i>
-            </div>
-            <div class="faq-ans text-xs text-gray-300 mt-2 leading-relaxed hidden">
-              No. Your privacy is protected with biometric consent compliance (BIPA, CCPA, COPPA). Photos are processed securely in memory and auto-deleted immediately.
-            </div>
-          </div>
-
-          <div class="rounded-2xl p-4 bg-[#130b29]/80 border border-purple-500/20 cursor-pointer hover:border-purple-500/50 transition" onclick="toggleFaq(this)">
-            <div class="flex items-center justify-between font-bold text-xs sm:text-sm text-white">
-              <span>Is there any watermark on the downloaded images?</span>
-              <i class="fa-solid fa-chevron-down text-purple-400 transition transform"></i>
-            </div>
-            <div class="faq-ans text-xs text-gray-300 mt-2 leading-relaxed hidden">
-              Zero watermarks! All single photo and 4x6 print sheet downloads are 100% clean and studio-ready.
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- Footer (Dark Neon Theme) -->
-    <footer class="py-12 relative z-10 border-t border-purple-500/20 bg-[#080414]">
-      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10 text-left">
-          
-          <!-- Col 1: Brand -->
-          <div class="col-span-2 md:col-span-1">
-            <a href="index.html" class="flex items-center gap-2 mb-3">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-white">
-                <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
-              </div>
-              <span class="font-extrabold text-base text-white">AllBG<span class="text-pink-400">Remove.com</span></span>
+            <a href="pricing.html" class="w-full py-2.5 text-center text-slate-800 font-bold text-xs rounded-xl border border-slate-300 hover:bg-white transition cursor-pointer">
+              Get Annual Plan (₹999)
             </a>
-            <p class="text-xs text-gray-400 leading-relaxed mb-4">
-              All-in-one AI Photo Editing Studio for background removal and professional ID photos.
-            </p>
           </div>
 
-          <!-- Col 2: AI Tools -->
-          <div>
-            <h4 class="text-xs font-black uppercase text-purple-300 tracking-wider mb-3">AI Tools</h4>
-            <ul class="space-y-2 text-xs text-gray-400">
-              <li><a href="#" onclick="document.getElementById('fileIn').click(); return false;" class="hover:text-white transition">Background Remover</a></li>
-              <li><a href="#" onclick="document.getElementById('fileIn').click(); return false;" class="hover:text-white transition">Photo Enhancer</a></li>
-              <li><a href="#" onclick="document.getElementById('fileIn').click(); return false;" class="hover:text-white transition">Change Background</a></li>
-              <li><a href="#" onclick="document.getElementById('fileIn').click(); return false;" class="hover:text-white transition">Photo Editor</a></li>
-            </ul>
-          </div>
+        </div>
 
-          <!-- Col 3: Photo Tools -->
-          <div>
-            <h4 class="text-xs font-black uppercase text-purple-300 tracking-wider mb-3">Photo Tools</h4>
-            <ul class="space-y-2 text-xs text-gray-400">
-              <li><a href="#" onclick="document.getElementById('fileIn').click(); return false;" class="hover:text-white transition">Passport Photo</a></li>
-              <li><a href="#" onclick="document.getElementById('fileIn').click(); return false;" class="hover:text-white transition">Aadhaar / PAN Photo</a></li>
-              <li><a href="#" onclick="document.getElementById('fileIn').click(); return false;" class="hover:text-white transition">Resize &amp; Crop</a></li>
-              <li><a href="#" onclick="document.getElementById('fileIn').click(); return false;" class="hover:text-white transition">4x6 Print Layout</a></li>
-            </ul>
-          </div>
+      </div>
+    </section>
 
-          <!-- Col 4: Resources -->
-          <div>
-            <h4 class="text-xs font-black uppercase text-purple-300 tracking-wider mb-3">Resources</h4>
-            <ul class="space-y-2 text-xs text-gray-400">
-              <li><a href="blog.html" class="hover:text-white transition">Blog</a></li>
-              <li><a href="requirements.html" class="hover:text-white transition">Photo Guide</a></li>
-              <li><a href="#faq" class="hover:text-white transition">Help Center</a></li>
-              <li><a href="contact.html" class="hover:text-white transition">Contact Us</a></li>
-            </ul>
-          </div>
-
-          <!-- Col 5: Company & Follow -->
-          <div>
-            <h4 class="text-xs font-black uppercase text-purple-300 tracking-wider mb-3">Company</h4>
-            <ul class="space-y-2 text-xs text-gray-400 mb-4">
-              <li><a href="about.html" class="hover:text-white transition">About Us</a></li>
-              <li><a href="privacy.html" class="hover:text-white transition">Privacy Policy</a></li>
-              <li><a href="terms.html" class="hover:text-white transition">Terms of Service</a></li>
-            </ul>
-            <div class="flex items-center gap-2.5 text-gray-400">
-              <a href="#" class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 hover:text-pink-400 flex items-center justify-center text-xs transition"><i class="fa-brands fa-youtube"></i></a>
-              <a href="#" class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 hover:text-pink-400 flex items-center justify-center text-xs transition"><i class="fa-brands fa-facebook"></i></a>
-              <a href="#" class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 hover:text-pink-400 flex items-center justify-center text-xs transition"><i class="fa-brands fa-instagram"></i></a>
-              <a href="#" class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 hover:text-pink-400 flex items-center justify-center text-xs transition"><i class="fa-brands fa-x-twitter"></i></a>
-              <a href="#" class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 hover:text-pink-400 flex items-center justify-center text-xs transition"><i class="fa-brands fa-linkedin"></i></a>
+    <!-- Canva-Style Footer -->
+    <footer class="bg-[#0e1318] text-slate-400 py-12 border-t border-slate-800">
+      <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pb-8 border-b border-slate-800 text-center sm:text-left">
+          
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#7d2ae8] to-[#00c4cc] flex items-center justify-center text-white font-bold text-sm">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
             </div>
+            <span class="font-black text-xl text-white">AllBGRemove.com</span>
+          </div>
+
+          <div class="flex items-center gap-6 text-xs font-semibold text-slate-400">
+            <a href="requirements.html" class="hover:text-white transition">Photo Requirements</a>
+            <a href="pricing.html" class="hover:text-white transition">Pricing</a>
+            <a href="privacy.html" class="hover:text-white transition">Privacy Policy</a>
+            <a href="terms.html" class="hover:text-white transition">Terms of Service</a>
+            <a href="contact.html" class="hover:text-white transition">Contact</a>
           </div>
 
         </div>
 
-        <div class="border-t border-purple-500/15 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500">
-          <div>&copy; 2026 AllBGRemove.com. All rights reserved.</div>
-          <div class="mt-2 sm:mt-0 flex gap-4">
-            <a href="privacy.html" class="hover:text-gray-300 transition">Privacy</a>
-            <a href="terms.html" class="hover:text-gray-300 transition">Terms</a>
-            <a href="disclaimer.html" class="hover:text-gray-300 transition">Security</a>
-          </div>
+        <div class="pt-6 text-center text-xs text-slate-500">
+          © 2026 AllBGRemove.com. All rights reserved. Create official biometric passport photos and remove backgrounds in seconds.
         </div>
+
       </div>
     </footer>
 
-  </div>
-
-  <!-- Interactive Demo Video Modal -->
-  <div id="demoModal" style="display:none;" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md items-center justify-center p-4">
-    <div class="bg-[#150d2c] border border-purple-500/30 rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl">
-      <button onclick="closeDemoModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-      <div class="text-left mb-4">
-        <div class="text-pink-400 text-xs font-bold uppercase tracking-wider">Quick Walkthrough</div>
-        <h3 class="text-xl font-bold text-white">How AllBGRemove.com Works</h3>
-      </div>
-      <div class="rounded-2xl overflow-hidden border border-purple-500/20 bg-black/50 aspect-video flex flex-col items-center justify-center p-6 text-center">
-        <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-purple-600 to-pink-600 text-white flex items-center justify-center text-2xl shadow-lg mb-3">
-          <i class="fa-solid fa-wand-magic-sparkles"></i>
-        </div>
-        <h4 class="text-white font-bold text-base mb-1">Instant 1-Click AI Processing</h4>
-        <p class="text-gray-400 text-xs max-w-md mb-4">Just upload any selfie or portrait photo — our AI automatically cuts out the background, applies official dimensions, and arranges high-DPI 4x6 print sheets in under 3 seconds.</p>
-        <button onclick="closeDemoModal(); document.getElementById('fileIn').click();" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-xs shadow-lg cursor-pointer">
-          Try It Now (100% Free)
-        </button>
-      </div>
-    </div>
   </div>
 
 <div id="app-container" style="display:none; padding-top: 74px;">
