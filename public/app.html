@@ -2358,14 +2358,15 @@
           </div>
 
           <!-- Row 2: Grid Layout & Number of Photos (Compact) -->
+                    <!-- Row 2: Grid & Auto-Fit with Visible Custom Photo Count Stepper -->
           <div class="form-group" style="margin-bottom:10px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
               <label style="font-size:11.5px; font-weight:800; color:var(--text-muted); margin:0;">
-                <i class="fa-solid fa-table-cells text-primary mr-1"></i> Auto-Fit Grid & Count:
+                <i class="fa-solid fa-table-cells text-primary mr-1"></i> Auto-Fit Grid & Sheet Capacity:
               </label>
-              <span id="photoCountDisplay" style="font-size:11.5px; font-weight:900; color:#4338ca; background:#eef2ff; border:1.5px solid #c7d2fe; padding:2px 8px; border-radius:6px; box-shadow:0 1px 3px rgba(79,70,229,0.15);">✓ 3 Photos (Default)</span>
+              <span id="maxPhotosBadge" style="font-size:11px; font-weight:700; color:#475569; background:#f1f5f9; padding:1px 6px; border-radius:6px;">Max: <span id="maxPhotosLabelSpan">12</span></span>
             </div>
-            <select id="gridLayout" onchange="onGridLayoutChange()" style="font-weight:700; font-size:13px; padding:7px 10px; margin-bottom:6px;">
+            <select id="gridLayout" onchange="onGridLayoutChange()" style="font-weight:700; font-size:13px; padding:7px 10px; margin-bottom:8px;">
               <option value="4x3" selected>Fit 12 Photos (3x4 Portrait / 4x3 • 12 Photos Default)</option>
               <option value="5x3">Fit 15 Photos (5x3 • 5 Cols x 3 Rows - 4x6 Landscape Fit)</option>
               <option value="6x3">Fit 18 Photos (6x3 • 6 Cols x 3 Rows - Popular 4x6 Landscape)</option>
@@ -2385,13 +2386,33 @@
               <option value="actual">Actual Size (From Crop Step)</option>
             </select>
             
-            <input type="number" id="photoCount" value="3" min="1" max="60" oninput="onPhotoCountChanged(this.value)" onchange="onPhotoCountChanged(this.value)" style="display:none;">
-            
-            <!-- Quick Preset Count Buttons (Highlighted with 3 Photos Default) -->
+            <!-- Custom Number Input Box (Prominent & Visible!) -->
+            <div style="background:linear-gradient(135deg, #f8faff 0%, #eef2ff 100%); border:1.5px solid #818cf8; border-radius:10px; padding:8px 10px; margin-bottom:8px; box-shadow:0 2px 6px rgba(79,70,229,0.08);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <label for="photoCount" style="font-size:11.5px; font-weight:800; color:#1e1b4b; margin:0; display:flex; align-items:center; gap:4px;">
+                  <i class="fa-solid fa-calculator text-indigo-600"></i>
+                  <span>Number of Photos (फ़ोटो संख्या):</span>
+                </label>
+                <span id="photoCountDisplay" style="font-size:11.5px; font-weight:900; color:#4338ca; background:#ffffff; border:1.5px solid #c7d2fe; padding:2px 8px; border-radius:6px; box-shadow:0 1px 3px rgba(79,70,229,0.15);">✓ 5 Photos (Default)</span>
+              </div>
+              
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button type="button" onclick="stepPhotoCount(-1)" style="width:38px; height:36px; border-radius:8px; background:#ffffff; border:1.5px solid #818cf8; color:#4338ca; font-size:20px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(79,70,229,0.15); transition:all 0.15s ease;" title="Kam karein (Decrease 1 photo)">−</button>
+                
+                <input type="number" id="photoCount" value="5" min="1" max="60" oninput="onPhotoCountChanged(this.value)" onchange="onPhotoCountChanged(this.value)" style="flex:1; height:36px; text-align:center; font-size:16px; font-weight:900; color:#1e1b4b; background:#ffffff; border:2px solid #6366f1; border-radius:8px; box-shadow:inset 0 1px 2px rgba(0,0,0,0.05);" placeholder="5, 10, etc.">
+                
+                <button type="button" onclick="stepPhotoCount(1)" style="width:38px; height:36px; border-radius:8px; background:#ffffff; border:1.5px solid #818cf8; color:#4338ca; font-size:20px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(79,70,229,0.15); transition:all 0.15s ease;" title="Badhayein (Increase 1 photo)">+</button>
+              </div>
+              <div style="font-size:10.5px; color:#64748b; margin-top:4px; font-weight:600; text-align:center;">
+                (जितनी फ़ोटो चाहिए यहाँ लिखें — जैसे 5, 8, 10 या + / − दबाएं)
+              </div>
+            </div>
+
+            <!-- Quick Preset Count Buttons -->
             <div id="presetCountButtons" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;">
-              <button type="button" class="btn btn-outline" id="btnCount_3" onclick="setPhotoCount(3)" style="padding:7px 2px; font-size:12px; font-weight:900; border-radius:8px; background:linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); color:#ffffff; border:2px solid #312e81; box-shadow:0 3px 10px rgba(79,70,229,0.35); cursor:pointer;">✓ 3 Photos</button>
-              <button type="button" class="btn btn-outline" id="btnCount_6" onclick="setPhotoCount(6)" style="padding:7px 2px; font-size:12px; font-weight:800; border-radius:8px; background:#ffffff; color:#334155; border:1.5px solid #cbd5e1; box-shadow:0 1px 3px rgba(0,0,0,0.05); cursor:pointer;">6 Photos</button>
-              <button type="button" class="btn btn-outline" id="btnCount_9" onclick="setPhotoCount(9)" style="padding:7px 2px; font-size:12px; font-weight:800; border-radius:8px; background:#ffffff; color:#334155; border:1.5px solid #cbd5e1; box-shadow:0 1px 3px rgba(0,0,0,0.05); cursor:pointer;">9 Photos</button>
+              <button type="button" class="btn btn-outline" id="btnCount_5" onclick="setPhotoCount(5)" style="padding:7px 2px; font-size:12px; font-weight:900; border-radius:8px; background:linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); color:#ffffff; border:2px solid #312e81; box-shadow:0 3px 10px rgba(79,70,229,0.35); cursor:pointer;">✓ 5 Photos</button>
+              <button type="button" class="btn btn-outline" id="btnCount_8" onclick="setPhotoCount(8)" style="padding:7px 2px; font-size:12px; font-weight:800; border-radius:8px; background:#ffffff; color:#334155; border:1.5px solid #cbd5e1; box-shadow:0 1px 3px rgba(0,0,0,0.05); cursor:pointer;">8 Photos</button>
+              <button type="button" class="btn btn-outline" id="btnCount_10" onclick="setPhotoCount(10)" style="padding:7px 2px; font-size:12px; font-weight:800; border-radius:8px; background:#ffffff; color:#334155; border:1.5px solid #cbd5e1; box-shadow:0 1px 3px rgba(0,0,0,0.05); cursor:pointer;">10 Photos</button>
               <button type="button" class="btn btn-outline" id="btnCount_12" onclick="setPhotoCount(12)" style="padding:7px 2px; font-size:12px; font-weight:800; border-radius:8px; background:#ffffff; color:#334155; border:1.5px solid #cbd5e1; box-shadow:0 1px 3px rgba(0,0,0,0.05); cursor:pointer;">12 (Full)</button>
             </div>
           </div>
@@ -3811,13 +3832,13 @@
 
       let defaultGrid = 'actual';
       let maxCount = 6;
-      let defaultCount = 3;
+      let defaultCount = 5;
 
       if (isIndianStandard) {
         // India Passport (35x45mm) defaults to studio 12 photos fit, with 3 photos default
         defaultGrid = '4x3';
         maxCount = 12;
-        defaultCount = 3;
+        defaultCount = 5;
       } else {
         // All other countries (US 51x51mm, Canada 50x70mm, Saudi 40x60mm, UAE 43x55mm, China 33x48mm)
         // MUST print at the EXACT physical millimeter dimensions user selected!
@@ -3829,7 +3850,7 @@
       if (defaultGrid === 'actual') {
         const m = getSheetMetrics();
         maxCount = m ? (m.cols * m.rows) : 6;
-        defaultCount = Math.min(3, maxCount);
+        defaultCount = Math.min(5, maxCount);
       }
 
       updateMaxPhotoCount(maxCount, false);
@@ -3867,27 +3888,27 @@
     if (maxCount <= 4) {
       presets = [1, 2, 3, maxCount];
     } else if (maxCount <= 6) {
-      presets = [2, 4, maxCount];
+      presets = [2, 4, 5, maxCount];
     } else if (maxCount <= 8) {
-      presets = [2, 4, 6, maxCount];
+      presets = [2, 4, 5, maxCount];
     } else if (maxCount <= 12) {
-      presets = [3, 6, 9, maxCount];
+      presets = [3, 5, 10, maxCount];
     } else if (maxCount === 15) {
       presets = [5, 10, 15];
     } else if (maxCount <= 16) {
-      presets = [4, 8, 12, maxCount];
+      presets = [5, 8, 12, maxCount];
     } else if (maxCount === 18) {
-      presets = [6, 12, 18];
+      presets = [5, 10, 15, maxCount];
     } else if (maxCount <= 20) {
       presets = [5, 10, 15, maxCount];
     } else if (maxCount <= 24) {
-      presets = [6, 12, 18, maxCount];
+      presets = [5, 10, 15, maxCount];
     } else if (maxCount <= 28) {
-      presets = [7, 14, 21, maxCount];
+      presets = [5, 10, 15, maxCount];
     } else if (maxCount <= 30) {
-      presets = [6, 12, 18, maxCount];
+      presets = [5, 10, 15, maxCount];
     } else if (maxCount <= 32) {
-      presets = [8, 16, 24, maxCount];
+      presets = [5, 10, 20, maxCount];
     } else if (maxCount <= 36) {
       presets = [9, 18, 27, maxCount];
     } else if (maxCount <= 40) {
@@ -3922,29 +3943,42 @@
 
   function updatePresetButtonStyles(num) {
     if (!currentPresetCounts || !currentPresetCounts.length) return;
-    currentPresetCounts.forEach(n => {
+    currentPresetCounts.forEach((n, idx) => {
       const btn = document.getElementById('btnCount_' + n);
       if (btn) {
+        const isFull = (idx === currentPresetCounts.length - 1);
+        const baseLabel = isFull ? `${n} (Full)` : `${n} Photos`;
         if (num === n) {
           btn.style.background = 'linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)';
           btn.style.borderColor = '#312e81';
           btn.style.color = '#ffffff';
           btn.style.boxShadow = '0 3px 10px rgba(79,70,229,0.35)';
           btn.style.fontWeight = '900';
-          btn.innerHTML = (n === 12) ? '✓ 12 (Full)' : `✓ ${n} Photos`;
+          btn.innerHTML = `✓ ${baseLabel}`;
         } else {
           btn.style.background = '#ffffff';
           btn.style.borderColor = '#cbd5e1';
           btn.style.color = '#334155';
           btn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
           btn.style.fontWeight = '800';
-          btn.innerHTML = (n === 12) ? '12 (Full)' : `${n} Photos`;
+          btn.innerHTML = baseLabel;
         }
       }
     });
   }
 
-  function setPhotoCount(count) {
+    function stepPhotoCount(delta) {
+    const input = document.getElementById('photoCount');
+    if (!input) return;
+    let val = parseInt(input.value) || 5;
+    val += delta;
+    if (val < 1) val = 1;
+    if (val > 60) val = 60;
+    input.value = val;
+    onPhotoCountChanged(val);
+  }
+
+function setPhotoCount(count) {
     const input = document.getElementById('photoCount');
     if (input) {
       input.value = count;
@@ -3987,7 +4021,7 @@
     // Update count display badge
     const badge = document.getElementById('photoCountDisplay');
     if (badge) {
-      badge.textContent = num + (num === 1 ? ' Photo' : ' Photos');
+      badge.textContent = (num === 5) ? '✓ 5 Photos (Default)' : `✓ ${num} Photos`;
     }
     
     // Update preset buttons active state
