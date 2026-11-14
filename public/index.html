@@ -1672,74 +1672,67 @@
   <!-- Step 2: Crop -->
   <div id="step-2" class="view-panel">
     <div class="editor-layout">
-      <!-- 1. Photo Stage First: Left Up-Down Slider, Photo in Middle, Right Zoom Slider, and Bottom Move Slider -->
-      <div class="canvas-container" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-        <div class="crop-stage-container">
-          <!-- Vertical Up-Down Photo Move Panel on the LEFT side of the photo -->
-          <div id="cropVMoveBar" class="crop-vertical-zoom-panel" title="Move Photo Up / Down (फोटो ऊपर-नीचे सरकाएं)">
-            <button type="button" class="vzoom-step-btn" onclick="nudgeCropPan(0, -10)" title="Move Photo Up (ऊपर सरकाएं)">
-              <i class="fa-solid fa-chevron-up"></i>
-            </button>
-            <span id="cropPanYBadgeCanvas" class="vzoom-badge" style="font-size:10px; min-width:40px;">0px</span>
+      <!-- 1. Photo Stage: Large Crisp Canvas + Biometric Guide + Modern Floating Toolbar -->
+      <div class="canvas-container" style="display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; min-height:540px; padding:20px 16px;">
+        
+        <!-- Live Status Bar -->
+        <div style="width:100%; max-width:520px; display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:12px; color:var(--text-muted); font-weight:700;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#4f46e5;"></span>
+            <span id="cropDimensionLabel">Live Frame: 35×45 mm (India Standard)</span>
+          </div>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#4f46e5; font-size:12px; font-weight:700; user-select:none;">
+            <input type="checkbox" id="biometricGuideCheckbox" checked onchange="toggleBiometricOverlay(this.checked)" style="accent-color:#4f46e5; cursor:pointer;">
+            <span>Biometric Guide (चेहरा गाइड)</span>
+          </label>
+        </div>
+
+        <!-- Crop Box (Center - Large & High Definition) -->
+        <div class="crop-stage-container" style="display:flex; align-items:center; justify-content:center; position:relative;">
+          <div id="cropWrapper" style="position:relative; overflow:hidden; border:3px solid #4f46e5; box-shadow: 0 12px 36px rgba(79, 70, 229, 0.22), 0 2px 10px rgba(0,0,0,0.08); border-radius:8px; background:#ffffff;">
+            <img id="cropImg" style="cursor:grab; transform-origin: top left; max-width: none !important; user-select:none; -webkit-user-drag:none;" />
             
-            <!-- Vertical Range Slider -->
-            <div style="height:140px; display:flex; align-items:center; justify-content:center; padding:6px 0;">
-              <input type="range" id="cropPanYSliderCanvas" orient="vertical" min="-300" max="300" value="0" step="2"
-                     style="writing-mode: vertical-lr; direction: rtl; appearance: slider-vertical; -webkit-appearance: slider-vertical; width: 18px; height: 130px; cursor: pointer; accent-color: var(--primary);"
-                     oninput="onCropPanSliderY(this.value)" title="Slide photo vertically (ऊपर-नीचे सरकाएं)">
-            </div>
-
-            <button type="button" class="vzoom-step-btn" onclick="nudgeCropPan(0, 10)" title="Move Photo Down (नीचे सरकाएं)">
-              <i class="fa-solid fa-chevron-down"></i>
-            </button>
-            <button type="button" class="vzoom-reset-btn" onclick="centerCropPhoto()" title="Center Photo (बीच में लाएं)">
-              <i class="fa-solid fa-crosshairs"></i>
-            </button>
-          </div>
-
-          <!-- Crop Box (Center) -->
-          <div id="cropWrapper" style="position:relative; overflow:hidden; border:2.5px solid #4f46e5; box-shadow: 0 8px 25px rgba(79, 70, 229, 0.18), 0 2px 8px rgba(0,0,0,0.06); border-radius:6px; background:#ffffff;">
-            <img id="cropImg" style="cursor:move; transform-origin: top left; max-width: none !important;" />
-          </div>
-
-          <!-- Vertical Zoom Slider widget directly on the right side of the photo -->
-          <div id="cropVZoomBar" class="crop-vertical-zoom-panel" title="Slide up to zoom in, slide down to zoom out">
-            <button type="button" class="vzoom-step-btn" onclick="stepZoom(10)" title="Zoom In (+10%)">
-              <i class="fa-solid fa-plus"></i>
-            </button>
-            <span id="vzoomPercentDisplay" class="vzoom-badge">100%</span>
-            <div id="vzoomTrack" class="vzoom-track-container" title="Drag knob up to zoom in, down to zoom out">
-              <div id="vzoomProgress" class="vzoom-track-fill"></div>
-              <div id="vzoomThumb" class="vzoom-thumb" tabindex="0" title="Slide Up/Down to Zoom">
-                <i class="fa-solid fa-up-down" style="font-size:10px; color:var(--primary);"></i>
+            <!-- Biometric Oval Overlay -->
+            <div id="biometricGuideOverlay" style="position:absolute; inset:0; pointer-events:none; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              <div style="width:58%; height:68%; border:2px dashed rgba(79, 70, 229, 0.7); border-radius: 50% 50% 48% 48% / 60% 60% 40% 40%; position:relative;">
+                <div style="position:absolute; top:42%; left:10%; right:10%; border-top:1.5px dashed rgba(239, 68, 68, 0.75);" title="Eye Level"></div>
+                <div style="position:absolute; bottom:12%; left:20%; right:20%; border-bottom:1.5px dashed rgba(16, 185, 129, 0.85);" title="Chin Level"></div>
+              </div>
+              <div style="position:absolute; bottom:6px; background:rgba(0,0,0,0.65); backdrop-filter:blur(6px); color:#ffffff; font-size:10px; font-weight:700; padding:2px 10px; border-radius:12px;">
+                Align eyes with red line & chin with green
               </div>
             </div>
-            <button type="button" class="vzoom-step-btn" onclick="stepZoom(-10)" title="Zoom Out (-10%)">
-              <i class="fa-solid fa-minus"></i>
+
+            <!-- Free-Size Dimension Badge -->
+            <div id="cropLiveBadge" style="position:absolute; top:8px; left:8px; background:rgba(79,70,229,0.92); backdrop-filter:blur(4px); color:white; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:6px; pointer-events:none; box-shadow:0 2px 6px rgba(0,0,0,0.15);">
+              350 × 450 px
+            </div>
+          </div>
+        </div>
+
+        <!-- Modern Sleek Floating Toolbar -->
+        <div id="cropModernToolbar" style="margin-top:16px; width:100%; max-width:520px; background:rgba(255, 255, 255, 0.98); backdrop-filter:blur(12px); border:1.5px solid #e2e8f0; border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,0.08), 0 2px 8px rgba(79,70,229,0.08); padding:10px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <!-- Zoom Controls -->
+          <div style="display:flex; align-items:center; gap:8px; flex:1;">
+            <button type="button" onclick="stepZoom(-10)" style="width:30px; height:30px; border-radius:8px; border:1px solid #cbd5e1; background:#f8fafc; font-weight:800; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#334155;" title="Zoom Out (-10%)">-</button>
+            <input type="range" id="modernZoomSlider" min="50" max="300" value="100" step="1" oninput="setZoomPercent(this.value)" style="flex:1; accent-color:var(--primary); cursor:pointer;">
+            <button type="button" onclick="stepZoom(10)" style="width:30px; height:30px; border-radius:8px; border:1px solid #cbd5e1; background:#f8fafc; font-weight:800; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#334155;" title="Zoom In (+10%)">+</button>
+            <span id="modernZoomBadge" style="font-size:11.5px; font-weight:800; color:var(--primary); background:#eef2ff; padding:3px 8px; border-radius:6px; min-width:44px; text-align:center;">100%</span>
+          </div>
+
+          <div style="height:22px; width:1px; background:#e2e8f0;"></div>
+
+          <!-- Quick Actions: Center & Reset -->
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button type="button" onclick="centerCropPhoto()" style="padding:6px 12px; border-radius:8px; border:1.5px solid #818cf8; background:#eef2ff; color:#3730a3; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:4px;" title="Center Photo (फोटो बीच में लाएं)">
+              <i class="fa-solid fa-crosshairs"></i> <span>Center</span>
             </button>
-            <button type="button" class="vzoom-reset-btn" onclick="resetZoom()" title="Reset to Fit">
-              <i class="fa-solid fa-rotate-left"></i>
+            <button type="button" onclick="resetCropPhotoScale()" style="padding:6px 12px; border-radius:8px; border:1.5px solid #cbd5e1; background:#ffffff; color:#475569; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:4px;" title="Reset Zoom">
+              <i class="fa-solid fa-rotate-left"></i> <span>Reset</span>
             </button>
           </div>
         </div>
 
-        <!-- Horizontal Move Slider under the photo -->
-        <div id="cropHMoveBar" class="crop-h-panel">
-          <span class="crop-h-label">
-            ↔️ Move:
-          </span>
-          <button type="button" class="vzoom-step-btn" onclick="nudgeCropPan(-10, 0)" title="Shift Left (बाएं सरकाएं)">
-            <i class="fa-solid fa-chevron-left"></i>
-          </button>
-          <input type="range" id="cropPanXSliderCanvas" min="-300" max="300" value="0" step="2" oninput="onCropPanSliderX(this.value)" title="Slide photo horizontally (बाएं-दाएं सरकाएं)">
-          <button type="button" class="vzoom-step-btn" onclick="nudgeCropPan(10, 0)" title="Shift Right (दाएं सरकाएं)">
-            <i class="fa-solid fa-chevron-right"></i>
-          </button>
-          <span id="cropPanXBadgeCanvas" class="crop-h-badge">0px</span>
-          <button type="button" class="vzoom-reset-btn" onclick="centerCropPhoto()" title="Center Photo (बीच में लाएं)">
-            <i class="fa-solid fa-crosshairs"></i>
-          </button>
-        </div>
       </div>
 
       <!-- 2. Settings Sidebar Below / Beside Photo Stage -->
@@ -1763,6 +1756,7 @@
               <option value="51x51">US Visa / OCI / Square (51×51 mm • 2×2 inch)</option>
               <option value="30x40">UAE Passport / Stamp Size (30×40 mm • 3×4 cm)</option>
               <option value="50.8x50.8">2×2 Inch Photo (50.8×50.8 mm • 2×2 in)</option>
+              <option value="free" style="color:#4f46e5; font-weight:800;">🔓 Free Size / Full Photo (फ्री साइज़)</option>
               <option value="custom">Custom Size (Custom mm / cm / inch)</option>
             </select>
           </div>
@@ -2483,6 +2477,12 @@
     const sideRange = document.getElementById('sidebarZoomRange');
     if (sideRange) sideRange.value = Math.round(currentZoomPercent);
 
+    const modernBadge = document.getElementById('modernZoomBadge');
+    if (modernBadge) modernBadge.textContent = Math.round(currentZoomPercent) + '%';
+
+    const modernSlider = document.getElementById('modernZoomSlider');
+    if (modernSlider) modernSlider.value = Math.round(currentZoomPercent);
+
     const vBadge = document.getElementById('vzoomPercentDisplay');
     if (vBadge) vBadge.textContent = Math.round(currentZoomPercent) + '%';
 
@@ -2494,6 +2494,18 @@
       vProgress.style.height = pct + '%';
       vThumb.style.bottom = pct + '%';
     }
+  }
+
+  function toggleBiometricOverlay(show) {
+    const overlay = document.getElementById('biometricGuideOverlay');
+    if (overlay) {
+      overlay.style.display = show ? 'flex' : 'none';
+    }
+  }
+
+  function resetCropPhotoScale() {
+    centerCropPhoto();
+    setZoomPercent(100);
   }
 
   function setZoomPercent(newPercent, preserveCenter = true) {
@@ -2839,7 +2851,25 @@
 
   function onCropSizePresetChange() {
     const size = document.getElementById('cropSize').value;
-    if (size === 'custom') {
+    if (size === 'custom' || size === 'free') {
+      if (size === 'free' && originalImage && originalImage.width && originalImage.height) {
+        // Auto-detect image aspect ratio for full free size
+        const aspect = originalImage.width / originalImage.height;
+        const baseH = 45;
+        const calcW = Math.round(baseH * aspect * 10) / 10;
+        const wInput = document.getElementById('cropW');
+        const hInput = document.getElementById('cropH');
+        if (currentCropUnit === 'mm') {
+          if (wInput) wInput.value = calcW;
+          if (hInput) hInput.value = baseH;
+        } else if (currentCropUnit === 'cm') {
+          if (wInput) wInput.value = (calcW / 10).toFixed(2);
+          if (hInput) hInput.value = (baseH / 10).toFixed(2);
+        } else if (currentCropUnit === 'inch') {
+          if (wInput) wInput.value = (calcW / 25.4).toFixed(2);
+          if (hInput) hInput.value = (baseH / 25.4).toFixed(2);
+        }
+      }
       updateCropBox(true);
       return;
     }
@@ -2863,24 +2893,39 @@
   function updateCropBox(isManual) {
     if (isManual) {
       const cropSizeSel = document.getElementById('cropSize');
-      if (cropSizeSel) cropSizeSel.value = 'custom';
+      if (cropSizeSel && cropSizeSel.value !== 'free') cropSizeSel.value = 'custom';
     }
     const w_mm = getCropWidthMM();
     const h_mm = getCropHeightMM();
 
     const wrap = document.getElementById('cropWrapper');
     if (!wrap) return;
-    // Scale for visual preview box (auto-adapts on mobile screens to preserve room for side sliding controls)
+
+    // Scale for visual preview box: Large, High-Definition & Free-size
     const isMobile = window.innerWidth && window.innerWidth < 768;
-    const maxAllowedW = isMobile ? Math.min(220, window.innerWidth - 96) : 280;
-    let visualMultiplier = 5;
+    const stageContainer = document.querySelector('.crop-stage-container') || document.querySelector('.canvas-container');
+    const containerW = stageContainer ? (stageContainer.clientWidth || (isMobile ? 320 : 600)) : (isMobile ? 320 : 600);
+    const maxAllowedW = isMobile ? Math.min(320, window.innerWidth - 40) : Math.min(520, Math.max(380, containerW - 40));
+    const maxAllowedH = isMobile ? 380 : 500;
+
+    let visualMultiplier = isMobile ? 8 : 10.5;
     if (w_mm * visualMultiplier > maxAllowedW) {
       visualMultiplier = maxAllowedW / w_mm;
     }
+    if (h_mm * visualMultiplier > maxAllowedH) {
+      visualMultiplier = maxAllowedH / h_mm;
+    }
+
     const visualW = Math.round(w_mm * visualMultiplier);
     const visualH = Math.round(h_mm * visualMultiplier);
     wrap.style.width = visualW + 'px';
     wrap.style.height = visualH + 'px';
+
+    // Update Live Badges & Dimension Labels
+    const dimBadge = document.getElementById('cropLiveBadge');
+    if (dimBadge) dimBadge.textContent = visualW + ' × ' + visualH + ' px HD';
+    const dimLabel = document.getElementById('cropDimensionLabel');
+    if (dimLabel) dimLabel.textContent = 'Live Frame: ' + w_mm + '×' + h_mm + ' mm (' + visualW + '×' + visualH + ' px HD)';
 
     // Auto-scale to fit nicely initially
     if (originalImage.width && originalImage.height) {
