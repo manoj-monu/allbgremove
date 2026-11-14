@@ -953,6 +953,7 @@
     }
   }
 </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body class="overflow-x-hidden">
 
@@ -1109,7 +1110,29 @@
 
         </div>
 
+        
+        <!-- 1-Click Quick Preset Chips for Cyber Cafes & CSC Centers -->
+        <div class="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-5">
+          <button type="button" onclick="selectQuickPreset('4x6_3')" class="px-3.5 py-1.5 rounded-full bg-white hover:bg-purple-50 border border-purple-200 text-[#7d2ae8] text-xs font-bold shadow-xs hover:shadow-md transition flex items-center gap-1.5 cursor-pointer">
+            <span class="w-2 h-2 rounded-full bg-[#7d2ae8]"></span>
+            <span>🇮🇳 3 Photos (4x6 Sheet)</span>
+          </button>
+          <button type="button" onclick="selectQuickPreset('4x6_6')" class="px-3.5 py-1.5 rounded-full bg-white hover:bg-purple-50 border border-purple-200 text-[#7d2ae8] text-xs font-bold shadow-xs hover:shadow-md transition flex items-center gap-1.5 cursor-pointer">
+            <span class="w-2 h-2 rounded-full bg-[#8b3dff]"></span>
+            <span>🇮🇳 6 Photos (4x6 Sheet)</span>
+          </button>
+          <button type="button" onclick="selectQuickPreset('a4_30')" class="px-3.5 py-1.5 rounded-full bg-white hover:bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold shadow-xs hover:shadow-md transition flex items-center gap-1.5 cursor-pointer">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>📄 30 Photos (A4 Sheet)</span>
+          </button>
+          <button type="button" onclick="selectQuickPreset('bg_only')" class="px-3.5 py-1.5 rounded-full bg-white hover:bg-cyan-50 border border-cyan-200 text-[#00c4cc] text-xs font-bold shadow-xs hover:shadow-md transition flex items-center gap-1.5 cursor-pointer">
+            <span class="w-2 h-2 rounded-full bg-[#00c4cc]"></span>
+            <span>✂ 1-Click Cutout Only</span>
+          </button>
+        </div>
+
         <!-- Canva Large Creative Studio Card (Dropzone & Action Box) -->
+
         <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-200/80 max-w-3xl mx-auto relative group">
           
           <div onclick="document.getElementById('fileIn').click()" class="border-2 border-dashed border-purple-300 hover:border-[#7d2ae8] bg-gradient-to-b from-purple-50/30 to-white hover:bg-purple-50/60 rounded-2xl p-8 sm:p-12 text-center transition duration-300 cursor-pointer">
@@ -1321,7 +1344,138 @@
       </div>
     </section>
 
-    <!-- Canva-Style Pricing (INR ₹) -->
+    
+    <!-- Live Draggable Before / After Slider Section (Canva Inspired) -->
+    <section class="py-14 sm:py-20 bg-white border-t border-slate-200/80">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+        
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-100 text-[#7d2ae8] text-xs font-extrabold mb-3">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Live AI Cutout Demonstration
+        </div>
+        <h2 class="text-2xl sm:text-4xl font-black text-[#0e1318] mb-3">
+          Slide to see the AI magic
+        </h2>
+        <p class="text-slate-500 text-xs sm:text-base mb-8 max-w-lg mx-auto">
+          Drag the center handle horizontally to compare the original photo with the official biometric cutout.
+        </p>
+
+        <!-- Draggable Slider Container -->
+        <div id="sliderWrapper" class="relative max-w-xl mx-auto rounded-3xl overflow-hidden shadow-2xl border-2 border-slate-200 select-none cursor-ew-resize aspect-[4/3] bg-slate-900 group">
+          
+          <!-- After Image (Clean White Studio Background) -->
+          <img src="assets/landing/hero_model_hd.png" class="absolute inset-0 w-full h-full object-cover pointer-events-none" alt="After Cutout">
+          
+          <!-- Badge: After -->
+          <div class="absolute top-4 right-4 bg-gradient-to-r from-[#7d2ae8] to-[#00c4cc] text-white text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-lg z-20 pointer-events-none">
+            After: 35×45mm Studio HD
+          </div>
+
+          <!-- Before Image (Overlay clipped with slider) -->
+          <div id="sliderBeforeClip" class="absolute inset-0 overflow-hidden pointer-events-none z-10" style="width: 50%;">
+            <img src="assets/landing/hero_model_hd.png" class="absolute inset-0 w-full h-full object-cover filter contrast-90 brightness-95" style="max-width: none; width: 100%; height: 100%;" alt="Before Cutout">
+            <div class="absolute top-4 left-4 bg-slate-900/85 text-white text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-lg">
+              Before: Original Selfie
+            </div>
+          </div>
+
+          <!-- Draggable Divider Line & Handle -->
+          <div id="sliderHandle" class="absolute top-0 bottom-0 z-30 flex items-center justify-center pointer-events-none" style="left: 50%; transform: translateX(-50%);">
+            <div class="w-1 bg-white h-full shadow-[0_0_12px_rgba(0,0,0,0.6)]"></div>
+            <div class="absolute w-11 h-11 rounded-full bg-white text-[#7d2ae8] shadow-2xl flex items-center justify-center font-black text-sm border-2 border-[#7d2ae8] group-hover:scale-110 transition duration-200">
+              <i class="fa-solid fa-arrows-left-right text-xs"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Micro Drag Instruction -->
+        <p class="text-xs text-slate-400 mt-4 flex items-center justify-center gap-1.5 font-medium">
+          <i class="fa-solid fa-hand-pointer text-xs text-[#7d2ae8]"></i> Drag or swipe horizontally to see real-time background removal
+        </p>
+
+      </div>
+    </section>
+
+    <!-- Canva-Style Comparison Table (Why AllBGRemove is #1) -->
+    <section class="py-16 sm:py-20 bg-[#f8f9fa] border-t border-slate-200/80">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+        
+        <span class="text-xs font-black uppercase tracking-wider text-[#7d2ae8]">Proven Superiority</span>
+        <h2 class="text-2xl sm:text-4xl font-black text-[#0e1318] mb-3 mt-1">
+          Why AllBGRemove is the #1 Choice
+        </h2>
+        <p class="text-slate-500 text-xs sm:text-base mb-10 max-w-lg mx-auto">
+          See why over 10,000+ CSC centers, cyber cafes, and applicants trust us over others.
+        </p>
+
+        <div class="bg-white rounded-3xl overflow-hidden border border-slate-200/90 shadow-xl text-left">
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs sm:text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-slate-700">
+                  <th class="py-4 px-4 sm:px-6 font-extrabold text-left">Feature / Tool</th>
+                  <th class="py-4 px-3 sm:px-5 font-black text-[#7d2ae8] bg-purple-50/80 border-x border-purple-100 text-center">
+                    AllBGRemove.com ✨
+                  </th>
+                  <th class="py-4 px-3 sm:px-5 font-bold text-slate-400 text-center">
+                    Remove.bg / Cutout.pro
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr>
+                  <td class="py-4 px-4 sm:px-6 font-bold text-slate-800">100% Free Single Photo Downloads</td>
+                  <td class="py-4 px-3 sm:px-5 text-center font-black text-emerald-600 bg-purple-50/30 border-x border-purple-100">
+                    <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600"></i> Free (No Watermark)</span>
+                  </td>
+                  <td class="py-4 px-3 sm:px-5 text-center text-slate-400 font-semibold">
+                    <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark text-rose-400"></i> Paid Credits ($0.99+)</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="py-4 px-4 sm:px-6 font-bold text-slate-800">Ready 4×6" &amp; A4 Print Sheets</td>
+                  <td class="py-4 px-3 sm:px-5 text-center font-black text-emerald-600 bg-purple-50/30 border-x border-purple-100">
+                    <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600"></i> 3, 6, 12, 30 Photos</span>
+                  </td>
+                  <td class="py-4 px-3 sm:px-5 text-center text-slate-400 font-semibold">
+                    <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark text-rose-400"></i> Not Supported</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="py-4 px-4 sm:px-6 font-bold text-slate-800">Official Indian Passport (35×45mm)</td>
+                  <td class="py-4 px-3 sm:px-5 text-center font-black text-emerald-600 bg-purple-50/30 border-x border-purple-100">
+                    <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600"></i> Strict Biometric Guides</span>
+                  </td>
+                  <td class="py-4 px-3 sm:px-5 text-center text-slate-400 font-semibold">
+                    <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark text-rose-400"></i> Manual Crop Only</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="py-4 px-4 sm:px-6 font-bold text-slate-800">Lab Quality 300 &amp; 600 DPI Export</td>
+                  <td class="py-4 px-3 sm:px-5 text-center font-black text-emerald-600 bg-purple-50/30 border-x border-purple-100">
+                    <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600"></i> Included Free</span>
+                  </td>
+                  <td class="py-4 px-3 sm:px-5 text-center text-slate-400 font-semibold">
+                    <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark text-rose-400"></i> Low-Res Only (0.25 MP)</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="py-4 px-4 sm:px-6 font-bold text-slate-800">1-Click Auto Enhance &amp; Lighting</td>
+                  <td class="py-4 px-3 sm:px-5 text-center font-black text-emerald-600 bg-purple-50/30 border-x border-purple-100">
+                    <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600"></i> 1-Click Studio Magic</span>
+                  </td>
+                  <td class="py-4 px-3 sm:px-5 text-center text-slate-400 font-semibold">
+                    <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark text-rose-400"></i> Extra Charge</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+<!-- Canva-Style Pricing (INR ₹) -->
     <section id="pricing" class="py-16 bg-white border-t border-slate-200/80">
       <div class="max-w-5xl mx-auto px-4 text-center">
         
@@ -4012,10 +4166,128 @@ function setPhotoCount(count) {
             body { margin: 0; display:flex; justify-content:center; align-items:center; background:#fff; }
             img { width: 100%; height: 100%; object-fit: contain; }
           </style>
-        </head>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
         <body>
           <img src="${dataUrl}" onload="window.print(); window.close();" />
-        </body>
+        
+<script>
+// Quick Presets from Landing Page
+window.selectedQuickPreset = null;
+function selectQuickPreset(preset) {
+  window.selectedQuickPreset = preset;
+  document.getElementById('fileIn').click();
+}
+
+// Interactive Before/After Split Slider on Landing Page
+function setupBeforeAfterSlider() {
+  const wrapper = document.getElementById('sliderWrapper');
+  const clip = document.getElementById('sliderBeforeClip');
+  const handle = document.getElementById('sliderHandle');
+  if (!wrapper || !clip || !handle) return;
+  
+  let isDown = false;
+  
+  function updateSlider(clientX) {
+    const rect = wrapper.getBoundingClientRect();
+    let pos = ((clientX - rect.left) / rect.width) * 100;
+    if (pos < 5) pos = 5;
+    if (pos > 95) pos = 95;
+    clip.style.width = pos + '%';
+    handle.style.left = pos + '%';
+  }
+  
+  wrapper.addEventListener('mousedown', (e) => { isDown = true; updateSlider(e.clientX); });
+  window.addEventListener('mouseup', () => { isDown = false; });
+  window.addEventListener('mousemove', (e) => { if (isDown) updateSlider(e.clientX); });
+  
+  wrapper.addEventListener('touchstart', (e) => { isDown = true; updateSlider(e.touches[0].clientX); }, { passive: true });
+  window.addEventListener('touchend', () => { isDown = false; });
+  window.addEventListener('touchmove', (e) => { if (isDown) updateSlider(e.touches[0].clientX); }, { passive: true });
+}
+
+// Studio Lighting Presets in Step 4
+function applyLightingPreset(preset) {
+  const bSlider = document.getElementById('bright');
+  const cSlider = document.getElementById('contrast');
+  const sSlider = document.getElementById('sat');
+  if (!bSlider || !cSlider || !sSlider) return;
+  
+  if (preset === 'studio_white') {
+    bSlider.value = 108;
+    cSlider.value = 114;
+    sSlider.value = 102;
+  } else if (preset === 'soft_warm') {
+    bSlider.value = 105;
+    cSlider.value = 108;
+    sSlider.value = 112;
+  } else if (preset === 'ultra_sharp') {
+    bSlider.value = 104;
+    cSlider.value = 120;
+    sSlider.value = 106;
+  }
+  
+  const bVal = document.getElementById('bVal');
+  const cVal = document.getElementById('cVal');
+  const sVal = document.getElementById('sVal');
+  if (bVal) bVal.innerText = bSlider.value + '%';
+  if (cVal) cVal.innerText = cSlider.value + '%';
+  if (sVal) sVal.innerText = sSlider.value + '%';
+  
+  if (typeof drawAdjust === 'function') drawAdjust();
+}
+
+// 1-Click Download as PDF in Step 5
+async function downloadSheetPDF() {
+  const canvas = document.getElementById('sheetCanvas');
+  if (!canvas) {
+    alert("Canvas not ready for PDF export.");
+    return;
+  }
+  
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    alert("PDF library loading. Please wait a second and try again.");
+    return;
+  }
+  
+  const paper = (document.getElementById('paperSize')?.value || '4x6').toLowerCase();
+  const { jsPDF } = window.jspdf;
+  
+  let orientation = 'portrait';
+  let format = [102, 152]; // 4x6 inch in mm
+  
+  if (paper.includes('a4')) {
+    format = 'a4';
+    orientation = paper.includes('landscape') ? 'landscape' : 'portrait';
+  } else if (paper.includes('4x6')) {
+    format = [102, 152];
+    orientation = paper.includes('landscape') ? 'landscape' : 'portrait';
+  } else if (paper.includes('12x6')) {
+    format = [152, 305];
+    orientation = 'landscape';
+  }
+  
+  const doc = new jsPDF({
+    orientation: orientation,
+    unit: 'mm',
+    format: format
+  });
+  
+  const imgData = canvas.toDataURL('image/jpeg', 0.98);
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  
+  doc.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+  doc.save(`passport_photo_sheet_${paper}_${Date.now()}.pdf`);
+}
+
+// Hook into DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+  setupBeforeAfterSlider();
+});
+</script>
+</body>
+
       </html>
     `);
     printWin.document.close();
@@ -5756,5 +6028,122 @@ function setPhotoCount(count) {
     <span id="protectToastText">🔒 Right-click & Copying disabled. Please login to download clean photo.</span>
   </div>
 
+
+<script>
+// Quick Presets from Landing Page
+window.selectedQuickPreset = null;
+function selectQuickPreset(preset) {
+  window.selectedQuickPreset = preset;
+  document.getElementById('fileIn').click();
+}
+
+// Interactive Before/After Split Slider on Landing Page
+function setupBeforeAfterSlider() {
+  const wrapper = document.getElementById('sliderWrapper');
+  const clip = document.getElementById('sliderBeforeClip');
+  const handle = document.getElementById('sliderHandle');
+  if (!wrapper || !clip || !handle) return;
+  
+  let isDown = false;
+  
+  function updateSlider(clientX) {
+    const rect = wrapper.getBoundingClientRect();
+    let pos = ((clientX - rect.left) / rect.width) * 100;
+    if (pos < 5) pos = 5;
+    if (pos > 95) pos = 95;
+    clip.style.width = pos + '%';
+    handle.style.left = pos + '%';
+  }
+  
+  wrapper.addEventListener('mousedown', (e) => { isDown = true; updateSlider(e.clientX); });
+  window.addEventListener('mouseup', () => { isDown = false; });
+  window.addEventListener('mousemove', (e) => { if (isDown) updateSlider(e.clientX); });
+  
+  wrapper.addEventListener('touchstart', (e) => { isDown = true; updateSlider(e.touches[0].clientX); }, { passive: true });
+  window.addEventListener('touchend', () => { isDown = false; });
+  window.addEventListener('touchmove', (e) => { if (isDown) updateSlider(e.touches[0].clientX); }, { passive: true });
+}
+
+// Studio Lighting Presets in Step 4
+function applyLightingPreset(preset) {
+  const bSlider = document.getElementById('bright');
+  const cSlider = document.getElementById('contrast');
+  const sSlider = document.getElementById('sat');
+  if (!bSlider || !cSlider || !sSlider) return;
+  
+  if (preset === 'studio_white') {
+    bSlider.value = 108;
+    cSlider.value = 114;
+    sSlider.value = 102;
+  } else if (preset === 'soft_warm') {
+    bSlider.value = 105;
+    cSlider.value = 108;
+    sSlider.value = 112;
+  } else if (preset === 'ultra_sharp') {
+    bSlider.value = 104;
+    cSlider.value = 120;
+    sSlider.value = 106;
+  }
+  
+  const bVal = document.getElementById('bVal');
+  const cVal = document.getElementById('cVal');
+  const sVal = document.getElementById('sVal');
+  if (bVal) bVal.innerText = bSlider.value + '%';
+  if (cVal) cVal.innerText = cSlider.value + '%';
+  if (sVal) sVal.innerText = sSlider.value + '%';
+  
+  if (typeof drawAdjust === 'function') drawAdjust();
+}
+
+// 1-Click Download as PDF in Step 5
+async function downloadSheetPDF() {
+  const canvas = document.getElementById('sheetCanvas');
+  if (!canvas) {
+    alert("Canvas not ready for PDF export.");
+    return;
+  }
+  
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    alert("PDF library loading. Please wait a second and try again.");
+    return;
+  }
+  
+  const paper = (document.getElementById('paperSize')?.value || '4x6').toLowerCase();
+  const { jsPDF } = window.jspdf;
+  
+  let orientation = 'portrait';
+  let format = [102, 152]; // 4x6 inch in mm
+  
+  if (paper.includes('a4')) {
+    format = 'a4';
+    orientation = paper.includes('landscape') ? 'landscape' : 'portrait';
+  } else if (paper.includes('4x6')) {
+    format = [102, 152];
+    orientation = paper.includes('landscape') ? 'landscape' : 'portrait';
+  } else if (paper.includes('12x6')) {
+    format = [152, 305];
+    orientation = 'landscape';
+  }
+  
+  const doc = new jsPDF({
+    orientation: orientation,
+    unit: 'mm',
+    format: format
+  });
+  
+  const imgData = canvas.toDataURL('image/jpeg', 0.98);
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  
+  doc.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+  doc.save(`passport_photo_sheet_${paper}_${Date.now()}.pdf`);
+}
+
+// Hook into DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+  setupBeforeAfterSlider();
+});
+</script>
 </body>
+
 </html>
