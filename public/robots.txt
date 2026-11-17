@@ -2,4 +2,20 @@ User-agent: *
 Allow: /
 Disallow: /admin.html
 
+User-agent: Googlebot
+Allow: /
+Allow: /assets/
+Allow: /public/
+
+User-agent: Googlebot-Image
+Allow: /assets/
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.webp$
+
+User-agent: Bingbot
+Allow: /
+
 Sitemap: https://allbgremove.com/sitemap.xml
+Host: https://allbgremove.com
