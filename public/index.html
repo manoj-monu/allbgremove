@@ -1313,22 +1313,22 @@
         </p>
 
         <!-- Draggable Slider Container -->
-        <div id="sliderWrapper" class="relative max-w-xl mx-auto rounded-3xl overflow-hidden shadow-2xl border-2 border-slate-200 select-none cursor-ew-resize aspect-[4/3] bg-slate-900 group">
+        <div id="sliderWrapper" class="relative max-w-md mx-auto rounded-3xl overflow-hidden shadow-2xl border-2 border-slate-200 select-none cursor-ew-resize aspect-[4/5] bg-white group">
           
-          <!-- After Image (Clean White Studio Background) -->
-          <img src="assets/landing/hero_model_hd.png" class="absolute inset-0 w-full h-full object-cover pointer-events-none" alt="After Cutout">
+          <!-- After Image (Clean White Studio Background - Bottom Layer) -->
+          <img src="assets/slider_after.jpg" class="absolute inset-0 w-full h-full object-cover pointer-events-none" alt="After Cutout">
           
           <!-- Badge: After -->
           <div class="absolute top-4 right-4 bg-gradient-to-r from-[#7d2ae8] to-[#00c4cc] text-white text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-lg z-20 pointer-events-none">
             After: 35×45mm Studio HD
           </div>
 
-          <!-- Before Image (Overlay clipped with slider) -->
-          <div id="sliderBeforeClip" class="absolute inset-0 overflow-hidden pointer-events-none z-10" style="width: 50%;">
-            <img src="assets/landing/hero_model_hd.png" class="absolute inset-0 w-full h-full object-cover filter contrast-90 brightness-95" style="max-width: none; width: 100%; height: 100%;" alt="Before Cutout">
-            <div class="absolute top-4 left-4 bg-slate-900/85 text-white text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-lg">
-              Before: Original Selfie
-            </div>
+          <!-- Before Image (Original Background - Top Layer with clip-path) -->
+          <img id="sliderBeforeImg" src="assets/slider_before.jpg" class="absolute inset-0 w-full h-full object-cover pointer-events-none z-10" style="clip-path: inset(0 50% 0 0); -webkit-clip-path: inset(0 50% 0 0);" alt="Before Selfie">
+          
+          <!-- Badge: Before -->
+          <div class="absolute top-4 left-4 bg-slate-900/85 text-white text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-lg z-20 pointer-events-none">
+            Before: Original Selfie
           </div>
 
           <!-- Draggable Divider Line & Handle -->
@@ -5875,18 +5875,20 @@ function selectQuickPreset(preset) {
 // Interactive Before/After Split Slider on Landing Page
 function setupBeforeAfterSlider() {
   const wrapper = document.getElementById('sliderWrapper');
-  const clip = document.getElementById('sliderBeforeClip');
+  const beforeImg = document.getElementById('sliderBeforeImg');
   const handle = document.getElementById('sliderHandle');
-  if (!wrapper || !clip || !handle) return;
+  if (!wrapper || !beforeImg || !handle) return;
   
   let isDown = false;
   
   function updateSlider(clientX) {
     const rect = wrapper.getBoundingClientRect();
     let pos = ((clientX - rect.left) / rect.width) * 100;
-    if (pos < 5) pos = 5;
-    if (pos > 95) pos = 95;
-    clip.style.width = pos + '%';
+    if (pos < 2) pos = 2;
+    if (pos > 98) pos = 98;
+    const clipVal = `inset(0 ${100 - pos}% 0 0)`;
+    beforeImg.style.clipPath = clipVal;
+    beforeImg.style.webkitClipPath = clipVal;
     handle.style.left = pos + '%';
   }
   
