@@ -1723,8 +1723,69 @@
           </div>
           
           <div class="form-group" style="margin-top:16px; margin-bottom:14px;">
-            <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:6px; display:block;">CUSTOM COLOR PICKER</label>
-            <input type="color" id="bgColor" value="#ffffff" oninput="applyBgColor()" style="height:46px; padding:4px 8px; cursor:pointer; border-radius:10px;">
+            <label style="font-size:12px; font-weight:800; color:var(--text); margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
+              <span><i class="fa-solid fa-palette text-primary mr-1"></i> CUSTOM COLOR PICKER (कलर चुनें)</span>
+              <span id="currentColorHex" style="font-family:monospace; font-size:11px; background:#f1f5f9; padding:2px 8px; border-radius:6px; color:#475569; font-weight:700;">#FFFFFF</span>
+            </label>
+
+            <!-- Visual Rainbow Spectrum Box (All colors clearly visible in front!) -->
+            <div onclick="document.getElementById('bgColor').click()" style="cursor:pointer; border:2px solid #cbd5e1; border-radius:12px; padding:10px; background:#ffffff; box-shadow:0 2px 6px rgba(0,0,0,0.04); transition:all 0.2s;" onmouseover="this.style.borderColor='#7d2ae8'" onmouseout="this.style.borderColor='#cbd5e1'">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div id="currentColorPreview" style="width:26px; height:26px; border-radius:8px; border:2px solid #ffffff; box-shadow:0 0 0 1px #cbd5e1, 0 2px 5px rgba(0,0,0,0.15); background:#ffffff;"></div>
+                  <span style="font-size:12px; font-weight:800; color:#1e293b;">Click to Pick Any Color</span>
+                </div>
+                <div style="background:#7d2ae8; color:white; font-size:11px; font-weight:800; padding:4px 10px; border-radius:6px; display:flex; align-items:center; gap:5px;">
+                  <i class="fa-solid fa-eye-dropper text-[10px]"></i> Color Picker
+                </div>
+              </div>
+
+              <!-- Full Continuous Rainbow Spectrum Strip -->
+              <div style="height:32px; border-radius:8px; background:linear-gradient(to right, #ff0000 0%, #ff7700 12%, #ffdd00 24%, #00e000 36%, #00d4ff 50%, #0044ff 64%, #8800ff 78%, #ff00aa 90%, #ff0000 100%); border:1px solid rgba(0,0,0,0.15); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                <span style="font-size:11px; font-weight:800; color:white; text-shadow:0 1px 3px rgba(0,0,0,0.85); letter-spacing:0.4px;">
+                  🌈 Click here to pick any custom shade (कलर चुनें)
+                </span>
+              </div>
+              <input type="color" id="bgColor" value="#ffffff" oninput="onCustomColorInput(this.value)" style="position:absolute; opacity:0; width:0; height:0; pointer-events:none;">
+            </div>
+
+            <!-- All Colors Palette (24 Vibrant & Official Swatches visible in front) -->
+            <div style="margin-top:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px;">
+              <div style="font-size:11px; font-weight:800; color:#64748b; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">
+                All Colors Palette (सामने सभी रंग चुनें):
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(8, 1fr); gap:6px;">
+                <!-- Row 1: Whites & Grays -->
+                <button type="button" data-color="#ffffff" title="Pure White" onclick="setBg('#ffffff')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#ffffff; border:1.5px solid #cbd5e1; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05);"></button>
+                <button type="button" data-color="#f8fafc" title="Off-White" onclick="setBg('#f8fafc')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#f8fafc; border:1.5px solid #cbd5e1; cursor:pointer;"></button>
+                <button type="button" data-color="#e2e8f0" title="Light Gray" onclick="setBg('#e2e8f0')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#e2e8f0; border:1.5px solid #94a3b8; cursor:pointer;"></button>
+                <button type="button" data-color="#94a3b8" title="Slate Gray" onclick="setBg('#94a3b8')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#94a3b8; border:1.5px solid #64748b; cursor:pointer;"></button>
+                <button type="button" data-color="#475569" title="Dark Slate" onclick="setBg('#475569')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#475569; border:1.5px solid #1e293b; cursor:pointer;"></button>
+                <button type="button" data-color="#0f172a" title="Jet Black" onclick="setBg('#0f172a')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#0f172a; border:1.5px solid #020617; cursor:pointer;"></button>
+                <button type="button" data-color="#fef08a" title="Soft Yellow" onclick="setBg('#fef08a')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#fef08a; border:1.5px solid #eab308; cursor:pointer;"></button>
+                <button type="button" data-color="#f97316" title="Bright Orange" onclick="setBg('#f97316')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#f97316; border:1.5px solid #c2410c; cursor:pointer;"></button>
+
+                <!-- Row 2: Blues & Cyans -->
+                <button type="button" data-color="#e0f2fe" title="Ice Blue" onclick="setBg('#e0f2fe')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#e0f2fe; border:1.5px solid #38bdf8; cursor:pointer;"></button>
+                <button type="button" data-color="#93c5fd" title="Sky Blue" onclick="setBg('#93c5fd')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#93c5fd; border:1.5px solid #60a5fa; cursor:pointer;"></button>
+                <button type="button" data-color="#38bdf8" title="Cyan Blue" onclick="setBg('#38bdf8')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#38bdf8; border:1.5px solid #0284c7; cursor:pointer;"></button>
+                <button type="button" data-color="#2563eb" title="Passport Blue" onclick="setBg('#2563eb')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#2563eb; border:1.5px solid #1d4ed8; cursor:pointer;"></button>
+                <button type="button" data-color="#1d4ed8" title="Royal Blue" onclick="setBg('#1d4ed8')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#1d4ed8; border:1.5px solid #1e40af; cursor:pointer;"></button>
+                <button type="button" data-color="#1e3a8a" title="Navy Blue" onclick="setBg('#1e3a8a')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#1e3a8a; border:1.5px solid #172554; cursor:pointer;"></button>
+                <button type="button" data-color="#312e81" title="Deep Indigo" onclick="setBg('#312e81')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#312e81; border:1.5px solid #1e1b4b; cursor:pointer;"></button>
+                <button type="button" data-color="#6366f1" title="Periwinkle" onclick="setBg('#6366f1')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#6366f1; border:1.5px solid #4338ca; cursor:pointer;"></button>
+
+                <!-- Row 3: Reds, Greens & Purples -->
+                <button type="button" data-color="#a7f3d0" title="Mint Green" onclick="setBg('#a7f3d0')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#a7f3d0; border:1.5px solid #34d399; cursor:pointer;"></button>
+                <button type="button" data-color="#10b981" title="Emerald Green" onclick="setBg('#10b981')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#10b981; border:1.5px solid #059669; cursor:pointer;"></button>
+                <button type="button" data-color="#047857" title="Forest Green" onclick="setBg('#047857')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#047857; border:1.5px solid #064e3b; cursor:pointer;"></button>
+                <button type="button" data-color="#fecdd3" title="Soft Pink" onclick="setBg('#fecdd3')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#fecdd3; border:1.5px solid #fb7185; cursor:pointer;"></button>
+                <button type="button" data-color="#f43f5e" title="Rose Red" onclick="setBg('#f43f5e')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#f43f5e; border:1.5px solid #e11d48; cursor:pointer;"></button>
+                <button type="button" data-color="#dc2626" title="Passport Red" onclick="setBg('#dc2626')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#dc2626; border:1.5px solid #b91c1c; cursor:pointer;"></button>
+                <button type="button" data-color="#7f1d1d" title="Dark Maroon" onclick="setBg('#7f1d1d')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#7f1d1d; border:1.5px solid #450a0a; cursor:pointer;"></button>
+                <button type="button" data-color="#7d2ae8" title="Canva Purple" onclick="setBg('#7d2ae8')" class="color-swatch-btn" style="height:28px; border-radius:6px; background:#7d2ae8; border:1.5px solid #6b21a8; cursor:pointer;"></button>
+              </div>
+            </div>
           </div>
           
           <div style="margin-top:14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px;">
@@ -3131,8 +3192,33 @@
     applyBgColor();
   }
 
+  function updateColorPickerUI(color) {
+    const preview = document.getElementById('currentColorPreview');
+    const hex = document.getElementById('currentColorHex');
+    if (preview) preview.style.background = color;
+    if (hex) hex.innerText = color.toUpperCase();
+    
+    document.querySelectorAll('.color-swatch-btn').forEach(btn => {
+      if (btn.getAttribute('data-color')?.toLowerCase() === color.toLowerCase()) {
+        btn.style.outline = '3px solid #7d2ae8';
+        btn.style.outlineOffset = '2px';
+        btn.style.transform = 'scale(1.1)';
+      } else {
+        btn.style.outline = 'none';
+        btn.style.transform = 'none';
+      }
+    });
+  }
+
+  function onCustomColorInput(color) {
+    updateColorPickerUI(color);
+    applyBgColor();
+  }
+
   function setBg(color) {
-    document.getElementById('bgColor').value = color;
+    const el = document.getElementById('bgColor');
+    if (el) el.value = color;
+    updateColorPickerUI(color);
     applyBgColor();
   }
 
